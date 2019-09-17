@@ -1,6 +1,5 @@
 #pragma once
 #include "Module.h"
-#include "p2DynArray.h"
 #include "Globals.h"
 #include "Primitive.h"
 
@@ -16,7 +15,7 @@ public:
 	~ModuleSceneIntro();
 
 	bool Start();
-	update_status Update(float dt);
+	bool Update(float dt);
 	bool CleanUp();
 
 	void OnCollision(PhysBody3D* body1, PhysBody3D* body2);

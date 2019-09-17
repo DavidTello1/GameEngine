@@ -8,6 +8,7 @@
 ModulePlayer::ModulePlayer(Application* app, bool start_enabled) : Module(app, start_enabled), vehicle(NULL)
 {
 	turn = acceleration = brake = 0.0f;
+	name = "Player";
 }
 
 ModulePlayer::~ModulePlayer()
@@ -111,7 +112,7 @@ bool ModulePlayer::CleanUp()
 }
 
 // Update: draw background
-update_status ModulePlayer::Update(float dt)
+bool ModulePlayer::Update(float dt)
 {
 	turn = acceleration = brake = 0.0f;
 
@@ -147,7 +148,7 @@ update_status ModulePlayer::Update(float dt)
 	sprintf_s(title, "%.1f Km/h", vehicle->GetKmh());
 	App->window->SetTitle(title);
 
-	return UPDATE_CONTINUE;
+	return true;
 }
 
 

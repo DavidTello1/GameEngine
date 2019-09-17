@@ -20,8 +20,10 @@ public:
 	~ModuleInput();
 
 	bool Init();
-	update_status PreUpdate(float dt);
+	bool PreUpdate(float dt);
 	bool CleanUp();
+
+	bool quit;
 
 	KEY_STATE GetKey(int id) const
 	{

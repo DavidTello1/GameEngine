@@ -32,38 +32,46 @@ Application::Application()
 
 Application::~Application()
 {
-	p2List_item<Module*>* item = list_modules.getLast();
+	modules.clear();
 
-	while(item != NULL)
+	/* I think its enough doing so ^ http://www.cplusplus.com/reference/list/list/clear/
+	
+	std::list<Module*>::iterator item = list_modules.end();
+
+	while(item != list_modules.begin())
 	{
-		delete item->data;
+		delete (*item)->data;
 		item = item->prev;
-	}
+	}*/
 }
 
 bool Application::Init()
 {
 	bool ret = true;
 
-	// Call Init() in all modules
-	p2List_item<Module*>* item = list_modules.getFirst();
+	LOG("Application Init --------------");
 
-	while(item != NULL && ret == true)
+	std::list<Module*>::iterator item = modules.begin();
+
+	while(item != modules.end() && ret == true)
 	{
-		ret = item->data->Init();
-		item = item->next;
+		LOG("initializing module %s", (*item)->name)
+		ret = (*item)->Init();
+		item++;
 	}
+	if (!ret) { if (item != modules.begin()) item--; LOG("ERROR at Init, module %s", (*item)->name) }
 
-	// After all Init calls we call Start() in all modules
 	LOG("Application Start --------------");
-	item = list_modules.getFirst();
 
-	while(item != NULL && ret == true)
+	item = modules.begin();
+	while(item != modules.end() && ret == true)
 	{
-		ret = item->data->Start();
-		item = item->next;
+		ret = (*item)->Start();
+		item++;
 	}
-	
+
+	if (!ret) { if (item != modules.begin())item--; LOG("ERROR at Start, module %s", (*item)->name) }
+
 	ms_timer.Start();
 	return ret;
 }
@@ -81,53 +89,60 @@ void Application::FinishUpdate()
 }
 
 // Call PreUpdate, Update and PostUpdate on all modules
-update_status Application::Update()
+bool Application::Update()
 {
-	update_status ret = UPDATE_CONTINUE;
+	bool ret = true;
 	PrepareUpdate();
 	
-	p2List_item<Module*>* item = list_modules.getFirst();
+	std::list<Module*>::iterator item = modules.begin();
 	
-	while(item != NULL && ret == UPDATE_CONTINUE)
+	while(item != modules.end() && ret == true)
 	{
-		ret = item->data->PreUpdate(dt);
-		item = item->next;
+		ret = (*item)->PreUpdate(dt);
+		item++;
 	}
+	// Error checking
+	if (!ret && !input->quit) { if(item != modules.begin()) item--; LOG("ERROR at PreUpdate, module %s", (*item)->name) }
 
-	item = list_modules.getFirst();
+	item = modules.begin();
 
-	while(item != NULL && ret == UPDATE_CONTINUE)
+	while(item != modules.end() && ret == true)
 	{
-		ret = item->data->Update(dt);
-		item = item->next;
+		ret = (*item)->Update(dt);
+		item++;
 	}
+	if (!ret && !input->quit) { if (item != modules.begin()) item--; LOG("ERROR at Update, module %s", (*item)->name) }
 
-	item = list_modules.getFirst();
+	item = modules.begin();
 
-	while(item != NULL && ret == UPDATE_CONTINUE)
+	while(item != modules.end() && ret == true)
 	{
-		ret = item->data->PostUpdate(dt);
-		item = item->next;
+		ret = (*item)->PostUpdate(dt);
+		item++;
 	}
+	if (!ret && !input->quit) { if (item != modules.begin()) item--; LOG("ERROR at PostUpdate, module %s", (*item)->name) }
 
 	FinishUpdate();
+
 	return ret;
 }
 
 bool Application::CleanUp()
 {
 	bool ret = true;
-	p2List_item<Module*>* item = list_modules.getLast();
+	std::list<Module*>::iterator item = modules.begin();
 
-	while(item != NULL && ret == true)
+	while(item != modules.end() && ret == true)
 	{
-		ret = item->data->CleanUp();
-		item = item->prev;
+		ret = (*item)->CleanUp();
+		item++;
 	}
+	if (!ret) { if (item != modules.begin()) item--; LOG("ERROR at CleanUp, module %s", (*item)->name) }
+
 	return ret;
 }
 
 void Application::AddModule(Module* mod)
 {
-	list_modules.add(mod);
+	modules.push_back(mod);
 }

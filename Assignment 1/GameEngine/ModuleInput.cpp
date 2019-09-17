@@ -9,6 +9,8 @@ ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, sta
 	keyboard = new KEY_STATE[MAX_KEYS];
 	memset(keyboard, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
 	memset(mouse_buttons, KEY_IDLE, sizeof(KEY_STATE) * MAX_MOUSE_BUTTONS);
+	name = "Input";
+	quit = false;
 }
 
 // Destructor
@@ -34,7 +36,7 @@ bool ModuleInput::Init()
 }
 
 // Called every draw update
-update_status ModuleInput::PreUpdate(float dt)
+bool ModuleInput::PreUpdate(float dt)
 {
 	SDL_PumpEvents();
 
@@ -84,7 +86,6 @@ update_status ModuleInput::PreUpdate(float dt)
 
 	mouse_x_motion = mouse_y_motion = 0;
 
-	bool quit = false;
 	SDL_Event e;
 	while(SDL_PollEvent(&e))
 	{
@@ -114,10 +115,13 @@ update_status ModuleInput::PreUpdate(float dt)
 		}
 	}
 
-	if(quit == true || keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP)
-		return UPDATE_STOP;
+	if (quit == true || keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP) {
+		LOG("CLOSE COMMAND EXECUTED: EXITING APPLICATION")
+		quit = true;
+		return false;
+	}
 
-	return UPDATE_CONTINUE;
+	return true;
 }
 
 // Called before quitting
