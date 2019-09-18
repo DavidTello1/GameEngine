@@ -1,4 +1,20 @@
 # Assignment 1 - 15%
+https://github.com/ponspack9/GameEngine
+
+## License
+Copyright 2019. Òscar Pons and David Tello
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Controls
+### Camera
+- While right clicking, "WASD" to freely move around, SPACE to go upwards, CTRL+SPACE to go downwards (Holding left SHIFT doubles speed)
+- Zoom using the mouse wheel
+- 
 ## Overview
 For our first assignment, we aim to deliver a simple geometry viewer supporting drag and drop and orbital
 camera. The final release should load the provided model (baker_house.zip) plus other two you created.
@@ -17,11 +33,11 @@ Release should be using a tag named “Assignment1.x” (x in case you make seve
 anywhere in the Hard Drive.
 6. It should feature Unity-like camera controls:
 
-- DONE | While Right clicking, “WASD” fps-like movement and free look around must be enabled. SPACE to go upwards, LCTRL + SPACE to go downwards
-- DONE | Mouse wheel should zoom in and out-> **zoom is moving with Z axis? or resizing the viewport?**
+- ~~While Right clicking, “WASD” fps-like movement and free look around must be enabled. SPACE to go upwards, LCTRL + SPACE to go downwards~~
+- ~~Mouse wheel should zoom in and out~~-> **zoom is moving with Z axis? or resizing the viewport?**
 - Alt+Left click should orbit the object
 - Pressing “f” should focus the camera around the geometry
-- Holding SHIFT duplicates movement speed
+- ~~Holding SHIFT duplicates movement speed~~
 - Have a console window that should LOG the geometry loading process from ASSIMP
 - There must be a configuration window containing at least:
 - A graph for the frames per second
@@ -40,6 +56,7 @@ rotation and scale).
 the scene. It should only need to load one texture at a time.
 13. You should have an option to show current geometry with checkers texture.
 The zip must be submitted before October 20th 23:58 (folder closes automatically).
+
 ## Grading Criteria
 To accept a submission for grading, it must comply with:
 1. It followed the submission rules stated above.
