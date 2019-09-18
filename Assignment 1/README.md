@@ -17,7 +17,7 @@ Release should be using a tag named “Assignment1.x” (x in case you make seve
 anywhere in the Hard Drive.
 6. It should feature Unity-like camera controls:
 
-a. While Right clicking, “WASD” fps-like movement and free look around must be enabled.
+a. While Right clicking, “WASD” fps-like movement and free look around must be enabled. SPACE to go upwards, LCTRL + SPACE to go downwards
 b. Mouse wheel should zoom in and out
 c. Alt+Left click should orbit the object
 d. Pressing “f” should focus the camera around the geometry

@@ -43,28 +43,35 @@ bool ModuleCamera3D::Update(float dt)
 	// Implement a debug camera with keys and mouse
 	// Now we can make this movememnt frame rate independant!
 
-	vec3 newPos(0,0,0);
-	float speed = 3.0f * dt;
-	if(App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
-		speed = 8.0f * dt;
-
-	if(App->input->GetKey(SDL_SCANCODE_R) == KEY_REPEAT) newPos.y += speed;
-	if(App->input->GetKey(SDL_SCANCODE_F) == KEY_REPEAT) newPos.y -= speed;
-
-	if(App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= Z * speed;
-	if(App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += Z * speed;
-
-
-	if(App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= X * speed;
-	if(App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += X * speed;
+	// Camera ZOOM with MOUSE WHEEL
+	vec3 newPos(0, 0, 0);
+	float speed = App->input->GetMouseZ() * 75.0f * dt;
+	newPos -= Z * speed;
 
 	Position += newPos;
 	Reference += newPos;
-
 	// Mouse motion ----------------
 
 	if(App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 	{
+		//Camera motion with WASD, Left Shift to go faster
+		vec3 newPos(0, 0, 0);
+		float speed = 10.0f * dt;
+
+		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
+			speed = 15.0f * dt;
+
+		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= Z * speed;
+		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += Z * speed;
+
+
+		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= X * speed;
+		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += X * speed;
+
+		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= Y * speed;
+		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += Y * speed;
+
+		// Camera rotation with mouse
 		int dx = -App->input->GetMouseXMotion();
 		int dy = -App->input->GetMouseYMotion();
 
@@ -94,6 +101,8 @@ bool ModuleCamera3D::Update(float dt)
 				Y = cross(Z, X);
 			}
 		}
+		Position += newPos;
+		Reference += newPos;
 
 		Position = Reference + Z * length(Position);
 	}
