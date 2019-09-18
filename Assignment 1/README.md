@@ -17,16 +17,16 @@ Release should be using a tag named “Assignment1.x” (x in case you make seve
 anywhere in the Hard Drive.
 6. It should feature Unity-like camera controls:
 
-a. DONE | While Right clicking, “WASD” fps-like movement and free look around must be enabled. SPACE to go upwards, LCTRL + SPACE to go downwards
-b. DONE | Mouse wheel should zoom in and out-> **zoom is moving with Z axis? or resizing the viewport?**
-c. Alt+Left click should orbit the object
-d. Pressing “f” should focus the camera around the geometry
-e. Holding SHIFT duplicates movement speed
-7. Have a console window that should LOG the geometry loading process from ASSIMP
-8. There must be a configuration window containing at least:
-a. A graph for the frames per second
-b. Configuration for all variables on each module (renderer, window, input and textures)
-c. There must be information output with FPS graph, memory consumption, hardware detection
+- DONE | While Right clicking, “WASD” fps-like movement and free look around must be enabled. SPACE to go upwards, LCTRL + SPACE to go downwards
+- DONE | Mouse wheel should zoom in and out-> **zoom is moving with Z axis? or resizing the viewport?**
+- Alt+Left click should orbit the object
+- Pressing “f” should focus the camera around the geometry
+- Holding SHIFT duplicates movement speed
+- Have a console window that should LOG the geometry loading process from ASSIMP
+- There must be a configuration window containing at least:
+- A graph for the frames per second
+- Configuration for all variables on each module (renderer, window, input and textures)
+- There must be information output with FPS graph, memory consumption, hardware detection
 and software versions (SDL, OpenGL, Devil).
 
 9. The camera must adapt to the size of the geometry after being dropped to move far or close
