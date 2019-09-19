@@ -7,6 +7,13 @@
 #include <windows.h>
 #include <stdio.h>
 
+/* CHARS AT END INDICATES THE TYPE OF LOG TO ENABLE FILTERS
+* Characters must be written as string type %s
+* v - verbose
+* g - geometry
+* d - debug
+* 
+*/
 #define LOG(format, ...) log(__FILE__, __LINE__, format, __VA_ARGS__);
 
 void log(const char file[], int line, const char* format, ...);

@@ -15,7 +15,7 @@ ModuleSceneIntro::~ModuleSceneIntro()
 // Load assets
 bool ModuleSceneIntro::Start()
 {
-	LOG("Loading Intro assets");
+	LOG("Loading Intro assets", 'v');
 	bool ret = true;
 
 	App->camera->Move(vec3(0.0f, 10.0f, -20.0f));
