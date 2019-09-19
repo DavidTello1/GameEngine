@@ -12,9 +12,8 @@ using namespace std;
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLEW
 #include "imgui/imgui.h"
-#include "imgui/examples/imgui_impl_sdl.h"
-#include "imgui/examples/imgui_impl_opengl3.h"
-
+#include "imgui/imgui_impl_sdl.h"
+#include "imgui/imgui_impl_opengl2.h"
 
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -34,8 +33,11 @@ bool ModuleEditor::Init()
 	// Setup Dear ImGui binding
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable keyboard controls
+
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer3D->context);
-	ImGui_ImplOpenGL3_Init("#version 130");
+	ImGui_ImplOpenGL2_Init();
 
 	// Setup style
 	ImGui::StyleColorsDark();
@@ -46,18 +48,14 @@ bool ModuleEditor::Init()
 
 bool ModuleEditor::Start()
 {
-	//conf->active = config->GetBool("ConfActive", true);
-	//props->active = config->GetBool("PropsActive", true);
-
-	//OnResize(App->window->GetWidth(), App->window->GetHeight());
-
 	return true;
 }
 
 
 bool ModuleEditor::PreUpdate(float dt)
 {
-	ImGui_ImplOpenGL3_NewFrame();
+	// Start the frame
+	ImGui_ImplOpenGL2_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->window->window);
 	ImGui::NewFrame();
 
@@ -67,14 +65,14 @@ bool ModuleEditor::PreUpdate(float dt)
 bool ModuleEditor::Update(float dt)
 {
 	bool ret = true;
-	static bool showcase = true;
+	static bool showdemo = true;
+	bool draw_menu = true;
 
 	// Main menu GUI
 	if (draw_menu == true)
 	{
 		if (ImGui::BeginMainMenuBar())
 		{
-			bool selected = false;
 			if (ImGui::BeginMenu("File"))
 			{
 				ImGui::MenuItem("New ...");
@@ -89,10 +87,10 @@ bool ModuleEditor::Update(float dt)
 		}
 	}
 
-	// Show showcase ? 
-	if (showcase)
+	// Show demo 
+	if (showdemo)
 	{
-		ImGui::ShowDemoWindow();
+		ImGui::ShowDemoWindow(&showdemo);
 		ImGui::ShowMetricsWindow();
 	}
 
@@ -104,9 +102,16 @@ bool ModuleEditor::CleanUp()
 {
 	LOG("Freeing editor gui");
 
-	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplOpenGL2_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
 	return true;
+}
+
+void ModuleEditor::Draw() const
+{
+	// Render
+	ImGui::Render();
+	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 }

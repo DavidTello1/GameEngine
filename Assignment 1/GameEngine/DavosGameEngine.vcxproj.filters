@@ -19,6 +19,12 @@
     <Filter Include="Sources\Modules\Game">
       <UniqueIdentifier>{83f46af7-e02f-40c0-9e56-41d76082527b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Containers\ImGui">
+      <UniqueIdentifier>{e54c4b1a-b820-4264-be67-383d2a988bfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Containers\Glew">
+      <UniqueIdentifier>{d3f27894-b540-43fb-a5c7-3a88b78a8c37}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -78,6 +84,42 @@
     <ClInclude Include="ModuleEditor.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
+    <ClInclude Include="src\glew\include\GL\eglew.h">
+      <Filter>Sources\Containers\Glew</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glew\include\GL\glew.h">
+      <Filter>Sources\Containers\Glew</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glew\include\GL\glxew.h">
+      <Filter>Sources\Containers\Glew</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glew\include\GL\wglew.h">
+      <Filter>Sources\Containers\Glew</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imconfig.h">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui.h">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui_impl_opengl2.h">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui_impl_sdl.h">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui_internal.h">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imstb_rectpack.h">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imstb_textedit.h">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imstb_truetype.h">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -136,6 +178,24 @@
     </ClCompile>
     <ClCompile Include="ModuleEditor.cpp">
       <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui.cpp">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_demo.cpp">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_draw.cpp">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_impl_opengl2.cpp">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_impl_sdl.cpp">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_widgets.cpp">
+      <Filter>Sources\Containers\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

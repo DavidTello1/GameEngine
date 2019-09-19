@@ -1,23 +1,24 @@
-#ifndef __MODULEEDITOR_H__
-#define __MODULEEDITOR_H__
+#ifndef __MODULE_EDITOR_H__
+#define __MODULE_EDITOR_H__
 
 #include "Module.h"
 
+
 class ModuleEditor : public Module
 {
-
 public:
+
 	ModuleEditor(Application* app, bool start_enabled = true);
 	~ModuleEditor();
 
-	bool Init() override;
-	bool Start() override;
-	bool PreUpdate(float dt) override;
-	bool Update(float dt) override;
-	bool CleanUp() override;
+	bool Init();
+	bool Start();
+	bool PreUpdate(float dt);
+	bool Update(float dt);
+	bool CleanUp();
 
-public:
-	bool draw_menu = true;
+	void Draw() const;
+
 };
 
-#endif // __MODULEEDITOR_H__
+#endif

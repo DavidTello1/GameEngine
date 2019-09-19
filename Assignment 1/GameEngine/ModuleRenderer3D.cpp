@@ -1,10 +1,14 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleRenderer3D.h"
-#include "SDL\include\SDL_opengl.h"
-#include <gl/GL.h>
-#include <gl/GLU.h>
 
+#include "glew/include/GL/glew.h"
+#include "SDL/include/SDL_opengl.h"
+#include "Imgui/imgui.h"
+//#include <gl/GL.h>
+//#include <gl/GLU.h>
+
+#pragma comment(lib, "glew/libx86/glew32.lib")
 #pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
 #pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
 
@@ -37,12 +41,22 @@ bool ModuleRenderer3D::Init()
 		if(VSYNC && SDL_GL_SetSwapInterval(1) < 0)
 			LOG("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 
+		// Initialize glew
+		GLenum error = glewInit();
+
+		if (error != GL_NO_ERROR)
+		{
+			LOG("Error initializing glew! %s\n"/*, glewGetErrorString(error)*/);
+			ret = false;
+		}
+
+
 		//Initialize Projection Matrix
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 
 		//Check for error
-		GLenum error = glGetError();
+		error = glGetError();
 		if(error != GL_NO_ERROR)
 		{
 			LOG("Error initializing OpenGL! %s\n", gluErrorString(error));
@@ -124,6 +138,8 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 // PostUpdate present buffer to screen
 bool ModuleRenderer3D::PostUpdate(float dt)
 {
+	App->editor->Draw();
+
 	SDL_GL_SwapWindow(App->window->window);
 	return true;
 }
