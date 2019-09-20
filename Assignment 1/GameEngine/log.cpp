@@ -23,6 +23,11 @@ void log(const char file[], int line, const char* format, ...)
 	va_end(ap);
 	sprintf_s(tmp_string2, 4096, "\n%s(%d) : %s", file, line, tmp_string);
 	OutputDebugString(tmp_string2);
+	static char short_file[256];
+	static const char* lastslashlocation = strrchr(file, 92);
+	strcpy(short_file, lastslashlocation+1);
+	sprintf_s(tmp_string2, 4096, "\n%s(%d) : %s", short_file, line, tmp_string);
+
 	Console::console.AddLog(tmp_string2);
 
 }
