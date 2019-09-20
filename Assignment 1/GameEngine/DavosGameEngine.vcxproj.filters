@@ -126,6 +126,7 @@
     <ClInclude Include="Console.h">
       <Filter>Sources\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="Configuration.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -206,5 +207,6 @@
     <ClCompile Include="Console.cpp">
       <Filter>Sources\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="Configuration.cpp" />
   </ItemGroup>
 </Project>

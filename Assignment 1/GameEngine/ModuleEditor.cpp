@@ -65,7 +65,7 @@ bool ModuleEditor::PreUpdate(float dt)
 bool ModuleEditor::Update(float dt)
 {
 	bool ret = true;
-	static bool showdemo = false;
+	static bool showdemo = true;
 	static bool showconsole = false;
 	bool draw_menu = true;
 

@@ -38,7 +38,7 @@ anywhere in the Hard Drive.
 - Alt+Left click should orbit the object
 - Pressing “f” should focus the camera around the geometry
 - ~~Holding SHIFT duplicates movement speed~~
-- Have a console window that should LOG the geometry loading process from ASSIMP
+- ~~Have a console window that should LOG the geometry loading process from ASSIMP~~
 - There must be a configuration window containing at least:
 - A graph for the frames per second
 - Configuration for all variables on each module (renderer, window, input and textures)

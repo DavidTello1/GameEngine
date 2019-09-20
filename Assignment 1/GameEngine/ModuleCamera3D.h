@@ -11,6 +11,7 @@ public:
 
 	bool Start();
 	bool Update(float dt);
+	void RotateWithMouse();
 	bool CleanUp();
 
 	void Look(const vec3 &Position, const vec3 &Reference, bool RotateAroundReference = false);
@@ -21,6 +22,8 @@ public:
 private:
 
 	void CalculateViewMatrix();
+
+	bool orbit;
 
 public:
 	

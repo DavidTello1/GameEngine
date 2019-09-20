@@ -15,6 +15,8 @@ ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(ap
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
 	name = "Camera3D";
+
+	orbit = false;
 }
 
 ModuleCamera3D::~ModuleCamera3D()
@@ -43,15 +45,19 @@ bool ModuleCamera3D::Update(float dt)
 	// Implement a debug camera with keys and mouse
 	// Now we can make this movememnt frame rate independant!
 
+	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN) {
+		orbit = !orbit;
+	}
 	// Camera ZOOM with MOUSE WHEEL
 	vec3 newPos(0, 0, 0);
 	float speed = App->input->GetMouseZ() * 75.0f * dt;
 	newPos -= Z * speed;
 
 	Position += newPos;
-	Reference += newPos;
+	//Reference += newPos;
 	// Mouse motion ----------------
 
+	//Free move 
 	if(App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 	{
 		//Camera motion with WASD, Left Shift to go faster
@@ -71,48 +77,57 @@ bool ModuleCamera3D::Update(float dt)
 		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= Y * speed;
 		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += Y * speed;
 
-		// Camera rotation with mouse
-		int dx = -App->input->GetMouseXMotion();
-		int dy = -App->input->GetMouseYMotion();
-
-		float Sensitivity = 0.25f;
-
-		Position -= Reference;
-
-		if(dx != 0)
-		{
-			float DeltaX = (float)dx * Sensitivity;
-
-			X = rotate(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-			Y = rotate(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-			Z = rotate(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-		}
-
-		if(dy != 0)
-		{
-			float DeltaY = (float)dy * Sensitivity;
-
-			Y = rotate(Y, DeltaY, X);
-			Z = rotate(Z, DeltaY, X);
-
-			if(Y.y < 0.0f)
-			{
-				Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
-				Y = cross(Z, X);
-			}
-		}
+		RotateWithMouse();
 		Position += newPos;
 		Reference += newPos;
-
-		Position = Reference + Z * length(Position);
+		
 	}
 
+	// Orbit move
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))
+	{
+		RotateWithMouse();
+		LookAt(vec3(0,0,0));
+	}
 	// Recalculate matrix -------------
 	CalculateViewMatrix();
 
 	return true;
 }
 
+void ModuleCamera3D::RotateWithMouse() {
+	// Camera rotation with mouse
+	int dx = -App->input->GetMouseXMotion();
+	int dy = -App->input->GetMouseYMotion();
+
+	float Sensitivity = 0.25f;
+
+	Position -= Reference;
+
+	if (dx != 0)
+	{
+		float DeltaX = (float)dx * Sensitivity;
+
+		X = rotate(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+		Y = rotate(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+		Z = rotate(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	if (dy != 0)
+	{
+		float DeltaY = (float)dy * Sensitivity;
+
+		Y = rotate(Y, DeltaY, X);
+		Z = rotate(Z, DeltaY, X);
+
+		if (Y.y < 0.0f)
+		{
+			Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
+			Y = cross(Z, X);
+		}
+	}
+	Position = Reference + Z * length(Position);
+}
 // -----------------------------------------------------------------
 void ModuleCamera3D::Look(const vec3 &Position, const vec3 &Reference, bool RotateAroundReference)
 {
