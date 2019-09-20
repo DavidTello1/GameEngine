@@ -2,7 +2,6 @@
 #include "Application.h"
 #include "PhysBody3D.h"
 #include "ModuleCamera3D.h"
-#include "ModulePlayer.h"
 
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -16,7 +15,6 @@ ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(ap
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
 	name = "Camera3D";
-	orbit = false;
 }
 
 ModuleCamera3D::~ModuleCamera3D()
@@ -42,9 +40,6 @@ bool ModuleCamera3D::CleanUp()
 // -----------------------------------------------------------------
 bool ModuleCamera3D::Update(float dt)
 {
-	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN) {
-		orbit = !orbit;
-	}
 	// Implement a debug camera with keys and mouse
 	// Now we can make this movememnt frame rate independant!
 
@@ -54,7 +49,7 @@ bool ModuleCamera3D::Update(float dt)
 	newPos -= Z * speed;
 
 	Position += newPos;
-
+	Reference += newPos;
 	// Mouse motion ----------------
 
 	if(App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
@@ -77,79 +72,39 @@ bool ModuleCamera3D::Update(float dt)
 		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += Y * speed;
 
 		// Camera rotation with mouse
-		if (orbit) {
-			Reference = App->player->vehicle->
+		int dx = -App->input->GetMouseXMotion();
+		int dy = -App->input->GetMouseYMotion();
 
-			int dx = -App->input->GetMouseXMotion();
-			int dy = -App->input->GetMouseYMotion();
+		float Sensitivity = 0.25f;
 
-			float Sensitivity = 0.25f;
+		Position -= Reference;
 
-			Position -= Reference;
+		if(dx != 0)
+		{
+			float DeltaX = (float)dx * Sensitivity;
 
-			if (dx != 0)
-			{
-				float DeltaX = (float)dx * Sensitivity;
-
-				X = rotate(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-				Y = rotate(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-				Z = rotate(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-			}
-
-			if (dy != 0)
-			{
-				float DeltaY = (float)dy * Sensitivity;
-
-				Y = rotate(Y, DeltaY, X);
-				Z = rotate(Z, DeltaY, X);
-
-				if (Y.y < 0.0f)
-				{
-					Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
-					Y = cross(Z, X);
-				}
-			}
-			Position += newPos;
-			Reference += newPos;
-
-			Position = Reference + Z * length(Position);
+			X = rotate(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+			Y = rotate(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+			Z = rotate(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
 		}
-		else {
 
-			int dx = -App->input->GetMouseXMotion();
-			int dy = -App->input->GetMouseYMotion();
+		if(dy != 0)
+		{
+			float DeltaY = (float)dy * Sensitivity;
 
-			float Sensitivity = 0.25f;
+			Y = rotate(Y, DeltaY, X);
+			Z = rotate(Z, DeltaY, X);
 
-			Position -= Reference;
-
-			if (dx != 0)
+			if(Y.y < 0.0f)
 			{
-				float DeltaX = (float)dx * Sensitivity;
-
-				X = rotate(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-				Y = rotate(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-				Z = rotate(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+				Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
+				Y = cross(Z, X);
 			}
-
-			if (dy != 0)
-			{
-				float DeltaY = (float)dy * Sensitivity;
-
-				Y = rotate(Y, DeltaY, X);
-				Z = rotate(Z, DeltaY, X);
-
-				if (Y.y < 0.0f)
-				{
-					Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
-					Y = cross(Z, X);
-				}
-			}
-			Position += newPos;
-			Reference += newPos;
-
-			Position = Reference + Z * length(Position);
 		}
+		Position += newPos;
+		Reference += newPos;
+
+		Position = Reference + Z * length(Position);
 	}
 
 	// Recalculate matrix -------------
