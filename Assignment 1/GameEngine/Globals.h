@@ -12,7 +12,7 @@
 * v - verbose
 * g - geometry
 * d - debug
-* 
+* Ex: LOG("My log string, my number %d", 23,'v')
 */
 #define LOG(format, ...) log(__FILE__, __LINE__, format, __VA_ARGS__);
 

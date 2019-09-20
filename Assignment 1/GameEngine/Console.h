@@ -7,6 +7,8 @@
 
 class Console
 {
+public:
+
 	char					InputBuf[256];
 	ImVector<char*>			Items;
 	ImVector<const char*>	Commands;
@@ -19,8 +21,6 @@ class Console
 	bool					ShowDebugLog;
 	bool					ScrollToBottom;
 
-
-public:
 	Console();
 	~Console();
 	static void ShowConsole(bool* p_open);

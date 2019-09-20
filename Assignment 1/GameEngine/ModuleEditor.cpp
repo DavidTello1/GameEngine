@@ -98,10 +98,15 @@ bool ModuleEditor::Update(float dt)
 	if (showconsole) Console::ShowConsole(&showconsole);
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
-		Console::console.AddLog("SAMKFASKFMASKFAS");
-		
+		LOG("GEOMETRY LOG %d",25,'g')
 	}
-
+	if (App->input->GetKey(SDL_SCANCODE_B) == KEY_DOWN) {
+		char c[8] = "jdsig";
+		LOG("DEBUG LOG %s", c,'d')
+	}
+	if (App->input->GetKey(SDL_SCANCODE_V) == KEY_DOWN) {
+		LOG("VERBOSE LOG", 'v')
+	}
 	return ret;
 }
 
