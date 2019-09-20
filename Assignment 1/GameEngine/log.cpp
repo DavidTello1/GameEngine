@@ -7,16 +7,21 @@ void log(const char file[], int line, const char* format, ...)
 	static char tmp_string[4096];
 	static char tmp_string2[4096];
 	static va_list  ap;
-
 	// Construct the string from variable arguments
 	va_start(ap, format);
 	vsprintf_s(tmp_string, 4096, format, ap);
-	char logtype = 'a';
-	while (va_arg(ap, char) != NULL) {
-		logtype = va_arg(ap, char);
 
-	}
+	// Filtering
+	static char extendedlog[4096];
+	static char extendedformat[4096];
+	strcpy(extendedformat, format);
+	strcat(extendedformat, "%c");
+	vsprintf(extendedlog, extendedformat, ap);
+	char logtype = extendedlog[strlen(extendedlog)-1];
+
 	va_end(ap);
+
+	//Default visual studio logging
 	sprintf_s(tmp_string2, 4096, "\n%s(%d) : %s", file, line, tmp_string);
 	OutputDebugString(tmp_string2);
 
@@ -25,18 +30,20 @@ void log(const char file[], int line, const char* format, ...)
 	// 92 stands for \ character
 	static const char* lastslashlocation = strrchr(file, 92);
 	strcpy(short_file, lastslashlocation+1);
-	sprintf_s(tmp_string2, 4096, "\n%s(%d) : %s", short_file, line, tmp_string);
 
 	// geometry logs
 	if (logtype == 'g' && Console::console.ShowGeometryLog) {
+		sprintf_s(tmp_string2, 4096, "\n[%s] %s(%d) : %s", "GEOMETRY", short_file, line, tmp_string);
 		Console::console.AddLog(tmp_string2);
 	}
 	// verbose logs
 	else if (logtype == 'v' && Console::console.ShowVerboseLog) {
+		sprintf_s(tmp_string2, 4096, "\n[%s] %s(%d) : %s", "VERBOSE", short_file, line,  tmp_string);
 		Console::console.AddLog(tmp_string2);
 	}
 	// debug logs
 	else if (logtype == 'd' && Console::console.ShowDebugLog) {
+		sprintf_s(tmp_string2, 4096, "\n[%s] %s(%d) : %s", "DEBUG", short_file, line,  tmp_string);
 		Console::console.AddLog(tmp_string2);
 	}
 

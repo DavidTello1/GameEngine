@@ -25,6 +25,9 @@
     <Filter Include="Sources\Containers\Glew">
       <UniqueIdentifier>{d3f27894-b540-43fb-a5c7-3a88b78a8c37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Windows">
+      <UniqueIdentifier>{1f2a57c0-5006-4c0c-b815-32f725bb1b43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -120,7 +123,9 @@
     <ClInclude Include="Imgui\imstb_truetype.h">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Console.h" />
+    <ClInclude Include="Console.h">
+      <Filter>Sources\Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -198,6 +203,8 @@
     <ClCompile Include="Imgui\imgui_widgets.cpp">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="Console.cpp">
+      <Filter>Sources\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
