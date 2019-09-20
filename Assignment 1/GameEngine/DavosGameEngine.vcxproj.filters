@@ -120,6 +120,7 @@
     <ClInclude Include="Imgui\imstb_truetype.h">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="Console.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -197,5 +198,6 @@
     <ClCompile Include="Imgui\imgui_widgets.cpp">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="Console.cpp" />
   </ItemGroup>
 </Project>
