@@ -30,9 +30,6 @@
     <ClInclude Include="Module.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleAudio.h">
-      <Filter>Sources\Modules</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleCamera3D.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
@@ -54,9 +51,6 @@
     <ClInclude Include="Globals.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Primitive.h">
-      <Filter>Sources\Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="Color.h">
       <Filter>Sources\Containers</Filter>
     </ClInclude>
@@ -68,18 +62,6 @@
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Sources\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="ModulePhysics3D.h">
-      <Filter>Sources\Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysBody3D.h">
-      <Filter>Sources\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysVehicle3D.h">
-      <Filter>Sources\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="ModulePlayer.h">
-      <Filter>Sources\Modules\Game</Filter>
     </ClInclude>
     <ClInclude Include="ModuleEditor.h">
       <Filter>Sources\Modules</Filter>
@@ -102,9 +84,6 @@
     <ClInclude Include="Imgui\imgui.h">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Imgui\imgui_impl_opengl2.h">
-      <Filter>Sources\Containers\ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="Imgui\imgui_impl_sdl.h">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClInclude>
@@ -120,11 +99,11 @@
     <ClInclude Include="Imgui\imstb_truetype.h">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="Imgui\imgui_impl_opengl3.h">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ModuleAudio.cpp">
-      <Filter>Sources\Modules</Filter>
-    </ClCompile>
     <ClCompile Include="ModuleCamera3D.cpp">
       <Filter>Sources\Modules</Filter>
     </ClCompile>
@@ -152,9 +131,6 @@
     <ClCompile Include="glmath.cpp">
       <Filter>Sources\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="Primitive.cpp">
-      <Filter>Sources\Helpers</Filter>
-    </ClCompile>
     <ClCompile Include="Color.cpp">
       <Filter>Sources\Containers</Filter>
     </ClCompile>
@@ -162,18 +138,6 @@
       <Filter>Sources\Helpers</Filter>
     </ClCompile>
     <ClCompile Include="ModuleSceneIntro.cpp">
-      <Filter>Sources\Modules\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="ModulePhysics3D.cpp">
-      <Filter>Sources\Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysBody3D.cpp">
-      <Filter>Sources\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysVehicle3D.cpp">
-      <Filter>Sources\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="ModulePlayer.cpp">
       <Filter>Sources\Modules\Game</Filter>
     </ClCompile>
     <ClCompile Include="ModuleEditor.cpp">
@@ -188,13 +152,13 @@
     <ClCompile Include="Imgui\imgui_draw.cpp">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Imgui\imgui_impl_opengl2.cpp">
-      <Filter>Sources\Containers\ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="Imgui\imgui_impl_sdl.cpp">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Imgui\imgui_widgets.cpp">
+      <Filter>Sources\Containers\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_impl_opengl3.cpp">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClCompile>
   </ItemGroup>

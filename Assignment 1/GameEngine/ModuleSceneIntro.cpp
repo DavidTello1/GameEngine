@@ -1,8 +1,6 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleSceneIntro.h"
-#include "Primitive.h"
-#include "PhysBody3D.h"
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -35,14 +33,7 @@ bool ModuleSceneIntro::CleanUp()
 // Update
 bool ModuleSceneIntro::Update(float dt)
 {
-	Plane p(0, 1, 0, 0);
-	p.axis = true;
-	p.Render();
 
 	return true;
-}
-
-void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
-{
 }
 
