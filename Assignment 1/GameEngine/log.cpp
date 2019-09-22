@@ -27,7 +27,7 @@ void log(const char file[], int line, const char* format, ...)
 
 	//Console logging
 	static char short_file[256];
-	// 92 stands for \ character
+	// 92 stands for '\' character
 	static const char* lastslashlocation = strrchr(file, 92);
 	strcpy(short_file, lastslashlocation+1);
 

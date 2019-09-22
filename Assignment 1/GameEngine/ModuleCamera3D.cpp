@@ -77,9 +77,10 @@ bool ModuleCamera3D::Update(float dt)
 		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= Y * speed;
 		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += Y * speed;
 
-		RotateWithMouse();
 		Position += newPos;
 		Reference += newPos;
+
+		RotateWithMouse();
 		
 	}
 
@@ -87,8 +88,10 @@ bool ModuleCamera3D::Update(float dt)
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))
 	{
 		RotateWithMouse();
+		// To change to the Reference we want to orbit at
 		LookAt(vec3(0,0,0));
 	}
+
 	// Recalculate matrix -------------
 	CalculateViewMatrix();
 
