@@ -13,7 +13,7 @@ using namespace std;
 #define IMGUI_IMPL_OPENGL_LOADER_GLEW
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl.h"
-#include "imgui/imgui_impl_opengl2.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -37,7 +37,7 @@ bool ModuleEditor::Init()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable keyboard controls
 
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer3D->context);
-	ImGui_ImplOpenGL2_Init();
+	ImGui_ImplOpenGL3_Init();
 
 	// Setup style
 	ImGui::StyleColorsDark();
@@ -55,7 +55,7 @@ bool ModuleEditor::Start()
 bool ModuleEditor::PreUpdate(float dt)
 {
 	// Start the frame
-	ImGui_ImplOpenGL2_NewFrame();
+	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->window->window);
 	ImGui::NewFrame();
 
@@ -78,13 +78,41 @@ bool ModuleEditor::Update(float dt)
 			{
 				ImGui::MenuItem("New ...");
 				ImGui::MenuItem("Load ...");
-				ImGui::MenuItem("Show Console", NULL, &showconsole);
+				ImGui::MenuItem("Save ...");
 
 				if (ImGui::MenuItem("Quit", "ESC"))
 					ret = false;
 
 				ImGui::EndMenu();
 			}
+
+			if (ImGui::BeginMenu("Window"))
+			{
+				ImGui::MenuItem("Console", NULL, &showconsole);
+				ImGui::MenuItem("Configuration");
+				ImGui::MenuItem("Properties");
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Help"))
+			{
+				if (ImGui::MenuItem("Show Demo"))
+					showdemo = !showdemo;
+
+				if (ImGui::MenuItem("Documentation"))
+					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine/wiki", NULL, NULL, SW_SHOWNORMAL);
+
+
+				if (ImGui::MenuItem("Latest Version"))
+					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine/releases", NULL, NULL, SW_SHOWNORMAL);
+
+				if (ImGui::MenuItem("Report a bug"))
+					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine/issues", NULL, NULL, SW_SHOWNORMAL);
+
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMainMenuBar();
 		}
 	}
@@ -110,22 +138,22 @@ bool ModuleEditor::Update(float dt)
 	return ret;
 }
 
-void ModuleEditor::Draw() const
-{
-	// Render
-	ImGui::Render();
-	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
-}
-
 // Called before quitting
 bool ModuleEditor::CleanUp()
 {
 	LOG("Freeing editor gui");
 
-	ImGui_ImplOpenGL2_Shutdown();
+	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
 	return true;
+}
+
+void ModuleEditor::Draw() const
+{
+	// Render
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
