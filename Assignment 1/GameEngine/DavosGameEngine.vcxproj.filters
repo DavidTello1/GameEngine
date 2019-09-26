@@ -105,9 +105,11 @@
     <ClInclude Include="Console.h">
       <Filter>Sources\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Configuration.h" />
     <ClInclude Include="Imgui\imgui_impl_opengl3.h">
       <Filter>Sources\Containers\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.h">
+      <Filter>Sources\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -168,9 +170,11 @@
     <ClCompile Include="Console.cpp">
       <Filter>Sources\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Imgui\imgui_impl_opengl3.cpp">
       <Filter>Sources\Containers\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Configuration.cpp">
+      <Filter>Sources\Windows</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
