@@ -65,20 +65,29 @@ bool ModuleEditor::PreUpdate(float dt)
 bool ModuleEditor::Update(float dt)
 {
 	bool ret = true;
-	static bool showdemo = true;
-	static bool showconsole = false;
-	bool draw_menu = true;
+	static bool is_show_demo = true;
+	bool is_draw_menu = true;
+
+	static bool is_show_console = false;
+	static bool is_show_configuration = false;
+	static bool is_show_properties = false;
+
+	static bool is_new = false;
+	static bool is_load = false;
+	static bool is_save = false;
+
+
 
 	// Main menu GUI
-	if (draw_menu == true)
+	if (is_draw_menu == true)
 	{
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				ImGui::MenuItem("New ...");
-				ImGui::MenuItem("Load ...");
-				ImGui::MenuItem("Save ...");
+				ImGui::MenuItem("New", new_docs);
+				ImGui::MenuItem("Load", load_docs);
+				ImGui::MenuItem("Save", save_docs);
 
 				if (ImGui::MenuItem("Quit", "ESC"))
 					ret = false;
@@ -88,17 +97,16 @@ bool ModuleEditor::Update(float dt)
 
 			if (ImGui::BeginMenu("Window"))
 			{
-				ImGui::MenuItem("Console", NULL, &showconsole);
-				ImGui::MenuItem("Configuration");
-				ImGui::MenuItem("Properties");
+				ImGui::MenuItem("Console", NULL, &is_show_console);
+				ImGui::MenuItem("Configuration", NULL, &is_show_configuration);
+				ImGui::MenuItem("Properties", NULL, &is_show_properties);
 
 				ImGui::EndMenu();
 			}
 
 			if (ImGui::BeginMenu("Help"))
 			{
-				if (ImGui::MenuItem("Show Demo"))
-					showdemo = !showdemo;
+				ImGui::MenuItem("Show Demo", NULL, &is_show_demo);
 
 				if (ImGui::MenuItem("Documentation"))
 					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine/wiki", NULL, NULL, SW_SHOWNORMAL);
@@ -117,13 +125,39 @@ bool ModuleEditor::Update(float dt)
 		}
 	}
 
-	// Show demo 
-	if (showdemo)
+
+	if (is_show_demo)
 	{
-		ImGui::ShowDemoWindow(&showdemo);
+		ImGui::ShowDemoWindow(&is_show_demo);
 		ImGui::ShowMetricsWindow();
 	}
-	if (showconsole) Console::ShowConsole(&showconsole);
+
+	if (is_show_console) 
+		Console::ShowConsole(&is_show_console);
+
+	if (is_show_properties) {}
+
+	if (is_show_configuration) {}
+
+	if (is_new)
+	{
+		//...
+		is_new = false;
+	}
+
+	if (is_load) 
+	{
+		//....
+		is_load = false;
+	}
+
+	if (is_save)
+	{
+		//...
+		is_save = false;
+	}
+
+
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
 		LOG("GEOMETRY LOG %d",25,'g')
@@ -135,6 +169,27 @@ bool ModuleEditor::Update(float dt)
 	if (App->input->GetKey(SDL_SCANCODE_V) == KEY_DOWN) {
 		LOG("VERBOSE LOG", 'v')
 	}
+
+	// --- SHORTCUTS -----------------
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))
+	{
+		is_new = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN))
+	{
+		is_load = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN))
+	{
+		is_save = true;
+	}
+
+
 	return ret;
 }
 
