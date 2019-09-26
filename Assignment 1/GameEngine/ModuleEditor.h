@@ -19,6 +19,8 @@ public:
 
 	void Draw() const;
 
+	void ShowExampleAppDockSpace(bool * p_open);
+
 };
 
 #endif
