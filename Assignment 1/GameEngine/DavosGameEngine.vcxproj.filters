@@ -111,6 +111,7 @@
     <ClInclude Include="Configuration.h">
       <Filter>Sources\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="Hierarchy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -176,5 +177,6 @@
     <ClCompile Include="Configuration.cpp">
       <Filter>Sources\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="Hierarchy.cpp" />
   </ItemGroup>
 </Project>

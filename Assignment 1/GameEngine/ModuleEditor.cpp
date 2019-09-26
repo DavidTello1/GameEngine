@@ -5,6 +5,7 @@
 #include "ModuleInput.h"
 #include "ModuleEditor.h"
 #include "Console.h"
+#include "Hierarchy.h"
 
 #include <string.h>
 #include <algorithm>
@@ -123,10 +124,12 @@ bool ModuleEditor::Update(float dt)
 	static bool is_show_configuration = false;
 	static bool is_show_properties = false;
 	static bool is_show_main_dockspace = true;
+	static bool is_show_hierarchy = true;
 
 	static bool is_new = false;
 	static bool is_open = false;
 	static bool is_save = false;
+	
 
 
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
@@ -183,6 +186,7 @@ bool ModuleEditor::Update(float dt)
 		}
 	}
 
+
 	if (is_show_demo)
 	{
 		ImGui::ShowDemoWindow(&is_show_demo);
@@ -191,7 +195,10 @@ bool ModuleEditor::Update(float dt)
 
 	if (is_show_console) 
 		Console::ShowConsole(&is_show_console);
-
+	if (is_show_hierarchy)
+	{
+		Hierarchy::ShowHierarchy(&is_show_hierarchy);
+	}
 	if (is_show_properties) {}
 
 	if (is_show_configuration) {}
