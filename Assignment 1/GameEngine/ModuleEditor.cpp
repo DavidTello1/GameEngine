@@ -93,6 +93,8 @@ bool ModuleEditor::Init()
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsClassic();
 
+	Hierarchy::Init();
+
 	return true;
 }
 
@@ -158,6 +160,7 @@ bool ModuleEditor::Update(float dt)
 
 			if (ImGui::BeginMenu("Window"))
 			{
+				ImGui::MenuItem("Hierarchy", NULL, &is_show_hierarchy);
 				ImGui::MenuItem("Console", NULL, &is_show_console);
 				ImGui::MenuItem("Configuration", NULL, &is_show_configuration);
 				ImGui::MenuItem("Properties", NULL, &is_show_properties);
