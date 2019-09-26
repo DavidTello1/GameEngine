@@ -1,10 +1,11 @@
 #include "Globals.h"
 #include "Application.h"
-#include "ModuleEditor.h"
 #include "ModuleWindow.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleInput.h"
+#include "ModuleEditor.h"
 #include "Console.h"
+
 #include <string.h>
 #include <algorithm>
 
@@ -73,7 +74,7 @@ bool ModuleEditor::Update(float dt)
 	static bool is_show_properties = false;
 
 	static bool is_new = false;
-	static bool is_load = false;
+	static bool is_open = false;
 	static bool is_save = false;
 
 
@@ -85,9 +86,14 @@ bool ModuleEditor::Update(float dt)
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				ImGui::MenuItem("New", new_docs);
-				ImGui::MenuItem("Load", load_docs);
-				ImGui::MenuItem("Save", save_docs);
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+					is_new = true;
+
+				if (ImGui::MenuItem("Open", "Ctrl+O"))
+					is_open = true;
+
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
+					is_save = true;
 
 				if (ImGui::MenuItem("Quit", "ESC"))
 					ret = false;
@@ -145,10 +151,10 @@ bool ModuleEditor::Update(float dt)
 		is_new = false;
 	}
 
-	if (is_load) 
+	if (is_open) 
 	{
 		//....
-		is_load = false;
+		is_open = false;
 	}
 
 	if (is_save)
@@ -180,7 +186,7 @@ bool ModuleEditor::Update(float dt)
 	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN) ||
 		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN))
 	{
-		is_load = true;
+		is_open = true;
 	}
 
 	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN) ||
