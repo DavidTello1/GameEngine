@@ -81,7 +81,7 @@ bool ModuleEditor::Update(float dt)
 				ImGui::MenuItem("Save ...");
 
 				if (ImGui::MenuItem("Quit", "ESC"))
-					ret = false;
+					App->input->quit = true;
 
 				ImGui::EndMenu();
 			}
