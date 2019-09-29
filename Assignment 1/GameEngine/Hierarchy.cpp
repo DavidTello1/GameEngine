@@ -16,8 +16,28 @@ void Hierarchy::Init()
 {
 	SetSceneName("Recursively");
 
-
 	for (int i = 0; i < 6; i++) {
+		AddNode();
+		for (int j = 0; j < i; j++) {
+			AddNode(&Hierarchy::nodes.back());
+		}
+	}
+	AddNode();
+	for (int i = 0; i < 3; i++) {
+		AddNode(&Hierarchy::nodes.back());
+		for (int j = 0; j < i+1; j++) {
+			AddNode(&Hierarchy::nodes.back().childs.back());
+		}
+	}
+	/*HierarchyNode node = HierarchyNode();
+	for (int j = 0; j < 3; j++) {
+		node.childs.push_back(HierarchyNode());
+	}
+	for (int j = 0; j < 4; j++) {
+		node.childs[0].childs.push_back(HierarchyNode());
+	}*/
+
+	/*for (int i = 0; i < 6; i++) {
 		HierarchyNode node = HierarchyNode();
 		for (int j = 0; j < i; j++) {
 			node.childs.push_back(HierarchyNode());
@@ -30,9 +50,9 @@ void Hierarchy::Init()
 	}
 	for (int j = 0; j < 4; j++) {
 		node.childs[0].childs.push_back(HierarchyNode());
-	}
+	}*/
 
-	Hierarchy::nodes.push_back(node);
+	//Hierarchy::nodes.push_back(node);
 }
 
 Hierarchy::~Hierarchy()
@@ -47,11 +67,13 @@ void Hierarchy::AddNode(HierarchyNode* node)
 	if (node == nullptr) 
 	{
 		Hierarchy::nodes.push_back(n);
+		LOG("Added free node %ld", n.id,'d');
 	}
 	else {
 		node->childs.push_back(n);
 		node->flags &= ~HierarchyNode::leaf_flags;
 		node->flags |= HierarchyNode::base_flags;
+		LOG("Added child %ld to parent %ld", n.id, node->id,'d');
 	}
 
 
@@ -94,7 +116,7 @@ void DrawNodes(std::vector<HierarchyNode>& v)
 
 			}
 			// Does not work
-			else {
+			else if (node.selected_index>=0){
 				node.flags &= ~ImGuiTreeNodeFlags_Selected;
 				Hierarchy::selected_nodes.erase(Hierarchy::selected_nodes.begin()+node.selected_index);
 				for (HierarchyNode* n : Hierarchy::selected_nodes)
@@ -129,6 +151,7 @@ void Hierarchy::Draw(const char * title, bool * p_open)
 		AddNode();
 	}ImGui::SameLine();
 	if (ImGui::Button("Add Child")) {
+		if(!Hierarchy::selected_nodes.empty())
 		AddNode(Hierarchy::selected_nodes[0]);
 	}ImGui::SameLine();
 	if (ImGui::Button("Add Childs")) {

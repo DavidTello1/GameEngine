@@ -32,14 +32,22 @@ void log(const char file[], int line, const char* format, ...)
 	strcpy(short_file, lastslashlocation+1);
 
 	// geometry logs
-	if (logtype == 'g' && Console::console.ShowGeometryLog) {
-		sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "GEOMETRY", short_file, line, tmp_string);
-		Console::console.AddLog(tmp_string2);
+	if (logtype == 'g')
+	{
+		if (Console::console.ShowGeometryLog) 
+		{
+			sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "GEOMETRY", short_file, line, tmp_string);
+			Console::console.AddLog(tmp_string2);
+		} // else { ignore log }
 	}
 	// debug logs
-	else if (logtype == 'd' && Console::console.ShowDebugLog) {
-		sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "DEBUG", short_file, line,  tmp_string);
-		Console::console.AddLog(tmp_string2);
+	else if (logtype == 'd')
+	{ 
+		if (Console::console.ShowDebugLog)
+		{
+			sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "DEBUG", short_file, line, tmp_string);
+			Console::console.AddLog(tmp_string2);
+		}
 	}
 	// verbose logs
 	else if (Console::console.ShowVerboseLog) {
