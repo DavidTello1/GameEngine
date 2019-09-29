@@ -59,7 +59,7 @@ void ShowExampleAppDockSpace(bool* p_open)
 	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
 	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("DockSpace", p_open, window_flags);
+	ImGui::Begin("MainDockSpace", p_open, window_flags);
 	ImGui::PopStyleVar();
 
 	if (opt_fullscreen)
@@ -124,7 +124,7 @@ bool ModuleEditor::Update(float dt)
 	static bool is_show_demo = true;
 	bool is_draw_menu = true;
 
-	static bool is_show_console = false;
+	static bool is_show_console = true;
 	static bool is_show_configuration = false;
 	static bool is_show_properties = false;
 	static bool is_show_main_dockspace = true;

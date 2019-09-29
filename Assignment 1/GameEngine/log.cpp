@@ -22,7 +22,7 @@ void log(const char file[], int line, const char* format, ...)
 	va_end(ap);
 
 	//Default visual studio logging
-	sprintf_s(tmp_string2, 4096, "\n%s(%d) : %s", file, line, tmp_string);
+	sprintf_s(tmp_string2, 4096, "%s(%d) : %s", file, line, tmp_string);
 	OutputDebugString(tmp_string2);
 
 	//Console logging
@@ -33,17 +33,17 @@ void log(const char file[], int line, const char* format, ...)
 
 	// geometry logs
 	if (logtype == 'g' && Console::console.ShowGeometryLog) {
-		sprintf_s(tmp_string2, 4096, "\n[%s] %s(%d) : %s", "GEOMETRY", short_file, line, tmp_string);
+		sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "GEOMETRY", short_file, line, tmp_string);
 		Console::console.AddLog(tmp_string2);
 	}
 	// debug logs
 	else if (logtype == 'd' && Console::console.ShowDebugLog) {
-		sprintf_s(tmp_string2, 4096, "\n[%s] %s(%d) : %s", "DEBUG", short_file, line,  tmp_string);
+		sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "DEBUG", short_file, line,  tmp_string);
 		Console::console.AddLog(tmp_string2);
 	}
 	// verbose logs
 	else if (Console::console.ShowVerboseLog) {
-		sprintf_s(tmp_string2, 4096, "\n[%s] %s(%d) : %s", "VERBOSE", short_file, line,  tmp_string);
+		sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "VERBOSE", short_file, line,  tmp_string);
 		Console::console.AddLog(tmp_string2);
 	}
 

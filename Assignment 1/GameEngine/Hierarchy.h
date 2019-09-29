@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <random>
+#include "ImGui/imgui.h"
 
 #define MAX_NAME_LENGTH 512
 
@@ -8,13 +9,32 @@ struct HierarchyNode
 {
 
 	long id;
+	int selected_index;
 	char name[MAX_NAME_LENGTH];
 	std::vector<HierarchyNode> childs;
+	ImGuiTreeNodeFlags flags;
 
 	HierarchyNode() 
 	{
 		id = lrand();
+		selected_index = -1;
 		sprintf_s(name, MAX_NAME_LENGTH, "Object");
+		flags = base_flags;
+	}
+
+	HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags)
+	{
+		id = lrand();
+		selected_index = -1;
+		sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
+		flags = Flags;
+	}
+	HierarchyNode(ImGuiTreeNodeFlags Flags)
+	{
+		id = lrand();
+		selected_index = -1;
+		sprintf_s(name, MAX_NAME_LENGTH, "Object");
+		flags = Flags;
 	}
 	~HierarchyNode() 
 	{
@@ -25,6 +45,16 @@ struct HierarchyNode
 	{
 		sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
 	}
+
+public:
+
+	// Base flags
+	static const ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+	static const ImGuiTreeNodeFlags leaf_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+
+	// Selected flags
+	static const ImGuiTreeNodeFlags base_selected_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Selected;
+	static const ImGuiTreeNodeFlags leaf_selected_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_Leaf;
 
 private:
 
@@ -47,6 +77,8 @@ public:
 	Hierarchy();
 	~Hierarchy();
 
+	static void AddNode(HierarchyNode* node = nullptr);
+
 	//static Hierarchy hierarchy;
 	static void Init();
 
@@ -66,6 +98,8 @@ public:
 
 	static std::vector<HierarchyNode> nodes;
 
-	//std::vector<HierarchyNode>* nodes;
+	static std::vector<HierarchyNode*> selected_nodes;
+
+
 };
 

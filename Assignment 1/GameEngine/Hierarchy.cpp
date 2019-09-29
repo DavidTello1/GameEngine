@@ -1,15 +1,13 @@
 #include "Hierarchy.h"
 #include "Console.h"
-#include "ImGui/imgui.h"
 #include "Globals.h"
-
 
 //Hierarchy hierarchy = Hierarchy();
 
 char Hierarchy::scene_name[MAX_NAME_LENGTH];
 
 std::vector<HierarchyNode> Hierarchy::nodes;
-
+std::vector<HierarchyNode*> Hierarchy::selected_nodes;
 Hierarchy::Hierarchy()
 {
 }
@@ -33,6 +31,7 @@ void Hierarchy::Init()
 	for (int j = 0; j < 4; j++) {
 		node.childs[0].childs.push_back(HierarchyNode());
 	}
+
 	Hierarchy::nodes.push_back(node);
 }
 
@@ -40,6 +39,22 @@ Hierarchy::~Hierarchy()
 {
 }
 
+// Add a new dummy node, child of the passed node or an independent if is nullptr
+void Hierarchy::AddNode(HierarchyNode* node) 
+{
+	HierarchyNode n = HierarchyNode(HierarchyNode::leaf_flags);
+
+	if (node == nullptr) 
+	{
+		Hierarchy::nodes.push_back(n);
+	}
+	else {
+		node->childs.push_back(n);
+		node->flags = HierarchyNode::base_flags;
+	}
+
+
+}
 
 
 void Hierarchy::ShowHierarchy(bool* open) 
@@ -48,45 +63,53 @@ void Hierarchy::ShowHierarchy(bool* open)
 	Draw("Hierarchy", open);
 }
 
-//void DrawNodes(const std::vector<HierarchyNode>& v) 
-//{
-//	char buffer[512];
-//
-//	for (int i = 0; i <v.size(); i++) {
-//
-//		sprintf_s(buffer, 512, "Node %ld", v[i].id);
-//		if (ImGui::TreeNode(buffer))
-//		{
-//			for (int j = 0; j < v[i].childs.size(); j++)
-//			{
-//				sprintf_s(buffer, 512, "Child %ld", v[i].childs[j].id);
-//				if (ImGui::TreeNode(buffer)) {
-//
-//					ImGui::TreePop();
-//				}
-//			}
-//			ImGui::TreePop();
-//		}
-//	}
-//}
 
-void DrawNodes(const std::vector<HierarchyNode>& v)
+void DrawNodes(std::vector<HierarchyNode>& v)
 {
 	char buffer[512];
-
-	for (const HierarchyNode node : v) 
+	for (HierarchyNode& node : v) 
 	{
-		// Get node name
-		sprintf_s(buffer, 512, "%s %ld", node.name, node.id);
 
-		if (ImGui::TreeNode(buffer))
+		//In future to be substituited buffer by node.name only, no need to show id
+		sprintf_s(buffer, 512, "%s %ld", node.name, node.id);
+		if (ImGui::TreeNodeEx(buffer, node.flags))
 		{
-			if (node.childs.size() > 0)
+			// if has childs
+			if (node.childs.size() > 0) 
 			{
 				DrawNodes(node.childs);
 			}
 			ImGui::TreePop();
 		}
+
+		if (ImGui::IsItemClicked()) 
+		{
+			if(node.selected_index == -1)
+			{
+				node.flags |= ImGuiTreeNodeFlags_Selected;
+				LOG("NODE %ld SELECTED", node.id, 'd');
+				Hierarchy::selected_nodes.push_back(&node);
+				node.selected_index = Hierarchy::selected_nodes.size()-1;
+
+			}
+			// Does not work
+			else {
+				node.flags &= ~ImGuiTreeNodeFlags_Selected;
+				Hierarchy::selected_nodes.erase(Hierarchy::selected_nodes.begin()+node.selected_index);
+				for (HierarchyNode* n : Hierarchy::selected_nodes)
+				{
+					n->selected_index--;
+				}
+				node.selected_index = -1;
+				LOG("NODE %ld UN-SELECTED", node.id, 'd');
+			}
+		}
+		else
+		{
+			//LOG("NODE %ld NOT CLICKED", node.id, 'd');
+		}
+
+
 	}
 
 }
@@ -101,13 +124,23 @@ void Hierarchy::Draw(const char * title, bool * p_open)
 		return;
 	}
 
+	if (ImGui::Button("Add Node")) {
+		AddNode();
+	}ImGui::SameLine();
+	if (ImGui::Button("Add Child")) {
+		AddNode(Hierarchy::selected_nodes[0]);
+	}ImGui::SameLine();
+	if (ImGui::Button("Add Childs")) {
+		for (HierarchyNode* selected : Hierarchy::selected_nodes)
+			AddNode(selected);
+	}
+
 	ImGui::Text(Hierarchy::scene_name);
 	ImGui::Separator();
 
 	// Actually drawing of nodes
-	static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-	
+	//Hierarchy::selected_nodes.clear();
 	DrawNodes(Hierarchy::nodes);
 
 	// To delete
