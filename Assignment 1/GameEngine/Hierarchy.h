@@ -8,15 +8,22 @@ struct HierarchyNode
 {
 
 	long id;
+	char name[MAX_NAME_LENGTH];
 	std::vector<HierarchyNode> childs;
 
 	HierarchyNode() 
 	{
 		id = lrand();
+		sprintf_s(name, MAX_NAME_LENGTH, "Object");
 	}
 	~HierarchyNode() 
 	{
 		childs.clear();
+	}
+
+	void HierarchyNode::SetName(const char* Name) 
+	{
+		sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
 	}
 
 private:

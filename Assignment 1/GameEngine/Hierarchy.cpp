@@ -18,6 +18,7 @@ void Hierarchy::Init()
 {
 	SetSceneName("Recursively");
 
+
 	for (int i = 0; i < 6; i++) {
 		HierarchyNode node = HierarchyNode();
 		for (int j = 0; j < i; j++) {
@@ -73,16 +74,16 @@ void DrawNodes(const std::vector<HierarchyNode>& v)
 {
 	char buffer[512];
 
-	for (const HierarchyNode n : v) 
+	for (const HierarchyNode node : v) 
 	{
 		// Get node name
-		sprintf_s(buffer, 512, "Node %ld",n.id);
+		sprintf_s(buffer, 512, "%s %ld", node.name, node.id);
 
 		if (ImGui::TreeNode(buffer))
 		{
-			if (n.childs.size() > 0)
+			if (node.childs.size() > 0)
 			{
-				DrawNodes(n.childs);
+				DrawNodes(node.childs);
 			}
 			ImGui::TreePop();
 		}
@@ -102,6 +103,9 @@ void Hierarchy::Draw(const char * title, bool * p_open)
 
 	ImGui::Text(Hierarchy::scene_name);
 	ImGui::Separator();
+
+	// Actually drawing of nodes
+	static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 	
 	DrawNodes(Hierarchy::nodes);

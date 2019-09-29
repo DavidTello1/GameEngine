@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleInput.h"
+#include "ImGui/imgui.h"
 
 #define MAX_KEYS 300
 
@@ -39,6 +40,7 @@ bool ModuleInput::Init()
 bool ModuleInput::PreUpdate(float dt)
 {
 	SDL_PumpEvents();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	
@@ -46,17 +48,24 @@ bool ModuleInput::PreUpdate(float dt)
 	{
 		if(keys[i] == 1)
 		{
-			if(keyboard[i] == KEY_IDLE)
+			if (keyboard[i] == KEY_IDLE) {
 				keyboard[i] = KEY_DOWN;
+				io.KeysDown[i] = KEY_DOWN;
+			}
 			else
 				keyboard[i] = KEY_REPEAT;
 		}
 		else
 		{
-			if(keyboard[i] == KEY_REPEAT || keyboard[i] == KEY_DOWN)
+			if (keyboard[i] == KEY_REPEAT || keyboard[i] == KEY_DOWN) {
+				io.KeysDown[i] = KEY_UP;
 				keyboard[i] = KEY_UP;
-			else
+			}
+			else {
 				keyboard[i] = KEY_IDLE;
+				io.KeysDown[i] = KEY_IDLE;
+
+			}
 		}
 	}
 
@@ -93,6 +102,7 @@ bool ModuleInput::PreUpdate(float dt)
 		{
 			case SDL_MOUSEWHEEL:
 			mouse_z = e.wheel.y;
+			io.MouseWheel = mouse_z;
 			break;
 
 			case SDL_MOUSEMOTION:
@@ -101,6 +111,9 @@ bool ModuleInput::PreUpdate(float dt)
 
 			mouse_x_motion = e.motion.xrel / SCREEN_SIZE;
 			mouse_y_motion = e.motion.yrel / SCREEN_SIZE;
+
+			//io.MouseDelta = ImVec2(mouse_x_motion, mouse_y_motion);
+
 			break;
 
 			case SDL_QUIT:

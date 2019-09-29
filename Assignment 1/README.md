@@ -47,8 +47,11 @@ and software versions (SDL, OpenGL, Devil).
 
 9. The camera must adapt to the size of the geometry after being dropped to move far or close
 depending on the scale of the geometry.
-10. There must be a general menu with option to quit, visit the github page, and get info about the
-engine (“About”). It should also be able to turn on/off editor windows
+10. There must be a general menu with: 
+~~- option to quit~~
+~~- visit the github page~~ 
+- info about theengine (“About”). 
+- It should also be able to turn on/off editor windows
 11. A properties window with three sections: transformation, geometry and texture. All should give
 information about the current loaded meshes and texture (triangle count, texture size, position,
 rotation and scale).
