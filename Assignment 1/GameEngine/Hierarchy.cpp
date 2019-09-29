@@ -50,7 +50,8 @@ void Hierarchy::AddNode(HierarchyNode* node)
 	}
 	else {
 		node->childs.push_back(n);
-		node->flags = HierarchyNode::base_flags;
+		node->flags &= ~HierarchyNode::leaf_flags;
+		node->flags |= HierarchyNode::base_flags;
 	}
 
 
