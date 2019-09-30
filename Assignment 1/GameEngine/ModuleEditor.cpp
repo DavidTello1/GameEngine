@@ -121,8 +121,9 @@ bool ModuleEditor::Update(float dt)
 	bool ret = true;
 	
 
-	static bool is_show_demo = true;
 	bool is_draw_menu = true;
+	static bool is_show_demo = true;
+	static bool is_about = false;
 
 	static bool is_show_console = false;
 	static bool is_show_configuration = false;
@@ -184,6 +185,9 @@ bool ModuleEditor::Update(float dt)
 				if (ImGui::MenuItem("Report a bug"))
 					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine/issues", NULL, NULL, SW_SHOWNORMAL);
 
+				if (ImGui::MenuItem("About"))
+					is_about = true;
+
 				ImGui::EndMenu();
 			}
 
@@ -196,6 +200,59 @@ bool ModuleEditor::Update(float dt)
 	{
 		ImGui::ShowDemoWindow(&is_show_demo);
 		ImGui::ShowMetricsWindow();
+	}
+
+	if (is_about)
+	{
+		ImGui::OpenPopup("About");
+		if (ImGui::BeginPopupModal("About"), true, ImGuiWindowFlags_AlwaysAutoResize)
+		{
+			static ImVec2 oscar_size(ImGui::CalcTextSize("Oscar Pons"));
+			static ImVec2 david_size(ImGui::CalcTextSize("David Tello"));
+
+			ImGui::Text("Davos Game Engine");
+			ImGui::Text("Description");
+			ImGui::Text("By"); ImGui::SameLine();
+			ImGui::Text("Oscar Pons"); ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() - oscar_size.x - 10);
+			if (ImGui::InvisibleButton("Oscar", ImVec2(oscar_size)))
+			{
+				ShellExecuteA(NULL, "open", "https://github.com/ponspack9", NULL, NULL, SW_SHOWNORMAL);
+			}
+			ImGui::SameLine();
+			ImGui::Text("&"); ImGui::SameLine();
+			ImGui::Text("David Tello"); ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() - david_size.x - 10);
+			if (ImGui::InvisibleButton("David", ImVec2(david_size)))
+			{
+				ShellExecuteA(NULL, "open", "https://github.com/DavidTello1", NULL, NULL, SW_SHOWNORMAL);
+			}
+			
+			ImGui::NewLine();
+			ImGui::Text("3rd Party Libraries used:");
+			ImGui::Text("- SDL 2.0.10");
+			ImGui::Text("- Glew 2.0.0");
+			ImGui::Text("- ImGui 1.73");
+			ImGui::Text("- OpenGL 3.1"); ImGui::NewLine();
+
+			ImGui::Text("License:");
+			ImGui::Text("MIT License");
+			ImGui::Text("Copyright 2019. Oscar Pons and David Tello");
+
+			ImGui::Text("Permission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files(the 'Software'), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions :");
+
+			ImGui::Text("The above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.");
+
+			ImGui::Text("THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.");
+			ImGui::NewLine();
+
+			if (ImGui::Button("Close"))
+			{
+				ImGui::CloseCurrentPopup();
+				is_about = false;
+			}
+			ImGui::EndPopup();
+		}
 	}
 
 	if (is_show_console) 
