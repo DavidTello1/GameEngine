@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <random>
+#include <set>
 #include "ImGui/imgui.h"
 
 #define MAX_NAME_LENGTH 512
@@ -9,7 +10,7 @@ struct HierarchyNode
 {
 
 	long id;
-	int selected_index;
+	bool is_selected;
 	char name[MAX_NAME_LENGTH];
 	std::vector<HierarchyNode> childs;
 	ImGuiTreeNodeFlags flags;
@@ -17,7 +18,7 @@ struct HierarchyNode
 	HierarchyNode() 
 	{
 		id = lrand();
-		selected_index = -1;
+		is_selected = false;
 		sprintf_s(name, MAX_NAME_LENGTH, "Object");
 		flags = base_flags;
 	}
@@ -25,14 +26,14 @@ struct HierarchyNode
 	HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags)
 	{
 		id = lrand();
-		selected_index = -1;
+		is_selected = false;
 		sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
 		flags = Flags;
 	}
 	HierarchyNode(ImGuiTreeNodeFlags Flags)
 	{
 		id = lrand();
-		selected_index = -1;
+		is_selected = false;
 		sprintf_s(name, MAX_NAME_LENGTH, "Object");
 		flags = Flags;
 	}
@@ -98,7 +99,7 @@ public:
 
 	static std::vector<HierarchyNode> nodes;
 
-	static std::vector<HierarchyNode*> selected_nodes;
+	static std::set<HierarchyNode*> selected_nodes;
 
 
 };
