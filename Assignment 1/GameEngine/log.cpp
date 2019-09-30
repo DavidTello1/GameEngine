@@ -47,12 +47,12 @@ void log(const char file[], int line, const char* format, ...)
 		{
 			sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "DEBUG", short_file, line, tmp_string);
 			Console::console.AddLog(tmp_string2);
-		}
+		} // else { ignore log }
 	}
 	// verbose logs
 	else if (Console::console.ShowVerboseLog) {
 		sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "VERBOSE", short_file, line,  tmp_string);
 		Console::console.AddLog(tmp_string2);
-	}
+	} // else { ignore log }
 
 }

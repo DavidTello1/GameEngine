@@ -70,19 +70,8 @@ void DrawNodes(std::vector<HierarchyNode>& v)
 	{
 		//In future to be substituited buffer by node.name only, no need to show id
 		sprintf_s(buffer, 512, "%s %ld", node.name, node.id);
-		if (ImGui::TreeNodeEx(buffer, node.flags))
-		{	// Node is open, need to draw childs
-
-			// if has childs
-			if (node.childs.size() > 0) 
-			{
-				DrawNodes(node.childs);
-			}
-			
-			ImGui::TreePop();
-						
-		}
-
+		bool is_open = ImGui::TreeNodeEx(buffer, node.flags);
+		
 		if (ImGui::IsItemClicked()) 
 		{
 			// if its NOT selected
@@ -103,6 +92,18 @@ void DrawNodes(std::vector<HierarchyNode>& v)
 			}
 		}
 
+		if (is_open)
+		{	// Node is open, need to draw childs
+
+			// if has childs
+			if (node.childs.size() > 0)
+			{
+				DrawNodes(node.childs);
+			}
+
+			ImGui::TreePop();
+
+		}
 	}
 
 }
