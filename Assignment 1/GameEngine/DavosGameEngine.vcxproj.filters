@@ -115,6 +115,9 @@
       <Filter>Sources\Windows</Filter>
     </ClInclude>
     <ClInclude Include="Inspector.h" />
+    <ClInclude Include="HierarchyNode.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -184,5 +187,8 @@
       <Filter>Sources\Windows</Filter>
     </ClCompile>
     <ClCompile Include="Inspector.cpp" />
+    <ClCompile Include="HierarchyNode.cpp">
+      <Filter>Sources\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

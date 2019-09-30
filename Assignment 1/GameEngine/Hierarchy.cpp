@@ -1,7 +1,7 @@
 #include "Hierarchy.h"
 #include "Console.h"
 #include "Globals.h"
-
+#include "ImGui/imgui.h"
 //Hierarchy hierarchy = Hierarchy();
 
 char Hierarchy::scene_name[MAX_NAME_LENGTH];
@@ -79,33 +79,42 @@ void DrawNodes(std::vector<HierarchyNode*>& v)
 	char buffer[512];
 	for (HierarchyNode* node : v) 
 	{
-		//In future to be substituited buffer by node.name only, no need to show id
+		//TODO In future to be substituited buffer by node.name only, no need to show id
 		sprintf_s(buffer, 512, "%s %ld", node->name, node->id);
 		bool is_open = ImGui::TreeNodeEx(buffer, node->flags);
 		
+		// if treenode is clicked, check whether it is a single or multi selection
 		if (ImGui::IsItemClicked()) 
 		{
-			// if its NOT selected
-			if(!node->is_selected)
+			if (!ImGui::GetIO().KeyCtrl) // Single selection, clear selected nodes
 			{
-				node->flags |= ImGuiTreeNodeFlags_Selected;
-				LOG("NODE %ld SELECTED", node->id, 'd');
-				Hierarchy::selected_nodes.emplace(node);//////////////////
-				node->is_selected = true;
+				for (HierarchyNode* i : Hierarchy::selected_nodes)
+				{ // Selected nodes has selected state, toggle is safe [panaderia de pan]
+					i->ToggleSelection();
+				}
+				Hierarchy::selected_nodes.clear();
+
+				LOG("Single selection", 'd');
+			}
+			else
+			{
+				LOG("Multi Selection", 'd');
 			}
 
-			// if its selected
-			else {
-				node->flags &= ~ImGuiTreeNodeFlags_Selected;
-				Hierarchy::selected_nodes.erase(Hierarchy::selected_nodes.find(node));
-				LOG("NODE %ld UN-SELECTED", node->id, 'd');
-				node->is_selected = false;
+			// Always need to toggle the state of selection of the node, getting its current state
+			if (node->ToggleSelection())
+			{
+				Hierarchy::selected_nodes.emplace(node);
 			}
+			else {
+				Hierarchy::selected_nodes.erase(Hierarchy::selected_nodes.find(node));
+			}
+
 		}
 
 		if (is_open)
-		{	// Node is open, need to draw childs if has childs
-
+		{	
+			// Node is open, need to draw childs if has childs
 			if (node->childs.size() > 0)
 			{
 				DrawNodes(node->childs);
@@ -131,10 +140,7 @@ void Hierarchy::Draw(const char * title, bool * p_open)
 	if (ImGui::Button("Add Node")) {
 		AddNode();
 	}ImGui::SameLine();
-	if (ImGui::Button("Add Child")) {
-		if(!Hierarchy::selected_nodes.empty())
-		AddNode(*Hierarchy::selected_nodes.begin());
-	}ImGui::SameLine();
+
 	if (ImGui::Button("Add Childs")) {
 		for (HierarchyNode* selected : Hierarchy::selected_nodes)
 			AddNode(selected);
