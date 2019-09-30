@@ -12,7 +12,7 @@ struct HierarchyNode
 	long id;
 	bool is_selected;
 	char name[MAX_NAME_LENGTH];
-	std::vector<HierarchyNode> childs;
+	std::vector<HierarchyNode*> childs;
 	ImGuiTreeNodeFlags flags;
 
 	HierarchyNode() 
@@ -97,7 +97,7 @@ public:
 
 	//Data
 
-	static std::vector<HierarchyNode> nodes;
+	static std::vector<HierarchyNode*> nodes;
 
 	static std::set<HierarchyNode*> selected_nodes;
 

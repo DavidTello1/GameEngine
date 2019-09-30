@@ -6,8 +6,9 @@
 
 char Hierarchy::scene_name[MAX_NAME_LENGTH];
 
-std::vector<HierarchyNode> Hierarchy::nodes;
+std::vector<HierarchyNode*> Hierarchy::nodes;
 std::set<HierarchyNode*> Hierarchy::selected_nodes;
+
 Hierarchy::Hierarchy()
 {
 }
@@ -16,19 +17,28 @@ void Hierarchy::Init()
 {
 	SetSceneName("Recursively");
 
-	for (int i = 0; i < 6; i++) {
+	/*for (int i = 0; i < 6; i++) {
 		AddNode();
 		for (int j = 0; j < i; j++) {
-			AddNode(&Hierarchy::nodes.back());
+			AddNode(Hierarchy::nodes.back());
 		}
+	}*/
+	/*for (int i = 0; i < 3; i++) {
+		AddNode(Hierarchy::nodes.back());
+		for (int j = 0; j < i+1; j++) {
+			if(Hierarchy::nodes.back()->childs.empty())
+				AddNode(Hierarchy::nodes.back());
+			else
+				AddNode(Hierarchy::nodes.back()->childs.back());
+		}
+	}*/
+	for (int i = 0; i < 6; i++) {
+		AddNode();
+		/*for (int j = 0; j < i; j++) {
+			AddNode(Hierarchy::nodes.back());
+		}*/
 	}
 	AddNode();
-	for (int i = 0; i < 3; i++) {
-		AddNode(&Hierarchy::nodes.back());
-		for (int j = 0; j < i+1; j++) {
-			AddNode(&Hierarchy::nodes.back().childs.back());
-		}
-	}
 }
 
 Hierarchy::~Hierarchy()
@@ -36,20 +46,21 @@ Hierarchy::~Hierarchy()
 }
 
 // Add a new dummy node, child of the passed node or an independent if is nullptr
-void Hierarchy::AddNode(HierarchyNode* node) 
+void Hierarchy::AddNode(HierarchyNode* parent) 
 {
-	HierarchyNode n = HierarchyNode(HierarchyNode::leaf_flags);
+	HierarchyNode* n = new HierarchyNode(HierarchyNode::leaf_flags);
 
-	if (node == nullptr) 
+	if (parent == nullptr)
 	{
 		Hierarchy::nodes.push_back(n);
-		LOG("Added free node %ld", n.id,'d');
+		LOG("Added free node %ld", n->id,'d');
 	}
 	else {
-		node->childs.push_back(n);
-		node->flags &= ~HierarchyNode::leaf_flags;
-		node->flags |= HierarchyNode::base_flags;
-		LOG("Added child %ld to parent %ld", n.id, node->id,'d');
+		//Hierarchy::nodes.push_back(n);
+		parent->childs.push_back(n);
+		parent->flags &= ~HierarchyNode::leaf_flags;
+		parent->flags |= HierarchyNode::base_flags;
+		LOG("Added child %ld to parent %ld", n->id, parent->id,'d');
 	}
 
 
@@ -63,46 +74,45 @@ void Hierarchy::ShowHierarchy(bool* open)
 }
 
 // Problems with the last child and parent doing the same thing
-void DrawNodes(std::vector<HierarchyNode>& v)
+void DrawNodes(std::vector<HierarchyNode*>& v)
 {
 	char buffer[512];
-	for (HierarchyNode& node : v) 
+	for (HierarchyNode* node : v) 
 	{
 		//In future to be substituited buffer by node.name only, no need to show id
-		sprintf_s(buffer, 512, "%s %ld", node.name, node.id);
-		bool is_open = ImGui::TreeNodeEx(buffer, node.flags);
+		sprintf_s(buffer, 512, "%s %ld", node->name, node->id);
+		bool is_open = ImGui::TreeNodeEx(buffer, node->flags);
 		
 		if (ImGui::IsItemClicked()) 
 		{
 			// if its NOT selected
-			if(!node.is_selected)
+			if(!node->is_selected)
 			{
-				node.flags |= ImGuiTreeNodeFlags_Selected;
-				LOG("NODE %ld SELECTED", node.id, 'd');
-				Hierarchy::selected_nodes.emplace(&node);
-				node.is_selected = true;
+				node->flags |= ImGuiTreeNodeFlags_Selected;
+				LOG("NODE %ld SELECTED", node->id, 'd');
+				Hierarchy::selected_nodes.emplace(node);//////////////////
+				node->is_selected = true;
 			}
 
 			// if its selected
 			else {
-				node.flags &= ~ImGuiTreeNodeFlags_Selected;
-				Hierarchy::selected_nodes.erase(Hierarchy::selected_nodes.find(&node));
-				LOG("NODE %ld UN-SELECTED", node.id, 'd');
-				node.is_selected = false;
+				node->flags &= ~ImGuiTreeNodeFlags_Selected;
+				Hierarchy::selected_nodes.erase(Hierarchy::selected_nodes.find(node));
+				LOG("NODE %ld UN-SELECTED", node->id, 'd');
+				node->is_selected = false;
 			}
 		}
 
 		if (is_open)
-		{	// Node is open, need to draw childs
+		{	// Node is open, need to draw childs if has childs
 
-			// if has childs
-			if (node.childs.size() > 0)
+			if (node->childs.size() > 0)
 			{
-				DrawNodes(node.childs);
+				DrawNodes(node->childs);
 			}
 
-			ImGui::TreePop();
 
+			ImGui::TreePop();
 		}
 	}
 
