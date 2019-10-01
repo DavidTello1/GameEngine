@@ -36,7 +36,7 @@ void log(const char file[], int line, const char* format, ...)
 	{
 		if (Console::console.ShowGeometryLog) 
 		{
-			sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "GEOMETRY", short_file, line, tmp_string);
+			sprintf_s(tmp_string2, 4096, "[Geometry] %s(%d) : %s", short_file, line, tmp_string);
 			Console::console.AddLog(tmp_string2);
 		} // else { ignore log }
 	}
@@ -45,13 +45,18 @@ void log(const char file[], int line, const char* format, ...)
 	{ 
 		if (Console::console.ShowDebugLog)
 		{
-			sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "DEBUG", short_file, line, tmp_string);
+			sprintf_s(tmp_string2, 4096, "[Debug] %s(%d) : %s", short_file, line, tmp_string);
 			Console::console.AddLog(tmp_string2);
 		} // else { ignore log }
 	}
+	else if (logtype == 'e') // errors can not be ignored, there's always something to learn
+	{
+		sprintf_s(tmp_string2, 4096, "[Error] %s(%d) : %s", short_file, line, tmp_string);
+		Console::console.AddLog(tmp_string2);
+	}
 	// verbose logs
 	else if (Console::console.ShowVerboseLog) {
-		sprintf_s(tmp_string2, 4096, "[%s] %s(%d) : %s", "VERBOSE", short_file, line,  tmp_string);
+		sprintf_s(tmp_string2, 4096, "[Verbose] %s(%d) : %s", short_file, line,  tmp_string);
 		Console::console.AddLog(tmp_string2);
 	} // else { ignore log }
 

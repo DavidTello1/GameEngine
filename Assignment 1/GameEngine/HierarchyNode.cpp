@@ -39,6 +39,7 @@ bool HierarchyNode::ToggleSelection()
 	{
 		flags |= ImGuiTreeNodeFlags_Selected;
 		is_selected = true;
+
 		LOG("NODE %ld SELECTED", id, 'd');
 	}
 
@@ -55,5 +56,11 @@ bool HierarchyNode::ToggleSelection()
 
 void HierarchyNode::SetName(const char* Name)
 {
-	sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
+	if (strlen(Name) < MAX_NAME_LENGTH) {
+		LOG("Renaming node %ld from '%s' to '%s'", id, name, Name);
+		sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
+	}
+	else {
+		LOG("Node name exceeds max length (%d)",MAX_NAME_LENGTH ,'e');
+	}
 }
