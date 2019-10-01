@@ -267,16 +267,12 @@ bool ModuleEditor::Update(float dt)
 		Console::ShowConsole(&is_show_console);
 
 	if (is_show_hierarchy)
-	{
 		Hierarchy::ShowHierarchy(&is_show_hierarchy);
-	}
 
 	if (is_show_properties) {}
 
 	if (is_show_configuration) 
-	{
 		//Configuration::ShowConfiguration(&is_show_configuration);
-	}
 
 	if (is_new)
 	{
@@ -295,7 +291,6 @@ bool ModuleEditor::Update(float dt)
 		//...
 		is_save = false;
 	}
-
 
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
@@ -327,7 +322,6 @@ bool ModuleEditor::Update(float dt)
 	{
 		is_save = true;
 	}
-
 
 	return ret;
 }
