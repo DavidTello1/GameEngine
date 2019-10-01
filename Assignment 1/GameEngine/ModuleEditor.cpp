@@ -9,14 +9,15 @@
 #include "Configuration.h"
 
 #include <string.h>
+#include <vector>
 #include <algorithm>
-
-using namespace std;
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLEW
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_opengl3.h"
+
+using namespace std;
 
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -208,40 +209,22 @@ bool ModuleEditor::Update(float dt)
 		ImGui::OpenPopup("About");
 		if (ImGui::BeginPopupModal("About"))
 		{
-			static ImVec2 oscar_size(ImGui::CalcTextSize("Oscar Pons"));
-			static ImVec2 david_size(ImGui::CalcTextSize("David Tello"));
-
 			ImGui::Text("Davos Game Engine");
 			ImGui::Text("Description");
-			ImGui::Text("By"); ImGui::SameLine();
-
-			ImGui::TextColored(ImVec4(0.0f, 0.8f, 1.0f, 1.0f), "Oscar Pons"); ImGui::SameLine();
-			if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
-				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() - oscar_size.x - 8);
-			if (ImGui::InvisibleButton("Oscar", ImVec2(oscar_size)))
-			{
-				ShellExecuteA(NULL, "open", "https://github.com/ponspack9", NULL, NULL, SW_SHOWNORMAL);
-			}
+			ImGui::Text("By"); 
 			ImGui::SameLine();
-
-			ImGui::Text("&"); ImGui::SameLine();
-
-			ImGui::TextColored(ImVec4(0.0f, 0.8f, 1.0f, 1.0f), "David Tello"); ImGui::SameLine();
-			if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
-				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() - david_size.x - 8);
-			if (ImGui::InvisibleButton("David", ImVec2(david_size)))
-			{
-				ShellExecuteA(NULL, "open", "https://github.com/DavidTello1", NULL, NULL, SW_SHOWNORMAL);
-			}
-			
+			CreateLink("Oscar Pons", "https://github.com/ponspack9");
+			ImGui::SameLine();
+			ImGui::Text("&");
+			ImGui::SameLine();
+			CreateLink("David Tello", "https://github.com/DavidTello1");
 			ImGui::NewLine();
+
 			ImGui::Text("3rd Party Libraries used:");
-			ImGui::BulletText("SDL 2.0.10");
-			ImGui::BulletText("Glew 2.0.0");
-			ImGui::BulletText("ImGui 1.73");
-			ImGui::BulletText("OpenGL 3.1"); ImGui::NewLine();
+			CreateLink("SDL 2.0.10", "", true);
+			CreateLink("Glew 2.0.0", "", true);
+			CreateLink("ImGui 1.73", "", true);
+			CreateLink("OpenGL 3.1", "", true); ImGui::NewLine();
 
 			ImGui::Text("License:");
 			ImGui::Text("MIT License");
@@ -345,3 +328,36 @@ void ModuleEditor::Draw() const
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
+{
+	ImVec2 size = ImGui::CalcTextSize(text);
+	ImVec2 pos = ImGui::GetCursorPos();
+	ImVec4 color;
+
+	if (bullet)
+	{
+		ImGui::BulletText(text);
+		pos.x += 21;
+	}
+	else
+		ImGui::Text(text);
+	ImGui::SameLine();
+
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
+	{
+		ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+		color = ImVec4(0.0f, 1.0f, 1.0f, 1.0f);
+	}
+	else
+		color = ImVec4(0.0f, 0.8f, 1.0f, 1.0f);
+
+	ImGui::SetCursorPos(pos);
+	ImGui::TextColored(color, text);
+	ImGui::SameLine();
+
+	ImGui::SetCursorPos(pos);
+	if (ImGui::InvisibleButton(text, ImVec2(size)))
+	{
+		ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
+	}
+}

@@ -3,7 +3,6 @@
 
 #include "Module.h"
 
-
 class ModuleEditor : public Module
 {
 public:
@@ -18,7 +17,7 @@ public:
 	bool CleanUp();
 
 	void Draw() const;
-
+	void CreateLink(const char* text, const char* url, bool bullet = false);
 
 };
 
