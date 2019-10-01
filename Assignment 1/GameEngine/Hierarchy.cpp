@@ -83,8 +83,9 @@ void DrawNodes(std::vector<HierarchyNode*>& v)
 		sprintf_s(buffer, 512, "%s %ld", node->name, node->id);
 		bool is_open = ImGui::TreeNodeEx(buffer, node->flags);
 
+
 		// Options menu poped up when right clicking a node
-		if (ImGui::BeginPopupContextItem("nodeoptions"))
+		if (ImGui::BeginPopupContextItem(buffer))
 		{
 			sprintf_s(buffer, 512, "");
 
