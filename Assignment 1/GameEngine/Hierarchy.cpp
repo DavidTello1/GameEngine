@@ -31,7 +31,7 @@ Hierarchy::~Hierarchy()
 // Add a new dummy node, child of the passed node or an independent if is nullptr
 void Hierarchy::AddNode(HierarchyNode* parent) 
 {
-	HierarchyNode* n = new HierarchyNode(HierarchyNode::leaf_flags);
+	HierarchyNode* n = new HierarchyNode(HierarchyNode::leaf_flags,parent);
 
 	if (parent == nullptr)
 	{
@@ -63,15 +63,34 @@ void DeleteNode(HierarchyNode* n)
 			Hierarchy::nodes.erase(it);
 
 		n->childs.clear();
+		
+		
 		delete(n);
+		
 	}
 	else
 	{
-		for (HierarchyNode* child : n->childs)
-		{
-			DeleteNode(child);
+		std::set<HierarchyNode*>::iterator it = n->childs.begin();
+		//std::set<HierarchyNode*>::iterator it2 = n->childs.begin();
+		for (it ; it != n->childs.end(); )
+		{	
+			DeleteNode(*it);
+			n->childs.erase(it++);
+
+			/*std::set<HierarchyNode*>::iterator to_erase = n->childs.find(*it);
+			if (to_erase != n->childs.end())
+			{
+				n->childs.erase( to_erase);
+			}*/
+			//if(n->childs.empty())
+			//std::advance(it, 1);
 		}
+		n->childs.clear();
+		DeleteNode(n);
 	}
+	
+	
+
 }
 
 void Hierarchy::DeleteSelected()

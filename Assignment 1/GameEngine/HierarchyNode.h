@@ -13,12 +13,14 @@ public:
 	long id;
 	bool is_selected;
 	char name[MAX_NAME_LENGTH];
+	HierarchyNode* parent;
 	std::set<HierarchyNode*> childs;
 	ImGuiTreeNodeFlags flags;
 
 	HierarchyNode::HierarchyNode();
-	HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags);
 	HierarchyNode(ImGuiTreeNodeFlags Flags);
+	HierarchyNode(ImGuiTreeNodeFlags Flags, HierarchyNode* Parent);
+	HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags);
 	~HierarchyNode();
 
 	bool ToggleSelection();

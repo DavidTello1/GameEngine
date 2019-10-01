@@ -6,13 +6,24 @@ HierarchyNode::HierarchyNode()
 {
 	id = lrand();
 	is_selected = false;
+	parent = nullptr;
 	sprintf_s(name, MAX_NAME_LENGTH, "Object");
 	flags = base_flags;
 }
+HierarchyNode::HierarchyNode(ImGuiTreeNodeFlags Flags, HierarchyNode* Parent)
+{
+	id = lrand();
+	is_selected = false;
+	parent = Parent;
+	sprintf_s(name, MAX_NAME_LENGTH, "Object");
+	flags = Flags;
+}
+
 HierarchyNode::HierarchyNode(ImGuiTreeNodeFlags Flags)
 {
 	id = lrand();
 	is_selected = false;
+	parent = nullptr;
 	sprintf_s(name, MAX_NAME_LENGTH, "Object");
 	flags = Flags;
 }
@@ -21,6 +32,7 @@ HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags)
 {
 	id = lrand();
 	is_selected = false;
+	parent = nullptr;
 	sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
 	flags = Flags;
 }
