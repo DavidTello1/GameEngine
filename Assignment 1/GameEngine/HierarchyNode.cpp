@@ -27,7 +27,12 @@ HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags)
 
 HierarchyNode::~HierarchyNode()
 {
-	childs.clear();
+	/*for (HierarchyNode* child : childs)
+	{
+		delete(child);
+		
+	}
+	childs.clear();*/
 }
 
 

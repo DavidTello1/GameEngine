@@ -114,9 +114,11 @@
     <ClInclude Include="Hierarchy.h">
       <Filter>Sources\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Inspector.h" />
     <ClInclude Include="HierarchyNode.h">
       <Filter>Sources\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Inspector.h">
+      <Filter>Sources\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -186,9 +188,11 @@
     <ClCompile Include="Hierarchy.cpp">
       <Filter>Sources\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="Inspector.cpp" />
     <ClCompile Include="HierarchyNode.cpp">
       <Filter>Sources\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Inspector.cpp">
+      <Filter>Sources\Windows</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ public:
 	long id;
 	bool is_selected;
 	char name[MAX_NAME_LENGTH];
-	std::vector<HierarchyNode*> childs;
+	std::set<HierarchyNode*> childs;
 	ImGuiTreeNodeFlags flags;
 
 	HierarchyNode::HierarchyNode();

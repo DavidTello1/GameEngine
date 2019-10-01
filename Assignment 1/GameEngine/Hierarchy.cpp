@@ -6,7 +6,8 @@
 
 char Hierarchy::scene_name[MAX_NAME_LENGTH];
 
-std::vector<HierarchyNode*> Hierarchy::nodes;
+std::set<HierarchyNode*> Hierarchy::root_nodes;
+std::set<HierarchyNode*> Hierarchy::nodes;
 std::set<HierarchyNode*> Hierarchy::selected_nodes;
 
 Hierarchy::Hierarchy()
@@ -17,26 +18,8 @@ void Hierarchy::Init()
 {
 	SetSceneName("Recursively");
 
-	/*for (int i = 0; i < 6; i++) {
-		AddNode();
-		for (int j = 0; j < i; j++) {
-			AddNode(Hierarchy::nodes.back());
-		}
-	}*/
-	/*for (int i = 0; i < 3; i++) {
-		AddNode(Hierarchy::nodes.back());
-		for (int j = 0; j < i+1; j++) {
-			if(Hierarchy::nodes.back()->childs.empty())
-				AddNode(Hierarchy::nodes.back());
-			else
-				AddNode(Hierarchy::nodes.back()->childs.back());
-		}
-	}*/
 	for (int i = 0; i < 6; i++) {
 		AddNode();
-		/*for (int j = 0; j < i; j++) {
-			AddNode(Hierarchy::nodes.back());
-		}*/
 	}
 	AddNode();
 }
@@ -52,21 +35,53 @@ void Hierarchy::AddNode(HierarchyNode* parent)
 
 	if (parent == nullptr)
 	{
-		Hierarchy::nodes.push_back(n);
+		Hierarchy::root_nodes.emplace(n);
 		LOG("Added free node %ld", n->id,'d');
 	}
 	else {
 		//Hierarchy::nodes.push_back(n);
-		parent->childs.push_back(n);
+		parent->childs.emplace(n);
 		parent->flags &= ~HierarchyNode::leaf_flags;
 		parent->flags |= HierarchyNode::base_flags;
 		LOG("Added child %ld to parent %ld", n->id, parent->id,'d');
 	}
-
+	nodes.emplace(n);
 
 }
 
+void DeleteNode(HierarchyNode* n)
+{
+	// if has no childs, delete the node
+	if (n->childs.empty())
+	{
+		std::set<HierarchyNode*>::iterator it = Hierarchy::root_nodes.find(n);
+		if (it != Hierarchy::root_nodes.end())
+			Hierarchy::root_nodes.erase(it);
 
+		it = Hierarchy::nodes.find(n);
+		if (it != Hierarchy::nodes.end())
+			Hierarchy::nodes.erase(it);
+
+		n->childs.clear();
+		delete(n);
+	}
+	else
+	{
+		for (HierarchyNode* child : n->childs)
+		{
+			DeleteNode(child);
+		}
+	}
+}
+
+void Hierarchy::DeleteSelected()
+{
+	for (HierarchyNode* n : Hierarchy::selected_nodes)
+	{
+		DeleteNode(n);
+	}
+	Hierarchy::selected_nodes.clear();
+}
 void Hierarchy::ShowHierarchy(bool* open) 
 {
 
@@ -74,7 +89,7 @@ void Hierarchy::ShowHierarchy(bool* open)
 }
 
 // Problems with the last child and parent doing the same thing
-void DrawNodes(std::vector<HierarchyNode*>& v)
+void DrawNodes(std::set<HierarchyNode*>& v)
 {
 	static char buffer[512] = "";
 	for (HierarchyNode* node : v) 
@@ -168,13 +183,17 @@ void Hierarchy::Draw(const char * title, bool * p_open)
 	if (ImGui::Button("Add Childs")) {
 		for (HierarchyNode* selected : Hierarchy::selected_nodes)
 			AddNode(selected);
+	}ImGui::SameLine();
+
+	if (ImGui::Button("Delete")) {
+		DeleteSelected();
 	}
 
 	ImGui::Text(Hierarchy::scene_name);
 	ImGui::Separator();
 
-	// Actually drawing of nodes
-	DrawNodes(Hierarchy::nodes);
+	// Actually drawing of nodes, recursively, needs only parents set
+	DrawNodes(Hierarchy::root_nodes);
 
 	
 	ImGui::End();

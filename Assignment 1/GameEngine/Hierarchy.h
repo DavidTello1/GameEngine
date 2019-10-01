@@ -22,6 +22,8 @@ public:
 
 	//Gui
 
+	static void DeleteSelected();
+
 	static void ShowHierarchy(bool* open);
 
 	static void Draw(const char* title, bool* p_open);
@@ -34,7 +36,8 @@ public:
 
 	//Data
 
-	static std::vector<HierarchyNode*> nodes;
+	static std::set<HierarchyNode*> root_nodes;
+	static std::set<HierarchyNode*> nodes;
 
 	static std::set<HierarchyNode*> selected_nodes;
 
