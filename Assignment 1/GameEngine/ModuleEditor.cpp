@@ -6,6 +6,7 @@
 #include "ModuleEditor.h"
 #include "Console.h"
 #include "Hierarchy.h"
+#include "Configuration.h"
 
 #include <string.h>
 #include <algorithm>
@@ -264,13 +265,18 @@ bool ModuleEditor::Update(float dt)
 
 	if (is_show_console) 
 		Console::ShowConsole(&is_show_console);
+
 	if (is_show_hierarchy)
 	{
 		Hierarchy::ShowHierarchy(&is_show_hierarchy);
 	}
+
 	if (is_show_properties) {}
 
-	if (is_show_configuration) {}
+	if (is_show_configuration) 
+	{
+		//Configuration::ShowConfiguration(&is_show_configuration);
+	}
 
 	if (is_new)
 	{

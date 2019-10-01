@@ -25,7 +25,7 @@
     <Filter Include="Sources\Containers\Glew">
       <UniqueIdentifier>{d3f27894-b540-43fb-a5c7-3a88b78a8c37}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\Windows">
+    <Filter Include="Sources\Panels">
       <UniqueIdentifier>{1f2a57c0-5006-4c0c-b815-32f725bb1b43}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -103,15 +103,18 @@
       <Filter>Sources\Containers\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Console.h">
-      <Filter>Sources\Windows</Filter>
+      <Filter>Sources\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Imgui\imgui_impl_opengl3.h">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Configuration.h">
-      <Filter>Sources\Windows</Filter>
+      <Filter>Sources\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Hierarchy.h" />
+    <ClInclude Include="Panel.h">
+      <Filter>Sources\Panels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -169,14 +172,17 @@
       <Filter>Sources\Containers\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Console.cpp">
-      <Filter>Sources\Windows</Filter>
+      <Filter>Sources\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Imgui\imgui_impl_opengl3.cpp">
       <Filter>Sources\Containers\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Configuration.cpp">
-      <Filter>Sources\Windows</Filter>
+      <Filter>Sources\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Hierarchy.cpp" />
+    <ClCompile Include="Panel.cpp">
+      <Filter>Sources\Panels</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
