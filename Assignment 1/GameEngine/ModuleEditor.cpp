@@ -205,7 +205,7 @@ bool ModuleEditor::Update(float dt)
 	if (is_about)
 	{
 		ImGui::OpenPopup("About");
-		if (ImGui::BeginPopupModal("About"), true, ImGuiWindowFlags_AlwaysAutoResize)
+		if (ImGui::BeginPopupModal("About"))
 		{
 			static ImVec2 oscar_size(ImGui::CalcTextSize("Oscar Pons"));
 			static ImVec2 david_size(ImGui::CalcTextSize("David Tello"));
@@ -213,16 +213,23 @@ bool ModuleEditor::Update(float dt)
 			ImGui::Text("Davos Game Engine");
 			ImGui::Text("Description");
 			ImGui::Text("By"); ImGui::SameLine();
-			ImGui::Text("Oscar Pons"); ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() - oscar_size.x - 10);
+
+			ImGui::TextColored(ImVec4(0.0f, 0.8f, 1.0f, 1.0f), "Oscar Pons"); ImGui::SameLine();
+			if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
+				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() - oscar_size.x - 8);
 			if (ImGui::InvisibleButton("Oscar", ImVec2(oscar_size)))
 			{
 				ShellExecuteA(NULL, "open", "https://github.com/ponspack9", NULL, NULL, SW_SHOWNORMAL);
 			}
 			ImGui::SameLine();
+
 			ImGui::Text("&"); ImGui::SameLine();
-			ImGui::Text("David Tello"); ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() - david_size.x - 10);
+
+			ImGui::TextColored(ImVec4(0.0f, 0.8f, 1.0f, 1.0f), "David Tello"); ImGui::SameLine();
+			if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
+				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() - david_size.x - 8);
 			if (ImGui::InvisibleButton("David", ImVec2(david_size)))
 			{
 				ShellExecuteA(NULL, "open", "https://github.com/DavidTello1", NULL, NULL, SW_SHOWNORMAL);
@@ -230,10 +237,10 @@ bool ModuleEditor::Update(float dt)
 			
 			ImGui::NewLine();
 			ImGui::Text("3rd Party Libraries used:");
-			ImGui::Text("- SDL 2.0.10");
-			ImGui::Text("- Glew 2.0.0");
-			ImGui::Text("- ImGui 1.73");
-			ImGui::Text("- OpenGL 3.1"); ImGui::NewLine();
+			ImGui::BulletText("SDL 2.0.10");
+			ImGui::BulletText("Glew 2.0.0");
+			ImGui::BulletText("ImGui 1.73");
+			ImGui::BulletText("OpenGL 3.1"); ImGui::NewLine();
 
 			ImGui::Text("License:");
 			ImGui::Text("MIT License");
