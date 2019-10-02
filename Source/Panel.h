@@ -17,14 +17,14 @@ public:
 	SDL_Scancode GetShortCut() const;
 	virtual void Draw() = 0;
 
-	const char* GetName() const { return name.c_str(); }
+	const char* GetName() const { return name; }
 
 public:
 	bool active = true;
 	int width, height, pos_x, pos_y;
 
 protected:
-	std::string name;
+	const char* name;
 	SDL_Scancode shortcut = SDL_SCANCODE_UNKNOWN;
 };
 

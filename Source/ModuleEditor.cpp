@@ -101,9 +101,7 @@ bool ModuleEditor::Init()
 	tab_panels[TabPanelLeft].name = "Hierarchy";
 	tab_panels[TabPanelRight].name = "Inspector";
 
-
-	//tab_panels[TabPanelBottom].panels.push_back(tab_console = new Console());
-	tab_panels[TabPanelRight].panels.push_back(tab_configuration = new Configuration());
+	tab_configuration = new Configuration();
 
 	//Hierarchy::Init();
 	return true;
@@ -111,7 +109,21 @@ bool ModuleEditor::Init()
 
 bool ModuleEditor::Start()
 {
-	OnResize(App->window->GetWidth(), App->window->GetHeight());
+	//TabPanels Default Position and Size
+	tab_panels[TabPanelLeft].pos_x = 2;
+	tab_panels[TabPanelLeft].pos_y = 21;
+	tab_panels[TabPanelLeft].width = 350;
+	tab_panels[TabPanelLeft].height = App->window->GetHeight() - tab_panels[TabPanelLeft].pos_y;
+
+	tab_panels[TabPanelBottom].pos_x = tab_panels[TabPanelLeft].pos_x + tab_panels[TabPanelLeft].width;
+	tab_panels[TabPanelBottom].height = 225;
+	tab_panels[TabPanelBottom].pos_y = App->window->GetHeight() - tab_panels[TabPanelBottom].height;
+	tab_panels[TabPanelBottom].width = App->window->GetWidth() - tab_panels[TabPanelLeft].width - tab_panels[TabPanelRight].width;
+
+	tab_panels[TabPanelRight].width = 350;
+	tab_panels[TabPanelRight].pos_y = 21;
+	tab_panels[TabPanelRight].pos_x = App->window->GetWidth() - tab_panels[TabPanelRight].width;
+	tab_panels[TabPanelRight].height = App->window->GetHeight() - tab_panels[TabPanelRight].pos_y;
 
 	return true;
 }
@@ -136,10 +148,14 @@ bool ModuleEditor::Update(float dt)
 	static bool is_show_demo = false;
 	static bool is_about = false;
 
-	static bool is_show_console = false;
-	static bool is_show_properties = false;
 	static bool is_show_hierarchy = true;
+	static bool is_show_console = false;
 	static bool is_show_configuration = true;
+	static bool is_show_properties = false;
+	static bool flag_hierarchy = false;
+	static bool flag_console = false;
+	static bool flag_configuration = false;
+	static bool flag_properties = false;
 
 	static bool is_new = false;
 	static bool is_open = false;
@@ -251,46 +267,52 @@ bool ModuleEditor::Update(float dt)
 
 	if (is_show_console) //console
 		Console::ShowConsole(&is_show_console);
+		//tab_panels[TabPanelBottom].panels.push_back(tab_console = new Console());
 
 	if (is_show_hierarchy) //hierarchy
 		Hierarchy::ShowHierarchy(&is_show_hierarchy);
+		//tab_panels[TabPanelLeft].panels.push_back(tab_hierarchy = new Hierarchy());
 
 	if (is_show_properties) //properties
 	{}
 
-	if (is_show_configuration) //configuration
-	{}
+	if (is_show_configuration && !flag_configuration) //properties
+	{
+		tab_panels[TabPanelRight].panels.push_back(tab_configuration);
+		flag_configuration = true;
+	}
+	else if (!is_show_configuration && flag_configuration)
+	{
+		ClosePanel("Configuration");
+		flag_configuration = false;
+	}
 
 	for (uint i = 0; i < TabPanelCount; ++i)
 	{
 		const TabPanel& tab = tab_panels[i];
-		ImGui::SetNextWindowPos(ImVec2((float)tab.pos_x, (float)tab.pos_y), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2((float)tab.width, (float)tab.height), ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2((float)tab.pos_x, (float)tab.pos_y), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2((float)tab.width, (float)tab.height), ImGuiCond_Once);
+
 		if (ImGui::Begin(tab.name, NULL, ImGuiWindowFlags_NoFocusOnAppearing))
 		{
-			if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
+			if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_Reorderable))
 			{
 				// Draw all active panels
 				for (vector<Panel*>::const_iterator it = tab.panels.begin(); it != tab.panels.end(); ++it)
 				{
-					Panel* panel = (*it);
-
-					if (ImGui::BeginTabItem(panel->GetName()))
+					if (ImGui::BeginTabItem((*it)->GetName()))
 					{
-						if (panel->IsActive())
+						if ((*it)->IsActive())
 						{
-							panel->Draw();
+							(*it)->Draw();
 						}
-
 						ImGui::EndTabItem();
 					}
 				}
-
 				ImGui::EndTabBar();
 			}
-
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 
 	if (is_new) //new
@@ -408,20 +430,18 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 	}
 }
 
-void ModuleEditor::OnResize(int width, int height)
+
+void ModuleEditor::ClosePanel(const char* name)
 {
-	tab_panels[TabPanelLeft].pos_x = 2;
-	tab_panels[TabPanelLeft].pos_y = 21;
-	tab_panels[TabPanelLeft].width = 350;
-	tab_panels[TabPanelLeft].height = height - tab_panels[TabPanelLeft].pos_y;
-
-	tab_panels[TabPanelBottom].pos_x = tab_panels[TabPanelLeft].pos_x + tab_panels[TabPanelLeft].width;
-	tab_panels[TabPanelBottom].height = 225;
-	tab_panels[TabPanelBottom].pos_y = height - tab_panels[TabPanelBottom].height;
-	tab_panels[TabPanelBottom].width = width - tab_panels[TabPanelLeft].width - tab_panels[TabPanelRight].width;
-
-	tab_panels[TabPanelRight].width = 350;
-	tab_panels[TabPanelRight].pos_y = 21;
-	tab_panels[TabPanelRight].pos_x = width - tab_panels[TabPanelRight].width;
-	tab_panels[TabPanelRight].height = height - tab_panels[TabPanelRight].pos_y;
+	for (uint i = 0; i < TabPanelCount; ++i)
+	{
+		for (vector<Panel*>::iterator it = tab_panels[i].panels.begin(); it != tab_panels[i].panels.end(); ++it)
+		{
+			if ((*it)->GetName() == name)
+			{
+				tab_panels[i].panels.erase(it);
+				break;
+			}
+		}
+	}
 }

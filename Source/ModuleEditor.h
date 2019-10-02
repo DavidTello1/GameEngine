@@ -46,8 +46,7 @@ public:
 
 	void Draw() const;
 	void CreateLink(const char* text, const char* url, bool bullet = false);
-	void OnResize(int width, int height);
-
+	void ClosePanel(const char* name);
 
 	int GetWidth(TabPanelEnum panel) const { return tab_panels[panel].width; }
 	int GetHeight(TabPanelEnum panel) const { return tab_panels[panel].height; }

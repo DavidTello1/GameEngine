@@ -27,8 +27,6 @@ Configuration::~Configuration()
 
 void Configuration::Draw()
 {
-	//ImGui::Begin("Configuration", &active, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoFocusOnAppearing);
-
 	if (ImGui::BeginMenu("Options"))
 	{
 		ImGui::MenuItem("Set Defaults");
@@ -77,8 +75,6 @@ void Configuration::Draw()
 
 	//if (InitModuleDraw(App->hints))
 	//	DrawModuleHints(App->hints);
-
-	//ImGui::End();
 }
 
 bool Configuration::InitModuleDraw(Module* module)
