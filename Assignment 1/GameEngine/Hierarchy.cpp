@@ -31,11 +31,11 @@ Hierarchy::~Hierarchy()
 // Add a new dummy node, child of the passed node or an independent if is nullptr
 void Hierarchy::AddNode(HierarchyNode* parent) 
 {
-	HierarchyNode* n = new HierarchyNode(HierarchyNode::leaf_flags,parent);
+	HierarchyNode* n = new HierarchyNode(HierarchyNode::leaf_flags, parent);
 
 	if (parent == nullptr)
 	{
-		Hierarchy::root_nodes.emplace(n);
+		root_nodes.emplace(n);
 		LOG("Added free node %ld", n->id,'d');
 	}
 	else {
@@ -45,6 +45,8 @@ void Hierarchy::AddNode(HierarchyNode* parent)
 		parent->flags |= HierarchyNode::base_flags;
 		LOG("Added child %ld to parent %ld", n->id, parent->id,'d');
 	}
+
+	// General list of all nodes, not used for printing
 	nodes.emplace(n);
 
 }
@@ -64,6 +66,10 @@ void DeleteNode(HierarchyNode* n)
 
 		n->childs.clear();
 		
+		if (n->parent)
+		{
+			n->parent->childs.erase(n);
+		}
 		
 		delete(n);
 		
@@ -74,8 +80,8 @@ void DeleteNode(HierarchyNode* n)
 		//std::set<HierarchyNode*>::iterator it2 = n->childs.begin();
 		for (it ; it != n->childs.end(); )
 		{	
-			DeleteNode(*it);
-			n->childs.erase(it++);
+			DeleteNode(*it++);
+			//n->childs.erase(it++);
 
 			/*std::set<HierarchyNode*>::iterator to_erase = n->childs.find(*it);
 			if (to_erase != n->childs.end())

@@ -19,20 +19,11 @@ HierarchyNode::HierarchyNode(ImGuiTreeNodeFlags Flags, HierarchyNode* Parent)
 	flags = Flags;
 }
 
-HierarchyNode::HierarchyNode(ImGuiTreeNodeFlags Flags)
+HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags, HierarchyNode* Parent)
 {
 	id = lrand();
 	is_selected = false;
-	parent = nullptr;
-	sprintf_s(name, MAX_NAME_LENGTH, "Object");
-	flags = Flags;
-}
-
-HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags)
-{
-	id = lrand();
-	is_selected = false;
-	parent = nullptr;
+	parent = Parent;
 	sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
 	flags = Flags;
 }

@@ -18,9 +18,8 @@ public:
 	ImGuiTreeNodeFlags flags;
 
 	HierarchyNode::HierarchyNode();
-	HierarchyNode(ImGuiTreeNodeFlags Flags);
-	HierarchyNode(ImGuiTreeNodeFlags Flags, HierarchyNode* Parent);
-	HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags);
+	HierarchyNode(ImGuiTreeNodeFlags Flags, HierarchyNode* Parent = nullptr);
+	HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags, HierarchyNode* Parent = nullptr);
 	~HierarchyNode();
 
 	bool ToggleSelection();
