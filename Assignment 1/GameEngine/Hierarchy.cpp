@@ -62,34 +62,37 @@ void DeleteNode(HierarchyNode* n)
 
 		it = Hierarchy::nodes.find(n);
 		if (it != Hierarchy::nodes.end())
+		{
 			Hierarchy::nodes.erase(it);
+		}
+		else
+		{
+			LOG("Node not found on general node set", 'e');
+		}
 
 		n->childs.clear();
 		
 		if (n->parent)
 		{
 			n->parent->childs.erase(n);
+			if (n->parent->childs.empty())
+			{
+				n->parent->flags = HierarchyNode::leaf_flags;
+			}
 		}
 		
+		LOG("Deleted node '%s', id: %ld", n->name, n->id, 'd');
+
 		delete(n);
+
 		
 	}
 	else
 	{
 		std::set<HierarchyNode*>::iterator it = n->childs.begin();
-		//std::set<HierarchyNode*>::iterator it2 = n->childs.begin();
 		for (it ; it != n->childs.end(); )
 		{	
 			DeleteNode(*it++);
-			//n->childs.erase(it++);
-
-			/*std::set<HierarchyNode*>::iterator to_erase = n->childs.find(*it);
-			if (to_erase != n->childs.end())
-			{
-				n->childs.erase( to_erase);
-			}*/
-			//if(n->childs.empty())
-			//std::advance(it, 1);
 		}
 		n->childs.clear();
 		DeleteNode(n);
@@ -101,11 +104,11 @@ void DeleteNode(HierarchyNode* n)
 
 void Hierarchy::DeleteSelected()
 {
-	for (HierarchyNode* n : Hierarchy::selected_nodes)
+	for (HierarchyNode* n : selected_nodes)
 	{
 		DeleteNode(n);
 	}
-	Hierarchy::selected_nodes.clear();
+	selected_nodes.clear();
 }
 void Hierarchy::ShowHierarchy(bool* open) 
 {
@@ -142,8 +145,8 @@ void DrawNodes(std::set<HierarchyNode*>& v)
 				ImGui::CloseCurrentPopup();
 			}
 
-			ImGui::Text("Option #2");
-			ImGui::Text("Option #3");
+			//ImGui::Text("Option #2");
+			//ImGui::Text("Option #3");
 			ImGui::EndPopup();
 		}
 
@@ -153,16 +156,16 @@ void DrawNodes(std::set<HierarchyNode*>& v)
 			if (!ImGui::GetIO().KeyCtrl) // Single selection, clear selected nodes
 			{
 				for (HierarchyNode* i : Hierarchy::selected_nodes)
-				{ // Selected nodes has selected state, toggle is safe [panaderia de pan]
+				{ // Selected nodes has selected state, need to unselect, toggle is safe [panaderia de pan]
 					i->ToggleSelection();
 				}
 				Hierarchy::selected_nodes.clear();
 
-				LOG("Single selection", 'd');
+				LOG("Single selection", 'v');
 			}
 			else
 			{
-				LOG("Multi Selection", 'd');
+				LOG("Multi Selection", 'v');
 			}
 
 			// Always need to toggle the state of selection of the node, getting its current state
