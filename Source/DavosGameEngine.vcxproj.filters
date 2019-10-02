@@ -28,6 +28,9 @@
     <Filter Include="Sources\Panels">
       <UniqueIdentifier>{1f2a57c0-5006-4c0c-b815-32f725bb1b43}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Containers\mmgr">
+      <UniqueIdentifier>{1bf0de0d-49d5-400f-b1db-7d11412e6830}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -115,6 +118,12 @@
     <ClInclude Include="Panel.h">
       <Filter>Sources\Panels</Filter>
     </ClInclude>
+    <ClInclude Include="mmgr\mmgr.h">
+      <Filter>Sources\Containers\mmgr</Filter>
+    </ClInclude>
+    <ClInclude Include="mmgr\nommgr.h">
+      <Filter>Sources\Containers\mmgr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -183,6 +192,9 @@
     <ClCompile Include="Hierarchy.cpp" />
     <ClCompile Include="Panel.cpp">
       <Filter>Sources\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="mmgr\mmgr.cpp">
+      <Filter>Sources\Containers\mmgr</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

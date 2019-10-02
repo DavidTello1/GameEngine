@@ -23,9 +23,9 @@ public:
 	SDL_Window* GetWindow() const { return window; }
 	uint GetWidth() const { return width; }
 	uint GetHeight() const { return height; }
+	void SetTitle(const char* title){ SDL_SetWindowTitle(window, title); }
 	void SetWidth(uint width) { SDL_SetWindowSize(window, width, GetHeight()); }
 	void SetHeigth(uint height) { SDL_SetWindowSize(window, GetWidth(), height); }
-	void SetTitle(const char* title){ SDL_SetWindowTitle(window, title); }
 
 private:
 	//The window we'll be rendering to

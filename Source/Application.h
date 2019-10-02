@@ -22,6 +22,10 @@ public:
 	bool Update();
 	bool CleanUp();
 
+	const char* GetAppName() const;
+	void SetAppName(const char* name);
+	const char* GetOrganizationName() const;
+	void SetOrganizationName(const char* name);
 	uint GetFramerateLimit() const;
 	void SetFramerateLimit(uint max_framerate);
 

@@ -7,7 +7,7 @@
 #include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
 
-#include "Imgui/imgui.h"
+#include "mmgr/mmgr.h"
 
 using namespace std;
 
@@ -94,62 +94,62 @@ bool Configuration::InitModuleDraw(Module* module)
 
 void Configuration::DrawApplication()
 {
-	//if (ImGui::CollapsingHeader("Application"))
-	//{
-	//	static char app_name[120];
-	//	strcpy_s(app_name, 120, App->GetAppName());
-	//	if (ImGui::InputText("App Name", app_name, 120, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
-	//		App->SetAppName(app_name);
+	if (ImGui::CollapsingHeader("Application"))
+	{
+		static char app_name[120];
+		strcpy_s(app_name, 120, App->GetAppName());
+		if (ImGui::InputText("App Name", app_name, 120, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+			App->SetAppName(app_name);
 
-	//	static char org_name[120];
-	//	strcpy_s(org_name, 120, App->GetOrganizationName());
-	//	if (ImGui::InputText("Organization", org_name, 120, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
-	//		App->SetOrganizationName(org_name);
+		static char org_name[120];
+		strcpy_s(org_name, 120, App->GetOrganizationName());
+		if (ImGui::InputText("Organization", org_name, 120, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+			App->SetOrganizationName(org_name);
 
-	//	int max_fps = App->GetFramerateLimit();
-	//	if (ImGui::SliderInt("Max FPS", &max_fps, 0, 120))
-	//		App->SetFramerateLimit(max_fps);
+		int max_fps = App->GetFramerateLimit();
+		if (ImGui::SliderInt("Max FPS", &max_fps, 0, 120))
+			App->SetFramerateLimit(max_fps);
 
-	//	ImGui::Text("Limit Framerate:");
-	//	ImGui::SameLine();
-	//	ImGui::TextColored(IMGUI_YELLOW, "%i", App->GetFramerateLimit());
+		ImGui::Text("Limit Framerate:");
+		ImGui::SameLine();
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", App->GetFramerateLimit());
 
-	//	char title[25];
-	//	sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
-	//	ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
-	//	sprintf_s(title, 25, "Milliseconds %0.1f", ms_log[ms_log.size() - 1]);
-	//	ImGui::PlotHistogram("##milliseconds", &ms_log[0], ms_log.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100));
+		char title[25];
+		sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
+		ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
+		sprintf_s(title, 25, "Milliseconds %0.1f", ms_log[ms_log.size() - 1]);
+		ImGui::PlotHistogram("##milliseconds", &ms_log[0], ms_log.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100));
 
-	//	// Memory --------------------
-	//	sMStats stats = m_getMemoryStatistics();
-	//	static int speed = 0;
-	//	static vector<float> memory(100);
-	//	if (++speed > 20)
-	//	{
-	//		speed = 0;
-	//		if (memory.size() == 100)
-	//		{
-	//			for (uint i = 0; i < 100 - 1; ++i)
-	//				memory[i] = memory[i + 1];
+		// Memory --------------------
+		sMStats stats = m_getMemoryStatistics();
+		static int speed = 0;
+		static vector<float> memory(100);
+		if (++speed > 20)
+		{
+			speed = 0;
+			if (memory.size() == 100)
+			{
+				for (uint i = 0; i < 100 - 1; ++i)
+					memory[i] = memory[i + 1];
 
-	//			memory[100 - 1] = (float)stats.totalReportedMemory;
-	//		}
-	//		else
-	//			memory.push_back((float)stats.totalReportedMemory);
-	//	}
+				memory[100 - 1] = (float)stats.totalReportedMemory;
+			}
+			else
+				memory.push_back((float)stats.totalReportedMemory);
+		}
 
-	//	ImGui::PlotHistogram("##memory", &memory[0], memory.size(), 0, "Memory Consumption", 0.0f, (float)stats.peakReportedMemory * 1.2f, ImVec2(310, 100));
+		ImGui::PlotHistogram("##memory", &memory[0], memory.size(), 0, "Memory Consumption", 0.0f, (float)stats.peakReportedMemory * 1.2f, ImVec2(310, 100));
 
-	//	ImGui::Text("Total Reported Mem: %u", stats.totalReportedMemory);
-	//	ImGui::Text("Total Actual Mem: %u", stats.totalActualMemory);
-	//	ImGui::Text("Peak Reported Mem: %u", stats.peakReportedMemory);
-	//	ImGui::Text("Peak Actual Mem: %u", stats.peakActualMemory);
-	//	ImGui::Text("Accumulated Reported Mem: %u", stats.accumulatedReportedMemory);
-	//	ImGui::Text("Accumulated Actual Mem: %u", stats.accumulatedActualMemory);
-	//	ImGui::Text("Accumulated Alloc Unit Count: %u", stats.accumulatedAllocUnitCount);
-	//	ImGui::Text("Total Alloc Unit Count: %u", stats.totalAllocUnitCount);
-	//	ImGui::Text("Peak Alloc Unit Count: %u", stats.peakAllocUnitCount);
-	//}
+		ImGui::Text("Total Reported Mem: %u", stats.totalReportedMemory);
+		ImGui::Text("Total Actual Mem: %u", stats.totalActualMemory);
+		ImGui::Text("Peak Reported Mem: %u", stats.peakReportedMemory);
+		ImGui::Text("Peak Actual Mem: %u", stats.peakActualMemory);
+		ImGui::Text("Accumulated Reported Mem: %u", stats.accumulatedReportedMemory);
+		ImGui::Text("Accumulated Actual Mem: %u", stats.accumulatedActualMemory);
+		ImGui::Text("Accumulated Alloc Unit Count: %u", stats.accumulatedAllocUnitCount);
+		ImGui::Text("Total Alloc Unit Count: %u", stats.totalAllocUnitCount);
+		ImGui::Text("Peak Alloc Unit Count: %u", stats.peakAllocUnitCount);
+	}
 }
 
 void Configuration::DrawModuleWindow(ModuleWindow* module)
@@ -247,4 +247,22 @@ void Configuration::DrawModuleRenderer(ModuleRenderer3D* module)
 	//bool vsync = App->renderer3D->GetVSync();
 	//if (ImGui::Checkbox("Vertical Sync", &vsync))
 	//	App->renderer3D->SetVSync(vsync);
+}
+
+void Configuration::AddFPS(float fps, float ms)
+{
+	static uint count = 0;
+	if (count == FPS_LOG_SIZE)
+	{
+		for (uint i = 0; i < FPS_LOG_SIZE - 1; ++i)
+		{
+			fps_log[i] = fps_log[i + 1];
+			ms_log[i] = ms_log[i + 1];
+		}
+	}
+	else
+		++count;
+
+	fps_log[count - 1] = fps;
+	ms_log[count - 1] = ms;
 }

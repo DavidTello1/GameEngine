@@ -53,7 +53,7 @@ public:
 
 	//void RecursiveDrawQuadtree(QuadtreeNode* node);
 	//void AddInput(const char* entry);
-	//void AddFPS(float fps, float ms);
+	void AddFPS(float fps, float ms);
 
 private:
 	ImGuiTextBuffer input_buf;

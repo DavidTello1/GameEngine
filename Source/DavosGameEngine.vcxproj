@@ -90,6 +90,8 @@
     <ClInclude Include="Imgui\imstb_textedit.h" />
     <ClInclude Include="Imgui\imstb_truetype.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="mmgr\mmgr.h" />
+    <ClInclude Include="mmgr\nommgr.h" />
     <ClInclude Include="ModuleCamera3D.h" />
     <ClInclude Include="ModuleEditor.h" />
     <ClInclude Include="ModuleRenderer3D.h" />
@@ -120,6 +122,7 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="mmgr\mmgr.cpp" />
     <ClCompile Include="ModuleCamera3D.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
     <ClCompile Include="ModuleInput.cpp" />

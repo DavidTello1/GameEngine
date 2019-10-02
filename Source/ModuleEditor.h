@@ -46,13 +46,13 @@ public:
 
 	void Draw() const;
 	void CreateLink(const char* text, const char* url, bool bullet = false);
-	void ClosePanel(const char* name);
+	bool ClosePanel(const char* name);
+	void LogFPS(float fps, float ms);
 
 	int GetWidth(TabPanelEnum panel) const { return tab_panels[panel].width; }
 	int GetHeight(TabPanelEnum panel) const { return tab_panels[panel].height; }
 	int GetPosX(TabPanelEnum panel) const { return tab_panels[panel].pos_x; }
 	int GetPosY(TabPanelEnum panel) const { return tab_panels[panel].pos_y; }
-
 };
 
 #endif

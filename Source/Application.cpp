@@ -112,8 +112,8 @@ void Application::FinishUpdate()
 	if (capped_ms > 0 && (last_frame_ms < capped_ms))
 		SDL_Delay(capped_ms - last_frame_ms);
 
-	//// notify the editor
-	//editor->LogFPS((float)last_fps, (float)last_frame_ms);
+	// notify the editor
+	editor->LogFPS((float)last_fps, (float)last_frame_ms);
 }
 
 // ---------------------------------------------
@@ -127,6 +127,39 @@ bool Application::CleanUp()
 
 	return ret;
 }
+
+// ---------------------------------------------
+const char* Application::GetAppName() const
+{
+	return app_name.c_str();
+}
+
+// ---------------------------------------------
+void Application::SetAppName(const char * name)
+{
+	if (name != nullptr && name != app_name)
+	{
+		app_name = name;
+		window->SetTitle(name);
+		// TODO: Filesystem should adjust its writing folder
+	}
+}
+
+// ---------------------------------------------
+const char* Application::GetOrganizationName() const
+{
+	return organization_name.c_str();
+}
+
+void Application::SetOrganizationName(const char * name)
+{
+	if (name != nullptr && name != organization_name)
+	{
+		organization_name = name;
+		// TODO: Filesystem should adjust its writing folder
+	}
+}
+
 
 // ---------------------------------------------
 uint Application::GetFramerateLimit() const

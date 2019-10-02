@@ -431,7 +431,7 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 }
 
 
-void ModuleEditor::ClosePanel(const char* name)
+bool ModuleEditor::ClosePanel(const char* name)
 {
 	for (uint i = 0; i < TabPanelCount; ++i)
 	{
@@ -440,8 +440,15 @@ void ModuleEditor::ClosePanel(const char* name)
 			if ((*it)->GetName() == name)
 			{
 				tab_panels[i].panels.erase(it);
-				break;
+				return true;
 			}
 		}
 	}
+	return false;
+}
+
+void ModuleEditor::LogFPS(float fps, float ms)
+{
+	if (tab_configuration != nullptr)
+		tab_configuration->AddFPS(fps, ms);
 }

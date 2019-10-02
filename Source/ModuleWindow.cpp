@@ -24,9 +24,14 @@ bool ModuleWindow::Init()
 	}
 	else
 	{
+		SDL_DisplayMode DM;
+		SDL_GetDesktopDisplayMode(0, &DM);
+
 		//Use OpenGL 3.2
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+		Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
 		if(WIN_FULLSCREEN == true)
 		{
@@ -48,7 +53,8 @@ bool ModuleWindow::Init()
 			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		}
 
-		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
+		App->SetAppName(TITLE);
+		window = SDL_CreateWindow(App->GetAppName(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
 
 		if(window == nullptr)
 		{
