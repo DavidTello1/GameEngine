@@ -7,9 +7,9 @@ Console::Console()
 	HistoryPos = -1;
 
 	//Commands
-	Commands.push_back("HELP");
-	Commands.push_back("HISTORY");
-	Commands.push_back("CLEAR");
+	Commands.push_back("help, -h");
+	Commands.push_back("copy, -cp");
+	Commands.push_back("clear, -cl");
 	Commands.push_back("CLASSIFY");  // "classify" is only here to provide an example of "C"+[tab] completing to "CL" and displaying matches.
 
 	//Booleans

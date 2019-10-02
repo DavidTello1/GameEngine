@@ -179,17 +179,17 @@ public:
 		History.push_back(Strdup(command_line));
 
 		// Process command
-		if (Stricmp(command_line, "CLEAR") == 0)
+		if (Stricmp(command_line, "clear") == 0 || Stricmp(command_line, "Clear") == 0 || Stricmp(command_line, "CLEAR") == 0 || Stricmp(command_line, "-cl") == 0)
 		{
 			ClearLog();
 		}
-		else if (Stricmp(command_line, "HELP") == 0)
+		else if (Stricmp(command_line, "help") == 0 || Stricmp(command_line, "Help") == 0 || Stricmp(command_line, "HELP") == 0 || Stricmp(command_line, "-h") == 0)
 		{
 			AddLog("Commands:");
 			for (int i = 0; i < Commands.Size; i++)
 				AddLog("- %s", Commands[i]);
 		}
-		else if (Stricmp(command_line, "HISTORY") == 0)
+		else if (Stricmp(command_line, "copy") == 0 || Stricmp(command_line, "Copy") == 0 || Stricmp(command_line, "COPY") == 0 || Stricmp(command_line, "-cp") == 0)
 		{
 			int first = History.Size - 10;
 			for (int i = first > 0 ? first : 0; i < History.Size; i++)

@@ -1,18 +1,20 @@
 #include "Hierarchy.h"
-#include "Console.h"
 #include "Globals.h"
 #include "ImGui/imgui.h"
 //Hierarchy hierarchy = Hierarchy();
 
 char Hierarchy::scene_name[MAX_NAME_LENGTH];
 
+// List of nodes to start drawing
 std::set<HierarchyNode*> Hierarchy::root_nodes;
+// List of all nodes (NOT used to draw)
 std::set<HierarchyNode*> Hierarchy::nodes;
+// Temporary list of selected nodes
 std::set<HierarchyNode*> Hierarchy::selected_nodes;
 
-Hierarchy::Hierarchy()
-{
-}
+Hierarchy::Hierarchy(){}
+Hierarchy::~Hierarchy(){}
+
 
 void Hierarchy::Init() 
 {
@@ -24,26 +26,26 @@ void Hierarchy::Init()
 	AddNode();
 }
 
-Hierarchy::~Hierarchy()
-{
-}
 
-// Add a new dummy node, child of the passed node or an independent if is nullptr
+// Add a new dummy node, child of the passed node or root node if parent is nullptr
 void Hierarchy::AddNode(HierarchyNode* parent) 
 {
-	HierarchyNode* n = new HierarchyNode(HierarchyNode::leaf_flags, parent);
+	HierarchyNode* n = new HierarchyNode(parent);
 
 	if (parent == nullptr)
 	{
 		root_nodes.emplace(n);
-		LOG("Added free node %ld", n->id,'d');
+		n->LogAction("Added root");
 	}
-	else {
-		//Hierarchy::nodes.push_back(n);
+	else 
+	{
 		parent->childs.emplace(n);
 		parent->flags &= ~HierarchyNode::leaf_flags;
 		parent->flags |= HierarchyNode::base_flags;
-		LOG("Added child %ld to parent %ld", n->id, parent->id,'d');
+		//LOG("Added child '%s', id: %ld to parent '%s', id: %ld",n->name, n->id, parent->name, parent->id,'d');
+		n->LogAction("Added child");
+		parent->LogAction("to parent");
+
 	}
 
 	// General list of all nodes, not used for printing
@@ -80,15 +82,13 @@ void DeleteNode(HierarchyNode* n)
 				n->parent->flags = HierarchyNode::leaf_flags;
 			}
 		}
-		
-		LOG("Deleted node '%s', id: %ld", n->name, n->id, 'd');
+		n->LogAction("Deleted");
 
-		delete(n);
-
-		
+		delete(n);		
 	}
 	else
 	{
+		// Delete childs before the actual node
 		std::set<HierarchyNode*>::iterator it = n->childs.begin();
 		for (it ; it != n->childs.end(); )
 		{	
@@ -97,9 +97,6 @@ void DeleteNode(HierarchyNode* n)
 		n->childs.clear();
 		DeleteNode(n);
 	}
-	
-	
-
 }
 
 void Hierarchy::DeleteSelected()
@@ -112,7 +109,6 @@ void Hierarchy::DeleteSelected()
 }
 void Hierarchy::ShowHierarchy(bool* open) 
 {
-
 	Draw("Hierarchy", open);
 }
 
@@ -209,7 +205,7 @@ void Hierarchy::Draw(const char * title, bool * p_open)
 	}ImGui::SameLine();
 
 	if (ImGui::Button("Add Childs")) {
-		for (HierarchyNode* selected : Hierarchy::selected_nodes)
+		for (HierarchyNode* selected : selected_nodes)
 			AddNode(selected);
 	}ImGui::SameLine();
 
@@ -217,11 +213,11 @@ void Hierarchy::Draw(const char * title, bool * p_open)
 		DeleteSelected();
 	}
 
-	ImGui::Text(Hierarchy::scene_name);
+	ImGui::Text(scene_name);
 	ImGui::Separator();
 
 	// Actually drawing of nodes, recursively, needs only parents set
-	DrawNodes(Hierarchy::root_nodes);
+	DrawNodes(root_nodes);
 
 	
 	ImGui::End();
@@ -230,8 +226,8 @@ void Hierarchy::Draw(const char * title, bool * p_open)
 bool Hierarchy::SetSceneName(const char * name)
 {
 	if (strlen(name) < MAX_NAME_LENGTH) {
-		LOG("Renaming scene from '%s' to '%s'", Hierarchy::scene_name, name);
-		sprintf_s(Hierarchy::scene_name, 512, "%s",name);
+		LOG("Renaming scene from '%s' to '%s'", scene_name, name);
+		sprintf_s(scene_name, 512, "%s",name);
 		return true;
 	}
 	else {

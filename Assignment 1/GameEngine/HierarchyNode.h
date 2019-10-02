@@ -18,14 +18,14 @@ public:
 	ImGuiTreeNodeFlags flags;
 
 	HierarchyNode::HierarchyNode();
-	HierarchyNode(ImGuiTreeNodeFlags Flags, HierarchyNode* Parent = nullptr);
-	HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags, HierarchyNode* Parent = nullptr);
+	HierarchyNode::HierarchyNode(HierarchyNode* Parent = nullptr, const char* Name = "Object", ImGuiTreeNodeFlags Flags = leaf_flags );
 	~HierarchyNode();
 
 	bool ToggleSelection();
 
 	void SetName(const char * Name);
 	
+	void LogAction(const char* Action);
 
 public:
 

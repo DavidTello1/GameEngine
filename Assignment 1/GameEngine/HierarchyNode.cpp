@@ -1,6 +1,4 @@
 #include "HierarchyNode.h"
-#include "Hierarchy.h"
-
 
 HierarchyNode::HierarchyNode()
 {
@@ -10,16 +8,8 @@ HierarchyNode::HierarchyNode()
 	sprintf_s(name, MAX_NAME_LENGTH, "Object");
 	flags = base_flags;
 }
-HierarchyNode::HierarchyNode(ImGuiTreeNodeFlags Flags, HierarchyNode* Parent)
-{
-	id = lrand();
-	is_selected = false;
-	parent = Parent;
-	sprintf_s(name, MAX_NAME_LENGTH, "Object");
-	flags = Flags;
-}
 
-HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags, HierarchyNode* Parent)
+HierarchyNode::HierarchyNode(HierarchyNode* Parent, const char* Name, ImGuiTreeNodeFlags Flags)
 {
 	id = lrand();
 	is_selected = false;
@@ -28,15 +18,7 @@ HierarchyNode::HierarchyNode(const char* Name, ImGuiTreeNodeFlags Flags, Hierarc
 	flags = Flags;
 }
 
-HierarchyNode::~HierarchyNode()
-{
-	/*for (HierarchyNode* child : childs)
-	{
-		delete(child);
-		
-	}
-	childs.clear();*/
-}
+HierarchyNode::~HierarchyNode(){}
 
 
 // Toggles the state of the node, returns current state after toggled
@@ -48,7 +30,7 @@ bool HierarchyNode::ToggleSelection()
 		flags |= ImGuiTreeNodeFlags_Selected;
 		is_selected = true;
 
-		LOG("NODE %ld SELECTED", id, 'd');
+		LogAction("Selected");
 	}
 
 	// if its selected
@@ -56,7 +38,7 @@ bool HierarchyNode::ToggleSelection()
 		flags &= ~ImGuiTreeNodeFlags_Selected;
 		is_selected = false;
 		
-		LOG("NODE %ld UN-SELECTED", id, 'd');
+		LogAction("Unselected");
 	}
 
 	return is_selected;
@@ -71,4 +53,9 @@ void HierarchyNode::SetName(const char* Name)
 	else {
 		LOG("Node name exceeds max length (%d)",MAX_NAME_LENGTH ,'e');
 	}
+}
+
+void HierarchyNode::LogAction(const char * Action)
+{
+	LOG("%s node '%s', id: %ld ", Action, name, id, 'd');
 }
