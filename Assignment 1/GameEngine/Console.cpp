@@ -7,10 +7,9 @@ Console::Console()
 	HistoryPos = -1;
 
 	//Commands
-	Commands.push_back("help, -h");
-	Commands.push_back("copy, -cp");
-	Commands.push_back("clear, -cl");
-	Commands.push_back("CLASSIFY");  // "classify" is only here to provide an example of "C"+[tab] completing to "CL" and displaying matches.
+	Commands.push_back("help");
+	Commands.push_back("copy");
+	Commands.push_back("clear");
 
 	//Booleans
 	AutoScroll		= true;
@@ -19,8 +18,7 @@ Console::Console()
 	ShowVerboseLog	= true;
 	ScrollToBottom	= false;
 
-
-	AddLog("Enter 'HELP' for help, press TAB to use text completion.");
+	AddLog("Enter 'help' or '-h' for help, press TAB to use text completion.");
 }
 
 Console::~Console()
