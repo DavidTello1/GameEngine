@@ -9,7 +9,6 @@
 #include "Configuration.h"
 
 #include <string.h>
-#include <vector>
 #include <algorithm>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLEW
@@ -19,17 +18,16 @@
 
 using namespace std;
 
-ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleEditor::ModuleEditor(bool start_enabled) : Module("ModuleEditor", start_enabled)
 {
-	name = "ModuleEditor";
 }
 
 // Destructor
 ModuleEditor::~ModuleEditor()
 {
 }
-static void ShowExampleAppDockSpace(bool* p_open);
 
+static void ShowExampleAppDockSpace(bool* p_open);
 void ShowExampleAppDockSpace(bool* p_open)
 {
 	static bool opt_fullscreen_persistant = true;
@@ -76,6 +74,7 @@ void ShowExampleAppDockSpace(bool* p_open)
 
 	ImGui::End();
 }
+
 // Called before render is available
 bool ModuleEditor::Init()
 {
@@ -90,20 +89,30 @@ bool ModuleEditor::Init()
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 
-	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer3D->context);
+	ImGui_ImplSDL2_InitForOpenGL(App->window->GetWindow(), App->renderer3D->context);
 	ImGui_ImplOpenGL3_Init();
 
 	// Setup style
-	ImGui::StyleColorsDark();
+	ImGui::StyleColorsNew();
 	//ImGui::StyleColorsClassic();
 
-	Hierarchy::Init();
+	// Create Panels
+	tab_panels[TabPanelBottom].name = "Output";
+	tab_panels[TabPanelLeft].name = "Hierarchy";
+	tab_panels[TabPanelRight].name = "Inspector";
 
+
+	//tab_panels[TabPanelBottom].panels.push_back(tab_console = new Console());
+	tab_panels[TabPanelRight].panels.push_back(tab_configuration = new Configuration());
+
+	//Hierarchy::Init();
 	return true;
 }
 
 bool ModuleEditor::Start()
 {
+	OnResize(App->window->GetWidth(), App->window->GetHeight());
+
 	return true;
 }
 
@@ -112,7 +121,7 @@ bool ModuleEditor::PreUpdate(float dt)
 {
 	// Start the frame
 	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame(App->window->window);
+	ImGui_ImplSDL2_NewFrame(App->window->GetWindow());
 	ImGui::NewFrame();
 
 	return true;
@@ -122,31 +131,28 @@ bool ModuleEditor::Update(float dt)
 {
 	bool ret = true;
 	
-
 	bool is_draw_menu = true;
-	static bool is_show_demo = true;
+	static bool is_show_main_dockspace = true;
+	static bool is_show_demo = false;
 	static bool is_about = false;
 
 	static bool is_show_console = false;
-	static bool is_show_configuration = false;
 	static bool is_show_properties = false;
-	static bool is_show_main_dockspace = true;
 	static bool is_show_hierarchy = true;
+	static bool is_show_configuration = true;
 
 	static bool is_new = false;
 	static bool is_open = false;
 	static bool is_save = false;
 	
 
-
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
 
-	// Main menu GUI
-	if (is_draw_menu == true)
+	if (is_draw_menu == true) // Main menu GUI
 	{
 		if (ImGui::BeginMainMenuBar())
 		{
-			if (ImGui::BeginMenu("File"))
+			if (ImGui::BeginMenu("File")) //file
 			{
 				if (ImGui::MenuItem("New", "Ctrl+N"))
 					is_new = true;
@@ -163,7 +169,7 @@ bool ModuleEditor::Update(float dt)
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Window"))
+			if (ImGui::BeginMenu("View")) //view
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &is_show_hierarchy);
 				ImGui::MenuItem("Console", NULL, &is_show_console);
@@ -173,7 +179,7 @@ bool ModuleEditor::Update(float dt)
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Help"))
+			if (ImGui::BeginMenu("Help")) //help
 			{
 				ImGui::MenuItem("Show Demo", NULL, &is_show_demo);
 
@@ -198,13 +204,13 @@ bool ModuleEditor::Update(float dt)
 	}
 
 
-	if (is_show_demo)
+	if (is_show_demo) //show demo
 	{
 		ImGui::ShowDemoWindow(&is_show_demo);
 		ImGui::ShowMetricsWindow();
 	}
 
-	if (is_about)
+	if (is_about) //about
 	{
 		ImGui::OpenPopup("About");
 		if (ImGui::BeginPopupModal("About"))
@@ -229,11 +235,8 @@ bool ModuleEditor::Update(float dt)
 			ImGui::Text("License:");
 			ImGui::Text("MIT License");
 			ImGui::Text("Copyright 2019. Oscar Pons and David Tello");
-
 			ImGui::Text("Permission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files(the 'Software'), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions :");
-
 			ImGui::Text("The above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.");
-
 			ImGui::Text("THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.");
 			ImGui::NewLine();
 
@@ -246,30 +249,63 @@ bool ModuleEditor::Update(float dt)
 		}
 	}
 
-	if (is_show_console) 
+	if (is_show_console) //console
 		Console::ShowConsole(&is_show_console);
 
-	if (is_show_hierarchy)
+	if (is_show_hierarchy) //hierarchy
 		Hierarchy::ShowHierarchy(&is_show_hierarchy);
 
-	if (is_show_properties) {}
+	if (is_show_properties) //properties
+	{}
 
-	if (is_show_configuration) 
-		//Configuration::ShowConfiguration(&is_show_configuration);
+	if (is_show_configuration) //configuration
+	{}
 
-	if (is_new)
+	for (uint i = 0; i < TabPanelCount; ++i)
+	{
+		const TabPanel& tab = tab_panels[i];
+		ImGui::SetNextWindowPos(ImVec2((float)tab.pos_x, (float)tab.pos_y), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2((float)tab.width, (float)tab.height), ImGuiCond_Always);
+		if (ImGui::Begin(tab.name, NULL, ImGuiWindowFlags_NoFocusOnAppearing))
+		{
+			if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
+			{
+				// Draw all active panels
+				for (vector<Panel*>::const_iterator it = tab.panels.begin(); it != tab.panels.end(); ++it)
+				{
+					Panel* panel = (*it);
+
+					if (ImGui::BeginTabItem(panel->GetName()))
+					{
+						if (panel->IsActive())
+						{
+							panel->Draw();
+						}
+
+						ImGui::EndTabItem();
+					}
+				}
+
+				ImGui::EndTabBar();
+			}
+
+			ImGui::End();
+		}
+	}
+
+	if (is_new) //new
 	{
 		//...
 		is_new = false;
 	}
 
-	if (is_open) 
+	if (is_open) //open
 	{
 		//....
 		is_open = false;
 	}
 
-	if (is_save)
+	if (is_save) //save
 	{
 		//...
 		is_save = false;
@@ -313,6 +349,16 @@ bool ModuleEditor::Update(float dt)
 bool ModuleEditor::CleanUp()
 {
 	LOG("Freeing editor gui");
+
+	for (uint i = 0; i < TabPanelCount; ++i)
+	{
+		for (vector<Panel*>::iterator it = tab_panels[i].panels.begin(); it != tab_panels[i].panels.end(); ++it)
+		{
+			RELEASE(*it);
+		}
+
+		tab_panels[i].panels.clear();
+	}
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
@@ -360,4 +406,22 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 	{
 		ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
 	}
+}
+
+void ModuleEditor::OnResize(int width, int height)
+{
+	tab_panels[TabPanelLeft].pos_x = 2;
+	tab_panels[TabPanelLeft].pos_y = 21;
+	tab_panels[TabPanelLeft].width = 350;
+	tab_panels[TabPanelLeft].height = height - tab_panels[TabPanelLeft].pos_y;
+
+	tab_panels[TabPanelBottom].pos_x = tab_panels[TabPanelLeft].pos_x + tab_panels[TabPanelLeft].width;
+	tab_panels[TabPanelBottom].height = 225;
+	tab_panels[TabPanelBottom].pos_y = height - tab_panels[TabPanelBottom].height;
+	tab_panels[TabPanelBottom].width = width - tab_panels[TabPanelLeft].width - tab_panels[TabPanelRight].width;
+
+	tab_panels[TabPanelRight].width = 350;
+	tab_panels[TabPanelRight].pos_y = 21;
+	tab_panels[TabPanelRight].pos_x = width - tab_panels[TabPanelRight].width;
+	tab_panels[TabPanelRight].height = height - tab_panels[TabPanelRight].pos_y;
 }

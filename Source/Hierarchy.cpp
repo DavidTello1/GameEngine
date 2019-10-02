@@ -40,11 +40,8 @@ Hierarchy::~Hierarchy()
 {
 }
 
-
-
 void Hierarchy::ShowHierarchy(bool* open) 
 {
-
 	Draw("Hierarchy", open);
 }
 

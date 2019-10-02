@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "Application.h"
 #include "Globals.h"
 
@@ -15,13 +14,14 @@ enum main_states
 	MAIN_EXIT
 };
 
+Application* App = nullptr;
+
 int main(int argc, char ** argv)
 {
-	LOG("Starting game '%s'...", TITLE);
+	LOG("Starting '%s' from[%s]", TITLE, argv[0]);
 
 	int main_return = EXIT_FAILURE;
 	main_states state = MAIN_CREATION;
-	Application* App = NULL;
 
 	while (state != MAIN_EXIT)
 	{
