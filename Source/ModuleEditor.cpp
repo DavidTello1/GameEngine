@@ -96,41 +96,18 @@ bool ModuleEditor::Init()
 	ImGui::StyleColorsNew();
 	//ImGui::StyleColorsClassic();
 
-	// Create Panels
-	tab_panels[TabPanelBottom].name = "Output";
-	tab_panels[TabPanelLeft].name = "Hierarchy";
-	tab_panels[TabPanelRight].name = "Inspector";
-
-	tab_configuration = new Configuration();
-
 	//Hierarchy::Init();
 	return true;
 }
 
 bool ModuleEditor::Start()
 {
-	//TabPanels Default Position and Size
-	tab_panels[TabPanelLeft].pos_x = 2;
-	tab_panels[TabPanelLeft].pos_y = 21;
-	tab_panels[TabPanelLeft].width = 350;
-	tab_panels[TabPanelLeft].height = App->window->GetHeight() - tab_panels[TabPanelLeft].pos_y;
+	// Create panels
+	panels.push_back(tab_configuration = new Configuration());
 
-	tab_panels[TabPanelBottom].pos_x = tab_panels[TabPanelLeft].pos_x + tab_panels[TabPanelLeft].width;
-	tab_panels[TabPanelBottom].height = 225;
-	tab_panels[TabPanelBottom].pos_y = App->window->GetHeight() - tab_panels[TabPanelBottom].height;
-	tab_panels[TabPanelBottom].width = App->window->GetWidth() - tab_panels[TabPanelLeft].width - tab_panels[TabPanelRight].width;
 
-	tab_panels[TabPanelRight].width = 350;
-	tab_panels[TabPanelRight].pos_y = 21;
-	tab_panels[TabPanelRight].pos_x = App->window->GetWidth() - tab_panels[TabPanelRight].width;
-	tab_panels[TabPanelRight].height = App->window->GetHeight() - tab_panels[TabPanelRight].pos_y;
-
-	for (uint i = 0; i < TabPanelCount; ++i)
-	{
-		visible_panels[i] = tab_panels[i];
-	}
-
-	tab_panels[TabPanelRight].panels.push_back(tab_configuration);
+	// Init panels
+	panel_configuration = GetPanel("Configuration");
 
 	return true;
 }
@@ -149,7 +126,7 @@ bool ModuleEditor::PreUpdate(float dt)
 bool ModuleEditor::Update(float dt)
 {
 	bool ret = true;
-	
+
 	bool is_draw_menu = true;
 	static bool is_show_main_dockspace = true;
 	static bool is_show_demo = false;
@@ -157,17 +134,12 @@ bool ModuleEditor::Update(float dt)
 
 	static bool is_show_hierarchy = true;
 	static bool is_show_console = false;
-	static bool is_show_configuration = true;
 	static bool is_show_properties = false;
-	static bool flag_hierarchy = false;
-	static bool flag_console = false;
-	static bool flag_configuration = false;
-	static bool flag_properties = false;
 
 	static bool is_new = false;
 	static bool is_open = false;
 	static bool is_save = false;
-	
+
 
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
 
@@ -196,7 +168,7 @@ bool ModuleEditor::Update(float dt)
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &is_show_hierarchy);
 				ImGui::MenuItem("Console", NULL, &is_show_console);
-				ImGui::MenuItem("Configuration", NULL, &is_show_configuration);
+				ImGui::MenuItem("Configuration", NULL, &panel_configuration->active);
 				ImGui::MenuItem("Properties", NULL, &is_show_properties);
 
 				ImGui::EndMenu();
@@ -240,7 +212,7 @@ bool ModuleEditor::Update(float dt)
 		{
 			ImGui::Text("Davos Game Engine");
 			ImGui::Text("Description");
-			ImGui::Text("By"); 
+			ImGui::Text("By");
 			ImGui::SameLine();
 			CreateLink("Oscar Pons", "https://github.com/ponspack9");
 			ImGui::SameLine();
@@ -274,53 +246,27 @@ bool ModuleEditor::Update(float dt)
 
 	if (is_show_console) //console
 		Console::ShowConsole(&is_show_console);
-		//tab_panels[TabPanelBottom].panels.push_back(tab_console = new Console());
+	//tab_panels[TabPanelBottom].panels.push_back(tab_console = new Console());
 
 	if (is_show_hierarchy) //hierarchy
 		Hierarchy::ShowHierarchy(&is_show_hierarchy);
-		//tab_panels[TabPanelLeft].panels.push_back(tab_hierarchy = new Hierarchy());
+	//tab_panels[TabPanelLeft].panels.push_back(tab_hierarchy = new Hierarchy());
 
 	if (is_show_properties) //properties
-	{}
-
-	if (is_show_configuration && !flag_configuration) //properties
 	{
-		visible_panels[TabPanelRight].panels.push_back(tab_configuration);
-		flag_configuration = true;
-	}
-	else if (!is_show_configuration && flag_configuration)
-	{
-		ClosePanel("Configuration");
-		flag_configuration = false;
 	}
 
-	for (uint i = 0; i < TabPanelCount; ++i)
+	// Draw all active panels
+	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
-		const TabPanel& tab = visible_panels[i];
-		ImGui::SetNextWindowPos(ImVec2((float)tab.pos_x, (float)tab.pos_y), ImGuiCond_Once);
-		ImGui::SetNextWindowSize(ImVec2((float)tab.width, (float)tab.height), ImGuiCond_Once);
-		static bool is_closable = true;
-
-		if (ImGui::Begin(tab.name, &is_closable, ImGuiWindowFlags_NoFocusOnAppearing))
+		if ((*it)->IsActive())
 		{
-			if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_Reorderable))
+			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
 			{
-				// Draw all active panels
-				for (vector<Panel*>::const_iterator it = tab.panels.begin(); it != tab.panels.end(); ++it)
-				{
-					if (ImGui::BeginTabItem((*it)->GetName()))
-					{
-						if ((*it)->IsActive())
-						{
-							(*it)->Draw();
-						}
-						ImGui::EndTabItem();
-					}
-				}
-				ImGui::EndTabBar();
+				(*it)->Draw();
+				ImGui::End();
 			}
 		}
-		ImGui::End();
 	}
 
 	if (is_new) //new
@@ -343,11 +289,11 @@ bool ModuleEditor::Update(float dt)
 
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
-		LOG("GEOMETRY LOG %d",25,'g')
+		LOG("GEOMETRY LOG %d", 25, 'g')
 	}
 	if (App->input->GetKey(SDL_SCANCODE_B) == KEY_DOWN) {
 		char c[8] = "jdsig";
-		LOG("DEBUG LOG %s", c,'d')
+		LOG("DEBUG LOG %s", c, 'd')
 	}
 	if (App->input->GetKey(SDL_SCANCODE_V) == KEY_DOWN) {
 		LOG("VERBOSE LOG", 'v')
@@ -380,15 +326,11 @@ bool ModuleEditor::CleanUp()
 {
 	LOG("Freeing editor gui");
 
-	for (uint i = 0; i < TabPanelCount; ++i)
+	for (vector<Panel*>::iterator it = panels.begin(); it != panels.end(); ++it)
 	{
-		for (vector<Panel*>::iterator it = tab_panels[i].panels.begin(); it != tab_panels[i].panels.end(); ++it)
-		{
-			RELEASE(*it);
-		}
-
-		tab_panels[i].panels.clear();
+		RELEASE(*it);
 	}
+	panels.clear();
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
@@ -439,22 +381,17 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 }
 
 
-bool ModuleEditor::ClosePanel(const char* name)
+Panel* ModuleEditor::GetPanel(const char* name)
 {
-	for (uint i = 0; i < TabPanelCount; ++i)
+	for (vector<Panel*>::iterator it = panels.begin(); it != panels.end(); ++it)
 	{
-		for (vector<Panel*>::iterator it = visible_panels[i].panels.begin(); it != visible_panels[i].panels.end(); ++it)
+		if ((*it)->GetName() == name)
 		{
-			if ((*it)->GetName() == name)
-			{
-				visible_panels[i].panels.erase(it);
-				return true;
-			}
+			return (*it);
 		}
 	}
-	return false;
+	return nullptr;
 }
-
 void ModuleEditor::LogFPS(float fps, float ms)
 {
 	if (tab_configuration != nullptr)

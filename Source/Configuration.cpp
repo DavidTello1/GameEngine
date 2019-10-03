@@ -12,8 +12,7 @@
 using namespace std;
 
 // ---------------------------------------------------------
-Configuration::Configuration() : Panel("Configuration"),
-fps_log(FPS_LOG_SIZE), ms_log(FPS_LOG_SIZE)
+Configuration::Configuration() : Panel("Configuration"), fps_log(FPS_LOG_SIZE), ms_log(FPS_LOG_SIZE)
 {
 	width = default_width;
 	height = default_height;
