@@ -6,6 +6,7 @@
 
 class Panel;
 class Configuration;
+class Hierarchy;
 
 class ModuleEditor : public Module
 {
@@ -34,9 +35,11 @@ public:
 
 public:
 	Configuration* tab_configuration = nullptr;
+	Hierarchy* tab_hierarchy = nullptr;
 
 private:
 	Panel* panel_configuration;
+	Panel* panel_hierarchy;
 };
 
 #endif

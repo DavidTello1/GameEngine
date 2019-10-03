@@ -1,7 +1,6 @@
 #include "Hierarchy.h"
 #include "Globals.h"
 #include "ImGui/imgui.h"
-//Hierarchy hierarchy = Hierarchy();
 
 char Hierarchy::scene_name[MAX_NAME_LENGTH];
 
@@ -12,20 +11,28 @@ std::set<HierarchyNode*> Hierarchy::nodes;
 // Temporary list of selected nodes
 std::set<HierarchyNode*> Hierarchy::selected_nodes;
 
-Hierarchy::Hierarchy(){}
-Hierarchy::~Hierarchy(){}
 
-
-void Hierarchy::Init() 
+// ---------------------------------------------------------
+Hierarchy::Hierarchy() : Panel("Hierarchy")
 {
+	width = default_width;
+	height = default_height;
+	pos_x = default_pos_x;
+	pos_y = default_pos_y;
+
+	//-----------
 	SetSceneName("Recursively");
 
 	for (int i = 0; i < 6; i++) {
 		AddNode();
 	}
 	AddNode();
+	//-----------
 }
 
+Hierarchy::~Hierarchy()
+{
+}
 
 // Add a new dummy node, child of the passed node or root node if parent is nullptr
 void Hierarchy::AddNode(HierarchyNode* parent) 
@@ -107,11 +114,6 @@ void Hierarchy::DeleteSelected()
 	selected_nodes.clear();
 }
 
-void Hierarchy::ShowHierarchy(bool* open) 
-{
-	Draw("Hierarchy", open);
-}
-
 // Problems with the last child and parent doing the same thing
 void DrawNodes(std::set<HierarchyNode*>& v)
 {
@@ -121,7 +123,6 @@ void DrawNodes(std::set<HierarchyNode*>& v)
 		//TODO In future to be substituited buffer by node.name only, no need to show id
 		sprintf_s(buffer, 512, "%s %ld", node->name, node->id);
 		bool is_open = ImGui::TreeNodeEx(buffer, node->flags);
-
 
 		// Options menu poped up when right clicking a node
 		if (ImGui::BeginPopupContextItem(buffer))
@@ -140,7 +141,6 @@ void DrawNodes(std::set<HierarchyNode*>& v)
 				node->SetName(buffer);
 				ImGui::CloseCurrentPopup();
 			}
-
 			//ImGui::Text("Option #2");
 			//ImGui::Text("Option #3");
 			ImGui::EndPopup();
@@ -156,7 +156,6 @@ void DrawNodes(std::set<HierarchyNode*>& v)
 					i->ToggleSelection();
 				}
 				Hierarchy::selected_nodes.clear();
-
 				LOG("Single selection", 'v');
 			}
 			else
@@ -169,10 +168,10 @@ void DrawNodes(std::set<HierarchyNode*>& v)
 			{
 				Hierarchy::selected_nodes.emplace(node);
 			}
-			else {
+			else 
+			{
 				Hierarchy::selected_nodes.erase(Hierarchy::selected_nodes.find(node));
 			}
-
 		}
 
 		if (is_open)
@@ -182,55 +181,46 @@ void DrawNodes(std::set<HierarchyNode*>& v)
 			{
 				DrawNodes(node->childs);
 			}
-
-
 			ImGui::TreePop();
 		}
 	}
-
 }
 
-void Hierarchy::Draw(const char * title, bool * p_open)
+void Hierarchy::Draw()
 {
-
-	ImGui::SetNextWindowSize(ImVec2(300, 600), ImGuiCond_FirstUseEver);
-	if (!ImGui::Begin(title, p_open))
-	{
-		ImGui::End();
-		return;
-	}
-
-	if (ImGui::Button("Add Free Node")) {
+	if (ImGui::Button("Add Free Node")) 
 		AddNode();
-	}ImGui::SameLine();
+	ImGui::SameLine();
 
-	if (ImGui::Button("Add Childs")) {
+	if (ImGui::Button("Add Childs"))
+	{
 		for (HierarchyNode* selected : selected_nodes)
+		{
 			AddNode(selected);
-	}ImGui::SameLine();
-
-	if (ImGui::Button("Delete")) {
-		DeleteSelected();
+		}
 	}
+	ImGui::SameLine();
+
+	if (ImGui::Button("Delete")) 
+		DeleteSelected();
 
 	ImGui::Text(scene_name);
 	ImGui::Separator();
 
 	// Actually drawing of nodes, recursively, needs only parents set
 	DrawNodes(root_nodes);
-
-	
-	ImGui::End();
 }
 
 bool Hierarchy::SetSceneName(const char * name)
 {
-	if (strlen(name) < MAX_NAME_LENGTH) {
+	if (strlen(name) < MAX_NAME_LENGTH) 
+	{
 		LOG("Renaming scene from '%s' to '%s'", scene_name, name);
 		sprintf_s(scene_name, 512, "%s",name);
 		return true;
 	}
-	else {
+	else 
+	{
 		LOG("Scene name exceeds max length (%d)",MAX_NAME_LENGTH,'e');
 		return false;
 

@@ -104,10 +104,12 @@ bool ModuleEditor::Start()
 {
 	// Create panels
 	panels.push_back(tab_configuration = new Configuration());
+	panels.push_back(tab_hierarchy = new Hierarchy());
 
 
 	// Init panels
 	panel_configuration = GetPanel("Configuration");
+	panel_hierarchy = GetPanel("Hierarchy");
 
 	return true;
 }
@@ -131,10 +133,6 @@ bool ModuleEditor::Update(float dt)
 	static bool is_show_main_dockspace = true;
 	static bool is_show_demo = false;
 	static bool is_about = false;
-
-	static bool is_show_hierarchy = true;
-	static bool is_show_console = false;
-	static bool is_show_properties = false;
 
 	static bool is_new = false;
 	static bool is_open = false;
@@ -166,10 +164,10 @@ bool ModuleEditor::Update(float dt)
 
 			if (ImGui::BeginMenu("View")) //view
 			{
-				ImGui::MenuItem("Hierarchy", NULL, &is_show_hierarchy);
-				ImGui::MenuItem("Console", NULL, &is_show_console);
+				ImGui::MenuItem("Hierarchy", NULL, &panel_hierarchy->active);
+				//ImGui::MenuItem("Console", NULL, &is_show_console);
 				ImGui::MenuItem("Configuration", NULL, &panel_configuration->active);
-				ImGui::MenuItem("Properties", NULL, &is_show_properties);
+				//ImGui::MenuItem("Properties", NULL, &is_show_properties);
 
 				ImGui::EndMenu();
 			}
@@ -244,18 +242,6 @@ bool ModuleEditor::Update(float dt)
 		}
 	}
 
-	if (is_show_console) //console
-		Console::ShowConsole(&is_show_console);
-	//tab_panels[TabPanelBottom].panels.push_back(tab_console = new Console());
-
-	if (is_show_hierarchy) //hierarchy
-		Hierarchy::ShowHierarchy(&is_show_hierarchy);
-	//tab_panels[TabPanelLeft].panels.push_back(tab_hierarchy = new Hierarchy());
-
-	if (is_show_properties) //properties
-	{
-	}
-
 	// Draw all active panels
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
@@ -264,8 +250,8 @@ bool ModuleEditor::Update(float dt)
 			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
 			{
 				(*it)->Draw();
-				ImGui::End();
 			}
+			ImGui::End();
 		}
 	}
 
