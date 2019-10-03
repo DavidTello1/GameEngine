@@ -2,11 +2,8 @@
 #include "Application.h"
 #include "ModuleWindow.h"
 
-ModuleWindow::ModuleWindow(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleWindow::ModuleWindow(bool start_enabled) : Module("Window", start_enabled)
 {
-	window = NULL;
-	screen_surface = NULL;
-	name = "Window";
 }
 
 // Destructor
@@ -27,14 +24,14 @@ bool ModuleWindow::Init()
 	}
 	else
 	{
-		//Create window
-		int width = SCREEN_WIDTH * SCREEN_SIZE;
-		int height = SCREEN_HEIGHT * SCREEN_SIZE;
-		Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
+		SDL_DisplayMode DM;
+		SDL_GetDesktopDisplayMode(0, &DM);
 
-		//Use OpenGL 2.1
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+		//Use OpenGL 3.2
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+		Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
 		if(WIN_FULLSCREEN == true)
 		{
@@ -56,9 +53,10 @@ bool ModuleWindow::Init()
 			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		}
 
-		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+		App->SetAppName(TITLE);
+		window = SDL_CreateWindow(App->GetAppName(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
 
-		if(window == NULL)
+		if(window == nullptr)
 		{
 			LOG("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 			ret = false;
@@ -73,13 +71,29 @@ bool ModuleWindow::Init()
 	return ret;
 }
 
+bool ModuleWindow::Start()
+{
+	//SetDefaultIcon();
+
+	//std::string icon_file = config->GetString("Icon", "");
+	//if (icon_file.size() > 1)
+	//	SetIcon(icon_file.c_str());
+
+	//SetBrightness(config->GetFloat("Brightness", 1.0f));
+
+	// Force to trigger a chain of events to refresh aspect ratios	
+	SDL_SetWindowSize(window, width, height);
+
+	return true;
+}
+
 // Called before quitting
 bool ModuleWindow::CleanUp()
 {
 	LOG("Destroying SDL window and quitting all SDL systems");
 
 	//Destroy window
-	if(window != NULL)
+	if(window != nullptr)
 	{
 		SDL_DestroyWindow(window);
 	}
@@ -87,9 +101,4 @@ bool ModuleWindow::CleanUp()
 	//Quit SDL subsystems
 	SDL_Quit();
 	return true;
-}
-
-void ModuleWindow::SetTitle(const char* title)
-{
-	SDL_SetWindowTitle(window, title);
 }

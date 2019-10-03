@@ -3,20 +3,43 @@
 class Application;
 struct PhysBody3D;
 
+#define MODULE_NAME_LENGTH 25
 class Module
 {
-private :
+private:
 	bool enabled;
+	char name[MODULE_NAME_LENGTH];
 
 public:
-	Application* App;
-	char* name = "NoName";
-
-	Module(Application* parent, bool start_enabled = true) : App(parent)
-	{}
+	Module(const char* name, bool start_enabled = true) : enabled(start_enabled)
+	{
+		strcpy_s(this->name, MODULE_NAME_LENGTH, name);
+	}
 
 	virtual ~Module()
 	{}
+
+	const char* GetName() const
+	{
+		return name;
+	}
+
+	bool IsActive() const
+	{
+		return enabled;
+	}
+
+	void SetActive(bool active)
+	{
+		if (enabled != active)
+		{
+			enabled = active;
+			if (active == true)
+				Start();
+			else
+				CleanUp();
+		}
+	}
 
 	virtual bool Init() 
 	{

@@ -2,9 +2,9 @@
 #include "Application.h"
 #include "ModuleSceneIntro.h"
 
-ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleSceneIntro::ModuleSceneIntro(bool start_enabled) : Module("SceneIntro", start_enabled)
 {
-	name = "SceneIntro";
+
 }
 
 ModuleSceneIntro::~ModuleSceneIntro()

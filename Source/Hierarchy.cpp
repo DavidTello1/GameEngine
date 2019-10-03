@@ -71,7 +71,6 @@ void DeleteNode(HierarchyNode* n)
 		{
 			LOG("Node not found on general node set", 'e');
 		}
-
 		n->childs.clear();
 		
 		if (n->parent)
@@ -107,6 +106,7 @@ void Hierarchy::DeleteSelected()
 	}
 	selected_nodes.clear();
 }
+
 void Hierarchy::ShowHierarchy(bool* open) 
 {
 	Draw("Hierarchy", open);
