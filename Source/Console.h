@@ -83,9 +83,9 @@ public:
 		if (ImGui::BeginPopup("Options"))
 		{
 			ImGui::Checkbox("Auto-scroll", &AutoScroll);
-			ImGui::Checkbox("Show Verbose Log", &ShowVerboseLog);
-			ImGui::Checkbox("Show Geometry Log", &ShowGeometryLog);
-			ImGui::Checkbox("Show Debug Log", &ShowDebugLog);
+			ImGui::Checkbox("Enable Verbose Log", &ShowVerboseLog);
+			ImGui::Checkbox("Enable Geometry Log", &ShowGeometryLog);
+			ImGui::Checkbox("Enable Debug Log", &ShowDebugLog);
 			ImGui::EndPopup();
 		}
 
@@ -93,7 +93,7 @@ public:
 		if (ImGui::Button("Options"))
 			ImGui::OpenPopup("Options");
 		ImGui::SameLine();
-		Filter.Draw("Filter (\"incl,-excl\") (\"error\")", 180);
+		Filter.Draw("Filter (\"incl,-excl\") (\"error\")",180);
 		ImGui::Separator();
 
 		const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing(); // 1 separator, 1 input text
@@ -179,17 +179,17 @@ public:
 		History.push_back(Strdup(command_line));
 
 		// Process command
-		if (Stricmp(command_line, "CLEAR") == 0)
+		if (Stricmp(command_line, "clear") == 0 || Stricmp(command_line, "Clear") == 0 || Stricmp(command_line, "CLEAR") == 0 || Stricmp(command_line, "-cl") == 0)
 		{
 			ClearLog();
 		}
-		else if (Stricmp(command_line, "HELP") == 0)
+		else if (Stricmp(command_line, "help") == 0 || Stricmp(command_line, "Help") == 0 || Stricmp(command_line, "HELP") == 0 || Stricmp(command_line, "-h") == 0)
 		{
 			AddLog("Commands:");
 			for (int i = 0; i < Commands.Size; i++)
 				AddLog("- %s", Commands[i]);
 		}
-		else if (Stricmp(command_line, "HISTORY") == 0)
+		else if (Stricmp(command_line, "copy") == 0 || Stricmp(command_line, "Copy") == 0 || Stricmp(command_line, "COPY") == 0 || Stricmp(command_line, "-cp") == 0)
 		{
 			int first = History.Size - 10;
 			for (int i = first > 0 ? first : 0; i < History.Size; i++)
