@@ -125,6 +125,13 @@ bool ModuleEditor::Start()
 	tab_panels[TabPanelRight].pos_x = App->window->GetWidth() - tab_panels[TabPanelRight].width;
 	tab_panels[TabPanelRight].height = App->window->GetHeight() - tab_panels[TabPanelRight].pos_y;
 
+	for (uint i = 0; i < TabPanelCount; ++i)
+	{
+		visible_panels[i] = tab_panels[i];
+	}
+
+	tab_panels[TabPanelRight].panels.push_back(tab_configuration);
+
 	return true;
 }
 
@@ -278,7 +285,7 @@ bool ModuleEditor::Update(float dt)
 
 	if (is_show_configuration && !flag_configuration) //properties
 	{
-		tab_panels[TabPanelRight].panels.push_back(tab_configuration);
+		visible_panels[TabPanelRight].panels.push_back(tab_configuration);
 		flag_configuration = true;
 	}
 	else if (!is_show_configuration && flag_configuration)
@@ -289,11 +296,12 @@ bool ModuleEditor::Update(float dt)
 
 	for (uint i = 0; i < TabPanelCount; ++i)
 	{
-		const TabPanel& tab = tab_panels[i];
+		const TabPanel& tab = visible_panels[i];
 		ImGui::SetNextWindowPos(ImVec2((float)tab.pos_x, (float)tab.pos_y), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2((float)tab.width, (float)tab.height), ImGuiCond_Once);
+		static bool is_closable = true;
 
-		if (ImGui::Begin(tab.name, NULL, ImGuiWindowFlags_NoFocusOnAppearing))
+		if (ImGui::Begin(tab.name, &is_closable, ImGuiWindowFlags_NoFocusOnAppearing))
 		{
 			if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_Reorderable))
 			{
@@ -435,11 +443,11 @@ bool ModuleEditor::ClosePanel(const char* name)
 {
 	for (uint i = 0; i < TabPanelCount; ++i)
 	{
-		for (vector<Panel*>::iterator it = tab_panels[i].panels.begin(); it != tab_panels[i].panels.end(); ++it)
+		for (vector<Panel*>::iterator it = visible_panels[i].panels.begin(); it != visible_panels[i].panels.end(); ++it)
 		{
 			if ((*it)->GetName() == name)
 			{
-				tab_panels[i].panels.erase(it);
+				visible_panels[i].panels.erase(it);
 				return true;
 			}
 		}

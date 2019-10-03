@@ -33,6 +33,7 @@ private:
 	};
 
 	TabPanel tab_panels[TabPanelCount];
+	TabPanel visible_panels[TabPanelCount];
 
 public:
 	ModuleEditor(bool start_enabled = true);
