@@ -105,11 +105,13 @@ bool ModuleEditor::Start()
 	// Create panels
 	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_hierarchy = new Hierarchy());
+	panels.push_back(tab_console = new Console());
 
 
 	// Init panels
 	panel_configuration = GetPanel("Configuration");
 	panel_hierarchy = GetPanel("Hierarchy");
+	panel_console = GetPanel("Console");
 
 	return true;
 }
@@ -165,7 +167,7 @@ bool ModuleEditor::Update(float dt)
 			if (ImGui::BeginMenu("View")) //view
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &panel_hierarchy->active);
-				//ImGui::MenuItem("Console", NULL, &is_show_console);
+				ImGui::MenuItem("Console", NULL, &panel_console->active);
 				ImGui::MenuItem("Configuration", NULL, &panel_configuration->active);
 				//ImGui::MenuItem("Properties", NULL, &is_show_properties);
 
@@ -247,8 +249,8 @@ bool ModuleEditor::Update(float dt)
 	{
 		if ((*it)->IsActive())
 		{
-			ImGui::SetNextWindowPos(ImVec2((*it)->pos_x, (*it)->pos_y), ImGuiCond_Appearing);
-			ImGui::SetNextWindowSize(ImVec2((*it)->width, (*it)->height), ImGuiCond_Appearing);
+			ImGui::SetNextWindowPos(ImVec2((*it)->pos_x, (*it)->pos_y), ImGuiCond_Once);
+			ImGui::SetNextWindowSize(ImVec2((*it)->width, (*it)->height), ImGuiCond_Once);
 			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
 			{
 				(*it)->Draw();
@@ -304,6 +306,11 @@ bool ModuleEditor::Update(float dt)
 		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN))
 	{
 		is_save = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP))
+	{
+		App->input->quit = true;
 	}
 
 	return ret;

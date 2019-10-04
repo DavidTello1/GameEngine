@@ -34,30 +34,30 @@ void log(const char file[], int line, const char* format, ...)
 	// geometry logs
 	if (logtype == 'g')
 	{
-		if (Console::console.ShowGeometryLog) 
+		if (Console::ShowGeometryLog) 
 		{
 			sprintf_s(tmp_string2, 4096, "[Geometry] %s(%d) : %s", short_file, line, tmp_string);
-			Console::console.AddLog(tmp_string2);
+			Console::AddLog(tmp_string2);
 		} // else { ignore log }
 	}
 	// debug logs
 	else if (logtype == 'd')
 	{ 
-		if (Console::console.ShowDebugLog)
+		if (Console::ShowDebugLog)
 		{
 			sprintf_s(tmp_string2, 4096, "[Debug] %s(%d) : %s", short_file, line, tmp_string);
-			Console::console.AddLog(tmp_string2);
+			Console::AddLog(tmp_string2);
 		} // else { ignore log }
 	}
 	else if (logtype == 'e') // errors can not be ignored, there's always something to learn
 	{
 		sprintf_s(tmp_string2, 4096, "[Error] %s(%d) : %s", short_file, line, tmp_string);
-		Console::console.AddLog(tmp_string2);
+		Console::AddLog(tmp_string2);
 	}
 	// verbose logs
-	else if (Console::console.ShowVerboseLog) {
+	else if (Console::ShowVerboseLog) {
 		sprintf_s(tmp_string2, 4096, "[Verbose] %s(%d) : %s", short_file, line,  tmp_string);
-		Console::console.AddLog(tmp_string2);
+		Console::AddLog(tmp_string2);
 	} // else { ignore log }
 
 }
