@@ -10,10 +10,10 @@
 class Hierarchy : public Panel
 {
 public:
-	static const uint default_width = 300;
-	static const uint default_height = 600;
+	static const uint default_width = 262;
+	static const uint default_height = 862;
 	static const uint default_pos_x = 0;
-	static const uint default_pos_y = 0;
+	static const uint default_pos_y = 19;
 
 public:
 	Hierarchy();

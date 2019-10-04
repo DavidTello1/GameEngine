@@ -26,10 +26,10 @@ class ModuleRenderer3D;
 class Configuration : public Panel
 {
 public:
-	static const uint default_width = 325;
-	static const uint default_height = 417;
-	static const uint default_pos_x = 956;
-	static const uint default_pos_y = 609;
+	static const uint default_width = 302;
+	static const uint default_height = 862;
+	static const uint default_pos_x = 978;
+	static const uint default_pos_y = 19;
 
 public:
 	Configuration();
