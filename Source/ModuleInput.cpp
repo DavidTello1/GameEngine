@@ -128,8 +128,6 @@ bool ModuleInput::PreUpdate(float dt)
 
 	if (quit == true) 
 	{
-		LOG("CLOSE COMMAND EXECUTED...")
-
 		if (App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP)
 			return false;
 
