@@ -3,6 +3,7 @@
 #include "ModuleInput.h"
 #include "ImGui/imgui.h"
 #include "imGui/imgui_impl_sdl.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 #define MAX_KEYS 300
 
@@ -125,10 +126,55 @@ bool ModuleInput::PreUpdate(float dt)
 		}
 	}
 
-	if (quit == true || keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP) {
-		LOG("CLOSE COMMAND EXECUTED: EXITING APPLICATION")
-		quit = true;
-		return false;
+	if (quit == true) 
+	{
+		LOG("CLOSE COMMAND EXECUTED...")
+
+		if (App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP)
+			return false;
+
+		ImGui::OpenPopup("Quit");
+		if (ImGui::BeginPopupModal("Quit", &quit, ImGuiWindowFlags_NoResize))
+		{
+			ImGui::Text("Are you sure you want to Quit?");
+			ImGui::NewLine();
+			ImGui::Text("  ");
+			ImGui::SameLine();
+
+			if (ImGui::Button("Save"))
+			{
+				//Save
+				ImGui::CloseCurrentPopup();
+
+				LOG("SAVING APPLICATION AND EXITING")
+				quit = true;
+				return false;
+			}
+			ImGui::SameLine();
+			ImGui::Text("");
+			ImGui::SameLine();
+
+			if (ImGui::Button("Close"))
+			{
+				ImGui::CloseCurrentPopup();
+
+				LOG("EXITING APPLICATION")
+				quit = true;
+				return false;
+
+			}
+			ImGui::SameLine();
+			ImGui::Text("");
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel"))
+			{
+				ImGui::CloseCurrentPopup();
+				LOG("CANCEL EXIT")
+				quit = false;
+			}
+			ImGui::EndPopup();
+		}
 	}
 
 	return true;
