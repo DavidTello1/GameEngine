@@ -6,6 +6,7 @@
 #include "ModuleEditor.h"
 #include "Console.h"
 #include "Hierarchy.h"
+#include "Inspector.h"
 #include "Configuration.h"
 
 #include <string.h>
@@ -106,12 +107,14 @@ bool ModuleEditor::Start()
 	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_hierarchy = new Hierarchy());
 	panels.push_back(tab_console = new Console());
+	panels.push_back(tab_inspector = new Inspector());
 
 
 	// Init panels
 	panel_configuration = GetPanel("Configuration");
 	panel_hierarchy = GetPanel("Hierarchy");
 	panel_console = GetPanel("Console");
+	panel_inspector = GetPanel("Inspector");
 
 	return true;
 }
@@ -169,7 +172,7 @@ bool ModuleEditor::Update(float dt)
 				ImGui::MenuItem("Hierarchy", NULL, &panel_hierarchy->active);
 				ImGui::MenuItem("Console", NULL, &panel_console->active);
 				ImGui::MenuItem("Configuration", NULL, &panel_configuration->active);
-				//ImGui::MenuItem("Properties", NULL, &is_show_properties);
+				ImGui::MenuItem("Inspector", NULL, &panel_inspector->active);
 
 				ImGui::EndMenu();
 			}
@@ -278,7 +281,7 @@ bool ModuleEditor::Update(float dt)
 	}
 
 
-	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
+	/*if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
 		LOG("GEOMETRY LOG %d", 25, 'g')
 	}
 	if (App->input->GetKey(SDL_SCANCODE_B) == KEY_DOWN) {
@@ -287,7 +290,7 @@ bool ModuleEditor::Update(float dt)
 	}
 	if (App->input->GetKey(SDL_SCANCODE_V) == KEY_DOWN) {
 		LOG("VERBOSE LOG", 'v')
-	}
+	}*/
 
 	// --- SHORTCUTS -----------------
 	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||

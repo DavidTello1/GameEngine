@@ -129,6 +129,9 @@
     <ClInclude Include="mmgr\nommgr.h">
       <Filter>Sources\Containers\mmgr</Filter>
     </ClInclude>
+    <ClInclude Include="Inspector.h">
+      <Filter>Sources\Panels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -205,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="mmgr\mmgr.cpp">
       <Filter>Sources\Containers\mmgr</Filter>
+    </ClCompile>
+    <ClCompile Include="Inspector.cpp">
+      <Filter>Sources\Panels</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
