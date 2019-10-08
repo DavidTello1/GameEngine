@@ -18,5 +18,8 @@ Viewport::~Viewport()
 
 void Viewport::Draw() 
 {
-	ImGui::GetWindowDrawList()->AddImage((void*)texture, ImVec2(pos_x, pos_y), ImVec2(pos_x + width, pos_y + height));
+	ImGui::GetWindowDrawList()->AddImage(
+		(ImTextureID*)texture, 
+		ImVec2(pos_x, pos_y), 
+		ImVec2(pos_x + width, pos_y + height));
 }

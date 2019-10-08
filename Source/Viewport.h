@@ -16,6 +16,6 @@ public:
 	~Viewport();
 	void Draw();
 
-	GLuint texture;
+	GLuint* texture;
 };
 
