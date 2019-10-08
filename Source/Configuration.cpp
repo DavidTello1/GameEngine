@@ -8,6 +8,7 @@
 #include "ModuleEditor.h"
 
 #include "mmgr/mmgr.h"
+#include "gpudetect/DeviceId.h"
 
 using namespace std;
 
@@ -18,6 +19,8 @@ Configuration::Configuration() : Panel("Configuration"), fps_log(FPS_LOG_SIZE), 
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
+
+	GetHardware(); //init hardware detection
 }
 
 Configuration::~Configuration()
@@ -41,6 +44,8 @@ void Configuration::Draw()
 	}
 
 	DrawApplication();
+
+	DrawHardware();
 
 	if (InitModuleDraw(App->window))
 		DrawModuleWindow(App->window);
@@ -150,6 +155,43 @@ void Configuration::DrawApplication()
 		ImGui::Text("Peak Alloc Unit Count: %u", stats.peakAllocUnitCount);
 	}
 }
+
+void Configuration::DrawHardware()
+{
+	if (ImGui::CollapsingHeader("Hardware"))
+	{
+
+		hardware_info info = GetHardwareInfo();
+		IMGUI_PRINT("SDL Version:", info.sdl_version);
+
+		ImGui::Separator();
+		IMGUI_PRINT("CPUs:", "%u (Cache: %ukb)", info.cpu_count, info.l1_cachekb);
+		IMGUI_PRINT("System RAM:", "%.1fGb", info.ram_gb);
+		IMGUI_PRINT("Caps:", "%s%s%s%s%s%s",
+			info.rdtsc ? "RDTSC," : "",
+			info.altivec ? "AltiVec," : "",
+			info.mmx ? "MMX," : "",
+			info.now3d ? "3DNow," : "",
+			info.sse ? "SSE," : "",
+			info.sse2 ? "SSE2," : "");
+		IMGUI_PRINT("", "%s%s%s%s%s",
+			info.sse3 ? "SSE3," : "",
+			info.sse41 ? "SSE41," : "",
+			info.sse42 ? "SSE42," : "",
+			info.avx ? "AVX," : "",
+			info.avx2 ? "AVX2" : "");
+
+
+		ImGui::Separator();
+		IMGUI_PRINT("GPU:", "vendor %u device %u", info.gpu_vendor, info.gpu_device);
+		IMGUI_PRINT("Brand:", info.gpu_brand);
+		IMGUI_PRINT("VRAM Budget:", "%.1f Mb", info.vram_mb_budget);
+		IMGUI_PRINT("VRAM Usage:", "%.1f Mb", info.vram_mb_usage);
+		IMGUI_PRINT("VRAM Available:", "%.1f Mb", info.vram_mb_available);
+		IMGUI_PRINT("VRAM Reserved:", "%.1f Mb", info.vram_mb_reserved);
+	}
+}
+
 
 void Configuration::DrawModuleWindow(ModuleWindow* module)
 {
@@ -264,4 +306,62 @@ void Configuration::AddFPS(float fps, float ms)
 
 	fps_log[count - 1] = fps;
 	ms_log[count - 1] = ms;
+}
+
+void Configuration::GetHardware()
+{
+	SDL_version version;
+	SDL_GetVersion(&version);
+
+	sprintf_s(info_hw.sdl_version, 25, "%i.%i.%i", version.major, version.minor, version.patch);
+	info_hw.ram_gb = (float)SDL_GetSystemRAM() / (1024.f);
+	info_hw.cpu_count = SDL_GetCPUCount();
+	info_hw.l1_cachekb = SDL_GetCPUCacheLineSize();
+	info_hw.rdtsc = SDL_HasRDTSC() == SDL_TRUE;
+	info_hw.altivec = SDL_HasAltiVec() == SDL_TRUE;
+	info_hw.now3d = SDL_Has3DNow() == SDL_TRUE;
+	info_hw.mmx = SDL_HasMMX() == SDL_TRUE;
+	info_hw.sse = SDL_HasSSE() == SDL_TRUE;
+	info_hw.sse2 = SDL_HasSSE2() == SDL_TRUE;
+	info_hw.sse3 = SDL_HasSSE3() == SDL_TRUE;
+	info_hw.sse41 = SDL_HasSSE41() == SDL_TRUE;
+	info_hw.sse42 = SDL_HasSSE42() == SDL_TRUE;
+	info_hw.avx = SDL_HasAVX() == SDL_TRUE;
+	info_hw.avx2 = SDL_HasAVX2() == SDL_TRUE;
+
+	uint vendor, device_id;
+	std::wstring brand;
+	unsigned __int64 video_mem_budget;
+	unsigned __int64 video_mem_usage;
+	unsigned __int64 video_mem_available;
+	unsigned __int64 video_mem_reserved;
+
+	if (getGraphicsDeviceInfo(&vendor, &device_id, &brand, &video_mem_budget, &video_mem_usage, &video_mem_available, &video_mem_reserved))
+	{
+		info_hw.gpu_vendor = vendor;
+		info_hw.gpu_device = device_id;
+		sprintf_s(info_hw.gpu_brand, 250, "%S", brand.c_str());
+		info_hw.vram_mb_budget = float(video_mem_budget) / 1073741824.0f;
+		info_hw.vram_mb_usage = float(video_mem_usage) / (1024.f * 1024.f * 1024.f);
+		info_hw.vram_mb_available = float(video_mem_available) / (1024.f * 1024.f * 1024.f);
+		info_hw.vram_mb_reserved = float(video_mem_reserved) / (1024.f * 1024.f * 1024.f);
+	}
+}
+
+const hardware_info& Configuration::GetHardwareInfo() const
+{
+	unsigned __int64 video_mem_budget;
+	unsigned __int64 video_mem_usage;
+	unsigned __int64 video_mem_available;
+	unsigned __int64 video_mem_reserved;
+
+	if (getGraphicsDeviceInfo(nullptr, nullptr, nullptr, &video_mem_budget, &video_mem_usage, &video_mem_available, &video_mem_reserved))
+	{
+		info_hw.vram_mb_budget = float(video_mem_budget) / (1024.f * 1024.f);
+		info_hw.vram_mb_usage = float(video_mem_usage) / (1024.f * 1024.f);
+		info_hw.vram_mb_available = float(video_mem_available) / (1024.f * 1024.f);
+		info_hw.vram_mb_reserved = float(video_mem_reserved) / (1024.f * 1024.f);
+	}
+
+	return info_hw;
 }

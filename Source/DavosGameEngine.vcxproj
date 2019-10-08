@@ -80,6 +80,8 @@
     <ClInclude Include="Console.h" />
     <ClInclude Include="glmath.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="gpudetect\DeviceId.h" />
+    <ClInclude Include="gpudetect\dxgi1_4.h" />
     <ClInclude Include="Hierarchy.h" />
     <ClInclude Include="HierarchyNode.h" />
     <ClInclude Include="Imgui\imconfig.h" />
@@ -113,6 +115,7 @@
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="glmath.cpp" />
+    <ClCompile Include="gpudetect\DeviceId.cpp" />
     <ClCompile Include="Hierarchy.cpp" />
     <ClCompile Include="HierarchyNode.cpp" />
     <ClCompile Include="Imgui\imgui.cpp" />

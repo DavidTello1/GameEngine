@@ -31,6 +31,9 @@
     <Filter Include="Sources\Containers\mmgr">
       <UniqueIdentifier>{1bf0de0d-49d5-400f-b1db-7d11412e6830}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Containers\gpudetect">
+      <UniqueIdentifier>{956fdc9f-efb4-41fa-b7b3-798bc3567716}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -129,6 +132,12 @@
     <ClInclude Include="mmgr\nommgr.h">
       <Filter>Sources\Containers\mmgr</Filter>
     </ClInclude>
+    <ClInclude Include="gpudetect\DeviceId.h">
+      <Filter>Sources\Containers\gpudetect</Filter>
+    </ClInclude>
+    <ClInclude Include="gpudetect\dxgi1_4.h">
+      <Filter>Sources\Containers\gpudetect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -205,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="mmgr\mmgr.cpp">
       <Filter>Sources\Containers\mmgr</Filter>
+    </ClCompile>
+    <ClCompile Include="gpudetect\DeviceId.cpp">
+      <Filter>Sources\Containers\gpudetect</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
