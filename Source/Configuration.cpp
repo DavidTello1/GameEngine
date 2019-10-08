@@ -29,19 +29,24 @@ Configuration::~Configuration()
 
 void Configuration::Draw()
 {
-	if (ImGui::BeginMenu("Options"))
+	if (ImGui::Button("Options"))
+		ImGui::OpenPopup("options_popup");
+	ImGui::SameLine();
+	if (ImGui::BeginPopup("options_popup"))
 	{
-		ImGui::MenuItem("Set Defaults");
-		if (ImGui::MenuItem("Load"))
-		{ }
+		ImGui::Selectable("Set Defaults");
+		if (ImGui::Selectable("Load"))
+		{ 
 			//App->LoadPrefs();
+		}
 
-		if (ImGui::MenuItem("Save"))
-		{ }
+		if (ImGui::Selectable("Save"))
+		{ 
 			//App->SavePrefs();
-
-		ImGui::EndMenu();
+		}
+		ImGui::EndPopup();
 	}
+	ImGui::NewLine();
 
 	DrawApplication();
 
