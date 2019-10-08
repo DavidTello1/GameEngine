@@ -121,18 +121,22 @@ bool ModuleRenderer3D::Init()
 // PreUpdate: clear buffer
 bool ModuleRenderer3D::PreUpdate(float dt)
 {
+	/*glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClearColor(1, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
+	glEnable(GL_DEPTH_TEST);*/
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(App->camera->GetViewMatrix());
-
-	// light 0 on cam pos
-	lights[0].SetPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
-
-	for(uint i = 0; i < MAX_LIGHTS; ++i)
-		lights[i].Render();
-
+	//glLoadIdentity();
+	//
+	//glMatrixMode(GL_MODELVIEW);
+	//glLoadMatrixf(App->camera->GetViewMatrix());
+	//
+	//// light 0 on cam pos
+	//lights[0].SetPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
+	//
+	//for (uint i = 0; i < MAX_LIGHTS; ++i)
+	//	lights[i].Render();
+	
 	return true;
 }
 
