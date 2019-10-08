@@ -8,6 +8,7 @@
 #include "Hierarchy.h"
 #include "Inspector.h"
 #include "Configuration.h"
+#include "Viewport.h"
 
 #include <string.h>
 #include <algorithm>
@@ -108,6 +109,7 @@ bool ModuleEditor::Start()
 	panels.push_back(tab_hierarchy = new Hierarchy());
 	panels.push_back(tab_console = new Console());
 	panels.push_back(tab_inspector = new Inspector());
+	panels.push_back(tab_viewport = new Viewport());
 
 
 	// Init panels
@@ -115,6 +117,7 @@ bool ModuleEditor::Start()
 	panel_hierarchy = GetPanel("Hierarchy");
 	panel_console = GetPanel("Console");
 	panel_inspector = GetPanel("Inspector");
+	panel_viewport = GetPanel("Viewport");
 
 	return true;
 }

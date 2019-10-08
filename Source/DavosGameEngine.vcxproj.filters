@@ -141,6 +141,9 @@
     <ClInclude Include="gpudetect\dxgi1_4.h">
       <Filter>Sources\Containers\gpudetect</Filter>
     </ClInclude>
+    <ClInclude Include="Viewport.h">
+      <Filter>Sources\Panels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -223,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="gpudetect\DeviceId.cpp">
       <Filter>Sources\Containers\gpudetect</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewport.cpp">
+      <Filter>Sources\Panels</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
