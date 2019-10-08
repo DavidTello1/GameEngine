@@ -31,8 +31,8 @@ void ModuleViewport::DrawScene()
 	glEnd();
 	glLineWidth(2.0f);*/
 
-	//App->editor->tab_viewport->texture = frame_buffer;
-	//App->editor->tab_viewport->Draw();
+	App->editor->tab_viewport->texture = &fbuffer.tex;
+	App->editor->tab_viewport->Draw();
 }
 void ModuleViewport::RemoveFrameBuffer(Framebuffer& buffer)
 {
@@ -102,7 +102,7 @@ void ModuleViewport::GenerateBuffer(Framebuffer& buffer)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		LOG("Something went wrong creating the frame buffer", 'e');
 
-	glViewport(0, 0, 600, 600); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+	//glViewport(0, 0, 600, 600); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
 	
 }
