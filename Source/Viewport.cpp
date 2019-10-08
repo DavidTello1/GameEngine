@@ -1,5 +1,5 @@
 #include "Viewport.h"
-
+#include "Imgui/imgui.h"
 
 
 Viewport::Viewport() : Panel("Viewport")
@@ -18,4 +18,5 @@ Viewport::~Viewport()
 
 void Viewport::Draw() 
 {
+	ImGui::GetWindowDrawList()->AddImage((void*)texture, ImVec2(pos_x, pos_y), ImVec2(pos_x + width, pos_y + height));
 }

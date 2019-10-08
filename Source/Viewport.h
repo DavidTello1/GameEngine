@@ -1,5 +1,6 @@
 #pragma once
 #include "Panel.h"
+#include "glew/include/GL/glew.h"
 
 class Viewport : public Panel
 {
@@ -14,5 +15,7 @@ public:
 	Viewport();
 	~Viewport();
 	void Draw();
+
+	GLuint texture;
 };
 

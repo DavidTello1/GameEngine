@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class Application;
 struct PhysBody3D;
