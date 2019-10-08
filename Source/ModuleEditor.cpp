@@ -144,7 +144,7 @@ bool ModuleEditor::Update(float dt)
 	static bool is_save = false;
 
 
-	ShowExampleAppDockSpace(&is_show_main_dockspace);
+	//ShowExampleAppDockSpace(&is_show_main_dockspace);
 
 	if (is_draw_menu == true) // Main menu GUI
 	{
