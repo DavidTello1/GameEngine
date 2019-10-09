@@ -21,6 +21,7 @@ public:
 
 	void Draw();
 	static void AddNode(HierarchyNode* node = nullptr);
+	static void DeleteNode(HierarchyNode * n);
 	static bool SetSceneName(const char* name);
 	static void DeleteSelected();
 

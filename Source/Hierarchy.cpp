@@ -32,6 +32,11 @@ Hierarchy::Hierarchy() : Panel("Hierarchy")
 
 Hierarchy::~Hierarchy()
 {
+	std::set<HierarchyNode*>::iterator it = root_nodes.begin();
+	for (;it != root_nodes.end();)
+	{
+		DeleteNode(*it++);
+	}
 }
 
 // Add a new dummy node, child of the passed node or root node if parent is nullptr
@@ -60,7 +65,7 @@ void Hierarchy::AddNode(HierarchyNode* parent)
 
 }
 
-void DeleteNode(HierarchyNode* n)
+void Hierarchy::DeleteNode(HierarchyNode* n)
 {
 	// if has no childs, delete the node
 	if (n->childs.empty())
