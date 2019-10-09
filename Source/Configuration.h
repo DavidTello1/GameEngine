@@ -17,13 +17,12 @@ class ModuleEditor;
 class ModuleWindow;
 class ModuleInput;
 class ModuleRenderer3D;
+class ModuleFileSystem;
 //class ModuleAudio;
 //class ModuleEditorCamera;
 //class ModulePhysics3D;
-//class ModuleFileSystem;
 //class ModuleTextures;
 //class ModuleMeshes;
-//class ModuleHardware;
 //class ModuleLevelManager;
 //class ModuleHints;
 //class QuadtreeNode;
@@ -75,12 +74,11 @@ public:
 	void DrawModuleWindow(ModuleWindow * module);
 	void DrawModuleInput(ModuleInput * module);
 	void DrawModuleRenderer(ModuleRenderer3D * module);
+	void DrawModuleFileSystem(ModuleFileSystem * module);
 	//void DrawModuleAudio(ModuleAudio * module);
 	//void DrawModuleCamera(ModuleEditorCamera * module);
 	//void DrawModulePhysics(ModulePhysics3D * module);
-	//void DrawModuleFileSystem(ModuleFileSystem * module);
 	//void DrawModuleTextures(ModuleTextures * module);
-	//void DrawModuleHardware(ModuleHardware * module);
 	//void DrawModuleLevel(ModuleLevelManager * module);
 	//void DrawModuleHints(ModuleHints * module);
 

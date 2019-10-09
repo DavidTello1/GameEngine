@@ -109,13 +109,6 @@ bool ModuleEditor::Start()
 	panels.push_back(tab_console = new Console());
 	panels.push_back(tab_inspector = new Inspector());
 
-
-	// Init panels
-	panel_configuration = GetPanel("Configuration");
-	panel_hierarchy = GetPanel("Hierarchy");
-	panel_console = GetPanel("Console");
-	panel_inspector = GetPanel("Inspector");
-
 	return true;
 }
 
@@ -169,10 +162,10 @@ bool ModuleEditor::Update(float dt)
 
 			if (ImGui::BeginMenu("View")) //view
 			{
-				ImGui::MenuItem("Hierarchy", NULL, &panel_hierarchy->active);
-				ImGui::MenuItem("Console", NULL, &panel_console->active);
-				ImGui::MenuItem("Configuration", NULL, &panel_configuration->active);
-				ImGui::MenuItem("Inspector", NULL, &panel_inspector->active);
+				ImGui::MenuItem("Hierarchy", NULL, &GetPanel("Hierarchy")->active);
+				ImGui::MenuItem("Console", NULL, &GetPanel("Console")->active);
+				ImGui::MenuItem("Configuration", NULL, &GetPanel("Configuration")->active);
+				ImGui::MenuItem("Inspector", NULL, &GetPanel("Inspector")->active);
 
 				ImGui::EndMenu();
 			}
@@ -262,6 +255,12 @@ bool ModuleEditor::Update(float dt)
 		}
 	}
 
+	if (file_dialog == opened)
+		LoadFile((file_dialog_filter.length() > 0) ? file_dialog_filter.c_str() : nullptr);
+	else
+		in_modal = false;
+
+
 	if (is_new) //new
 	{
 		//...
@@ -344,6 +343,7 @@ void ModuleEditor::Draw() const
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+
 void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 {
 	ImVec2 size = ImGui::CalcTextSize(text);
@@ -378,6 +378,115 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 	}
 }
 
+bool ModuleEditor::FileDialog(const char * extension, const char* from_folder)
+{
+	bool ret = true;
+
+	switch (file_dialog)
+	{
+	case closed:
+		selected_file[0] = '\0';
+		file_dialog_filter = (extension) ? extension : "";
+		file_dialog_origin = (from_folder) ? from_folder : "";
+		file_dialog = opened;
+	case opened:
+		ret = false;
+		break;
+	}
+
+	return ret;
+}
+
+const char * ModuleEditor::CloseFileDialog()
+{
+	if (file_dialog == ready_to_close)
+	{
+		file_dialog = closed;
+		return selected_file[0] ? selected_file : nullptr;
+	}
+	return nullptr;
+}
+
+void ModuleEditor::LoadFile(const char* filter_extension, const char* from_dir)
+{
+	ImGui::OpenPopup("Load File");
+	if (ImGui::BeginPopupModal("Load File", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		in_modal = true;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
+		ImGui::BeginChild("File Browser", ImVec2(0, 300), true);
+		DrawDirectoryRecursive(from_dir, filter_extension);
+		ImGui::EndChild();
+		ImGui::PopStyleVar();
+
+		ImGui::PushItemWidth(250.f);
+		if (ImGui::InputText("##file_selector", selected_file, FILE_MAX, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+			file_dialog = ready_to_close;
+
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		if (ImGui::Button("Ok", ImVec2(50, 20)))
+			file_dialog = ready_to_close;
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(50, 20)))
+		{
+			file_dialog = ready_to_close;
+			selected_file[0] = '\0';
+		}
+
+		ImGui::EndPopup();
+	}
+	else
+	{
+		in_modal = false;
+	}
+}
+
+void ModuleEditor::DrawDirectoryRecursive(const char* directory, const char* filter_extension)
+{
+	vector<string> files;
+	vector<string> dirs;
+
+	std::string dir((directory) ? directory : "");
+	dir += "/";
+
+	App->file_system->DiscoverFiles(dir.c_str(), files, dirs);
+
+	for (vector<string>::const_iterator it = dirs.begin(); it != dirs.end(); ++it)
+	{
+		if (ImGui::TreeNodeEx((dir + (*it)).c_str(), 0, "%s/", (*it).c_str()))
+		{
+			DrawDirectoryRecursive((dir + (*it)).c_str(), filter_extension);
+			ImGui::TreePop();
+		}
+	}
+
+	std::sort(files.begin(), files.end());
+
+	for (vector<string>::const_iterator it = files.begin(); it != files.end(); ++it)
+	{
+		const string& str = *it;
+
+		bool ok = true;
+
+		if (filter_extension && str.substr(str.find_last_of(".") + 1) != filter_extension)
+			ok = false;
+
+		if (ok && ImGui::TreeNodeEx(str.c_str(), ImGuiTreeNodeFlags_Leaf))
+		{
+			if (ImGui::IsItemClicked()) {
+				sprintf_s(selected_file, FILE_MAX, "%s%s", dir.c_str(), str.c_str());
+
+				if (ImGui::IsMouseDoubleClicked(0))
+					file_dialog = ready_to_close;
+			}
+
+			ImGui::TreePop();
+		}
+	}
+}
 
 Panel* ModuleEditor::GetPanel(const char* name)
 {
@@ -390,6 +499,7 @@ Panel* ModuleEditor::GetPanel(const char* name)
 	}
 	return nullptr;
 }
+
 void ModuleEditor::LogFPS(float fps, float ms)
 {
 	if (tab_configuration != nullptr)

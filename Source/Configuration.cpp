@@ -6,6 +6,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
+#include "ModuleFileSystem.h"
 
 #include "mmgr/mmgr.h"
 #include "gpudetect/DeviceId.h"
@@ -61,6 +62,9 @@ void Configuration::Draw()
 	if (InitModuleDraw(App->renderer3D))
 		DrawModuleRenderer(App->renderer3D);
 	
+	if (InitModuleDraw(App->file_system))
+		DrawModuleFileSystem(App->file_system);
+
 	//if (InitModuleDraw(App->audio))
 	//	DrawModuleAudio(App->audio);
 
@@ -70,14 +74,8 @@ void Configuration::Draw()
 	//if (InitModuleDraw(App->physics3D))
 	//	DrawModulePhysics(App->physics3D);
 
-	//if (InitModuleDraw(App->fs))
-	//	DrawModuleFileSystem(App->fs);
-
 	//if (InitModuleDraw(App->tex))
 	//	DrawModuleTextures(App->tex);
-
-	//if (InitModuleDraw(App->hw))
-	//	DrawModuleHardware(App->hw);
 
 	//if (InitModuleDraw(App->level))
 	//	DrawModuleLevel(App->level);
@@ -256,7 +254,7 @@ void Configuration::DrawModuleWindow(ModuleWindow* module)
 	//	App->window->SetFullScreenDesktop(full_desktop);
 }
 
-void Configuration::DrawModuleInput(ModuleInput * module)
+void Configuration::DrawModuleInput(ModuleInput* module)
 {
 	//int mouse_x, mouse_y;
 	//module->GetMousePosition(mouse_x, mouse_y);
@@ -295,6 +293,26 @@ void Configuration::DrawModuleRenderer(ModuleRenderer3D* module)
 	//	App->renderer3D->SetVSync(vsync);
 }
 
+void Configuration::DrawModuleFileSystem(ModuleFileSystem* module)
+{
+	ImGui::Text("Base Path:");
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+	ImGui::TextWrapped(module->GetBasePath());
+	ImGui::PopStyleColor();
+
+	ImGui::Text("Read Paths:");
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+	ImGui::TextWrapped(module->GetReadPaths());
+	ImGui::PopStyleColor();
+
+	ImGui::Text("Write Path:");
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+	ImGui::TextWrapped(module->GetWritePath());
+	ImGui::PopStyleColor();
+}
+
+
+//---------------------------------
 void Configuration::AddFPS(float fps, float ms)
 {
 	static uint count = 0;

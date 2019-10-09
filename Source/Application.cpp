@@ -11,8 +11,7 @@ Application::Application()
 	fps_counter = 0;
 
 	//modules.push_back(hints = new ModuleHints());
-	//modules.push_back(hw = new ModuleHardware(false));
-	//modules.push_back(fs = new ModuleFileSystem(ASSETS_FOLDER));
+	modules.push_back(file_system = new ModuleFileSystem(ASSETS_FOLDER));
 	modules.push_back(window = new ModuleWindow());
 	//modules.push_back(resources = new ModuleResources());
 	//modules.push_back(tex = new ModuleTextures());
