@@ -112,22 +112,66 @@ void Configuration::DrawApplication()
 		strcpy_s(org_name, 120, App->GetOrganizationName());
 		if (ImGui::InputText("Organization", org_name, 120, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
 			App->SetOrganizationName(org_name);
+		ImGui::Separator();
 
-		int max_fps = App->GetFramerateLimit();
-		if (ImGui::SliderInt("Max FPS", &max_fps, 0, 120))
-			App->SetFramerateLimit(max_fps);
+		// Software Versions
+		if (ImGui::TreeNode("Software Versions"))
+		{
+			// SDL
+			SDL_version compiled;
+			SDL_VERSION(&compiled);
 
-		ImGui::Text("Limit Framerate:");
-		ImGui::SameLine();
-		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", App->GetFramerateLimit());
+			ImGui::BulletText("SDL Version:");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d.%d.%d", compiled.major, compiled.minor, compiled.patch);
 
-		char title[25];
-		sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
-		ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
-		sprintf_s(title, 25, "Milliseconds %0.1f", ms_log[ms_log.size() - 1]);
-		ImGui::PlotHistogram("##milliseconds", &ms_log[0], ms_log.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100));
+			// OpenGL
+			ImGui::BulletText("OpenGL Version:");
+			//ImGui::SameLine();
+			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", glGetString(GL_VERSION));
 
-		// Memory --------------------
+			// OpenGL
+			ImGui::BulletText("Glew Version:");
+			//ImGui::SameLine();
+			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", glewGetString(GLEW_VERSION));
+
+
+			//ImGui
+			ImGui::BulletText("ImGui Version:");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", IMGUI_VERSION);
+
+			// Devil
+			ImGui::BulletText("DevIL Version:");
+			//ImGui::SameLine();
+			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", IL_VERSION);
+
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
+
+		// FPS 
+		if (ImGui::TreeNode("FPS"))
+		{
+			int max_fps = App->GetFramerateLimit();
+			if (ImGui::SliderInt("Max FPS", &max_fps, 0, 120))
+				App->SetFramerateLimit(max_fps);
+
+			ImGui::Text("Limit Framerate:");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", App->GetFramerateLimit());
+
+			char title[25];
+			sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
+			ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
+			sprintf_s(title, 25, "Milliseconds %0.1f", ms_log[ms_log.size() - 1]);
+			ImGui::PlotHistogram("##milliseconds", &ms_log[0], ms_log.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100));
+
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
+
+		// Memory 
 		sMStats stats = m_getMemoryStatistics();
 		static int speed = 0;
 		static vector<float> memory(100);
@@ -144,18 +188,22 @@ void Configuration::DrawApplication()
 			else
 				memory.push_back((float)stats.totalReportedMemory);
 		}
+		if (ImGui::TreeNode("Memory"))
+		{
+			ImGui::PlotHistogram("##memory", &memory[0], memory.size(), 0, "Memory Consumption", 0.0f, (float)stats.peakReportedMemory * 1.2f, ImVec2(310, 100));
 
-		ImGui::PlotHistogram("##memory", &memory[0], memory.size(), 0, "Memory Consumption", 0.0f, (float)stats.peakReportedMemory * 1.2f, ImVec2(310, 100));
+			ImGui::Text("Total Reported Mem: %u", stats.totalReportedMemory);
+			ImGui::Text("Total Actual Mem: %u", stats.totalActualMemory);
+			ImGui::Text("Peak Reported Mem: %u", stats.peakReportedMemory);
+			ImGui::Text("Peak Actual Mem: %u", stats.peakActualMemory);
+			ImGui::Text("Accumulated Reported Mem: %u", stats.accumulatedReportedMemory);
+			ImGui::Text("Accumulated Actual Mem: %u", stats.accumulatedActualMemory);
+			ImGui::Text("Accumulated Alloc Unit Count: %u", stats.accumulatedAllocUnitCount);
+			ImGui::Text("Total Alloc Unit Count: %u", stats.totalAllocUnitCount);
+			ImGui::Text("Peak Alloc Unit Count: %u", stats.peakAllocUnitCount);
 
-		ImGui::Text("Total Reported Mem: %u", stats.totalReportedMemory);
-		ImGui::Text("Total Actual Mem: %u", stats.totalActualMemory);
-		ImGui::Text("Peak Reported Mem: %u", stats.peakReportedMemory);
-		ImGui::Text("Peak Actual Mem: %u", stats.peakActualMemory);
-		ImGui::Text("Accumulated Reported Mem: %u", stats.accumulatedReportedMemory);
-		ImGui::Text("Accumulated Actual Mem: %u", stats.accumulatedActualMemory);
-		ImGui::Text("Accumulated Alloc Unit Count: %u", stats.accumulatedAllocUnitCount);
-		ImGui::Text("Total Alloc Unit Count: %u", stats.totalAllocUnitCount);
-		ImGui::Text("Peak Alloc Unit Count: %u", stats.peakAllocUnitCount);
+			ImGui::TreePop();
+		}
 	}
 }
 
@@ -163,11 +211,8 @@ void Configuration::DrawHardware()
 {
 	if (ImGui::CollapsingHeader("Hardware"))
 	{
-
 		hardware_info info = GetHardwareInfo();
-		IMGUI_PRINT("SDL Version:", info.sdl_version);
 
-		ImGui::Separator();
 		IMGUI_PRINT("CPUs:", "%u (Cache: %ukb)", info.cpu_count, info.l1_cachekb);
 		IMGUI_PRINT("System RAM:", "%.1fGb", info.ram_gb);
 		IMGUI_PRINT("Caps:", "%s%s%s%s%s%s",
@@ -183,7 +228,6 @@ void Configuration::DrawHardware()
 			info.sse42 ? "SSE42," : "",
 			info.avx ? "AVX," : "",
 			info.avx2 ? "AVX2" : "");
-
 
 		ImGui::Separator();
 		IMGUI_PRINT("GPU:", "vendor %u device %u", info.gpu_vendor, info.gpu_device);
@@ -336,7 +380,6 @@ void Configuration::GetHardware()
 	SDL_version version;
 	SDL_GetVersion(&version);
 
-	sprintf_s(info_hw.sdl_version, 25, "%i.%i.%i", version.major, version.minor, version.patch);
 	info_hw.ram_gb = (float)SDL_GetSystemRAM() / (1024.f);
 	info_hw.cpu_count = SDL_GetCPUCount();
 	info_hw.l1_cachekb = SDL_GetCPUCacheLineSize();

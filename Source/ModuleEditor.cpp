@@ -136,6 +136,8 @@ bool ModuleEditor::Update(float dt)
 	static bool is_open = false;
 	static bool is_save = false;
 
+	static bool is_import = false;
+
 
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
 
@@ -156,6 +158,14 @@ bool ModuleEditor::Update(float dt)
 
 				if (ImGui::MenuItem("Quit", "ESC"))
 					App->input->quit = true;
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Edit")) //edit
+			{
+				if (ImGui::MenuItem("Import", "Ctrl+N"))
+					is_import = true;
 
 				ImGui::EndMenu();
 			}
@@ -218,10 +228,12 @@ bool ModuleEditor::Update(float dt)
 			ImGui::NewLine();
 
 			ImGui::Text("3rd Party Libraries used:");
-			CreateLink("SDL 2.0.10", "", true);
-			CreateLink("Glew 2.0.0", "", true);
-			CreateLink("ImGui 1.73", "", true);
-			CreateLink("OpenGL 3.1", "", true); ImGui::NewLine();
+			CreateLink("SDL", "", true);
+			CreateLink("OpenGL", "", true);
+			CreateLink("Glew", "", true);
+			CreateLink("ImGui", "", true);
+			CreateLink("DevIL", "", true);
+			ImGui::NewLine();
 
 			ImGui::Text("License:");
 			ImGui::Text("MIT License");
@@ -269,7 +281,7 @@ bool ModuleEditor::Update(float dt)
 
 	if (is_open) //open
 	{
-		//....
+		//...
 		is_open = false;
 	}
 
@@ -277,6 +289,12 @@ bool ModuleEditor::Update(float dt)
 	{
 		//...
 		is_save = false;
+	}
+
+	if (is_import)
+	{
+		//...
+		is_import = false;
 	}
 
 
