@@ -1,6 +1,11 @@
+#include "Application.h"
 #include "Viewport.h"
 
 
+const int Viewport::default_width = 600;
+const int Viewport::default_height = 600;
+const int Viewport::default_pos_x = 300;
+const int Viewport::default_pos_y = 250;
 
 Viewport::Viewport() : Panel("Viewport")
 {
@@ -8,7 +13,6 @@ Viewport::Viewport() : Panel("Viewport")
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
-
 }
 
 
@@ -21,18 +25,33 @@ bool Viewport::PreUpdate()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
 	//GREEN
-	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
 	glEnable(GL_DEPTH_TEST);
+
+	App->scene_intro->Draw();
+	//DrawFigures();
+	//glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 	return true;
 }
 
+
 void Viewport::Draw() 
 {
-	/*ImGui::GetWindowDrawList()->AddImage(
-		(void*)frame_buffer.tex, 
-		ImVec2(pos_x, pos_y), 
-		ImVec2(pos_x + width, pos_y + height));*/
+
+	if (width != ImGui::GetWindowWidth() || height != ImGui::GetWindowHeight())
+	{
+		width  = static_cast<int>(ImGui::GetWindowWidth());
+		height = static_cast<int>(ImGui::GetWindowHeight());
+		pos_x  = static_cast<int>(ImGui::GetWindowPos().x);
+		pos_y  = static_cast<int>(ImGui::GetWindowPos().y);
+
+		RemoveBuffer(frame_buffer);
+		Generate(ImVec2( width,height));
+		OnResize(pos_x, pos_y, width, height);
+		//OnResize(pos_x, pos_y, width, height);
+
+	}
 
 	ImGui::Image((ImTextureID)frame_buffer.tex,
 		ImVec2(width, height));
@@ -52,6 +71,7 @@ bool Viewport::PostUpdate()
 
 bool Viewport::Generate(ImVec2 size)
 {
+	
 	//Generate the FBO and bind it, continue if FBO is complete
 	glGenFramebuffers(1, &frame_buffer.id);
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
@@ -77,5 +97,40 @@ bool Viewport::Generate(ImVec2 size)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	OnResize(pos_x, pos_y, width, height);
 	return true;
+}
+
+void Viewport::RemoveBuffer(FrameBuffer& buffer)
+{
+	if (buffer.id != 0)
+	{
+		glDeleteFramebuffers(1, &buffer.id);
+		buffer.id = 0;
+	}
+
+	if (buffer.depth != 0)
+	{
+		glDeleteRenderbuffers(1, &buffer.depth);
+		buffer.depth = 0;
+	}
+
+	if (buffer.tex != 0)
+	{
+		glDeleteTextures(1, &buffer.tex);
+		buffer.tex = 0;
+	}
+}
+
+void Viewport::OnResize(int x, int y, int width, int height)
+{
+	glViewport(x, y, width, height);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	//ProjectionMatrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
+	//glLoadMatrixf(&ProjectionMatrix);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 }

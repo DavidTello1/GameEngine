@@ -148,6 +148,9 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 	//App->viewport->DrawScene();
 
 	// Drawing of gui and panels(and viewport panel)
+
+	
+
 	App->editor->Draw();
 
 	SDL_GL_SwapWindow(App->window->GetWindow());

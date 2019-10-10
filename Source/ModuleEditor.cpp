@@ -114,7 +114,9 @@ bool ModuleEditor::Start(Config* config)
 	panels.push_back(tab_assets = new Assets());
 	panels.push_back(tab_viewport = new Viewport());
 
-	tab_viewport->Generate();
+	int w = GetWidth(GetPanel("Viewport"));
+	int h = GetHeight(GetPanel("Viewport"));
+	tab_viewport->Generate(ImVec2(w,h));
 
 	return true;
 }
@@ -189,6 +191,7 @@ void ModuleEditor::Draw()
 	DrawDemo(is_show_demo);
 	DrawAbout(is_about);
 	DrawPanels();
+
 
 	if (file_dialog == opened)
 		LoadFile((file_dialog_filter.length() > 0) ? file_dialog_filter.c_str() : nullptr);
