@@ -114,9 +114,7 @@ bool ModuleEditor::Start(Config* config)
 	panels.push_back(tab_assets = new Assets());
 	panels.push_back(tab_viewport = new Viewport());
 
-	int w = GetWidth(GetPanel("Viewport"));
-	int h = GetHeight(GetPanel("Viewport"));
-	tab_viewport->Generate(ImVec2(w,h));
+	tab_viewport->GenerateFBO();
 
 	return true;
 }

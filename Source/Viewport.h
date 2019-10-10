@@ -23,7 +23,7 @@ public:
 	Viewport();
 	~Viewport();
 
-	bool Generate(ImVec2 size = { 600,600 });
+	bool GenerateFBO(ImVec2 size = { static_cast<float>(default_width), static_cast<float>(default_height )});
 
 	void RemoveBuffer(FrameBuffer & buffer);
 
@@ -39,6 +39,8 @@ public:
 
 	FrameBuffer frame_buffer;
 
-	mat4x4 ModelMatrix, ViewMatrix, ProjectionMatrix;
+	mat4x4 model_matrix, view_matrix, projection_matrix;
+
+	ImVec2 window_avail_size;
 };
 

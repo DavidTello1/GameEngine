@@ -23,6 +23,16 @@ Viewport::~Viewport()
 // Is not automatically called
 bool Viewport::PreUpdate()
 {
+	if (width != window_avail_size.x || height != window_avail_size.y)
+	{
+		width = window_avail_size.x;
+		height = window_avail_size.y;
+
+		GenerateFBO(ImVec2(width, height));
+		OnResize(width, height);
+
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
 	//GREEN
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -44,38 +54,31 @@ bool Viewport::PreUpdate()
 
 void Viewport::Draw() 
 {
-
-	if (width != ImGui::GetWindowWidth() || height != ImGui::GetWindowHeight())
-	{
-		width  = static_cast<int>(ImGui::GetWindowWidth());
-		height = static_cast<int>(ImGui::GetWindowHeight());
-		pos_x  = static_cast<int>(ImGui::GetWindowPos().x);
-		pos_y  = static_cast<int>(ImGui::GetWindowPos().y);
-
-		//RemoveBuffer(frame_buffer);
-		Generate(ImVec2( width,height));
-		OnResize(width, height);
-		//OnResize(pos_x, pos_y, width, height);
-
-	}
-
-	ImGui::Image((ImTextureID)frame_buffer.tex,
-		ImVec2(width, height));
+	window_avail_size = ImGui::GetContentRegionAvail();
+	
+	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height));
 }
 
 // Is not automatically called
 bool Viewport::PostUpdate()
 {
-	// second pass
+	// second step
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
 	// BLUE
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	return true;
 }
 
-bool Viewport::Generate(ImVec2 size)
+bool Viewport::CleanUp()
+{
+	RemoveBuffer(frame_buffer);
+
+	return true;
+}
+
+bool Viewport::GenerateFBO(ImVec2 size)
 {
 	
 	//Generate the FBO and bind it, continue if FBO is complete
@@ -134,8 +137,8 @@ void Viewport::OnResize(int width, int height)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	ProjectionMatrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
-	glLoadMatrixf(&ProjectionMatrix);
+	projection_matrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
+	glLoadMatrixf(&projection_matrix);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
