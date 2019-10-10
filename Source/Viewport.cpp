@@ -24,6 +24,6 @@ void Viewport::Draw()
 		ImVec2(pos_x + width, pos_y + height));*/
 
 	// IDK Why it creates an extra window
-	ImGui::Image((void*)texture,
+	ImGui::Image((ImTextureID)texture,
 		ImVec2(width, height));
 }

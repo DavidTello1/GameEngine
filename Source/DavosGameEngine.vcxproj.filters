@@ -147,6 +147,7 @@
     <ClInclude Include="ModuleViewport.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
+    <ClInclude Include="FrameBufferObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -236,5 +237,6 @@
     <ClCompile Include="ModuleViewport.cpp">
       <Filter>Sources\Modules</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBufferObject.cpp" />
   </ItemGroup>
 </Project>

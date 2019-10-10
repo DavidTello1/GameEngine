@@ -26,7 +26,8 @@ public:
 	bool Update(float dt);
 	bool CleanUp();
 
-	void Draw() const;
+	void Draw();
+
 	void CreateLink(const char* text, const char* url, bool bullet = false);
 	Panel* GetPanel(const char* name);
 	void LogFPS(float fps, float ms);

@@ -78,6 +78,7 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Console.h" />
+    <ClInclude Include="FrameBufferObject.h" />
     <ClInclude Include="glmath.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="gpudetect\DeviceId.h" />
@@ -117,6 +118,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="FrameBufferObject.cpp" />
     <ClCompile Include="glmath.cpp" />
     <ClCompile Include="gpudetect\DeviceId.cpp" />
     <ClCompile Include="Hierarchy.cpp" />
