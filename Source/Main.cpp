@@ -18,7 +18,7 @@ Application* App = nullptr;
 
 int main(int argc, char ** argv)
 {
-	LOG("Starting '%s' from[%s]", TITLE, argv[0]);
+	LOG("Starting Davos Game Engine from[%s]", argv[0]);
 
 	int main_return = EXIT_FAILURE;
 	main_states state = MAIN_CREATION;
@@ -77,6 +77,6 @@ int main(int argc, char ** argv)
 	}
 
 	delete App;
-	LOG("Exiting '%s'...\n", TITLE);
+	LOG("Exiting engine...");
 	return main_return;
 }

@@ -35,38 +35,17 @@ public:
 		return mouse_buttons[id];
 	}
 
-	int GetMouseX() const
-	{
-		return mouse_x;
-	}
-
-	int GetMouseY() const
-	{
-		return mouse_y;
-	}
-
-	int GetMouseZ() const
-	{
-		return mouse_z;
-	}
-
-	int GetMouseXMotion() const
-	{
-		return mouse_x_motion;
-	}
-
-	int GetMouseYMotion() const
-	{
-		return mouse_y_motion;
-	}
+	// Get mouse / axis position
+	void GetMouseMotion(int& x, int& y) const { x = mouse_motion_x; y = mouse_motion_y; }
+	void GetMousePosition(int& x, int& y) const { x = mouse_x; y = mouse_y; }
+	int GetMouseWheel() const { return mouse_wheel; }
 
 private:
 	KEY_STATE* keyboard;
 	KEY_STATE mouse_buttons[MAX_MOUSE_BUTTONS];
-	int mouse_x;
-	int mouse_y;
-	int mouse_z;
-	int mouse_x_motion;
-	int mouse_y_motion;
-	//int mouse_z_motion;
+	int mouse_motion_x = 0;
+	int mouse_motion_y = 0;
+	int mouse_x = 0;
+	int mouse_y = 0;
+	int mouse_wheel = 0;
 };

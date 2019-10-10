@@ -256,73 +256,94 @@ void Configuration::DrawModuleWindow(ModuleWindow* module)
 	//if (ImGui::Selectable(App->window->GetIcon()))
 	//	waiting_to_load_icon = true;
 
-	//float brightness = App->window->GetBrightness();
-	//if (ImGui::SliderFloat("Brightness", &brightness, 0.0f, 1.0f))
-	//	App->window->SetBrightness(brightness);
+	float brightness = App->window->GetBrightness();
+	if (ImGui::SliderFloat("Brightness", &brightness, 0.0f, 1.0f))
+		App->window->SetBrightness(brightness);
 
-	//uint w, h, min_w, min_h, max_w, max_h;
-	//App->window->GetMaxMinSize(min_w, min_h, max_w, max_h);
-	//w = App->window->GetWidth();
-	//h = App->window->GetHeight();
+	uint w, h, min_w, min_h, max_w, max_h;
+	App->window->GetMaxMinSize(min_w, min_h, max_w, max_h);
+	w = App->window->GetWidth();
+	h = App->window->GetHeight();
 
-	//if (ImGui::SliderInt("Width", (int*)&w, min_w, max_w))
-	//	App->window->SetWidth(w);
+	static int width = (int)w;
+	static int height = (int)h;
 
-	//if (ImGui::SliderInt("Height", (int*)&h, min_h, max_h))
-	//	App->window->SetHeigth(h);
+	if (ImGui::InputInt("Width", &width, 1, 1))
+	{
+		if (width > max_w)
+			width = int(max_w);
+		else if (width < min_w)
+			width = int(min_w);
 
-	//ImGui::Text("Refresh rate:");
-	//ImGui::SameLine();
-	//ImGui::TextColored(IMGUI_YELLOW, "%u", App->window->GetRefreshRate());
+		App->window->SetWidth((uint)width);
+	}
 
-	//bool fullscreen = App->window->IsFullscreen();
-	//bool resizable = App->window->IsResizable();
-	//bool borderless = App->window->IsBorderless();
-	//bool full_desktop = App->window->IsFullscreenDesktop();
+	if (ImGui::InputInt("Height", &height, 1, 1))
+	{
+		if (height > max_h)
+			height = max_h;
+		else if (height < min_h)
+			height = min_h;
 
-	//if (ImGui::Checkbox("Fullscreen", &fullscreen))
-	//	App->window->SetFullscreen(fullscreen);
+		App->window->SetHeigth((uint)height);
+	}
 
-	//ImGui::SameLine();
-	//if (ImGui::Checkbox("Resizable", &resizable))
-	//	App->window->SetResizable(resizable);
-	//if (ImGui::IsItemHovered())
-	//	ImGui::SetTooltip("Restart to apply");
+	ImGui::Text("Refresh rate:");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%u", App->window->GetRefreshRate());
 
-	//if (ImGui::Checkbox("Borderless", &borderless))
-	//	App->window->SetBorderless(borderless);
+	bool fullscreen = App->window->IsFullscreen();
+	bool resizable = App->window->IsResizable();
+	bool borderless = App->window->IsBorderless();
+	bool full_desktop = App->window->IsFullscreenDesktop();
 
-	//ImGui::SameLine();
-	//if (ImGui::Checkbox("Full Desktop", &full_desktop))
-	//	App->window->SetFullScreenDesktop(full_desktop);
+	if (ImGui::Checkbox("Fullscreen", &fullscreen))
+		App->window->SetFullscreen(fullscreen);
+
+	ImGui::SameLine();
+	if (ImGui::Checkbox("Resizable", &resizable))
+		App->window->SetResizable(resizable);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Restart to apply");
+
+	if (ImGui::Checkbox("Borderless", &borderless))
+		App->window->SetBorderless(borderless);
+
+	ImGui::SameLine();
+	if (ImGui::Checkbox("Full Desktop", &full_desktop))
+		App->window->SetFullScreenDesktop(full_desktop);
 }
 
 void Configuration::DrawModuleInput(ModuleInput* module)
 {
-	//int mouse_x, mouse_y;
-	//module->GetMousePosition(mouse_x, mouse_y);
-	//ImGui::Text("Mouse Position:");
-	//ImGui::SameLine();
-	//ImGui::TextColored(IMGUI_YELLOW, "%i,%i", mouse_x, mouse_y);
+	int mouse_x, mouse_y;
+	module->GetMousePosition(mouse_x, mouse_y);
+	ImGui::Text("Mouse Position:");
+	ImGui::SameLine();
+	ImGui::Text("x");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_x);
+	ImGui::SameLine();
+	ImGui::Text("y");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_y);
 
-	//module->GetMouseMotion(mouse_x, mouse_y);
-	//ImGui::Text("Mouse Motion:");
-	//ImGui::SameLine();
-	//ImGui::TextColored(IMGUI_YELLOW, "%i,%i", mouse_x, mouse_y);
 
-	//int wheel = module->GetMouseWheel();
-	//ImGui::Text("Mouse Wheel:");
-	//ImGui::SameLine();
-	//ImGui::TextColored(IMGUI_YELLOW, "%i", wheel);
+	module->GetMouseMotion(mouse_x, mouse_y);
+	ImGui::Text("Mouse Motion:");
+	ImGui::SameLine();
+	ImGui::Text("x");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_x);
+	ImGui::SameLine();
+	ImGui::Text("y");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_y);
 
-	//ImGui::Separator();
-
-	//ImGui::BeginChild("Input Log");
-	//ImGui::TextUnformatted(input_buf.begin());
-	//if (need_scroll)
-	//	ImGui::SetScrollHere(1.0f);
-	//need_scroll = false;
-	//ImGui::EndChild();
+	int wheel = module->GetMouseWheel();
+	ImGui::Text("Mouse Wheel:");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", wheel);
 }
 
 void Configuration::DrawModuleRenderer(ModuleRenderer3D* module)
