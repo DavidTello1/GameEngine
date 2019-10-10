@@ -258,8 +258,6 @@ bool ModuleEditor::Update(float dt)
 	{
 		if ((*it)->IsActive())
 		{
-			ImGui::SetNextWindowPos(ImVec2((*it)->pos_x, (*it)->pos_y), ImGuiCond_Once);
-			ImGui::SetNextWindowSize(ImVec2((*it)->width, (*it)->height), ImGuiCond_Once);
 			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
 			{
 				(*it)->Draw();
