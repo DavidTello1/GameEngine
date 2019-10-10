@@ -17,3 +17,5 @@ public:
 	bool CleanUp();
 
 };
+
+void DrawGridPlane();
