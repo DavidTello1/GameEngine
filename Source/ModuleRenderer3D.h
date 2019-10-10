@@ -12,7 +12,7 @@ public:
 	ModuleRenderer3D(bool start_enabled = true);
 	~ModuleRenderer3D();
 
-	bool Init();
+	bool Init(Config* config = nullptr);
 	bool PreUpdate(float dt);
 	bool PostUpdate(float dt);
 	bool CleanUp();

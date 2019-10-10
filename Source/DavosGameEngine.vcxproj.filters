@@ -31,6 +31,15 @@
     <Filter Include="Sources\Containers\mmgr">
       <UniqueIdentifier>{1bf0de0d-49d5-400f-b1db-7d11412e6830}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Containers\gpudetect">
+      <UniqueIdentifier>{956fdc9f-efb4-41fa-b7b3-798bc3567716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Containers\assimp">
+      <UniqueIdentifier>{abca0654-e889-4d37-bb9d-4cd14ceffee4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Containers\parson">
+      <UniqueIdentifier>{60413707-f765-4b6f-b9d7-74ec9d1253e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -117,11 +126,11 @@
     <ClInclude Include="HierarchyNode.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="Hierarchy.h">
+      <Filter>Sources\Panels</Filter>
+    </ClInclude>
     <ClInclude Include="Inspector.h">
       <Filter>Sources\Panels</Filter>
-	  </ClInclude>
-    <ClInclude Include="Hierarchy.h" >
-	<Filter>Sources\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Panel.h">
       <Filter>Sources\Panels</Filter>
@@ -131,6 +140,126 @@
     </ClInclude>
     <ClInclude Include="mmgr\nommgr.h">
       <Filter>Sources\Containers\mmgr</Filter>
+    </ClInclude>
+    <ClInclude Include="gpudetect\DeviceId.h">
+      <Filter>Sources\Containers\gpudetect</Filter>
+    </ClInclude>
+    <ClInclude Include="gpudetect\dxgi1_4.h">
+      <Filter>Sources\Containers\gpudetect</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleFileSystem.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\ai_assert.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\anim.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\camera.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\cexport.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\cfileio.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\cimport.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\color4.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\config.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\DefaultLogger.hpp">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\defs.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\Exporter.hpp">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\Importer.hpp">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\importerdesc.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\IOStream.hpp">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\IOSystem.hpp">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\light.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\Logger.hpp">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\LogStream.hpp">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\material.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\matrix3x3.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\matrix4x4.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\mesh.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\metadata.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\NullLogger.hpp">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\postprocess.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\ProgressHandler.hpp">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\quaternion.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\scene.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\texture.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\types.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\vector2.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\vector3.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="assimp\include\version.h">
+      <Filter>Sources\Containers\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="parson\parson.h">
+      <Filter>Sources\Containers\parson</Filter>
+    </ClInclude>
+    <ClInclude Include="MathGeoLib\Math.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets.h">
+      <Filter>Sources\Panels</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -200,17 +329,55 @@
     <ClCompile Include="Hierarchy.cpp">
       <Filter>Sources\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Inspector.cpp">
+      <Filter>Sources\Panels</Filter>
+    </ClCompile>
     <ClCompile Include="HierarchyNode.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="Inspector.cpp">
-      <Filter>Sources\Panels</Filter>
-	</ClCompile>
     <ClCompile Include="Panel.cpp">
       <Filter>Sources\Panels</Filter>
     </ClCompile>
     <ClCompile Include="mmgr\mmgr.cpp">
       <Filter>Sources\Containers\mmgr</Filter>
     </ClCompile>
+    <ClCompile Include="gpudetect\DeviceId.cpp">
+      <Filter>Sources\Containers\gpudetect</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleFileSystem.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Sources\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="parson\parson.c">
+      <Filter>Sources\Containers\parson</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets.cpp">
+      <Filter>Sources\Panels</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assimp\include\color4.inl">
+      <Filter>Sources\Containers\assimp</Filter>
+    </None>
+    <None Include="assimp\include\material.inl">
+      <Filter>Sources\Containers\assimp</Filter>
+    </None>
+    <None Include="assimp\include\matrix3x3.inl">
+      <Filter>Sources\Containers\assimp</Filter>
+    </None>
+    <None Include="assimp\include\matrix4x4.inl">
+      <Filter>Sources\Containers\assimp</Filter>
+    </None>
+    <None Include="assimp\include\quaternion.inl">
+      <Filter>Sources\Containers\assimp</Filter>
+    </None>
+    <None Include="assimp\include\vector2.inl">
+      <Filter>Sources\Containers\assimp</Filter>
+    </None>
+    <None Include="assimp\include\vector3.inl">
+      <Filter>Sources\Containers\assimp</Filter>
+    </None>
   </ItemGroup>
 </Project>

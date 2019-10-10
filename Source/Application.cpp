@@ -11,8 +11,7 @@ Application::Application()
 	fps_counter = 0;
 
 	//modules.push_back(hints = new ModuleHints());
-	//modules.push_back(hw = new ModuleHardware(false));
-	//modules.push_back(fs = new ModuleFileSystem(ASSETS_FOLDER));
+	modules.push_back(file_system = new ModuleFileSystem(ASSETS_FOLDER));
 	modules.push_back(window = new ModuleWindow());
 	//modules.push_back(resources = new ModuleResources());
 	//modules.push_back(tex = new ModuleTextures());
@@ -42,13 +41,17 @@ Application::~Application()
 bool Application::Init()
 {
 	bool ret = true;
-
 	char* buffer = nullptr;
+
+	file_system->Load(SETTINGS_FOLDER "config.json", &buffer);
+
+	Config config((const char*)buffer);
+	ReadConfiguration(config.GetSection("App"));
 
 	// We init everything, even if not enabled
 	for (list<Module*>::iterator it = modules.begin(); it != modules.end() && ret; ++it)
 	{
-		ret = (*it)->Init();
+		ret = (*it)->Init(&(config.GetSection((*it)->GetName())));
 	}
 
 	// Another round, just before starting the Updates. Only called for "active" modules
@@ -56,7 +59,7 @@ bool Application::Init()
 	for (list<Module*>::iterator it = modules.begin(); it != modules.end() && ret; ++it)
 	{
 		if ((*it)->IsActive() == true)
-			ret = (*it)->Start();
+			ret = (*it)->Start(&(config.GetSection((*it)->GetName())));
 	}
 
 	RELEASE_ARRAY(buffer);
@@ -177,4 +180,70 @@ void Application::SetFramerateLimit(uint max_framerate)
 		capped_ms = 1000 / max_framerate;
 	else
 		capped_ms = 0;
+}
+
+void Application::ReadConfiguration(const Config& config)
+{
+	app_name = config.GetString("Name", "Davos Game Engine");
+	organization_name = config.GetString("Organization", "");
+	SetFramerateLimit(config.GetInt("MaxFramerate", 0));
+}
+
+void Application::SaveConfiguration(Config& config) const
+{
+	config.AddString("Name", app_name.c_str());
+	config.AddString("Organization", organization_name.c_str());
+	config.AddInt("MaxFramerate", GetFramerateLimit());
+}
+
+string Application::GetLog()
+{
+	return log;
+}
+
+void Application::LoadPrefs()
+{
+	char* buffer = nullptr;
+	file_system->Load(SETTINGS_FOLDER "config.json", &buffer);
+
+	if (buffer != nullptr)
+	{
+		Config config((const char*)buffer);
+
+		if (config.IsValid() == true)
+		{
+			//LOG("Loading Engine Preferences")
+
+			ReadConfiguration(config.GetSection("App"));
+
+			Config section;
+			for (list<Module*>::iterator it = modules.begin(); it != modules.end(); ++it)
+			{
+				section = config.GetSection((*it)->GetName());
+				//if (section.IsValid())
+				(*it)->Load(&section);
+			}
+		}
+		//else
+		//	LOG("Cannot load Engine Preferences: Invalid format")
+
+		RELEASE_ARRAY(buffer);
+	}
+}
+
+// ---------------------------------------------
+void Application::SavePrefs() const
+{
+	Config config;
+
+	SaveConfiguration(config.AddSection("App"));
+
+	for (list<Module*>::const_iterator it = modules.begin(); it != modules.end(); ++it)
+		(*it)->Save(&config.AddSection((*it)->GetName()));
+
+	char *buf;
+	uint size = config.Save(&buf, "Saved preferences for Davos Game Engine");
+	if (App->file_system->Save(SETTINGS_FOLDER "config.json", buf, size) > 0) {}
+		//LOG("Saved Engine Preferences")
+	RELEASE_ARRAY(buf);
 }

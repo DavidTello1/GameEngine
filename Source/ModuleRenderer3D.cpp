@@ -22,7 +22,7 @@ ModuleRenderer3D::~ModuleRenderer3D()
 {}
 
 // Called before render is available
-bool ModuleRenderer3D::Init()
+bool ModuleRenderer3D::Init(Config* config)
 {
 	LOG("Creating 3D Renderer context");
 	bool ret = true;
@@ -37,9 +37,9 @@ bool ModuleRenderer3D::Init()
 	
 	if(ret == true)
 	{
-		//Use Vsync
-		if(VSYNC && SDL_GL_SetSwapInterval(1) < 0)
-			LOG("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
+		////Use Vsync
+		//if(VSYNC && SDL_GL_SetSwapInterval(1) < 0)
+		//	LOG("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 
 		// Initialize glew
 		GLenum error = glewInit();
@@ -111,8 +111,8 @@ bool ModuleRenderer3D::Init()
 		glEnable(GL_COLOR_MATERIAL);
 	}
 
-	// Projection matrix for
-	OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	//// Projection matrix for
+	//OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	return ret;
 }

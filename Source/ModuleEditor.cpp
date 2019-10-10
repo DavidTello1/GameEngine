@@ -1,12 +1,15 @@
 #include "Globals.h"
 #include "Application.h"
+#include "Config.h"
 #include "ModuleWindow.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleInput.h"
 #include "ModuleEditor.h"
 #include "Console.h"
 #include "Hierarchy.h"
+#include "Inspector.h"
 #include "Configuration.h"
+#include "Assets.h"
 
 #include <string.h>
 #include <algorithm>
@@ -15,6 +18,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_opengl3.h"
+
+#include "mmgr/mmgr.h"
 
 using namespace std;
 
@@ -76,7 +81,7 @@ void ShowExampleAppDockSpace(bool* p_open)
 }
 
 // Called before render is available
-bool ModuleEditor::Init()
+bool ModuleEditor::Init(Config* config)
 {
 	LOG("Init editor gui with imgui lib version %s", ImGui::GetVersion());
 
@@ -94,40 +99,21 @@ bool ModuleEditor::Init()
 
 	// Setup style
 	ImGui::StyleColorsNew();
-	//ImGui::StyleColorsClassic();
 
-	// Create Panels
-	tab_panels[TabPanelBottom].name = "Output";
-	tab_panels[TabPanelLeft].name = "Hierarchy";
-	tab_panels[TabPanelRight].name = "Inspector";
-
-	tab_configuration = new Configuration();
-
-	//Hierarchy::Init();
 	return true;
 }
 
-bool ModuleEditor::Start()
+bool ModuleEditor::Start(Config* config)
 {
-	//TabPanels Default Position and Size
-	tab_panels[TabPanelLeft].pos_x = 2;
-	tab_panels[TabPanelLeft].pos_y = 21;
-	tab_panels[TabPanelLeft].width = 350;
-	tab_panels[TabPanelLeft].height = App->window->GetHeight() - tab_panels[TabPanelLeft].pos_y;
-
-	tab_panels[TabPanelBottom].pos_x = tab_panels[TabPanelLeft].pos_x + tab_panels[TabPanelLeft].width;
-	tab_panels[TabPanelBottom].height = 225;
-	tab_panels[TabPanelBottom].pos_y = App->window->GetHeight() - tab_panels[TabPanelBottom].height;
-	tab_panels[TabPanelBottom].width = App->window->GetWidth() - tab_panels[TabPanelLeft].width - tab_panels[TabPanelRight].width;
-
-	tab_panels[TabPanelRight].width = 350;
-	tab_panels[TabPanelRight].pos_y = 21;
-	tab_panels[TabPanelRight].pos_x = App->window->GetWidth() - tab_panels[TabPanelRight].width;
-	tab_panels[TabPanelRight].height = App->window->GetHeight() - tab_panels[TabPanelRight].pos_y;
+	// Create panels
+	panels.push_back(tab_hierarchy = new Hierarchy());
+	panels.push_back(tab_configuration = new Configuration());
+	panels.push_back(tab_inspector = new Inspector());
+	panels.push_back(tab_console = new Console());
+	panels.push_back(tab_assets = new Assets());
 
 	return true;
 }
-
 
 bool ModuleEditor::PreUpdate(float dt)
 {
@@ -142,25 +128,18 @@ bool ModuleEditor::PreUpdate(float dt)
 bool ModuleEditor::Update(float dt)
 {
 	bool ret = true;
-	
+
 	bool is_draw_menu = true;
 	static bool is_show_main_dockspace = true;
 	static bool is_show_demo = false;
 	static bool is_about = false;
 
-	static bool is_show_hierarchy = true;
-	static bool is_show_console = false;
-	static bool is_show_configuration = true;
-	static bool is_show_properties = false;
-	static bool flag_hierarchy = false;
-	static bool flag_console = false;
-	static bool flag_configuration = false;
-	static bool flag_properties = false;
-
 	static bool is_new = false;
 	static bool is_open = false;
 	static bool is_save = false;
-	
+
+	static bool is_import = false;
+
 
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
 
@@ -185,12 +164,21 @@ bool ModuleEditor::Update(float dt)
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Edit")) //edit
+			{
+				if (ImGui::MenuItem("Import"))
+					is_import = true;
+
+				ImGui::EndMenu();
+			}
+
 			if (ImGui::BeginMenu("View")) //view
 			{
-				ImGui::MenuItem("Hierarchy", NULL, &is_show_hierarchy);
-				ImGui::MenuItem("Console", NULL, &is_show_console);
-				ImGui::MenuItem("Configuration", NULL, &is_show_configuration);
-				ImGui::MenuItem("Properties", NULL, &is_show_properties);
+				ImGui::MenuItem("Hierarchy", NULL, &GetPanel("Hierarchy")->active);
+				ImGui::MenuItem("Configuration", NULL, &GetPanel("Configuration")->active);
+				ImGui::MenuItem("Inspector", NULL, &GetPanel("Inspector")->active);
+				ImGui::MenuItem("Console", NULL, &GetPanel("Console")->active);
+				ImGui::MenuItem("Assets", NULL, &GetPanel("Assets")->active);
 
 				ImGui::EndMenu();
 			}
@@ -233,7 +221,7 @@ bool ModuleEditor::Update(float dt)
 		{
 			ImGui::Text("Davos Game Engine");
 			ImGui::Text("Description");
-			ImGui::Text("By"); 
+			ImGui::Text("By");
 			ImGui::SameLine();
 			CreateLink("Oscar Pons", "https://github.com/ponspack9");
 			ImGui::SameLine();
@@ -243,10 +231,12 @@ bool ModuleEditor::Update(float dt)
 			ImGui::NewLine();
 
 			ImGui::Text("3rd Party Libraries used:");
-			CreateLink("SDL 2.0.10", "", true);
-			CreateLink("Glew 2.0.0", "", true);
-			CreateLink("ImGui 1.73", "", true);
-			CreateLink("OpenGL 3.1", "", true); ImGui::NewLine();
+			CreateLink("SDL", "http://www.libsdl.org/index.php", true);
+			CreateLink("OpenGL", "https://opengl.org/", true);
+			CreateLink("Glew", "http://glew.sourceforge.net/", true);
+			CreateLink("ImGui", "https://github.com/ocornut/imgui", true);
+			CreateLink("DevIL", "http://openil.sourceforge.net/", true);
+			ImGui::NewLine();
 
 			ImGui::Text("License:");
 			ImGui::Text("MIT License");
@@ -265,55 +255,72 @@ bool ModuleEditor::Update(float dt)
 		}
 	}
 
-	if (is_show_console) //console
-		Console::ShowConsole(&is_show_console);
-		//tab_panels[TabPanelBottom].panels.push_back(tab_console = new Console());
-
-	if (is_show_hierarchy) //hierarchy
-		Hierarchy::ShowHierarchy(&is_show_hierarchy);
-		//tab_panels[TabPanelLeft].panels.push_back(tab_hierarchy = new Hierarchy());
-
-	if (is_show_properties) //properties
-	{}
-
-	if (is_show_configuration && !flag_configuration) //properties
+	if (App->input->quit == true)
 	{
-		tab_panels[TabPanelRight].panels.push_back(tab_configuration);
-		flag_configuration = true;
-	}
-	else if (!is_show_configuration && flag_configuration)
-	{
-		ClosePanel("Configuration");
-		flag_configuration = false;
-	}
+		if (App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP)
+			close = true;
 
-	for (uint i = 0; i < TabPanelCount; ++i)
-	{
-		const TabPanel& tab = tab_panels[i];
-		ImGui::SetNextWindowPos(ImVec2((float)tab.pos_x, (float)tab.pos_y), ImGuiCond_Once);
-		ImGui::SetNextWindowSize(ImVec2((float)tab.width, (float)tab.height), ImGuiCond_Once);
-
-		if (ImGui::Begin(tab.name, NULL, ImGuiWindowFlags_NoFocusOnAppearing))
+		ImGui::OpenPopup("Quit");
+		if (ImGui::BeginPopupModal("Quit", &App->input->quit, ImGuiWindowFlags_NoResize))
 		{
-			if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_Reorderable))
+			ImGui::Text("Are you sure you want to Quit?");
+			ImGui::NewLine();
+			//ImGui::Text("  ");
+			//ImGui::SameLine();
+
+			//if (ImGui::Button("Save"))
+			//{
+			//	//Save
+			//	ImGui::CloseCurrentPopup();
+
+			//	LOG("SAVING APPLICATION AND EXITING");
+			//	quit = true;
+			//	return false;
+			//}
+			//ImGui::SameLine();
+			//ImGui::Text("");
+			//ImGui::SameLine();
+
+			if (ImGui::Button("Close"))
 			{
-				// Draw all active panels
-				for (vector<Panel*>::const_iterator it = tab.panels.begin(); it != tab.panels.end(); ++it)
-				{
-					if (ImGui::BeginTabItem((*it)->GetName()))
-					{
-						if ((*it)->IsActive())
-						{
-							(*it)->Draw();
-						}
-						ImGui::EndTabItem();
-					}
-				}
-				ImGui::EndTabBar();
+				ImGui::CloseCurrentPopup();
+
+				LOG("EXITING APPLICATION");
+				close = true;
 			}
+			ImGui::SameLine();
+			ImGui::Text("");
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel"))
+			{
+				ImGui::CloseCurrentPopup();
+				LOG("CANCEL EXIT");
+				close = false;
+			}
+			ImGui::EndPopup();
 		}
-		ImGui::End();
 	}
+
+
+	// Draw all active panels
+	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
+	{
+		if ((*it)->IsActive())
+		{
+			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
+			{
+				(*it)->Draw();
+			}
+			ImGui::End();
+		}
+	}
+
+	if (file_dialog == opened)
+		LoadFile((file_dialog_filter.length() > 0) ? file_dialog_filter.c_str() : nullptr);
+	else
+		in_modal = false;
+
 
 	if (is_new) //new
 	{
@@ -323,27 +330,34 @@ bool ModuleEditor::Update(float dt)
 
 	if (is_open) //open
 	{
-		//....
+		//...
 		is_open = false;
 	}
 
 	if (is_save) //save
 	{
-		//...
+		App->file_system->Save(SETTINGS_FOLDER "Engine.log", App->GetLog().c_str(), App->GetLog().size());
+		App->SavePrefs();
 		is_save = false;
 	}
 
+	if (is_import)
+	{
+		//...
+		is_import = false;
+	}
 
-	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
-		LOG("GEOMETRY LOG %d",25,'g')
+
+	/*if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
+		LOG("GEOMETRY LOG %d", 25, 'g')
 	}
 	if (App->input->GetKey(SDL_SCANCODE_B) == KEY_DOWN) {
 		char c[8] = "jdsig";
-		LOG("DEBUG LOG %s", c,'d')
+		LOG("DEBUG LOG %s", c, 'd')
 	}
 	if (App->input->GetKey(SDL_SCANCODE_V) == KEY_DOWN) {
 		LOG("VERBOSE LOG", 'v')
-	}
+	}*/
 
 	// --- SHORTCUTS -----------------
 	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
@@ -364,7 +378,20 @@ bool ModuleEditor::Update(float dt)
 		is_save = true;
 	}
 
+	if ((App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP))
+	{
+		App->input->quit = true;
+	}
+
 	return ret;
+}
+
+bool ModuleEditor::PostUpdate(float dt)
+{
+	if (close)
+		return false;
+
+	return true;
 }
 
 // Called before quitting
@@ -372,15 +399,11 @@ bool ModuleEditor::CleanUp()
 {
 	LOG("Freeing editor gui");
 
-	for (uint i = 0; i < TabPanelCount; ++i)
+	for (vector<Panel*>::iterator it = panels.begin(); it != panels.end(); ++it)
 	{
-		for (vector<Panel*>::iterator it = tab_panels[i].panels.begin(); it != tab_panels[i].panels.end(); ++it)
-		{
-			RELEASE(*it);
-		}
-
-		tab_panels[i].panels.clear();
+		RELEASE(*it);
 	}
+	panels.clear();
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
@@ -395,6 +418,7 @@ void ModuleEditor::Draw() const
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
 
 void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 {
@@ -430,21 +454,126 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 	}
 }
 
-
-bool ModuleEditor::ClosePanel(const char* name)
+bool ModuleEditor::FileDialog(const char * extension, const char* from_folder)
 {
-	for (uint i = 0; i < TabPanelCount; ++i)
+	bool ret = true;
+
+	switch (file_dialog)
 	{
-		for (vector<Panel*>::iterator it = tab_panels[i].panels.begin(); it != tab_panels[i].panels.end(); ++it)
+	case closed:
+		selected_file[0] = '\0';
+		file_dialog_filter = (extension) ? extension : "";
+		file_dialog_origin = (from_folder) ? from_folder : "";
+		file_dialog = opened;
+	case opened:
+		ret = false;
+		break;
+	}
+
+	return ret;
+}
+
+const char * ModuleEditor::CloseFileDialog()
+{
+	if (file_dialog == ready_to_close)
+	{
+		file_dialog = closed;
+		return selected_file[0] ? selected_file : nullptr;
+	}
+	return nullptr;
+}
+
+void ModuleEditor::LoadFile(const char* filter_extension, const char* from_dir)
+{
+	ImGui::OpenPopup("Load File");
+	if (ImGui::BeginPopupModal("Load File", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		in_modal = true;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
+		ImGui::BeginChild("File Browser", ImVec2(0, 300), true);
+		DrawDirectoryRecursive(from_dir, filter_extension);
+		ImGui::EndChild();
+		ImGui::PopStyleVar();
+
+		ImGui::PushItemWidth(250.f);
+		if (ImGui::InputText("##file_selector", selected_file, FILE_MAX, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+			file_dialog = ready_to_close;
+
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		if (ImGui::Button("Ok", ImVec2(50, 20)))
+			file_dialog = ready_to_close;
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(50, 20)))
 		{
-			if ((*it)->GetName() == name)
-			{
-				tab_panels[i].panels.erase(it);
-				return true;
-			}
+			file_dialog = ready_to_close;
+			selected_file[0] = '\0';
+		}
+
+		ImGui::EndPopup();
+	}
+	else
+	{
+		in_modal = false;
+	}
+}
+
+void ModuleEditor::DrawDirectoryRecursive(const char* directory, const char* filter_extension)
+{
+	vector<string> files;
+	vector<string> dirs;
+
+	std::string dir((directory) ? directory : "");
+	dir += "/";
+
+	App->file_system->DiscoverFiles(dir.c_str(), files, dirs);
+
+	for (vector<string>::const_iterator it = dirs.begin(); it != dirs.end(); ++it)
+	{
+		if (ImGui::TreeNodeEx((dir + (*it)).c_str(), 0, "%s/", (*it).c_str()))
+		{
+			DrawDirectoryRecursive((dir + (*it)).c_str(), filter_extension);
+			ImGui::TreePop();
 		}
 	}
-	return false;
+
+	std::sort(files.begin(), files.end());
+
+	for (vector<string>::const_iterator it = files.begin(); it != files.end(); ++it)
+	{
+		const string& str = *it;
+
+		bool ok = true;
+
+		if (filter_extension && str.substr(str.find_last_of(".") + 1) != filter_extension)
+			ok = false;
+
+		if (ok && ImGui::TreeNodeEx(str.c_str(), ImGuiTreeNodeFlags_Leaf))
+		{
+			if (ImGui::IsItemClicked()) {
+				sprintf_s(selected_file, FILE_MAX, "%s%s", dir.c_str(), str.c_str());
+
+				if (ImGui::IsMouseDoubleClicked(0))
+					file_dialog = ready_to_close;
+			}
+
+			ImGui::TreePop();
+		}
+	}
+}
+
+Panel* ModuleEditor::GetPanel(const char* name)
+{
+	for (vector<Panel*>::iterator it = panels.begin(); it != panels.end(); ++it)
+	{
+		if ((*it)->GetName() == name)
+		{
+			return (*it);
+		}
+	}
+	return nullptr;
 }
 
 void ModuleEditor::LogFPS(float fps, float ms)

@@ -20,7 +20,7 @@ ModuleCamera3D::~ModuleCamera3D()
 {}
 
 // -----------------------------------------------------------------
-bool ModuleCamera3D::Start()
+bool ModuleCamera3D::Start(Config* config)
 {
 	LOG("Setting up the camera");
 	bool ret = true;
@@ -47,7 +47,7 @@ bool ModuleCamera3D::Update(float dt)
 	}
 	// Camera ZOOM with MOUSE WHEEL
 	vec3 newPos(0, 0, 0);
-	float speed = App->input->GetMouseZ() * 75.0f * dt;
+	float speed = App->input->GetMouseWheel() * 75.0f * dt;
 	newPos -= Z * speed;
 
 	Position += newPos;
@@ -97,8 +97,10 @@ bool ModuleCamera3D::Update(float dt)
 
 void ModuleCamera3D::RotateWithMouse() {
 	// Camera rotation with mouse
-	int dx = -App->input->GetMouseXMotion();
-	int dy = -App->input->GetMouseYMotion();
+	int dx, dy;
+	App->input->GetMouseMotion(dx, dy);
+	dx = -dx;
+	dy = -dy;
 
 	float Sensitivity = 0.25f;
 

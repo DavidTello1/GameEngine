@@ -9,6 +9,8 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
+#include "ModuleFileSystem.h"
+#include "Config.h"
 
 #include <list>
 
@@ -29,8 +31,12 @@ public:
 	uint GetFramerateLimit() const;
 	void SetFramerateLimit(uint max_framerate);
 
-	//void LoadPrefs();
-	//void SavePrefs() const;
+	void ReadConfiguration(const Config& config);
+	void SaveConfiguration(Config& config) const;
+
+	std::string GetLog();
+	void LoadPrefs();
+	void SavePrefs() const;
 
 private:
 	void PrepareUpdate();
@@ -44,6 +50,7 @@ public:
 	ModuleRenderer3D* renderer3D;
 	ModuleCamera3D* camera;
 	ModuleEditor* editor;
+	ModuleFileSystem* file_system;
 
 private:
 	Timer	ms_timer;

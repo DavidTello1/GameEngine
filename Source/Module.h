@@ -1,7 +1,7 @@
 #pragma once
 
 class Application;
-struct PhysBody3D;
+class Config;
 
 #define MODULE_NAME_LENGTH 25
 class Module
@@ -41,12 +41,12 @@ public:
 		}
 	}
 
-	virtual bool Init() 
+	virtual bool Init(Config* config = nullptr)
 	{
-		return true; 
+		return true;
 	}
 
-	virtual bool Start()
+	virtual bool Start(Config* config = nullptr)
 	{
 		return true;
 	}
@@ -71,6 +71,9 @@ public:
 		return true; 
 	}
 
-	virtual void OnCollision(PhysBody3D* body1, PhysBody3D* body2)
+	virtual void Save(Config* config) const
+	{}
+
+	virtual void Load(Config* config)
 	{}
 };

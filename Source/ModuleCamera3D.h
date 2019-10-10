@@ -9,7 +9,7 @@ public:
 	ModuleCamera3D(bool start_enabled = true);
 	~ModuleCamera3D();
 
-	bool Start();
+	bool Start(Config* config = nullptr);
 	bool Update(float dt);
 	void RotateWithMouse();
 	bool CleanUp();

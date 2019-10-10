@@ -2,7 +2,7 @@
 #include "Globals.h"
 #include <vector>
 #include "ImGui/imgui.h"
-#include <set>
+#include <vector>
 
 #define MAX_NAME_LENGTH 512
 
@@ -14,7 +14,7 @@ public:
 	bool is_selected;
 	char name[MAX_NAME_LENGTH];
 	HierarchyNode* parent;
-	std::set<HierarchyNode*> childs;
+	std::vector<HierarchyNode*> childs;
 	ImGuiTreeNodeFlags flags;
 
 	HierarchyNode::HierarchyNode();

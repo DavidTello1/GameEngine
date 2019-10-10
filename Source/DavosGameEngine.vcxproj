@@ -75,11 +75,48 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Assets.h" />
+    <ClInclude Include="assimp\include\ai_assert.h" />
+    <ClInclude Include="assimp\include\anim.h" />
+    <ClInclude Include="assimp\include\camera.h" />
+    <ClInclude Include="assimp\include\cexport.h" />
+    <ClInclude Include="assimp\include\cfileio.h" />
+    <ClInclude Include="assimp\include\cimport.h" />
+    <ClInclude Include="assimp\include\color4.h" />
+    <ClInclude Include="assimp\include\config.h" />
+    <ClInclude Include="assimp\include\DefaultLogger.hpp" />
+    <ClInclude Include="assimp\include\defs.h" />
+    <ClInclude Include="assimp\include\Exporter.hpp" />
+    <ClInclude Include="assimp\include\Importer.hpp" />
+    <ClInclude Include="assimp\include\importerdesc.h" />
+    <ClInclude Include="assimp\include\IOStream.hpp" />
+    <ClInclude Include="assimp\include\IOSystem.hpp" />
+    <ClInclude Include="assimp\include\light.h" />
+    <ClInclude Include="assimp\include\Logger.hpp" />
+    <ClInclude Include="assimp\include\LogStream.hpp" />
+    <ClInclude Include="assimp\include\material.h" />
+    <ClInclude Include="assimp\include\matrix3x3.h" />
+    <ClInclude Include="assimp\include\matrix4x4.h" />
+    <ClInclude Include="assimp\include\mesh.h" />
+    <ClInclude Include="assimp\include\metadata.h" />
+    <ClInclude Include="assimp\include\NullLogger.hpp" />
+    <ClInclude Include="assimp\include\postprocess.h" />
+    <ClInclude Include="assimp\include\ProgressHandler.hpp" />
+    <ClInclude Include="assimp\include\quaternion.h" />
+    <ClInclude Include="assimp\include\scene.h" />
+    <ClInclude Include="assimp\include\texture.h" />
+    <ClInclude Include="assimp\include\types.h" />
+    <ClInclude Include="assimp\include\vector2.h" />
+    <ClInclude Include="assimp\include\vector3.h" />
+    <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="glmath.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="gpudetect\DeviceId.h" />
+    <ClInclude Include="gpudetect\dxgi1_4.h" />
     <ClInclude Include="Hierarchy.h" />
     <ClInclude Include="HierarchyNode.h" />
     <ClInclude Include="Imgui\imconfig.h" />
@@ -92,16 +129,19 @@
     <ClInclude Include="Imgui\imstb_truetype.h" />
     <ClInclude Include="Inspector.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="MathGeoLib\Math.h" />
     <ClInclude Include="mmgr\mmgr.h" />
     <ClInclude Include="mmgr\nommgr.h" />
     <ClInclude Include="ModuleCamera3D.h" />
     <ClInclude Include="ModuleEditor.h" />
+    <ClInclude Include="ModuleFileSystem.h" />
     <ClInclude Include="ModuleRenderer3D.h" />
     <ClInclude Include="Module.h" />
     <ClInclude Include="ModuleInput.h" />
     <ClInclude Include="ModuleSceneIntro.h" />
     <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="Panel.h" />
+    <ClInclude Include="parson\parson.h" />
     <ClInclude Include="src\glew\include\GL\eglew.h" />
     <ClInclude Include="src\glew\include\GL\glew.h" />
     <ClInclude Include="src\glew\include\GL\glxew.h" />
@@ -110,10 +150,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Assets.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="glmath.cpp" />
+    <ClCompile Include="gpudetect\DeviceId.cpp" />
     <ClCompile Include="Hierarchy.cpp" />
     <ClCompile Include="HierarchyNode.cpp" />
     <ClCompile Include="Imgui\imgui.cpp" />
@@ -129,12 +172,23 @@
     <ClCompile Include="mmgr\mmgr.cpp" />
     <ClCompile Include="ModuleCamera3D.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
+    <ClCompile Include="ModuleFileSystem.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
     <ClCompile Include="ModuleRenderer3D.cpp" />
     <ClCompile Include="ModuleSceneIntro.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="Panel.cpp" />
+    <ClCompile Include="parson\parson.c" />
     <ClCompile Include="Timer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assimp\include\color4.inl" />
+    <None Include="assimp\include\material.inl" />
+    <None Include="assimp\include\matrix3x3.inl" />
+    <None Include="assimp\include\matrix4x4.inl" />
+    <None Include="assimp\include\quaternion.inl" />
+    <None Include="assimp\include\vector2.inl" />
+    <None Include="assimp\include\vector3.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
