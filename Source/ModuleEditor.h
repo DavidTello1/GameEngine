@@ -11,6 +11,7 @@ class Configuration;
 class Hierarchy;
 class Console;
 class Inspector;
+class Assets;
 
 class ModuleEditor : public Module
 {
@@ -51,6 +52,7 @@ public:
 	Hierarchy* tab_hierarchy = nullptr;
 	Console* tab_console = nullptr;
 	Inspector* tab_inspector = nullptr;
+	Assets* tab_assets = nullptr;
 
 private:
 	enum

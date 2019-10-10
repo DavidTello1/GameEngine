@@ -140,21 +140,21 @@ bool ModuleInput::PreUpdate(float dt)
 		{
 			ImGui::Text("Are you sure you want to Quit?");
 			ImGui::NewLine();
-			ImGui::Text("  ");
-			ImGui::SameLine();
+			//ImGui::Text("  ");
+			//ImGui::SameLine();
 
-			if (ImGui::Button("Save"))
-			{
-				//Save
-				ImGui::CloseCurrentPopup();
+			//if (ImGui::Button("Save"))
+			//{
+			//	//Save
+			//	ImGui::CloseCurrentPopup();
 
-				LOG("SAVING APPLICATION AND EXITING");
-				quit = true;
-				return false;
-			}
-			ImGui::SameLine();
-			ImGui::Text("");
-			ImGui::SameLine();
+			//	LOG("SAVING APPLICATION AND EXITING");
+			//	quit = true;
+			//	return false;
+			//}
+			//ImGui::SameLine();
+			//ImGui::Text("");
+			//ImGui::SameLine();
 
 			if (ImGui::Button("Close"))
 			{

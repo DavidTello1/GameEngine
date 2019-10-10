@@ -35,13 +35,12 @@ void Configuration::Draw()
 	ImGui::SameLine();
 	if (ImGui::BeginPopup("options_popup"))
 	{
-		ImGui::Selectable("Set Defaults");
-		if (ImGui::Selectable("Load"))
+		if (ImGui::Selectable("Load Config"))
 		{ 
 			App->LoadPrefs();
 		}
 
-		if (ImGui::Selectable("Save"))
+		if (ImGui::Selectable("Save Config"))
 		{ 
 			App->SavePrefs();
 		}
@@ -350,7 +349,7 @@ void Configuration::DrawModuleRenderer(ModuleRenderer3D* module)
 {
 	//ImGui::Text("Driver:");
 	//ImGui::SameLine();
-	//ImGui::TextColored(IMGUI_YELLOW, App->renderer3D->GetDriver());
+	//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), App->renderer3D->GetDriver());
 
 	//bool vsync = App->renderer3D->GetVSync();
 	//if (ImGui::Checkbox("Vertical Sync", &vsync))

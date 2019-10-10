@@ -69,7 +69,7 @@ typedef unsigned long long UID;
 	 }
 
 // Configuration -----------
-#define VERSION "0.4-alpha"
+#define VERSION "0.1-alpha"
 #define ASSETS_FOLDER "/Assets/"
 #define SETTINGS_FOLDER "/Settings/"
 #define LIBRARY_FOLDER "/Library/"

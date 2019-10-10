@@ -258,6 +258,9 @@
     <ClInclude Include="MathGeoLib\Math.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="Assets.h">
+      <Filter>Sources\Panels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -349,6 +352,9 @@
     </ClCompile>
     <ClCompile Include="parson\parson.c">
       <Filter>Sources\Containers\parson</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets.cpp">
+      <Filter>Sources\Panels</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

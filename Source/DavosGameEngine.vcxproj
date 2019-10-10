@@ -75,6 +75,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Assets.h" />
     <ClInclude Include="assimp\include\ai_assert.h" />
     <ClInclude Include="assimp\include\anim.h" />
     <ClInclude Include="assimp\include\camera.h" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Assets.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Configuration.cpp" />

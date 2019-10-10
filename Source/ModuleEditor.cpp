@@ -9,6 +9,7 @@
 #include "Hierarchy.h"
 #include "Inspector.h"
 #include "Configuration.h"
+#include "Assets.h"
 
 #include <string.h>
 #include <algorithm>
@@ -98,7 +99,6 @@ bool ModuleEditor::Init(Config* config)
 
 	// Setup style
 	ImGui::StyleColorsNew();
-	//ImGui::StyleColorsClassic();
 
 	return true;
 }
@@ -110,6 +110,7 @@ bool ModuleEditor::Start(Config* config)
 	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_inspector = new Inspector());
 	panels.push_back(tab_console = new Console());
+	panels.push_back(tab_assets = new Assets());
 
 	return true;
 }
@@ -177,6 +178,7 @@ bool ModuleEditor::Update(float dt)
 				ImGui::MenuItem("Configuration", NULL, &GetPanel("Configuration")->active);
 				ImGui::MenuItem("Inspector", NULL, &GetPanel("Inspector")->active);
 				ImGui::MenuItem("Console", NULL, &GetPanel("Console")->active);
+				ImGui::MenuItem("Assets", NULL, &GetPanel("Assets")->active);
 
 				ImGui::EndMenu();
 			}
