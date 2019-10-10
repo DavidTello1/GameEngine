@@ -255,6 +255,54 @@ bool ModuleEditor::Update(float dt)
 		}
 	}
 
+	if (App->input->quit == true)
+	{
+		if (App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP)
+			close = true;
+
+		ImGui::OpenPopup("Quit");
+		if (ImGui::BeginPopupModal("Quit", &App->input->quit, ImGuiWindowFlags_NoResize))
+		{
+			ImGui::Text("Are you sure you want to Quit?");
+			ImGui::NewLine();
+			//ImGui::Text("  ");
+			//ImGui::SameLine();
+
+			//if (ImGui::Button("Save"))
+			//{
+			//	//Save
+			//	ImGui::CloseCurrentPopup();
+
+			//	LOG("SAVING APPLICATION AND EXITING");
+			//	quit = true;
+			//	return false;
+			//}
+			//ImGui::SameLine();
+			//ImGui::Text("");
+			//ImGui::SameLine();
+
+			if (ImGui::Button("Close"))
+			{
+				ImGui::CloseCurrentPopup();
+
+				LOG("EXITING APPLICATION");
+				close = true;
+			}
+			ImGui::SameLine();
+			ImGui::Text("");
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel"))
+			{
+				ImGui::CloseCurrentPopup();
+				LOG("CANCEL EXIT");
+				close = false;
+			}
+			ImGui::EndPopup();
+		}
+	}
+
+
 	// Draw all active panels
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
@@ -336,6 +384,14 @@ bool ModuleEditor::Update(float dt)
 	}
 
 	return ret;
+}
+
+bool ModuleEditor::PostUpdate(float dt)
+{
+	if (close)
+		return false;
+
+	return true;
 }
 
 // Called before quitting

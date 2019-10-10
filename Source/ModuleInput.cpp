@@ -129,56 +129,6 @@ bool ModuleInput::PreUpdate(float dt)
 		}
 		}
 	}
-
-	if (quit == true) 
-	{
-		if (App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP)
-			return false;
-
-		ImGui::OpenPopup("Quit");
-		if (ImGui::BeginPopupModal("Quit", &quit, ImGuiWindowFlags_NoResize))
-		{
-			ImGui::Text("Are you sure you want to Quit?");
-			ImGui::NewLine();
-			//ImGui::Text("  ");
-			//ImGui::SameLine();
-
-			//if (ImGui::Button("Save"))
-			//{
-			//	//Save
-			//	ImGui::CloseCurrentPopup();
-
-			//	LOG("SAVING APPLICATION AND EXITING");
-			//	quit = true;
-			//	return false;
-			//}
-			//ImGui::SameLine();
-			//ImGui::Text("");
-			//ImGui::SameLine();
-
-			if (ImGui::Button("Close"))
-			{
-				ImGui::CloseCurrentPopup();
-
-				LOG("EXITING APPLICATION");
-				quit = true;
-				return false;
-
-			}
-			ImGui::SameLine();
-			ImGui::Text("");
-			ImGui::SameLine();
-
-			if (ImGui::Button("Cancel"))
-			{
-				ImGui::CloseCurrentPopup();
-				LOG("CANCEL EXIT");
-				quit = false;
-			}
-			ImGui::EndPopup();
-		}
-	}
-
 	return true;
 }
 

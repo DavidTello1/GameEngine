@@ -26,6 +26,7 @@ public:
 	bool Start(Config* config = nullptr);
 	bool PreUpdate(float dt);
 	bool Update(float dt);
+	bool PostUpdate(float dt);
 	bool CleanUp();
 
 	void Draw() const;
@@ -71,6 +72,7 @@ private:
 	char selected_file[FILE_MAX];
 	bool draw_menu = true;
 
+	bool close = false;
 };
 
 #endif
