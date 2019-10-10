@@ -17,7 +17,6 @@ Application::Application()
 	//modules.push_back(tex = new ModuleTextures());
 	//modules.push_back(physics3D = new ModulePhysics3D());
 	modules.push_back(camera = new ModuleCamera3D());
-	modules.push_back(renderer3D = new ModuleRenderer3D());
 	modules.push_back(editor = new ModuleEditor());
 	modules.push_back(input = new ModuleInput());
 	//modules.push_back(audio = new ModuleAudio(true));
@@ -26,6 +25,7 @@ Application::Application()
 	//modules.push_back(programs = new ModulePrograms(true));
 	//modules.push_back(renderer = new ModuleRenderer());
 	//modules.push_back(debug_draw = new ModuleDebugDraw());
+	modules.push_back(renderer3D = new ModuleRenderer3D());
 }
 
 // ---------------------------------------------

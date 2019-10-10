@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleRenderer3D.h"
+#include "Viewport.h"
 
 #include "glew/include/GL/glew.h"
 #include "SDL/include/SDL_opengl.h"
@@ -120,27 +121,38 @@ bool ModuleRenderer3D::Init(Config* config)
 // PreUpdate: clear buffer
 bool ModuleRenderer3D::PreUpdate(float dt)
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// RED
+	glClearColor(1, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
+	glEnable(GL_DEPTH_TEST);
 
+	glLoadIdentity();
+	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(App->camera->GetViewMatrix());
-
+	
 	// light 0 on cam pos
 	lights[0].SetPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
-
-	for(uint i = 0; i < MAX_LIGHTS; ++i)
+	
+	for (uint i = 0; i < MAX_LIGHTS; ++i)
 		lights[i].Render();
-
+	
 	return true;
 }
 
 // PostUpdate present buffer to screen
 bool ModuleRenderer3D::PostUpdate(float dt)
 {
+	
+	//App->viewport->DrawScene();
+
+	// Drawing of gui and panels(and viewport panel)
 	App->editor->Draw();
 
 	SDL_GL_SwapWindow(App->window->GetWindow());
+
+
 	return true;
 }
 

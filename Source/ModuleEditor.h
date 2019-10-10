@@ -12,6 +12,7 @@ class Hierarchy;
 class Console;
 class Inspector;
 class Assets;
+class Viewport;
 
 class ModuleEditor : public Module
 {
@@ -29,7 +30,8 @@ public:
 	bool PostUpdate(float dt);
 	bool CleanUp();
 
-	void Draw() const;
+	void Draw();
+
 	void CreateLink(const char* text, const char* url, bool bullet = false);
 	void LogFPS(float fps, float ms);
 	 
@@ -48,11 +50,18 @@ private:
 	void LoadFile(const char* filter_extension = nullptr, const char* from_dir = nullptr);
 	void DrawDirectoryRecursive(const char* directory, const char* filter_extension);
 
+	void DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import);
+	void DrawDemo(bool &is_show_demo);
+	void DrawAbout(bool &is_about);
+	void DrawPanels();
+	void ConfirmExit();
+
 public:
 	Configuration* tab_configuration = nullptr;
 	Hierarchy* tab_hierarchy = nullptr;
 	Console* tab_console = nullptr;
 	Inspector* tab_inspector = nullptr;
+	Viewport* tab_viewport = nullptr;
 	Assets* tab_assets = nullptr;
 
 private:
@@ -71,7 +80,6 @@ private:
 	bool in_modal = false;
 	char selected_file[FILE_MAX];
 	bool draw_menu = true;
-
 	bool close = false;
 };
 
