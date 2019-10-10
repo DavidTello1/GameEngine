@@ -10,6 +10,7 @@
 #include "Inspector.h"
 #include "Configuration.h"
 #include "Assets.h"
+#include "Viewport.h"
 
 #include <string.h>
 #include <algorithm>
@@ -111,6 +112,9 @@ bool ModuleEditor::Start(Config* config)
 	panels.push_back(tab_inspector = new Inspector());
 	panels.push_back(tab_console = new Console());
 	panels.push_back(tab_assets = new Assets());
+	panels.push_back(tab_viewport = new Viewport());
+
+	tab_viewport->Generate();
 
 	return true;
 }
@@ -118,15 +122,55 @@ bool ModuleEditor::Start(Config* config)
 bool ModuleEditor::PreUpdate(float dt)
 {
 	// Start the frame
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame(App->window->GetWindow());
-	ImGui::NewFrame();
+	// Call preupdate viewport
+	tab_viewport->PreUpdate();
 
 	return true;
 }
 
 bool ModuleEditor::Update(float dt)
 {
+	return true;
+}
+
+bool ModuleEditor::PostUpdate(float dt)
+{
+	// end the frame
+	// Call postupdate viewport
+	tab_viewport->PostUpdate();
+
+	if (close)
+		return false;
+
+	return true;
+}
+
+// Called before quitting
+bool ModuleEditor::CleanUp()
+{
+	LOG("Freeing editor gui");
+
+	for (vector<Panel*>::iterator it = panels.begin(); it != panels.end(); ++it)
+	{
+		RELEASE(*it);
+	}
+	panels.clear();
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
+	return true;
+}
+
+// Drawing of the FULL gui
+// First gets drawn the Menus, then panels
+void ModuleEditor::Draw()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame(App->window->GetWindow());
+	ImGui::NewFrame();
+
 	bool ret = true;
 
 	bool is_draw_menu = true;
@@ -140,8 +184,79 @@ bool ModuleEditor::Update(float dt)
 
 	static bool is_import = false;
 
-
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
+	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import);
+	DrawDemo(is_show_demo);
+	DrawAbout(is_about);
+	DrawPanels();
+
+	if (file_dialog == opened)
+		LoadFile((file_dialog_filter.length() > 0) ? file_dialog_filter.c_str() : nullptr);
+	else
+		in_modal = false;
+
+	if (is_new)
+	{
+		//...
+		is_new = false;
+	}
+
+	if (is_open)
+	{
+		//...
+		is_open = false;
+	}
+
+	if (is_save) //save
+	{
+		App->file_system->Save(SETTINGS_FOLDER "Engine.log", App->GetLog().c_str(), App->GetLog().size());
+		App->SavePrefs();
+		is_save = false;
+	}
+
+	if (is_import)
+	{
+		//...
+		is_import = false;
+	}
+
+	// --- SHORTCUTS -----------------
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))
+	{
+		is_new = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN))
+	{
+		is_open = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN))
+	{
+		is_save = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP))
+	{
+		App->input->quit = true;
+	}
+
+	if (App->input->quit == true)
+	{
+		ConfirmExit();
+	}
+
+	// Render
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import)
+{
+	bool ret = true;
 
 	if (is_draw_menu == true) // Main menu GUI
 	{
@@ -206,14 +321,19 @@ bool ModuleEditor::Update(float dt)
 			ImGui::EndMainMenuBar();
 		}
 	}
+}
 
-
+void ModuleEditor::DrawDemo(bool &is_show_demo)
+{
 	if (is_show_demo) //show demo
 	{
 		ImGui::ShowDemoWindow(&is_show_demo);
 		ImGui::ShowMetricsWindow();
 	}
+}
 
+void ModuleEditor::DrawAbout(bool &is_about)
+{
 	if (is_about) //about
 	{
 		ImGui::OpenPopup("About");
@@ -254,56 +374,10 @@ bool ModuleEditor::Update(float dt)
 			ImGui::EndPopup();
 		}
 	}
+}
 
-	if (App->input->quit == true)
-	{
-		if (App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP)
-			close = true;
-
-		ImGui::OpenPopup("Quit");
-		if (ImGui::BeginPopupModal("Quit", &App->input->quit, ImGuiWindowFlags_NoResize))
-		{
-			ImGui::Text("Are you sure you want to Quit?");
-			ImGui::NewLine();
-			//ImGui::Text("  ");
-			//ImGui::SameLine();
-
-			//if (ImGui::Button("Save"))
-			//{
-			//	//Save
-			//	ImGui::CloseCurrentPopup();
-
-			//	LOG("SAVING APPLICATION AND EXITING");
-			//	quit = true;
-			//	return false;
-			//}
-			//ImGui::SameLine();
-			//ImGui::Text("");
-			//ImGui::SameLine();
-
-			if (ImGui::Button("Close"))
-			{
-				ImGui::CloseCurrentPopup();
-
-				LOG("EXITING APPLICATION");
-				close = true;
-			}
-			ImGui::SameLine();
-			ImGui::Text("");
-			ImGui::SameLine();
-
-			if (ImGui::Button("Cancel"))
-			{
-				ImGui::CloseCurrentPopup();
-				LOG("CANCEL EXIT");
-				close = false;
-			}
-			ImGui::EndPopup();
-		}
-	}
-
-
-	// Draw all active panels
+void ModuleEditor::DrawPanels()
+{
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
 		if ((*it)->IsActive())
@@ -315,110 +389,54 @@ bool ModuleEditor::Update(float dt)
 			ImGui::End();
 		}
 	}
-
-	if (file_dialog == opened)
-		LoadFile((file_dialog_filter.length() > 0) ? file_dialog_filter.c_str() : nullptr);
-	else
-		in_modal = false;
-
-
-	if (is_new) //new
-	{
-		//...
-		is_new = false;
-	}
-
-	if (is_open) //open
-	{
-		//...
-		is_open = false;
-	}
-
-	if (is_save) //save
-	{
-		App->file_system->Save(SETTINGS_FOLDER "Engine.log", App->GetLog().c_str(), App->GetLog().size());
-		App->SavePrefs();
-		is_save = false;
-	}
-
-	if (is_import)
-	{
-		//...
-		is_import = false;
-	}
-
-
-	/*if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
-		LOG("GEOMETRY LOG %d", 25, 'g')
-	}
-	if (App->input->GetKey(SDL_SCANCODE_B) == KEY_DOWN) {
-		char c[8] = "jdsig";
-		LOG("DEBUG LOG %s", c, 'd')
-	}
-	if (App->input->GetKey(SDL_SCANCODE_V) == KEY_DOWN) {
-		LOG("VERBOSE LOG", 'v')
-	}*/
-
-	// --- SHORTCUTS -----------------
-	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
-		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))
-	{
-		is_new = true;
-	}
-
-	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN) ||
-		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN))
-	{
-		is_open = true;
-	}
-
-	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN) ||
-		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN))
-	{
-		is_save = true;
-	}
-
-	if ((App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP))
-	{
-		App->input->quit = true;
-	}
-
-	return ret;
 }
 
-bool ModuleEditor::PostUpdate(float dt)
+void ModuleEditor::ConfirmExit()
 {
-	if (close)
-		return false;
+	if (App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP)
+		close = true;
 
-	return true;
-}
-
-// Called before quitting
-bool ModuleEditor::CleanUp()
-{
-	LOG("Freeing editor gui");
-
-	for (vector<Panel*>::iterator it = panels.begin(); it != panels.end(); ++it)
+	ImGui::OpenPopup("Quit");
+	if (ImGui::BeginPopupModal("Quit", &App->input->quit, ImGuiWindowFlags_NoResize))
 	{
-		RELEASE(*it);
+		ImGui::Text("Are you sure you want to Quit?");
+		ImGui::NewLine();
+		//ImGui::Text("  ");
+		//ImGui::SameLine();
+
+		//if (ImGui::Button("Save"))
+		//{
+		//	//Save
+		//	ImGui::CloseCurrentPopup();
+
+		//	LOG("SAVING APPLICATION AND EXITING");
+		//	quit = true;
+		//	return false;
+		//}
+		//ImGui::SameLine();
+		//ImGui::Text("");
+		//ImGui::SameLine();
+
+		if (ImGui::Button("Close"))
+		{
+			ImGui::CloseCurrentPopup();
+
+			LOG("EXITING APPLICATION");
+			close = true;
+		}
+		ImGui::SameLine();
+		ImGui::Text("");
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))
+		{
+			ImGui::CloseCurrentPopup();
+			LOG("CANCEL EXIT");
+			close = false;
+		}
+		ImGui::EndPopup();
 	}
-	panels.clear();
-
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
-
-	return true;
 }
-
-void ModuleEditor::Draw() const
-{
-	// Render
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
 
 void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 {
@@ -448,6 +466,7 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 	ImGui::SameLine();
 
 	ImGui::SetCursorPos(pos);
+
 	if (ImGui::InvisibleButton(text, ImVec2(size)))
 	{
 		ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);

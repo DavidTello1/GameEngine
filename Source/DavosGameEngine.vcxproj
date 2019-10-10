@@ -147,6 +147,7 @@
     <ClInclude Include="src\glew\include\GL\glxew.h" />
     <ClInclude Include="src\glew\include\GL\wglew.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Viewport.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -180,6 +181,7 @@
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="parson\parson.c" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl" />
