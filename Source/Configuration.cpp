@@ -269,9 +269,9 @@ void Configuration::DrawModuleWindow(ModuleWindow* module)
 
 	if (ImGui::InputInt("Width", &width, 1, 1))
 	{
-		if (width > max_w)
+		if ((uint)width > max_w)
 			width = int(max_w);
-		else if (width < min_w)
+		else if ((uint)width < min_w)
 			width = int(min_w);
 
 		App->window->SetWidth((uint)width);
@@ -279,9 +279,9 @@ void Configuration::DrawModuleWindow(ModuleWindow* module)
 
 	if (ImGui::InputInt("Height", &height, 1, 1))
 	{
-		if (height > max_h)
+		if ((uint)height > max_h)
 			height = max_h;
-		else if (height < min_h)
+		else if ((uint)height < min_h)
 			height = min_h;
 
 		App->window->SetHeigth((uint)height);
@@ -347,13 +347,13 @@ void Configuration::DrawModuleInput(ModuleInput* module)
 
 void Configuration::DrawModuleRenderer(ModuleRenderer3D* module)
 {
-	//ImGui::Text("Driver:");
-	//ImGui::SameLine();
-	//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), App->renderer3D->GetDriver());
+	ImGui::Text("Driver:");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), App->renderer3D->GetDriver());
 
-	//bool vsync = App->renderer3D->GetVSync();
-	//if (ImGui::Checkbox("Vertical Sync", &vsync))
-	//	App->renderer3D->SetVSync(vsync);
+	bool vsync = App->renderer3D->GetVSync();
+	if (ImGui::Checkbox("Vertical Sync", &vsync))
+		App->renderer3D->SetVSync(vsync);
 }
 
 void Configuration::DrawModuleFileSystem(ModuleFileSystem* module)

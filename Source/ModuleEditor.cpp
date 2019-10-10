@@ -433,6 +433,7 @@ void ModuleEditor::ConfirmExit()
 			ImGui::CloseCurrentPopup();
 			LOG("CANCEL EXIT");
 			close = false;
+			App->input->quit = false;
 		}
 		ImGui::EndPopup();
 	}

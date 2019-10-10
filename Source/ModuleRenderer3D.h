@@ -2,7 +2,6 @@
 #include "Module.h"
 #include "Globals.h"
 #include "glmath.h"
-#include "Light.h"
 
 #define MAX_LIGHTS 8
 
@@ -17,12 +16,20 @@ public:
 	bool PostUpdate(float dt);
 	bool CleanUp();
 
+	void Load(Config* config);
+	void Save(Config* config) const;
+
 	void OnResize(int width, int height);
 
-public:
+	void SetVSync(bool vsync);
+	bool GetVSync() const { return vsync; }
+	const char* GetDriver() const { return SDL_GetCurrentVideoDriver(); }
 
-	Light lights[MAX_LIGHTS];
+public:
 	SDL_GLContext context;
 	mat3x3 NormalMatrix;
 	mat4x4 ModelMatrix, ViewMatrix, ProjectionMatrix;
+
+	bool vsync = false;
+	bool in_game = false;
 };
