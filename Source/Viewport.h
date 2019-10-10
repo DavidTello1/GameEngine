@@ -27,7 +27,7 @@ public:
 
 	void RemoveBuffer(FrameBuffer & buffer);
 
-	void OnResize(int x, int y, int width, int height);
+	void OnResize(int width, int height);
 
 	bool PreUpdate();
 
@@ -38,5 +38,7 @@ public:
 	void Draw();
 
 	FrameBuffer frame_buffer;
+
+	mat4x4 ModelMatrix, ViewMatrix, ProjectionMatrix;
 };
 

@@ -113,7 +113,7 @@ bool ModuleRenderer3D::Init(Config* config)
 	}
 
 	//// Projection matrix for
-	//OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	OnResize(App->window->GetWidth(), App->window->GetHeight());
 
 	return ret;
 }
@@ -126,11 +126,6 @@ bool ModuleRenderer3D::PreUpdate(float dt)
 	glClearColor(1, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-
-	glLoadIdentity();
-	
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(App->camera->GetViewMatrix());
 	
 	// light 0 on cam pos
 	lights[0].SetPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);

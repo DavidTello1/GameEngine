@@ -29,7 +29,13 @@ bool Viewport::PreUpdate()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
 	glEnable(GL_DEPTH_TEST);
 
+	glLoadIdentity();
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(App->camera->GetViewMatrix());
+
 	App->scene_intro->Draw();
+
 	//DrawFigures();
 	//glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 	return true;
@@ -46,9 +52,9 @@ void Viewport::Draw()
 		pos_x  = static_cast<int>(ImGui::GetWindowPos().x);
 		pos_y  = static_cast<int>(ImGui::GetWindowPos().y);
 
-		RemoveBuffer(frame_buffer);
+		//RemoveBuffer(frame_buffer);
 		Generate(ImVec2( width,height));
-		OnResize(pos_x, pos_y, width, height);
+		OnResize(width, height);
 		//OnResize(pos_x, pos_y, width, height);
 
 	}
@@ -97,7 +103,7 @@ bool Viewport::Generate(ImVec2 size)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	OnResize(pos_x, pos_y, width, height);
+	//OnResize(pos_x, pos_y, width, height);
 	return true;
 }
 
@@ -122,14 +128,14 @@ void Viewport::RemoveBuffer(FrameBuffer& buffer)
 	}
 }
 
-void Viewport::OnResize(int x, int y, int width, int height)
+void Viewport::OnResize(int width, int height)
 {
-	glViewport(x, y, width, height);
+	glViewport(0, 0, width, height);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//ProjectionMatrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
-	//glLoadMatrixf(&ProjectionMatrix);
+	ProjectionMatrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
+	glLoadMatrixf(&ProjectionMatrix);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
