@@ -22,6 +22,7 @@ Configuration::Configuration() : Panel("Configuration"), fps_log(FPS_LOG_SIZE), 
 	pos_y = default_pos_y;
 
 	GetHardware(); //init hardware detection
+	info_hw = GetHardwareInfo();
 }
 
 Configuration::~Configuration()
@@ -209,31 +210,29 @@ void Configuration::DrawHardware()
 {
 	if (ImGui::CollapsingHeader("Hardware"))
 	{
-		hardware_info info = GetHardwareInfo();
-
-		IMGUI_PRINT("CPUs:", "%u (Cache: %ukb)", info.cpu_count, info.l1_cachekb);
-		IMGUI_PRINT("System RAM:", "%.1fGb", info.ram_gb);
+		IMGUI_PRINT("CPUs:", "%u (Cache: %ukb)", info_hw.cpu_count, info_hw.l1_cachekb);
+		IMGUI_PRINT("System RAM:", "%.1fGb", info_hw.ram_gb);
 		IMGUI_PRINT("Caps:", "%s%s%s%s%s%s",
-			info.rdtsc ? "RDTSC," : "",
-			info.altivec ? "AltiVec," : "",
-			info.mmx ? "MMX," : "",
-			info.now3d ? "3DNow," : "",
-			info.sse ? "SSE," : "",
-			info.sse2 ? "SSE2," : "");
+			info_hw.rdtsc ? "RDTSC," : "",
+			info_hw.altivec ? "AltiVec," : "",
+			info_hw.mmx ? "MMX," : "",
+			info_hw.now3d ? "3DNow," : "",
+			info_hw.sse ? "SSE," : "",
+			info_hw.sse2 ? "SSE2," : "");
 		IMGUI_PRINT("", "%s%s%s%s%s",
-			info.sse3 ? "SSE3," : "",
-			info.sse41 ? "SSE41," : "",
-			info.sse42 ? "SSE42," : "",
-			info.avx ? "AVX," : "",
-			info.avx2 ? "AVX2" : "");
+			info_hw.sse3 ? "SSE3," : "",
+			info_hw.sse41 ? "SSE41," : "",
+			info_hw.sse42 ? "SSE42," : "",
+			info_hw.avx ? "AVX," : "",
+			info_hw.avx2 ? "AVX2" : "");
 
 		ImGui::Separator();
-		IMGUI_PRINT("GPU:", "vendor %u device %u", info.gpu_vendor, info.gpu_device);
-		IMGUI_PRINT("Brand:", info.gpu_brand);
-		IMGUI_PRINT("VRAM Budget:", "%.1f Mb", info.vram_mb_budget);
-		IMGUI_PRINT("VRAM Usage:", "%.1f Mb", info.vram_mb_usage);
-		IMGUI_PRINT("VRAM Available:", "%.1f Mb", info.vram_mb_available);
-		IMGUI_PRINT("VRAM Reserved:", "%.1f Mb", info.vram_mb_reserved);
+		IMGUI_PRINT("GPU:", "vendor %u device %u", info_hw.gpu_vendor, info_hw.gpu_device);
+		IMGUI_PRINT("Brand:", info_hw.gpu_brand);
+		IMGUI_PRINT("VRAM Budget:", "%.1f Mb", info_hw.vram_mb_budget);
+		IMGUI_PRINT("VRAM Usage:", "%.1f Mb", info_hw.vram_mb_usage);
+		IMGUI_PRINT("VRAM Available:", "%.1f Mb", info_hw.vram_mb_available);
+		IMGUI_PRINT("VRAM Reserved:", "%.1f Mb", info_hw.vram_mb_reserved);
 	}
 }
 
