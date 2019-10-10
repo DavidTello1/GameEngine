@@ -21,8 +21,8 @@ public:
 	ModuleEditor(bool start_enabled = true);
 	~ModuleEditor();
 
-	bool Init();
-	bool Start();
+	bool Init(Config* config = nullptr);
+	bool Start(Config* config = nullptr);
 	bool PreUpdate(float dt);
 	bool Update(float dt);
 	bool CleanUp();

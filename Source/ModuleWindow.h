@@ -16,8 +16,8 @@ public:
 	// Destructor
 	virtual ~ModuleWindow();
 
-	bool Init();
-	bool Start();
+	bool Init(Config* config = nullptr);
+	bool Start(Config* config = nullptr);
 	bool CleanUp();
 
 	SDL_Window* GetWindow() const { return window; }

@@ -12,7 +12,7 @@ ModuleWindow::~ModuleWindow()
 }
 
 // Called before render is available
-bool ModuleWindow::Init()
+bool ModuleWindow::Init(Config* config)
 {
 	LOG("Init SDL window & surface");
 	bool ret = true;
@@ -71,7 +71,7 @@ bool ModuleWindow::Init()
 	return ret;
 }
 
-bool ModuleWindow::Start()
+bool ModuleWindow::Start(Config* config)
 {
 	//SetDefaultIcon();
 

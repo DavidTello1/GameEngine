@@ -1,6 +1,7 @@
 #include "Hierarchy.h"
 #include "Globals.h"
 #include "ImGui/imgui.h"
+#include "mmgr/mmgr.h"
 
 char Hierarchy::scene_name[MAX_NAME_LENGTH];
 

@@ -17,8 +17,8 @@ public:
 	ModuleFileSystem(const char* game_path = nullptr);
 	~ModuleFileSystem();
 
-	bool Init() override;
-	bool CleanUp() override;
+	bool Init(Config* config = nullptr);
+	bool CleanUp();
 
 	// Utility functions
 	bool AddPath(const char* path_or_zip);

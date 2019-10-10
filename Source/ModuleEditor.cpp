@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "Application.h"
+#include "Config.h"
 #include "ModuleWindow.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleInput.h"
@@ -16,6 +17,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_opengl3.h"
+
+#include "mmgr/mmgr.h"
 
 using namespace std;
 
@@ -77,7 +80,7 @@ void ShowExampleAppDockSpace(bool* p_open)
 }
 
 // Called before render is available
-bool ModuleEditor::Init()
+bool ModuleEditor::Init(Config* config)
 {
 	LOG("Init editor gui with imgui lib version %s", ImGui::GetVersion());
 
@@ -97,21 +100,19 @@ bool ModuleEditor::Init()
 	ImGui::StyleColorsNew();
 	//ImGui::StyleColorsClassic();
 
-	//Hierarchy::Init();
 	return true;
 }
 
-bool ModuleEditor::Start()
+bool ModuleEditor::Start(Config* config)
 {
 	// Create panels
-	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_hierarchy = new Hierarchy());
-	panels.push_back(tab_console = new Console());
+	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_inspector = new Inspector());
+	panels.push_back(tab_console = new Console());
 
 	return true;
 }
-
 
 bool ModuleEditor::PreUpdate(float dt)
 {
@@ -164,7 +165,7 @@ bool ModuleEditor::Update(float dt)
 
 			if (ImGui::BeginMenu("Edit")) //edit
 			{
-				if (ImGui::MenuItem("Import", "Ctrl+N"))
+				if (ImGui::MenuItem("Import"))
 					is_import = true;
 
 				ImGui::EndMenu();
@@ -173,9 +174,9 @@ bool ModuleEditor::Update(float dt)
 			if (ImGui::BeginMenu("View")) //view
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &GetPanel("Hierarchy")->active);
-				ImGui::MenuItem("Console", NULL, &GetPanel("Console")->active);
 				ImGui::MenuItem("Configuration", NULL, &GetPanel("Configuration")->active);
 				ImGui::MenuItem("Inspector", NULL, &GetPanel("Inspector")->active);
+				ImGui::MenuItem("Console", NULL, &GetPanel("Console")->active);
 
 				ImGui::EndMenu();
 			}
@@ -228,11 +229,11 @@ bool ModuleEditor::Update(float dt)
 			ImGui::NewLine();
 
 			ImGui::Text("3rd Party Libraries used:");
-			CreateLink("SDL", "", true);
-			CreateLink("OpenGL", "", true);
-			CreateLink("Glew", "", true);
-			CreateLink("ImGui", "", true);
-			CreateLink("DevIL", "", true);
+			CreateLink("SDL", "http://www.libsdl.org/index.php", true);
+			CreateLink("OpenGL", "https://opengl.org/", true);
+			CreateLink("Glew", "http://glew.sourceforge.net/", true);
+			CreateLink("ImGui", "https://github.com/ocornut/imgui", true);
+			CreateLink("DevIL", "http://openil.sourceforge.net/", true);
 			ImGui::NewLine();
 
 			ImGui::Text("License:");
@@ -287,7 +288,8 @@ bool ModuleEditor::Update(float dt)
 
 	if (is_save) //save
 	{
-		//...
+		App->file_system->Save(SETTINGS_FOLDER "Engine.log", App->GetLog().c_str(), App->GetLog().size());
+		App->SavePrefs();
 		is_save = false;
 	}
 

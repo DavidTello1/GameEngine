@@ -37,6 +37,9 @@
     <Filter Include="Sources\Containers\assimp">
       <UniqueIdentifier>{abca0654-e889-4d37-bb9d-4cd14ceffee4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Containers\parson">
+      <UniqueIdentifier>{60413707-f765-4b6f-b9d7-74ec9d1253e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -246,6 +249,15 @@
     <ClInclude Include="assimp\include\version.h">
       <Filter>Sources\Containers\assimp</Filter>
     </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="parson\parson.h">
+      <Filter>Sources\Containers\parson</Filter>
+    </ClInclude>
+    <ClInclude Include="MathGeoLib\Math.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -331,6 +343,12 @@
     </ClCompile>
     <ClCompile Include="ModuleFileSystem.cpp">
       <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Sources\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="parson\parson.c">
+      <Filter>Sources\Containers\parson</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

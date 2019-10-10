@@ -19,7 +19,7 @@ public:
 	ModuleInput(bool start_enabled = true);
 	~ModuleInput();
 
-	bool Init();
+	bool Init(Config* config = nullptr);
 	bool PreUpdate(float dt);
 	bool CleanUp();
 

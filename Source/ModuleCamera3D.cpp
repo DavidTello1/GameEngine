@@ -20,7 +20,7 @@ ModuleCamera3D::~ModuleCamera3D()
 {}
 
 // -----------------------------------------------------------------
-bool ModuleCamera3D::Start()
+bool ModuleCamera3D::Start(Config* config)
 {
 	LOG("Setting up the camera");
 	bool ret = true;

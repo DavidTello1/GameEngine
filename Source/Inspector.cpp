@@ -1,5 +1,6 @@
 #include "Inspector.h"
 #include "Imgui/imgui.h"
+#include "mmgr/mmgr.h"
 
 
 Inspector::Inspector() : Panel("Inspector")

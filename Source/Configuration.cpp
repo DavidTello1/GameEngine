@@ -38,12 +38,12 @@ void Configuration::Draw()
 		ImGui::Selectable("Set Defaults");
 		if (ImGui::Selectable("Load"))
 		{ 
-			//App->LoadPrefs();
+			App->LoadPrefs();
 		}
 
 		if (ImGui::Selectable("Save"))
 		{ 
-			//App->SavePrefs();
+			App->SavePrefs();
 		}
 		ImGui::EndPopup();
 	}
@@ -134,7 +134,6 @@ void Configuration::DrawApplication()
 			ImGui::BulletText("Glew Version:");
 			//ImGui::SameLine();
 			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", glewGetString(GLEW_VERSION));
-
 
 			//ImGui
 			ImGui::BulletText("ImGui Version:");
