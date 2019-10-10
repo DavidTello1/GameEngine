@@ -20,7 +20,6 @@ Application::Application()
 	modules.push_back(camera = new ModuleCamera3D());
 	modules.push_back(editor = new ModuleEditor());
 	modules.push_back(input = new ModuleInput());
-	modules.push_back(viewport = new ModuleViewport());
 	//modules.push_back(audio = new ModuleAudio(true));
 	//modules.push_back(ai = new ModuleAI());
 	//modules.push_back(level = new ModuleLevelManager());

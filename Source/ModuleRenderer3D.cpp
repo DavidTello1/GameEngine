@@ -1,7 +1,6 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleRenderer3D.h"
-#include "ModuleViewport.h"
 #include "Viewport.h"
 
 #include "glew/include/GL/glew.h"
@@ -81,7 +80,7 @@ bool ModuleRenderer3D::Init()
 		glClearDepth(1.0f);
 		
 		//Initialize clear color
-		glClearColor(0.f, 1.f, 0.f, 1.f);
+		glClearColor(0.f, 0.f, 0.f, 1.f);
 
 		//Check for error
 		error = glGetError();
@@ -123,7 +122,8 @@ bool ModuleRenderer3D::Init()
 bool ModuleRenderer3D::PreUpdate(float dt)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClearColor(0, 1, 0, 1);
+	// RED
+	glClearColor(1, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
@@ -147,8 +147,7 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 	
 	//App->viewport->DrawScene();
 
-	//App->editor->tab_viewport->Draw();
-
+	// Drawing of gui and panels(and viewport panel)
 	App->editor->Draw();
 
 	SDL_GL_SwapWindow(App->window->GetWindow());

@@ -58,7 +58,7 @@ bool ModuleWindow::Init()
 
 		if(window == nullptr)
 		{
-			LOG("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+			LOG("Window could not be created! SDL_Error: %s\n", SDL_GetError(),'d');
 			ret = false;
 		}
 		else

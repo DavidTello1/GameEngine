@@ -119,6 +119,8 @@ bool ModuleEditor::Start()
 	panel_inspector = GetPanel("Inspector");
 	panel_viewport = GetPanel("Viewport");
 
+	tab_viewport->Generate();
+
 	return true;
 }
 
@@ -126,11 +128,20 @@ bool ModuleEditor::Start()
 bool ModuleEditor::PreUpdate(float dt)
 {
 	// Start the frame
-	
+	// Call preupdate viewport
+	tab_viewport->PreUpdate();
 
 	return true;
 }
 
+bool ModuleEditor::PostUpdate(float dt)
+{
+	// end the frame
+	// Call postupdate viewport
+	tab_viewport->PostUpdate();
+
+	return true;
+}
 bool ModuleEditor::Update(float dt)
 {
 	return true;
@@ -339,7 +350,9 @@ bool ModuleEditor::CleanUp()
 	return true;
 }
 
-void ModuleEditor::Draw() 
+// Drawing of the FULL gui
+// First gets drawn the Menus, then panels
+void ModuleEditor::Draw()
 {
 	// preupdate
 
@@ -361,6 +374,135 @@ void ModuleEditor::Draw()
 
 	//ShowExampleAppDockSpace(&is_show_main_dockspace);
 
+	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about);
+
+	DrawDemo(is_show_demo);
+
+	DrawAbout(is_about);
+
+	// Draw all active panels
+	DrawPanels();
+
+	{
+		if (is_new) //new
+		{
+			//...
+			is_new = false;
+		}
+
+		if (is_open) //open
+		{
+			//....
+			is_open = false;
+		}
+
+		if (is_save) //save
+		{
+			//...
+			is_save = false;
+		}
+	}
+
+
+	// --- SHORTCUTS -----------------
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))
+	{
+		is_new = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN))
+	{
+		is_open = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN))
+	{
+		is_save = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP))
+	{
+		App->input->quit = true;
+	}
+
+	// Render
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void ModuleEditor::DrawPanels()
+{
+	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
+	{
+		if ((*it)->IsActive())
+		{
+			ImGui::SetNextWindowPos(ImVec2((*it)->pos_x, (*it)->pos_y), ImGuiCond_Once);
+			ImGui::SetNextWindowSize(ImVec2((*it)->width, (*it)->height), ImGuiCond_Once);
+			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
+			{
+				(*it)->Draw();
+			}
+			ImGui::End();
+		}
+	}
+}
+
+void ModuleEditor::DrawDemo(bool &is_show_demo)
+{
+	if (is_show_demo) //show demo
+	{
+		ImGui::ShowDemoWindow(&is_show_demo);
+		ImGui::ShowMetricsWindow();
+	}
+}
+
+void ModuleEditor::DrawAbout(bool &is_about)
+{
+	if (is_about) //about
+	{
+		ImGui::OpenPopup("About");
+		if (ImGui::BeginPopupModal("About"))
+		{
+			ImGui::Text("Davos Game Engine");
+			ImGui::Text("Description");
+			ImGui::Text("By");
+			ImGui::SameLine();
+			CreateLink("Oscar Pons", "https://github.com/ponspack9");
+			ImGui::SameLine();
+			ImGui::Text("&");
+			ImGui::SameLine();
+			CreateLink("David Tello", "https://github.com/DavidTello1");
+			ImGui::NewLine();
+
+			ImGui::Text("3rd Party Libraries used:");
+			CreateLink("SDL 2.0.10", "", true);
+			CreateLink("Glew 2.0.0", "", true);
+			CreateLink("ImGui 1.73", "", true);
+			CreateLink("OpenGL 3.1", "", true); ImGui::NewLine();
+
+			ImGui::Text("License:");
+			ImGui::Text("MIT License");
+			ImGui::Text("Copyright 2019. Oscar Pons and David Tello");
+			ImGui::Text("Permission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files(the 'Software'), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions :");
+			ImGui::Text("The above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.");
+			ImGui::Text("THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.");
+			ImGui::NewLine();
+
+			if (ImGui::Button("Close"))
+			{
+				ImGui::CloseCurrentPopup();
+				is_about = false;
+			}
+			ImGui::EndPopup();
+		}
+	}
+}
+
+void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about)
+{
 	if (is_draw_menu == true) // Main menu GUI
 	{
 		if (ImGui::BeginMainMenuBar())
@@ -415,125 +557,6 @@ void ModuleEditor::Draw()
 			ImGui::EndMainMenuBar();
 		}
 	}
-
-
-	if (is_show_demo) //show demo
-	{
-		ImGui::ShowDemoWindow(&is_show_demo);
-		ImGui::ShowMetricsWindow();
-	}
-
-	if (is_about) //about
-	{
-		ImGui::OpenPopup("About");
-		if (ImGui::BeginPopupModal("About"))
-		{
-			ImGui::Text("Davos Game Engine");
-			ImGui::Text("Description");
-			ImGui::Text("By");
-			ImGui::SameLine();
-			CreateLink("Oscar Pons", "https://github.com/ponspack9");
-			ImGui::SameLine();
-			ImGui::Text("&");
-			ImGui::SameLine();
-			CreateLink("David Tello", "https://github.com/DavidTello1");
-			ImGui::NewLine();
-
-			ImGui::Text("3rd Party Libraries used:");
-			CreateLink("SDL 2.0.10", "", true);
-			CreateLink("Glew 2.0.0", "", true);
-			CreateLink("ImGui 1.73", "", true);
-			CreateLink("OpenGL 3.1", "", true); ImGui::NewLine();
-
-			ImGui::Text("License:");
-			ImGui::Text("MIT License");
-			ImGui::Text("Copyright 2019. Oscar Pons and David Tello");
-			ImGui::Text("Permission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files(the 'Software'), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions :");
-			ImGui::Text("The above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.");
-			ImGui::Text("THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.");
-			ImGui::NewLine();
-
-			if (ImGui::Button("Close"))
-			{
-				ImGui::CloseCurrentPopup();
-				is_about = false;
-			}
-			ImGui::EndPopup();
-		}
-	}
-
-	// Draw all active panels
-	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
-	{
-		if ((*it)->IsActive())
-		{
-			ImGui::SetNextWindowPos(ImVec2((*it)->pos_x, (*it)->pos_y), ImGuiCond_Once);
-			ImGui::SetNextWindowSize(ImVec2((*it)->width, (*it)->height), ImGuiCond_Once);
-			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
-			{
-				(*it)->Draw();
-			}
-			ImGui::End();
-		}
-	}
-
-	if (is_new) //new
-	{
-		//...
-		is_new = false;
-	}
-
-	if (is_open) //open
-	{
-		//....
-		is_open = false;
-	}
-
-	if (is_save) //save
-	{
-		//...
-		is_save = false;
-	}
-
-
-	/*if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {
-		LOG("GEOMETRY LOG %d", 25, 'g')
-	}
-	if (App->input->GetKey(SDL_SCANCODE_B) == KEY_DOWN) {
-		char c[8] = "jdsig";
-		LOG("DEBUG LOG %s", c, 'd')
-	}
-	if (App->input->GetKey(SDL_SCANCODE_V) == KEY_DOWN) {
-		LOG("VERBOSE LOG", 'v')
-	}*/
-
-	// --- SHORTCUTS -----------------
-	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
-		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))
-	{
-		is_new = true;
-	}
-
-	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN) ||
-		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN))
-	{
-		is_open = true;
-	}
-
-	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN) ||
-		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN))
-	{
-		is_save = true;
-	}
-
-	if ((App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP))
-	{
-		App->input->quit = true;
-	}
-
-	// Render
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
@@ -564,6 +587,7 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 	ImGui::SameLine();
 
 	ImGui::SetCursorPos(pos);
+
 	if (ImGui::InvisibleButton(text, ImVec2(size)))
 	{
 		ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);

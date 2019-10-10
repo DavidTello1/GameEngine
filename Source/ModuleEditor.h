@@ -23,14 +23,26 @@ public:
 	bool Init();
 	bool Start();
 	bool PreUpdate(float dt);
+	bool PostUpdate(float dt);
 	bool Update(float dt);
 	bool CleanUp();
 
 	void Draw();
 
+
+
+
+
 	void CreateLink(const char* text, const char* url, bool bullet = false);
 	Panel* GetPanel(const char* name);
 	void LogFPS(float fps, float ms);
+
+private:
+
+	void DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about);
+	void DrawDemo(bool &is_show_demo);
+	void DrawAbout(bool &is_about);
+	void DrawPanels();
 
 	//int GetWidth(Panel* panel) const { return tab_panels.width; }
 	//int GetHeight(Panel* panel) const { return tab_panels[panel].height; }

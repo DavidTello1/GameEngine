@@ -1,6 +1,14 @@
 #pragma once
 #include "Panel.h"
 #include "glew/include/GL/glew.h"
+#include "Imgui/imgui.h"
+
+struct FrameBuffer
+{
+	unsigned int id;
+	unsigned int tex;
+	unsigned int depth;
+};
 
 class Viewport : public Panel
 {
@@ -14,8 +22,17 @@ public:
 
 	Viewport();
 	~Viewport();
+
+	bool Generate(ImVec2 size = { 600,600 });
+
+	bool PreUpdate();
+
+	bool PostUpdate();
+
+	bool CleanUp();
+
 	void Draw();
 
-	unsigned int* texture;
+	FrameBuffer frame_buffer;
 };
 
