@@ -4,7 +4,7 @@
 #include "Panel.h"
 #include "Imgui/imgui.h"
 #include <random>
-#include <set>
+#include <vector>
 #include "HierarchyNode.h"
 
 class Hierarchy : public Panel
@@ -20,15 +20,16 @@ public:
 	virtual ~Hierarchy();
 
 	void Draw();
-	static void AddNode(HierarchyNode* node = nullptr);
+	static HierarchyNode* AddNode(HierarchyNode* node = nullptr);
+	static void DeleteNode(HierarchyNode * n);
 	static bool SetSceneName(const char* name);
 	static void DeleteSelected();
 
 
 	//Data
-	static std::set<HierarchyNode*> root_nodes;
-	static std::set<HierarchyNode*> nodes;
-	static std::set<HierarchyNode*> selected_nodes;
+	static std::vector<HierarchyNode*> root_nodes;
+	static std::vector<HierarchyNode*> nodes;
+	static std::vector<HierarchyNode*> selected_nodes;
 
 	static char scene_name[MAX_NAME_LENGTH];
 };
