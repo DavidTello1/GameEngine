@@ -10,7 +10,7 @@
 #pragma comment (lib, "assimp/libx86/assimp.lib")
 
 
-struct VertexData {
+struct MeshData {
 	uint id_index = 0; // index in VRAM 
 	uint num_index = 0; 
 	uint* index = nullptr;
