@@ -267,6 +267,7 @@
     <ClInclude Include="par_shapes.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="GeometryLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -365,6 +366,7 @@
     <ClCompile Include="par_shapes.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="GeometryLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">
