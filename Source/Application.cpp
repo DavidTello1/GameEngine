@@ -13,7 +13,7 @@ Application::Application()
 	//modules.push_back(hints = new ModuleHints());
 	modules.push_back(file_system = new ModuleFileSystem(ASSETS_FOLDER));
 	modules.push_back(window = new ModuleWindow());
-	//modules.push_back(resources = new ModuleResources());
+	modules.push_back(resources = new ModuleResources());
 	//modules.push_back(tex = new ModuleTextures());
 	//modules.push_back(physics3D = new ModulePhysics3D());
 	modules.push_back(camera = new ModuleCamera3D());
