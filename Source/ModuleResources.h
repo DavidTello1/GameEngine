@@ -18,7 +18,7 @@ public:
 	bool CleanUp();
 
 	void Draw();
-	bool LoadFBX(const char* path);
+	Mesh* LoadFBX(const char* path);
 
 private:
 	std::vector<Mesh*> meshes;

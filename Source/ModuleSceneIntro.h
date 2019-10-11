@@ -2,6 +2,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "GeometryLoader.h"
+#include "Mesh.h"
 
 #define MAX_SNAKE 2
 
@@ -18,7 +19,7 @@ public:
 	bool CleanUp();
 
 	//Temporary mesh data
-	MeshData* m;
+	Mesh* m;
 };
 
 void DrawGridPlane();

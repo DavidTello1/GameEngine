@@ -50,24 +50,24 @@ void ModuleResources::Draw()
 
 }
 
-bool ModuleResources::LoadFBX(const char* path)
+Mesh* ModuleResources::LoadFBX(const char* path)
 {
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 
 	if (scene != nullptr && scene->HasMeshes())
 	{
+		Mesh* new_mesh = new Mesh();
 		for (uint i = 0; i < scene->mNumMeshes; ++i)
 		{
-			Mesh* new_mesh = new Mesh;
 			meshes.push_back(new_mesh);
 
 			aiMesh* mesh = scene->mMeshes[i];
 			new_mesh->ImportMesh(mesh);
 		}
 		aiReleaseImport(scene);
+		return new_mesh;
 	}
 	else
 		LOG("Error loading scene %s", path, 'd');
 
-	return true;
 }
