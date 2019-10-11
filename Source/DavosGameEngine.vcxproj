@@ -145,6 +145,7 @@
     <ClInclude Include="Panel.h" />
     <ClInclude Include="parson\parson.h" />
     <ClInclude Include="Resources.h" />
+    <ClInclude Include="par_shapes.h" />
     <ClInclude Include="src\glew\include\GL\eglew.h" />
     <ClInclude Include="src\glew\include\GL\glew.h" />
     <ClInclude Include="src\glew\include\GL\glxew.h" />
@@ -186,6 +187,7 @@
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="parson\parson.c" />
     <ClCompile Include="Resources.cpp" />
+    <ClCompile Include="par_shapes.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Viewport.cpp" />
   </ItemGroup>

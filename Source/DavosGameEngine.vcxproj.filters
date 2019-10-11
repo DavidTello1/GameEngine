@@ -275,6 +275,9 @@
     </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Sources\Resources</Filter>
+	  </ClInclude>
+    <ClInclude Include="par_shapes.h">
+      <Filter>Sources\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -379,6 +382,9 @@
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="par_shapes.cpp">
+      <Filter>Sources\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

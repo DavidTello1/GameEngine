@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleCamera3D.h"
+#include "Imgui/imgui.h"
 
 ModuleCamera3D::ModuleCamera3D(bool start_enabled) : Module("Camera3D", start_enabled)
 {
@@ -46,11 +47,15 @@ bool ModuleCamera3D::Update(float dt)
 		orbit = !orbit;
 	}
 	// Camera ZOOM with MOUSE WHEEL
+	ImGuiIO io = ImGui::GetIO();
 	vec3 newPos(0, 0, 0);
-	float speed = App->input->GetMouseWheel() * 75.0f * dt;
-	newPos -= Z * speed;
+	float speed = io.MouseWheel * 75.0f * dt;
+	if (speed != 0)
+	{
+		newPos -= Z * speed;
+		Position += newPos;
+	}
 
-	Position += newPos;
 	//Reference += newPos;
 	// Mouse motion ----------------
 
@@ -100,7 +105,7 @@ void ModuleCamera3D::RotateWithMouse() {
 	int dx, dy;
 	App->input->GetMouseMotion(dx, dy);
 	dx = -dx;
-	dy = -dy;
+	dy = dy;
 
 	float Sensitivity = 0.25f;
 

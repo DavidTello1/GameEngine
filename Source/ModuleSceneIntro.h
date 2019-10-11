@@ -12,6 +12,10 @@ public:
 
 	bool Start();
 	bool Update(float dt);
+	bool Draw();
+	bool PostUpdate(float dt);
 	bool CleanUp();
 
 };
+
+void DrawGridPlane();

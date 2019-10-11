@@ -15,15 +15,19 @@ class Viewport : public Panel
 public:
 
 	//Panel 
-	static const uint default_width = 600;
-	static const uint default_height = 600;
-	static const uint default_pos_x = 300;
-	static const uint default_pos_y = 250;
+	static const int default_width;
+	static const int default_height;
+	static const int default_pos_x;
+	static const int default_pos_y;
 
 	Viewport();
 	~Viewport();
 
-	bool Generate(ImVec2 size = { 600,600 });
+	bool GenerateFBO(ImVec2 size = { static_cast<float>(default_width), static_cast<float>(default_height )});
+
+	void RemoveBuffer(FrameBuffer & buffer);
+
+	void OnResize(int width, int height);
 
 	bool PreUpdate();
 
@@ -34,5 +38,9 @@ public:
 	void Draw();
 
 	FrameBuffer frame_buffer;
+
+	mat4x4 model_matrix, view_matrix, projection_matrix;
+
+	ImVec2 window_avail_size;
 };
 

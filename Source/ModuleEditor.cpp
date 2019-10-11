@@ -114,7 +114,7 @@ bool ModuleEditor::Start(Config* config)
 	panels.push_back(tab_assets = new Assets());
 	panels.push_back(tab_viewport = new Viewport());
 
-	tab_viewport->Generate();
+	tab_viewport->GenerateFBO();
 
 	return true;
 }

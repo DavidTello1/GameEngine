@@ -111,7 +111,7 @@ bool ModuleRenderer3D::Init(Config* config)
 	}
 
 	//// Projection matrix for
-	//OnResize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	OnResize(App->window->GetWidth(), App->window->GetHeight());
 
 	return ret;
 }
@@ -140,6 +140,9 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 	//App->viewport->DrawScene();
 
 	// Drawing of gui and panels(and viewport panel)
+
+	
+
 	App->editor->Draw();
 
 	SDL_GL_SwapWindow(App->window->GetWindow());
