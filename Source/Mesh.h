@@ -5,7 +5,6 @@
 #include "glew\include\GL\glew.h"
 
 struct aiMesh;
-
 struct Vertex
 {
 	GLfloat position[3];
@@ -23,18 +22,18 @@ public:
 
 	void ImportMesh(aiMesh* mesh);
 
-	void GenVertexBufferObj();
-	void GenIndexBufferObj();
-	void GenVertexArrayObj();
+	void GenVBO(); //vertex buffer object
+	void GenIBO(); //index buffer object
+	void GenVAO(); //vertex array object
 
 public:
 	Vertex* vertices = nullptr;
-	uint vertices_size = 0;
+	uint num_vertices = 0;
 
 	GLuint* indices = nullptr;
-	uint indices_size = 0;
+	uint num_indices = 0;
 
-	GLuint vertex_buf_obj = 0;
-	GLuint index_buf_obj = 0;
-	GLuint vertex_arr_obj = 0;
+	GLuint VBO = 0;
+	GLuint IBO = 0;
+	GLuint VAO = 0;
 };

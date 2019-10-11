@@ -98,34 +98,7 @@ bool ModuleSceneIntro::Draw()
 	
 	DrawCube();
 
-	if (m != nullptr) {
-
-		//uint my_id = 0; glGenBuffers(1, (GLuint*) &(my_id)); 
-		//glBindBuffer(GL_ARRAY_BUFFER, my_id); 
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(float)*m->vertices_size * 3, m->vertices, GL_STATIC_DRAW);
-
-		//glEnableClientState(GL_VERTEX_ARRAY); 
-		//glBindBuffer(GL_ARRAY_BUFFER, my_id); 
-		//glVertexPointer(3, GL_FLOAT, 0, NULL);
-		//// ... draw other buffers
-		//glDrawArrays(GL_TRIANGLES, 0, m->vertices_size);
-		//glDisableClientState(GL_VERTEX_ARRAY);
-
-
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glBindVertexArray(m->vertex_arr_obj);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->index_buf_obj);
-
-		glDrawElements(GL_TRIANGLES, m->indices_size, GL_UNSIGNED_INT, NULL);
-
-		//Unbind
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		glDisableClientState(GL_VERTEX_ARRAY);
-
-
-	}
+	App->resources->Draw();
 
 	/*par_shapes_mesh* s = par_shapes_create_cone(10, 10);
 	par_shapes_translate(s, 0, 0, 0);

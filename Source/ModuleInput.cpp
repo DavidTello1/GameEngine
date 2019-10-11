@@ -1,10 +1,11 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleInput.h"
+#include "ModuleResources.h"
+
 #include "ImGui/imgui.h"
 #include "imGui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_opengl3.h"
-#include "ModuleSceneIntro.h"
 
 #define MAX_KEYS 300
 
@@ -88,7 +89,7 @@ bool ModuleInput::PreUpdate(float dt)
 	}
 
 	SDL_Event e;
-	const char* dir;
+	static const char* dir;
 	while (SDL_PollEvent(&e))
 	{
 		ImGui_ImplSDL2_ProcessEvent(&e);
@@ -116,7 +117,7 @@ bool ModuleInput::PreUpdate(float dt)
 
 		case SDL_DROPFILE:
 			dir = e.drop.file;
-			App->scene_intro->m = App->resources->LoadFBX(dir);
+			App->resources->LoadResource(dir);
 			SDL_free(e.drop.file);
 			break;
 

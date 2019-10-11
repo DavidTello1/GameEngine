@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Module.h"
+#include "Resources.h"
 
 class Mesh;
 
@@ -18,7 +19,10 @@ public:
 	bool CleanUp();
 
 	void Draw();
-	Mesh* LoadFBX(const char* path);
+
+	Resources::Type GetResourceType(const char* path);
+	void LoadResource(const char* path, Resources::Type type = Resources::Type::unknown);
+	void UnLoadResource();
 
 private:
 	std::vector<Mesh*> meshes;
