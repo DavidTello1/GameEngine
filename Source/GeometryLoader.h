@@ -20,7 +20,7 @@ struct MeshData {
 	float* vertex = nullptr;
 };
 
-class GeometryLoader : Module
+class GeometryLoader : public Module
 {
 public:
 
@@ -29,7 +29,7 @@ public:
 
 
 	bool Start();
-	bool LoadModel(const char * path);
+	static MeshData* LoadModel(const char * path);
 	bool Update(float dt);
 	bool CleanUp();
 

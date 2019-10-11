@@ -7,20 +7,22 @@
 
 ModuleSceneIntro::ModuleSceneIntro(bool start_enabled) : Module("SceneIntro", start_enabled)
 {
-
+	m = nullptr;
 }
 
 ModuleSceneIntro::~ModuleSceneIntro()
 {}
 
 // Load assets
-bool ModuleSceneIntro::Start()
+bool ModuleSceneIntro::Start(Config* config)
 {
 	LOG("Loading Intro assets", 'v');
 	bool ret = true;
 
-	App->camera->Move(vec3(0.0f, 10.0f, 0.0f));
+	App->camera->Move(vec3(0, 0, 0.0f));
 	App->camera->LookAt(vec3(0, 0, 0));
+	
+	m = GeometryLoader::LoadModel("Assets/Warrior.fbx");
 
 	return ret;
 }
@@ -94,6 +96,20 @@ bool ModuleSceneIntro::Draw()
 	
 	DrawCube();
 
+	if (m != nullptr) {
+
+		uint my_id = 0; glGenBuffers(1, (GLuint*) &(my_id)); 
+		glBindBuffer(GL_ARRAY_BUFFER, my_id); 
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*m->num_vertex * 3, m->vertex, GL_STATIC_DRAW);
+
+		glEnableClientState(GL_VERTEX_ARRAY); 
+		glBindBuffer(GL_ARRAY_BUFFER, my_id); 
+		glVertexPointer(3, GL_FLOAT, 0, NULL);
+		// ... draw other buffers
+		glDrawArrays(GL_TRIANGLES, 0, m->num_vertex);
+		glDisableClientState(GL_VERTEX_ARRAY);
+	}
+
 	/*par_shapes_mesh* s = par_shapes_create_cone(10, 10);
 	par_shapes_translate(s, 0, 0, 0);
 
@@ -103,7 +119,7 @@ bool ModuleSceneIntro::Draw()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint)*s->ntriangles, s->triangles, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_indices);
-	glDrawElements(GL_TRIANGLES, s->ntriangles, GL_UNSIGNED_INT, NULL);*/
+	glDrawElements(GL_TRIANGLES, s->ntriangles, GL_UNSIGNED_INT, NULL);
 
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, App->editor->tab_viewport->frame_buffer.id);
 	////glBindVertexArray(s->points);
@@ -115,7 +131,7 @@ bool ModuleSceneIntro::Draw()
 	//glDisableClientState(GL_VERTEX_ARRAY);
 
 	//par_shapes_free_mesh(s);
-
+	*/
 	return true;
 }
 
