@@ -11,6 +11,7 @@
 #include "ModuleEditor.h"
 #include "ModuleFileSystem.h"
 #include "GeometryLoader.h"
+#include "ModuleResources.h"
 #include "Config.h"
 
 #include <list>
@@ -53,6 +54,7 @@ public:
 	ModuleEditor* editor;
 	ModuleFileSystem* file_system;
 	GeometryLoader* assimp;
+	ModuleResources* resources;
 
 private:
 	Timer	ms_timer;

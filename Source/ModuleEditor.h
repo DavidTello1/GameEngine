@@ -55,6 +55,7 @@ private:
 	void DrawAbout(bool &is_about);
 	void DrawPanels();
 	void ConfirmExit();
+	void Shortcuts(bool &is_new, bool &is_open, bool &is_save);
 
 public:
 	Configuration* tab_configuration = nullptr;

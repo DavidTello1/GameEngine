@@ -167,30 +167,30 @@ bool ModuleEditor::CleanUp()
 // First gets drawn the Menus, then panels
 void ModuleEditor::Draw()
 {
+	bool ret = true;
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->window->GetWindow());
 	ImGui::NewFrame();
 
-	bool ret = true;
-
-	bool is_draw_menu = true;
+	// Bools
+	static bool is_draw_menu = true;
 	static bool is_show_main_dockspace = true;
 	static bool is_show_demo = false;
 	static bool is_about = false;
-
 	static bool is_new = false;
 	static bool is_open = false;
 	static bool is_save = false;
-
 	static bool is_import = false;
 
+	// Draw functions
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
 	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import);
 	DrawDemo(is_show_demo);
 	DrawAbout(is_about);
 	DrawPanels();
 
-
+	// Menu Functionalities
 	if (file_dialog == opened)
 		LoadFile((file_dialog_filter.length() > 0) ? file_dialog_filter.c_str() : nullptr);
 	else
@@ -201,52 +201,32 @@ void ModuleEditor::Draw()
 		//...
 		is_new = false;
 	}
-
 	if (is_open)
 	{
 		//...
 		is_open = false;
 	}
-
 	if (is_save) //save
 	{
 		App->file_system->Save(SETTINGS_FOLDER "Engine.log", App->GetLog().c_str(), App->GetLog().size());
 		App->SavePrefs();
 		is_save = false;
 	}
-
 	if (is_import)
 	{
 		//...
 		is_import = false;
 	}
 
-	// --- SHORTCUTS -----------------
-	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
-		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))
-	{
-		is_new = true;
-	}
+	// Shortcuts
+	Shortcuts(is_new, is_open, is_save);
 
-	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN) ||
-		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN))
-	{
-		is_open = true;
-	}
-
-	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN) ||
-		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN))
-	{
-		is_save = true;
-	}
-
-	if ((App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP))
-	{
-		App->input->quit = true;
-	}
-
+	// Are you sure you want to Quit
 	if (App->input->quit == true)
 	{
+		if (is_about)
+			is_about = false;
+
 		ConfirmExit();
 	}
 
@@ -434,8 +414,35 @@ void ModuleEditor::ConfirmExit()
 			ImGui::CloseCurrentPopup();
 			LOG("CANCEL EXIT");
 			close = false;
+			App->input->quit = false;
 		}
 		ImGui::EndPopup();
+	}
+}
+
+void ModuleEditor::Shortcuts(bool &is_new, bool &is_open, bool &is_save)
+{
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))
+	{
+		is_new = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_O) == KEY_DOWN))
+	{
+		is_open = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN) ||
+		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_S) == KEY_DOWN))
+	{
+		is_save = true;
+	}
+
+	if ((App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP))
+	{
+		App->input->quit = true;
 	}
 }
 
