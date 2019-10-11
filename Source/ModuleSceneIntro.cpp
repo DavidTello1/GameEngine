@@ -23,7 +23,7 @@ bool ModuleSceneIntro::Start(Config* config)
 	App->camera->Move(vec3(0, 0, 0.0f));
 	App->camera->LookAt(vec3(0, 0, 0));
 	
-	m = App->resources->LoadFBX("Assets/Warrior.fbx");
+	//m = App->resources->LoadFBX("Assets/Warrior.fbx");
 	//m = GeometryLoader::LoadModel("Assets/Warrior.fbx");
 
 	return ret;

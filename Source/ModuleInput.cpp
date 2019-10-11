@@ -4,6 +4,7 @@
 #include "ImGui/imgui.h"
 #include "imGui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_opengl3.h"
+#include "ModuleSceneIntro.h"
 
 #define MAX_KEYS 300
 
@@ -87,6 +88,7 @@ bool ModuleInput::PreUpdate(float dt)
 	}
 
 	SDL_Event e;
+	const char* dir;
 	while (SDL_PollEvent(&e))
 	{
 		ImGui_ImplSDL2_ProcessEvent(&e);
@@ -112,12 +114,12 @@ bool ModuleInput::PreUpdate(float dt)
 			mouse_wheel = e.wheel.y;
 			break;
 
-			//case SDL_DROPFILE:
-			//	Event ev(Event::file_dropped);
-			//	ev.string.ptr = event.drop.file;
-			//	App->BroadcastEvent(ev);
-			//	SDL_free(event.drop.file);
-			//	break;
+		case SDL_DROPFILE:
+			dir = e.drop.file;
+			App->scene_intro->m = App->resources->LoadFBX(dir);
+			SDL_free(e.drop.file);
+			break;
+
 		case SDL_QUIT:
 			quit = true;
 			break;
