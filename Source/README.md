@@ -189,5 +189,133 @@ VAOs store all of the links between the attributes and your VBOs with raw vertex
 GLuint vao;
 glGenVertexArrays(1, &vao);
 
+// start using it
 glBindVertexArray(vao);
+```
+As soon as you've bound a certain VAO, every time you call **glVertexAttribPointer**, that information will be stored in that VAO
+Just remember that a VAO **doesn't store any vertex data** by itself, it just **references the VBOs** you've created and how to **retrieve the attribute** values from them.
+
+## Uniforms
+These are essentially global variables, having the same value for all vertices and/or fragments, it is another way to pass data to the shaders.
+[Fragment shader]
+```c++
+#version 150 core
+
+uniform vec3 triangleColor;
+
+out vec4 outColor;
+
+void main()
+{
+    outColor = vec4(triangleColor, 1.0);
+}
+```
+Changing the value of a uniform is just like setting vertex attributes, you first have to grab the location. Then the values of uniforms are changed with any of the **glUniformXY** functions, where X is the number of components and Y is the type. Common types are f (float), d (double) and i (integer).
+```c++
+GLint uniColor = glGetUniformLocation(shaderProgram, "triangleColor");
+glUniform3f(uniColor, 1.0f, 0.0f, 0.0f);
+```
+## Adding more colors
+
+```c++
+float vertices[] = {
+     0.0f,  0.5f, 1.0f, 0.0f, 0.0f, // Vertex 1: Red
+     0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Vertex 2: Green
+    -0.5f, -0.5f, 0.0f, 0.0f, 1.0f  // Vertex 3: Blue
+};
+```
+[Vertex shader]
+```c++
+#version 150 core
+
+in vec2 position;
+in vec3 color;
+
+out vec3 Color;
+
+void main()
+{
+    Color = color;
+    gl_Position = vec4(position, 0.0, 1.0);
+}
+```
+[Fragment shader]
+```c++
+#version 150 core
+
+in vec3 Color;
+
+out vec4 outColor;
+
+void main()
+{
+    outColor = vec4(Color, 1.0);
+}
+```
+
+VAO attribute linking
+```c++
+GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+glEnableVertexAttribArray(posAttrib);
+glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE,
+                       5*sizeof(float), 0);
+
+GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
+glEnableVertexAttribArray(colAttrib);
+glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(2*sizeof(float)));
+```
+The fifth parameter is set to 5*sizeof(float) now, because each vertex consists of 5 floating point attribute values. The offset of 2*sizeof(float) for the color attribute is there because each vertex starts with 2 floating point values for the position that it has to skip over.
+
+## Element buffers
+An element array is filled with unsigned integers referring to vertices bound to GL_ARRAY_BUFFER.
+
+```c++
+GLuint elements[] = {
+    0, 1, 2
+};
+
+GLuint ebo;
+glGenBuffers(1, &ebo);
+...
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+``` 
+
+To make us of this buffer, you'll have to change the draw command. The first parameter is the same as with glDrawArrays, but the other ones all refer to the element buffer. The second parameter specifies the number of indices to draw, the third parameter specifies the type of the element data and the last parameter specifies the offset. The only real difference is that you're talking about indices instead of vertices now.
+```c++
+glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+```
+
+Drawing a rectangle **without element buffer**
+```c++
+float vertices[] = {
+    -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // Top-left
+     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // Top-right
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Bottom-right
+
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Bottom-right
+    -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, // Bottom-left
+    -0.5f,  0.5f, 1.0f, 0.0f, 0.0f  // Top-left
+};
+glDrawArrays(GL_TRIANGLES, 0, 6);
+```
+Drawing a rectangle **with element buffer**
+```c++
+float vertices[] = {
+    -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // Top-left
+     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // Top-right
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Bottom-right
+    -0.5f, -0.5f, 1.0f, 1.0f, 1.0f  // Bottom-left
+};
+
+...
+
+GLuint elements[] = {
+    0, 1, 2,
+    2, 3, 0
+};
+
+...
+
+glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 ```
