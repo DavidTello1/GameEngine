@@ -53,6 +53,9 @@ bool ModuleCamera3D::Update(float dt)
 		float speed = io.MouseWheel * 75.0f * dt;
 		if (speed != 0)
 		{
+			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT || App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
+				speed *= 2.0f;
+
 			newPos -= Z * speed;
 			Position += newPos;
 		}

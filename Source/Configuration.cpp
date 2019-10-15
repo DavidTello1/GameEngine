@@ -35,6 +35,8 @@ void Configuration::Draw()
 	{
 		if (ImGui::BeginMenu("Options"))
 		{
+			in_menu = true;
+
 			if (ImGui::MenuItem("Load Config"))
 				App->LoadPrefs();
 
@@ -43,6 +45,9 @@ void Configuration::Draw()
 
 			ImGui::EndMenu();
 		}
+		else
+			in_menu = false;
+
 		ImGui::EndMenuBar();
 	}
 
