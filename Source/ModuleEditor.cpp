@@ -177,6 +177,7 @@ void ModuleEditor::Draw()
 	static bool is_draw_menu = true;
 	static bool is_show_main_dockspace = true;
 	static bool is_show_demo = false;
+	static bool is_auto_select = false;
 	static bool is_about = false;
 	static bool is_new = false;
 	static bool is_open = false;
@@ -185,10 +186,10 @@ void ModuleEditor::Draw()
 
 	// Draw functions
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
-	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import);
+	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import, is_auto_select);
 	DrawDemo(is_show_demo);
 	DrawAbout(is_about);
-	DrawPanels();
+	DrawPanels(is_auto_select);
 
 	// Menu Functionalities
 	if (file_dialog == opened)
@@ -235,7 +236,7 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import)
+void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_auto_select)
 {
 	bool ret = true;
 
@@ -268,13 +269,20 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("View")) //view
+			if (ImGui::BeginMenu("Windows")) //view
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &GetPanel("Hierarchy")->active);
 				ImGui::MenuItem("Configuration", NULL, &GetPanel("Configuration")->active);
 				ImGui::MenuItem("Inspector", NULL, &GetPanel("Inspector")->active);
 				ImGui::MenuItem("Console", NULL, &GetPanel("Console")->active);
 				ImGui::MenuItem("Assets", NULL, &GetPanel("Assets")->active);
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Options")) //options
+			{
+				ImGui::MenuItem("Autoselect windows", NULL, &is_auto_select);
 
 				ImGui::EndMenu();
 			}
@@ -357,7 +365,7 @@ void ModuleEditor::DrawAbout(bool &is_about)
 	}
 }
 
-void ModuleEditor::DrawPanels()
+void ModuleEditor::DrawPanels(bool &is_auto_select)
 {
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
@@ -379,6 +387,11 @@ void ModuleEditor::DrawPanels()
 					(*it)->Draw();
 				}
 			}
+			if (ImGui::IsWindowHovered() == true && is_auto_select == true)
+			{
+				ImGui::SetWindowFocus();
+			}
+
 			ImGui::End();
 		}
 	}

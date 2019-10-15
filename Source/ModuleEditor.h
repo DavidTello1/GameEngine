@@ -50,10 +50,10 @@ private:
 	void LoadFile(const char* filter_extension = nullptr, const char* from_dir = nullptr);
 	void DrawDirectoryRecursive(const char* directory, const char* filter_extension);
 
-	void DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import);
+	void DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_auto_select);
 	void DrawDemo(bool &is_show_demo);
 	void DrawAbout(bool &is_about);
-	void DrawPanels();
+	void DrawPanels(bool &is_auto_select);
 	void ConfirmExit();
 	void Shortcuts(bool &is_new, bool &is_open, bool &is_save);
 
