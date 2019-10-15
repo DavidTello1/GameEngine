@@ -40,9 +40,9 @@ bool ModuleSceneIntro::CleanUp()
 // Update
 bool ModuleSceneIntro::Update(float dt)
 {
-
 	return true;
 }
+
 void DrawCube()
 {
 	glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
@@ -128,23 +128,23 @@ bool ModuleSceneIntro::Draw()
 void DrawGridPlane()
 {
 	//PLANE -----------------------------
-	glLineWidth(3.0f);
+	glLineWidth(1.0f);
 
 	glBegin(GL_LINES);
 	glColor3ub(255, 255, 255);
 	for (float i = -20; i <= 20; ++i)
 	{
 		glVertex3f(i, 0.f, 0.f);
-		glVertex3f(i, 0, 10.f);
+		glVertex3f(i, 0, 20.f);
 
 		glVertex3f(0.f, 0.f, i);
-		glVertex3f(10.f, 0, i);
+		glVertex3f(20.f, 0, i);
 
 		glVertex3f(i, 0.f, 0.f);
-		glVertex3f(i, 0, -10.f);
+		glVertex3f(i, 0, -20.f);
 
 		glVertex3f(0.f, 0.f, i);
-		glVertex3f(-10.f, 0, i);
+		glVertex3f(-20.f, 0, i);
 	}
 	glEnd();
 }

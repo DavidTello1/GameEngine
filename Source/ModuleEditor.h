@@ -40,13 +40,13 @@ public:
 	const char* CloseFileDialog();
 
 	// Panels
-	int GetWidth(Panel* panel) const { return panel->width; }
-	int GetHeight(Panel* panel) const { return panel->height; }
-	int GetPosX(Panel* panel) const { return panel->pos_x; }
-	int GetPosY(Panel* panel) const { return panel->pos_y; }
+	Panel* GetPanel(const char* name);
+	int GetPanelWidth(Panel* panel) const { return panel->width; }
+	int GetPanelHeight(Panel* panel) const { return panel->height; }
+	int GetPanelPosX(Panel* panel) const { return panel->pos_x; }
+	int GetPanelPosY(Panel* panel) const { return panel->pos_y; }
 
 private:
-	Panel* GetPanel(const char* name);
 	void LoadFile(const char* filter_extension = nullptr, const char* from_dir = nullptr);
 	void DrawDirectoryRecursive(const char* directory, const char* filter_extension);
 

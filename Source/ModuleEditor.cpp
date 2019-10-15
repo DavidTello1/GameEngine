@@ -365,9 +365,19 @@ void ModuleEditor::DrawPanels()
 		{
 			ImGui::SetNextWindowPos(ImVec2((float)(*it)->pos_x, (float)(*it)->pos_y), ImGuiCond_FirstUseEver);
 			ImGui::SetNextWindowSize(ImVec2((float)(*it)->width, (float)(*it)->height), ImGuiCond_FirstUseEver);
-			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
+			if ((*it)->GetName() == "Configuration" || (*it)->GetName() == "Console")
 			{
-				(*it)->Draw();
+				if (ImGui::Begin((*it)->GetName(), &(*it)->active, ImGuiWindowFlags_MenuBar)) //panel has a menu bar
+				{
+					(*it)->Draw();
+				}
+			}
+			else
+			{
+				if (ImGui::Begin((*it)->GetName(), &(*it)->active))
+				{
+					(*it)->Draw();
+				}
 			}
 			ImGui::End();
 		}

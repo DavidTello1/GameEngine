@@ -20,16 +20,13 @@ public:
 	float* GetViewMatrix();
 
 private:
-
 	void CalculateViewMatrix();
-
 	bool orbit;
 
 public:
-	
 	vec3 X, Y, Z, Position, Reference;
+	bool viewport_focus;
 
 private:
-
 	mat4x4 ViewMatrix, ViewMatrixInverse;
 };

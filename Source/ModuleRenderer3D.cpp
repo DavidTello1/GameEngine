@@ -110,7 +110,7 @@ bool ModuleRenderer3D::Init(Config* config)
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 
-	//// Projection matrix for
+	// Projection matrix for
 	OnResize(App->window->GetWidth(), App->window->GetHeight());
 
 	return ret;

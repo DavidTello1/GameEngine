@@ -79,11 +79,11 @@ Resources::Type ModuleResources::GetResourceType(const char* path)
 		extension[i] = tolower(extension[i]);
 	}
 
-	if (extension == "obj" || strcmp("fbx",extension) == 0) // Mesh
+	if (strcmp("obj", extension) == 0 || strcmp("fbx",extension) == 0) // Mesh
 	{
 		return Resources::Type::mesh; 
 	}
-	else if (extension == "dds") // Texture
+	else if (strcmp("png", extension) == 0 || strcmp("dds", extension) == 0) // Texture
 	{
 		return Resources::Type::texture;
 	}

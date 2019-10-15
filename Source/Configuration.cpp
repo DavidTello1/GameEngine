@@ -31,23 +31,20 @@ Configuration::~Configuration()
 
 void Configuration::Draw()
 {
-	if (ImGui::Button("Options"))
-		ImGui::OpenPopup("options_popup");
-	ImGui::SameLine();
-	if (ImGui::BeginPopup("options_popup"))
+	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::Selectable("Load Config"))
-		{ 
-			App->LoadPrefs();
-		}
+		if (ImGui::BeginMenu("Options"))
+		{
+			if (ImGui::MenuItem("Load Config"))
+				App->LoadPrefs();
 
-		if (ImGui::Selectable("Save Config"))
-		{ 
-			App->SavePrefs();
+			if (ImGui::MenuItem("Save Config"))
+				App->SavePrefs();
+
+			ImGui::EndMenu();
 		}
-		ImGui::EndPopup();
+		ImGui::EndMenuBar();
 	}
-	ImGui::NewLine();
 
 	DrawApplication();
 
@@ -127,13 +124,13 @@ void Configuration::DrawApplication()
 
 			// OpenGL
 			ImGui::BulletText("OpenGL Version:");
-			//ImGui::SameLine();
-			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", glGetString(GL_VERSION));
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", glGetString(GL_VERSION));
 
 			// OpenGL
 			ImGui::BulletText("Glew Version:");
-			//ImGui::SameLine();
-			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", glewGetString(GLEW_VERSION));
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", glewGetString(GLEW_VERSION));
 
 			//ImGui
 			ImGui::BulletText("ImGui Version:");

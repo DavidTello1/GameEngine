@@ -1,6 +1,6 @@
 #include "Application.h"
 #include "Viewport.h"
-
+#include "mmgr/mmgr.h"
 
 const int Viewport::default_width = 600;
 const int Viewport::default_height = 600;
@@ -54,6 +54,12 @@ bool Viewport::PreUpdate()
 
 void Viewport::Draw() 
 {
+	if (ImGui::IsWindowFocused() == true) // only accept camera controls if viewport is selected
+		App->camera->viewport_focus = true;
+	else
+		App->camera->viewport_focus = false;
+
+
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height));
