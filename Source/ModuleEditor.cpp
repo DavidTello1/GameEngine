@@ -363,6 +363,8 @@ void ModuleEditor::DrawPanels()
 	{
 		if ((*it)->IsActive())
 		{
+			ImGui::SetNextWindowPos(ImVec2((float)(*it)->pos_x, (float)(*it)->pos_y), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2((float)(*it)->width, (float)(*it)->height), ImGuiCond_FirstUseEver);
 			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
 			{
 				(*it)->Draw();
