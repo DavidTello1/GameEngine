@@ -311,14 +311,15 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 			if (ImGui::BeginMenu("Options")) //options
 			{
 				ImGui::MenuItem("Autoselect windows", NULL, &is_auto_select);
-				if (ImGui::BeginMenu("Debug Draw")) //options
-				{
-					ImGui::MenuItem("Plane", NULL, &is_plane);
-					ImGui::MenuItem("Axis", NULL, &is_axis);
-					ImGui::MenuItem("Wireframe", NULL, &is_wireframe);
 
-					ImGui::EndMenu();
-				}
+				ImGui::Separator();
+				if (ImGui::MenuItem("Show Plane", NULL, &is_plane))
+					show_plane = !show_plane;
+
+				if (ImGui::MenuItem("Show Axis", NULL, &is_axis))
+					show_axis = !show_axis;
+
+				ImGui::MenuItem("Wireframe", NULL, &is_wireframe);
 
 				ImGui::EndMenu();
 			}

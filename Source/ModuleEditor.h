@@ -66,6 +66,9 @@ public:
 	Viewport* tab_viewport = nullptr;
 	Assets* tab_assets = nullptr;
 
+	bool show_plane = true;
+	bool show_axis = true;
+
 private:
 	enum
 	{
@@ -81,7 +84,6 @@ private:
 	//bool capture_keyboard = false;
 	bool in_modal = false;
 	char selected_file[FILE_MAX];
-	bool draw_menu = true;
 	bool close = false;
 };
 

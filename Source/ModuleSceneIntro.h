@@ -14,12 +14,14 @@ public:
 
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
-	bool Draw();
 	bool PostUpdate(float dt);
 	bool CleanUp();
+	
+	bool Draw();
 
-	//Temporary mesh data
-	Mesh* m;
+private:
+	void DrawCube();
+	void DrawGridPlane();
+	void DrawAxis();
 };
 
-void DrawGridPlane();
