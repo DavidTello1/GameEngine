@@ -1,10 +1,12 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleSceneIntro.h"
-#include "glew/include/GL/glew.h"
-#include "par_shapes.h"
 #include "Viewport.h"
 #include "ModuleResources.h"
+
+#include "glew/include/GL/glew.h"
+#include "par_shapes.h"
+#include "mmgr/mmgr.h"
 
 ModuleSceneIntro::ModuleSceneIntro(bool start_enabled) : Module("SceneIntro", start_enabled)
 {}
@@ -45,16 +47,18 @@ bool ModuleSceneIntro::CleanUp()
 
 bool ModuleSceneIntro::Draw()
 {
-	//glLoadIdentity();
-
 	if (App->editor->show_plane)
 		DrawGridPlane();
 	
 	if (App->editor->show_axis)
 		DrawAxis();
 
-	DrawCube();
+	if (App->editor->show_wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	//DrawCube();
 	App->resources->Draw();
 
 	/*par_shapes_mesh* s = par_shapes_create_cone(10, 10);
@@ -156,5 +160,24 @@ void ModuleSceneIntro::DrawGridPlane()
 
 void ModuleSceneIntro::DrawAxis()
 {
+	//AXIS -----------------------------
+	glLineWidth(2.0f);
+	glBegin(GL_LINES);
 
+	// x
+	glColor3ub(255, 0, 0);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(1.0f, 0.0f, 0.0f);
+
+	//y
+	glColor3ub(255, 255, 0);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 1.0f);
+
+	// z
+	glColor3ub(0, 0, 255);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, -1.0f, 0.0f);
+
+	glEnd();
 }

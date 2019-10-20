@@ -68,6 +68,8 @@ public:
 
 	bool show_plane = true;
 	bool show_axis = true;
+	bool show_wireframe = false;
+	bool is_gameobj_selected = false;
 
 private:
 	enum
@@ -85,6 +87,8 @@ private:
 	bool in_modal = false;
 	char selected_file[FILE_MAX];
 	bool close = false;
+
+	bool show_gizmos = false;
 };
 
 #endif

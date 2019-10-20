@@ -7,6 +7,8 @@
 #include "imGui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "mmgr/mmgr.h"
+
 #define MAX_KEYS 300
 
 ModuleInput::ModuleInput(bool start_enabled) : Module("Input", start_enabled)

@@ -319,7 +319,8 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				if (ImGui::MenuItem("Show Axis", NULL, &is_axis))
 					show_axis = !show_axis;
 
-				ImGui::MenuItem("Wireframe", NULL, &is_wireframe);
+				if (ImGui::MenuItem("Wireframe", NULL, &is_wireframe))
+					show_wireframe = !show_wireframe;
 
 				ImGui::EndMenu();
 			}
@@ -412,24 +413,20 @@ void ModuleEditor::DrawPanels(bool &is_auto_select)
 		{
 			ImGui::SetNextWindowPos(ImVec2((float)(*it)->pos_x, (float)(*it)->pos_y), ImGuiCond_FirstUseEver);
 			ImGui::SetNextWindowSize(ImVec2((float)(*it)->width, (float)(*it)->height), ImGuiCond_FirstUseEver);
+
 			if ((*it)->GetName() == "Configuration" || (*it)->GetName() == "Console")
 			{
 				if (ImGui::Begin((*it)->GetName(), &(*it)->active, ImGuiWindowFlags_MenuBar)) //panel has a menu bar
-				{
 					(*it)->Draw();
-				}
 			}
 			else
 			{
 				if (ImGui::Begin((*it)->GetName(), &(*it)->active))
-				{
 					(*it)->Draw();
-				}
 			}
-			if (ImGui::IsWindowHovered() == true && is_auto_select == true && (*it)->in_menu == false)
-			{
+			
+			if (is_auto_select == true && ImGui::IsWindowHovered() == true && (*it)->in_menu == false) // auto-select
 				ImGui::SetWindowFocus();
-			}
 
 			ImGui::End();
 		}
@@ -660,9 +657,7 @@ Panel* ModuleEditor::GetPanel(const char* name)
 	for (vector<Panel*>::iterator it = panels.begin(); it != panels.end(); ++it)
 	{
 		if ((*it)->GetName() == name)
-		{
 			return (*it);
-		}
 	}
 	return nullptr;
 }
