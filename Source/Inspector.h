@@ -16,13 +16,13 @@ public:
 	~Inspector();
 
 	void Draw();
-//	void SetTranslation(float x, float y, float z);
-//	void SetRotation(float x, float y, float z);
-//	void SetScale(float x, float y, float z);
-//
-//	//void GetTriangles();
-//
-//private:
-//	float3 translation, rotation, scale;
+	void SetTranslation(float x, float y, float z);
+	void SetRotation(float x, float y, float z);
+	void SetScale(float x, float y, float z);
+
+	//void GetTriangles();
+
+private:
+	float3 translation, rotation, scale;
 	float min, max;
 };

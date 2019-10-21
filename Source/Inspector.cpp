@@ -23,47 +23,47 @@ Inspector::~Inspector()
 
 void Inspector::Draw() 
 {
-	//if (App->editor->GetSelectedGameobj() == nullptr)
-	//	translation = rotation = scale = float3::zero;
+	if (App->editor->GetSelectedGameobj() == nullptr)
+		translation = rotation = scale = float3::zero;
 
-	//ImGui::Text("Transform");
+	ImGui::Text("Transform");
+	ImGui::Separator();
+
+	// Translate
+	ImGui::Columns(1, "##value", false);
+	ImGui::Text("Translation");
+	ImGui::Columns(3, "##value", false);
+	ImGui::InputFloat("X", &translation.x, min, max);
+	ImGui::NextColumn();
+	ImGui::InputFloat("Y", &translation.y, min, max);
+	ImGui::NextColumn();
+	ImGui::InputFloat("Z", &translation.z, min, max);
+	ImGui::NextColumn();
+
+	// Rotate
+	ImGui::Columns(1,"##value",false);
+	ImGui::Text("Rotation");
+	ImGui::Columns(3, "##value", false);
+	ImGui::InputFloat("X", &rotation.x, min, max);
+	ImGui::NextColumn();
+	ImGui::InputFloat("Y", &rotation.y, min, max);
+	ImGui::NextColumn();
+	ImGui::InputFloat("Z", &rotation.z, min, max);
+	ImGui::NextColumn();
+
+	// Scale
+	ImGui::Columns(1, "##value", false);
+	ImGui::Text("Scale");
+	ImGui::Columns(3, "##value", false);
+	ImGui::InputFloat("X", &scale.x, min, max);
+	ImGui::NextColumn();
+	ImGui::InputFloat("Y", &scale.y, min, max);
+	ImGui::NextColumn();
+	ImGui::InputFloat("Z", &scale.z, min, max);
+	ImGui::NextColumn();
+
 	//ImGui::Separator();
-
-	//// Translate
-	//ImGui::Columns(1, "##value", false);
-	//ImGui::Text("Translation");
-	//ImGui::Columns(3, "##value", false);
-	//ImGui::InputFloat("X", &translation.x, min, max);
-	//ImGui::NextColumn();
-	//ImGui::InputFloat("Y", &translation.y, min, max);
-	//ImGui::NextColumn();
-	//ImGui::InputFloat("Z", &translation.z, min, max);
-	//ImGui::NextColumn();
-
-	//// Rotate
-	//ImGui::Columns(1,"##value",false);
-	//ImGui::Text("Rotation");
-	//ImGui::Columns(3, "##value", false);
-	//ImGui::InputFloat("X", &rotation.x, min, max);
-	//ImGui::NextColumn();
-	//ImGui::InputFloat("Y", &rotation.y, min, max);
-	//ImGui::NextColumn();
-	//ImGui::InputFloat("Z", &rotation.z, min, max);
-	//ImGui::NextColumn();
-
-	//// Scale
-	//ImGui::Columns(1, "##value", false);
-	//ImGui::Text("Scale");
-	//ImGui::Columns(3, "##value", false);
-	//ImGui::InputFloat("X", &scale.x, min, max);
-	//ImGui::NextColumn();
-	//ImGui::InputFloat("Y", &scale.y, min, max);
-	//ImGui::NextColumn();
-	//ImGui::InputFloat("Z", &scale.z, min, max);
-	//ImGui::NextColumn();
-
-	////ImGui::Separator();
-	////ImGui::Text("Advanced");
-	////ImGui::Text("Triangle count: %d", 9564);
+	//ImGui::Text("Advanced");
+	//ImGui::Text("Triangle count: %d", 9564);
 
 }

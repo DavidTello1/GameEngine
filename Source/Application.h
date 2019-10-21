@@ -13,7 +13,7 @@
 #include "ModuleResources.h"
 #include "Config.h"
 
-//#include "MathGeoLib/include/Algorithm/Random/LCG.h"
+#include "MathGeoLib/include/Algorithm/Random/LCG.h"
 
 #include <list>
 
@@ -41,7 +41,7 @@ public:
 	void LoadPrefs();
 	void SavePrefs() const;
 
-	//LCG& Random() { return *random; }
+	LCG& Random() { return *random; }
 
 private:
 	void PrepareUpdate();
@@ -49,7 +49,7 @@ private:
 
 
 public:
-	//LCG* random = nullptr;
+	LCG* random = nullptr;
 
 	ModuleWindow* window;
 	ModuleInput* input;
