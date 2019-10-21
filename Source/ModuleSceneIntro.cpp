@@ -161,7 +161,7 @@ void ModuleSceneIntro::DrawGridPlane()
 void ModuleSceneIntro::DrawAxis()
 {
 	//AXIS -----------------------------
-	glLineWidth(2.0f);
+	glLineWidth(3.0f);
 	glBegin(GL_LINES);
 
 	// x

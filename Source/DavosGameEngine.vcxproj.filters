@@ -43,6 +43,9 @@
     <Filter Include="Sources\Resources">
       <UniqueIdentifier>{071ddd9b-e0ee-491c-a662-5831def098dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\GameObjects">
+      <UniqueIdentifier>{cfab9f7b-d2bf-4d7e-998f-201454c89031}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -258,9 +261,6 @@
     <ClInclude Include="parson\parson.h">
       <Filter>Sources\Containers\parson</Filter>
     </ClInclude>
-    <ClInclude Include="MathGeoLib\Math.h">
-      <Filter>Sources\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="Assets.h">
       <Filter>Sources\Panels</Filter>
     </ClInclude>
@@ -278,6 +278,9 @@
     </ClInclude>
     <ClInclude Include="par_shapes.h">
       <Filter>Sources\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Sources\GameObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -385,6 +388,9 @@
     </ClCompile>
     <ClCompile Include="par_shapes.cpp">
       <Filter>Sources\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Sources\GameObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

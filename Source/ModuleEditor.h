@@ -14,6 +14,8 @@ class Inspector;
 class Assets;
 class Viewport;
 
+class GameObject;
+
 class ModuleEditor : public Module
 {
 private:
@@ -46,6 +48,9 @@ public:
 	int GetPanelPosX(Panel* panel) const { return panel->pos_x; }
 	int GetPanelPosY(Panel* panel) const { return panel->pos_y; }
 	bool GetPanelActive(Panel* panel) const { return panel->active; }
+
+	// Game Objects
+	GameObject* GetSelectedGameobj() { return selected_gameobj; }
 
 private:
 	void LoadFile(const char* filter_extension = nullptr, const char* from_dir = nullptr);
@@ -82,13 +87,13 @@ private:
 	std::string file_dialog_filter;
 	std::string file_dialog_origin;
 
-	//bool capture_mouse = false;
-	//bool capture_keyboard = false;
 	bool in_modal = false;
 	char selected_file[FILE_MAX];
 	bool close = false;
 
 	bool show_gizmos = false;
+	GameObject* selected_gameobj = nullptr;
+
 };
 
 #endif

@@ -1,7 +1,10 @@
 #include "Inspector.h"
+#include "Application.h"
+#include "ModuleEditor.h"
+#include "GameObject.h"
+
 #include "Imgui/imgui.h"
 #include "mmgr/mmgr.h"
-
 
 Inspector::Inspector() : Panel("Inspector")
 {
@@ -9,59 +12,58 @@ Inspector::Inspector() : Panel("Inspector")
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
-}
 
+	min = -3000;
+	max = 3000;
+}
 
 Inspector::~Inspector()
 {
 }
 
-void Inspector::Draw() {
+void Inspector::Draw() 
+{
+	//if (App->editor->GetSelectedGameobj() == nullptr)
+	//	translation = rotation = scale = float3::zero;
 
-	float dummy = 0;
-	float min = -340000000;
-	float max = 340000000;
-	ImGui::Text("Transform");
-	ImGui::Separator();
+	//ImGui::Text("Transform");
+	//ImGui::Separator();
 
-	ImGui::Columns(1, "##value", false);
-	// Translate
-	ImGui::Text("Translation");
-	ImGui::Columns(3, "##value", false);
-	ImGui::InputFloat("X",&dummy,min,max);
-	ImGui::NextColumn();
-	ImGui::InputFloat("Y", &dummy, min, max);
-	ImGui::NextColumn();
-	ImGui::InputFloat("Z", &dummy, min, max);
-	ImGui::NextColumn();
+	//// Translate
+	//ImGui::Columns(1, "##value", false);
+	//ImGui::Text("Translation");
+	//ImGui::Columns(3, "##value", false);
+	//ImGui::InputFloat("X", &translation.x, min, max);
+	//ImGui::NextColumn();
+	//ImGui::InputFloat("Y", &translation.y, min, max);
+	//ImGui::NextColumn();
+	//ImGui::InputFloat("Z", &translation.z, min, max);
+	//ImGui::NextColumn();
 
-	ImGui::Columns(1,"##value",false);
-	// Rotate
-	ImGui::Text("Rotation");
-	ImGui::Columns(3, "##value", false);
-	ImGui::InputFloat("X", &dummy, min, max);
-	ImGui::NextColumn();
-	ImGui::InputFloat("Y", &dummy, min, max);
-	ImGui::NextColumn();
-	ImGui::InputFloat("Z", &dummy, min, max);
-	ImGui::NextColumn();
+	//// Rotate
+	//ImGui::Columns(1,"##value",false);
+	//ImGui::Text("Rotation");
+	//ImGui::Columns(3, "##value", false);
+	//ImGui::InputFloat("X", &rotation.x, min, max);
+	//ImGui::NextColumn();
+	//ImGui::InputFloat("Y", &rotation.y, min, max);
+	//ImGui::NextColumn();
+	//ImGui::InputFloat("Z", &rotation.z, min, max);
+	//ImGui::NextColumn();
 
-	ImGui::Columns(1, "##value", false);
-	// Scale
-	ImGui::Text("Scaling");
-	ImGui::Columns(3, "##value", false);
-	ImGui::InputFloat("X", &dummy, min, max);
-	ImGui::NextColumn();
-	ImGui::InputFloat("Y", &dummy, min, max);
-	ImGui::NextColumn();
-	ImGui::InputFloat("Z", &dummy, min, max);
-	ImGui::NextColumn();
+	//// Scale
+	//ImGui::Columns(1, "##value", false);
+	//ImGui::Text("Scale");
+	//ImGui::Columns(3, "##value", false);
+	//ImGui::InputFloat("X", &scale.x, min, max);
+	//ImGui::NextColumn();
+	//ImGui::InputFloat("Y", &scale.y, min, max);
+	//ImGui::NextColumn();
+	//ImGui::InputFloat("Z", &scale.z, min, max);
+	//ImGui::NextColumn();
 
-	ImGui::Separator();
-	ImGui::Text("Advanced");
-	ImGui::Text("Triangle count: %d", 9564);
-	ImGui::Text("Triangle count: %d", 9564);
-	ImGui::Text("Triangle count: %d", 9564);
-	ImGui::Text("Triangle count: %d", 9564);
+	////ImGui::Separator();
+	////ImGui::Text("Advanced");
+	////ImGui::Text("Triangle count: %d", 9564);
 
 }

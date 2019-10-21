@@ -13,6 +13,8 @@
 #include "ModuleResources.h"
 #include "Config.h"
 
+//#include "MathGeoLib/include/Algorithm/Random/LCG.h"
+
 #include <list>
 
 class Application
@@ -39,12 +41,16 @@ public:
 	void LoadPrefs();
 	void SavePrefs() const;
 
+	//LCG& Random() { return *random; }
+
 private:
 	void PrepareUpdate();
 	void FinishUpdate();
 
 
 public:
+	//LCG* random = nullptr;
+
 	ModuleWindow* window;
 	ModuleInput* input;
 	ModuleSceneIntro* scene_intro;
