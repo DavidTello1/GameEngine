@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "Application.h"
+#include "ModuleSceneIntro.h"
 #include "ModuleResources.h"
 #include "ModuleFileSystem.h"
 //#include "ModuleTextures.h"
@@ -42,29 +43,7 @@ bool ModuleResources::Start(Config* config)
 
 bool ModuleResources::CleanUp()
 {
-	for (int i = 0; i < meshes.size(); i++) //meshes
-	{
-		delete meshes[i];
-	}
-	meshes.clear();
-
 	return true;
-}
-
-void ModuleResources::Draw()
-{
-	for (int i = 0; i < meshes.size(); i++)
-	{
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glBindVertexArray(meshes[i]->VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshes[i]->IBO);
-
-		glDrawElements(GL_TRIANGLES, meshes[i]->num_indices, GL_UNSIGNED_INT, NULL);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		glDisableClientState(GL_VERTEX_ARRAY);
-	}
 }
 
 //---------------------------------
@@ -95,10 +74,11 @@ Resources::Type ModuleResources::GetResourceType(const char* path)
 void ModuleResources::LoadResource(const char* path, Resources::Type type)
 {
 	if (type == Resources::Type::unknown)
-	{
 		type = GetResourceType(path);
-	}
-	
+
+	if (type != Resources::Type::unknown)
+		App->scene_intro->selected_gameobj = App->scene_intro->CreateGameObj();
+
 	if (type == Resources::Type::mesh) // Mesh
 	{
 		const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
@@ -108,7 +88,7 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 			for (uint i = 0; i < scene->mNumMeshes; ++i)
 			{
 				Mesh* new_mesh = new Mesh();
-				meshes.push_back(new_mesh);
+				App->scene_intro->selected_gameobj->meshes.push_back(new_mesh);
 
 				aiMesh* mesh = scene->mMeshes[i];
 				new_mesh->ImportMesh(mesh);

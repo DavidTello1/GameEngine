@@ -11,6 +11,9 @@ GameObject::GameObject(const char* name)
 
 GameObject::~GameObject()
 {
+	for (int i = 0; i < meshes.size(); i++)
+		delete meshes[i];
+	meshes.clear();
 }
 
 void GameObject::SetLocalRotation(const float3& XYZ_euler_rotation)

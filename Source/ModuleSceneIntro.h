@@ -2,6 +2,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "Mesh.h"
+#include "GameObject.h"
 
 #define MAX_SNAKE 2
 
@@ -18,9 +19,20 @@ public:
 	
 	bool Draw();
 
+	GameObject* CreateGameObj();
+	GameObject* GetSelectedGameobj() { return selected_gameobj; }
+	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj;  }
+
 private:
 	void DrawCube();
 	void DrawGridPlane();
 	void DrawAxis();
+
+public:
+	GameObject* selected_gameobj = nullptr;
+	bool create_gameobj = false;
+
+private:
+	std::vector<GameObject*> gameobjs;
 };
 

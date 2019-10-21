@@ -108,8 +108,8 @@ bool ModuleEditor::Start(Config* config)
 {
 	// Create panels
 	panels.push_back(tab_hierarchy = new Hierarchy());
-	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_inspector = new Inspector());
+	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_console = new Console());
 	panels.push_back(tab_assets = new Assets());
 	panels.push_back(tab_viewport = new Viewport());
@@ -428,6 +428,11 @@ void ModuleEditor::DrawPanels(bool &is_auto_select)
 			if (is_auto_select == true && ImGui::IsWindowHovered() == true && (*it)->in_menu == false) // auto-select
 				ImGui::SetWindowFocus();
 
+			if (App->scene_intro->create_gameobj == true && (*it)->GetName() == "Inspector") //show inspector when a gameobject is created
+			{
+				ImGui::SetWindowFocus();
+				App->scene_intro->create_gameobj = false;
+			}
 			ImGui::End();
 		}
 	}

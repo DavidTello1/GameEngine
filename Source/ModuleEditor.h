@@ -14,8 +14,6 @@ class Inspector;
 class Assets;
 class Viewport;
 
-class GameObject;
-
 class ModuleEditor : public Module
 {
 private:
@@ -49,9 +47,6 @@ public:
 	int GetPanelPosY(Panel* panel) const { return panel->pos_y; }
 	bool GetPanelActive(Panel* panel) const { return panel->active; }
 
-	// Game Objects
-	GameObject* GetSelectedGameobj() { return selected_gameobj; }
-
 private:
 	void LoadFile(const char* filter_extension = nullptr, const char* from_dir = nullptr);
 	void DrawDirectoryRecursive(const char* directory, const char* filter_extension);
@@ -74,7 +69,6 @@ public:
 	bool show_plane = true;
 	bool show_axis = true;
 	bool show_wireframe = false;
-	bool is_gameobj_selected = false;
 
 private:
 	enum
@@ -92,8 +86,6 @@ private:
 	bool close = false;
 
 	bool show_gizmos = false;
-	GameObject* selected_gameobj = nullptr;
-
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include "ModuleSceneIntro.h"
 #include "Viewport.h"
 #include "ModuleResources.h"
+#include "GameObject.h"
 
 #include "glew/include/GL/glew.h"
 #include "par_shapes.h"
@@ -42,50 +43,67 @@ bool ModuleSceneIntro::CleanUp()
 {
 	LOG("Unloading Intro scene");
 
+	for (uint i = 0; i < gameobjs.size(); ++i)
+	{
+		delete gameobjs[i];
+	}
+	gameobjs.clear();
+
 	return true;
 }
 
 bool ModuleSceneIntro::Draw()
 {
-	if (App->editor->show_plane)
+	if (App->editor->show_plane) // plane
 		DrawGridPlane();
 	
-	if (App->editor->show_axis)
+	if (App->editor->show_axis) // axis
 		DrawAxis();
 
-	if (App->editor->show_wireframe)
+	if (App->editor->show_wireframe) //wireframe
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	//DrawCube();
-	App->resources->Draw();
 
-	/*par_shapes_mesh* s = par_shapes_create_cone(10, 10);
-	par_shapes_translate(s, 0, 0, 0);
+	// Draw GameObjects
+	for (int i = 0; i < gameobjs.size(); i++)
+	{
+		if (gameobjs[i]->active)
+		{
+			for (int j = 0; j < gameobjs[i]->meshes.size(); j++) //meshes
+			{
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glBindVertexArray(gameobjs[i]->meshes[j]->VAO);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gameobjs[i]->meshes[j]->IBO);
 
-	GLuint my_indices = 0;
-	glGenBuffers(1, (GLuint*) &(my_indices));
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_indices);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint)*s->ntriangles, s->triangles, GL_STATIC_DRAW);
+				glDrawElements(GL_TRIANGLES, gameobjs[i]->meshes[j]->num_indices, GL_UNSIGNED_INT, NULL);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_indices);
-	glDrawElements(GL_TRIANGLES, s->ntriangles, GL_UNSIGNED_INT, NULL);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+				glBindVertexArray(0);
+				glDisableClientState(GL_VERTEX_ARRAY);
+			}
+		}
+	}
 
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, App->editor->tab_viewport->frame_buffer.id);
-	////glBindVertexArray(s->points);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float)*s->npoints, s->points, GL_STATIC_DRAW);
-	//glEnableClientState(GL_VERTEX_ARRAY);
-	//glVertexPointer(3, GL_FLOAT, 0, NULL);
-	////glDrawArrays(GL_TRIANGLES, 0, s->npoints);
-	//glDrawElements(GL_TRIANGLES, s->npoints, GL_UNSIGNED_INT, NULL);
-	//glDisableClientState(GL_VERTEX_ARRAY);
-
-	//par_shapes_free_mesh(s);
-	*/
 	return true;
 }
 
+GameObject* ModuleSceneIntro::CreateGameObj()
+{
+	create_gameobj = true;
+	std::string name = "GameObject ";
+	name.append(std::to_string(gameobjs.size()));
+
+	GameObject* obj = new GameObject(name.data());
+	gameobjs.push_back(obj);
+
+	return obj;
+}
+
+
+//--------------------------------------------------------
 void ModuleSceneIntro::DrawCube()
 {
 	glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads

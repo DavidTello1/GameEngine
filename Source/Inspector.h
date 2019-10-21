@@ -2,6 +2,7 @@
 
 #include "Panel.h"
 #include "Math.h"
+#include "GameObject.h"
 
 class Inspector : public Panel
 {
@@ -16,13 +17,13 @@ public:
 	~Inspector();
 
 	void Draw();
-	void SetTranslation(float x, float y, float z);
-	void SetRotation(float x, float y, float z);
-	void SetScale(float x, float y, float z);
+	void SetPosition(GameObject* Object, float3 Position) { Object->SetLocalPosition(Position); }
+	void SetRotation(GameObject* Object, float3 Rotation) { Object->SetLocalRotation(Rotation); }
+	void SetScale(GameObject* Object, float3 Scale) { Object->SetLocalScale(Scale); }
 
 	//void GetTriangles();
 
 private:
-	float3 translation, rotation, scale;
-	float min, max;
+	GameObject* obj = nullptr;
+	float3 position, rotation, scale;
 };
