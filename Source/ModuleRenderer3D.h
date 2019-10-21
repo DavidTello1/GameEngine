@@ -19,16 +19,12 @@ public:
 	void Load(Config* config);
 	void Save(Config* config) const;
 
-	void OnResize(int width, int height);
-
 	void SetVSync(bool vsync);
 	bool GetVSync() const { return vsync; }
 	const char* GetDriver() const { return SDL_GetCurrentVideoDriver(); }
 
 public:
 	SDL_GLContext context;
-	mat3x3 NormalMatrix;
-	mat4x4 ModelMatrix, ViewMatrix, ProjectionMatrix;
 
 	bool vsync = false;
 	bool in_game = false;

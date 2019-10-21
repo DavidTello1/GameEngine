@@ -1,7 +1,6 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
-#include "GeometryLoader.h"
 #include "Mesh.h"
 
 #define MAX_SNAKE 2

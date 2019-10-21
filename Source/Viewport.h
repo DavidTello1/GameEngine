@@ -42,5 +42,6 @@ public:
 	mat4x4 model_matrix, view_matrix, projection_matrix;
 
 	ImVec2 window_avail_size;
+
 };
 

@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Viewport.h"
+#include "Shader.h"
 
 
 const int Viewport::default_width = 600;
@@ -13,6 +14,7 @@ Viewport::Viewport() : Panel("Viewport")
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
+
 }
 
 
@@ -75,6 +77,8 @@ bool Viewport::CleanUp()
 {
 	RemoveBuffer(frame_buffer);
 
+	
+
 	return true;
 }
 
@@ -85,8 +89,7 @@ bool Viewport::GenerateFBO(ImVec2 size)
 	glGenFramebuffers(1, &frame_buffer.id);
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
-		glGenTextures(1, &frame_buffer.tex);
+	glGenTextures(1, &frame_buffer.tex);
 	glBindTexture(GL_TEXTURE_2D, frame_buffer.tex);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -103,8 +106,7 @@ bool Viewport::GenerateFBO(ImVec2 size)
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//OnResize(pos_x, pos_y, width, height);
 	return true;

@@ -22,7 +22,7 @@ void log(const char file[], int line, const char* format, ...)
 	va_end(ap);
 
 	//Default visual studio logging
-	sprintf_s(tmp_string2, 4096, "%s(%d) : %s", file, line, tmp_string);
+	sprintf_s(tmp_string2, 4096, "\n%s(%d) : %s", file, line, tmp_string);
 	OutputDebugString(tmp_string2);
 
 	//Console logging
@@ -36,8 +36,8 @@ void log(const char file[], int line, const char* format, ...)
 	{
 		if (Console::ShowGeometryLog) 
 		{
-			sprintf_s(tmp_string2, 4096, "[Geometry] %s(%d) : %s", short_file, line, tmp_string);
-			Console::AddLog(tmp_string2);
+			sprintf_s(extendedlog, 4096, "[Geometry] %s(%d) : %s", short_file, line, tmp_string);
+			Console::AddLog(extendedlog);
 		} // else { ignore log }
 	}
 	// debug logs
@@ -45,19 +45,19 @@ void log(const char file[], int line, const char* format, ...)
 	{ 
 		if (Console::ShowDebugLog)
 		{
-			sprintf_s(tmp_string2, 4096, "[Debug] %s(%d) : %s", short_file, line, tmp_string);
-			Console::AddLog(tmp_string2);
+			sprintf_s(extendedlog, 4096, "[Debug] %s(%d) : %s", short_file, line, tmp_string);
+			Console::AddLog(extendedlog);
 		} // else { ignore log }
 	}
 	else if (logtype == 'e') // errors can not be ignored, there's always something to learn
 	{
-		sprintf_s(tmp_string2, 4096, "[Error] %s(%d) : %s", short_file, line, tmp_string);
-		Console::AddLog(tmp_string2);
+		sprintf_s(extendedlog, 4096, "[Error] %s(%d) : %s", short_file, line, tmp_string);
+		Console::AddLog(extendedlog);
 	}
 	// verbose logs
 	else if (Console::ShowVerboseLog) {
-		sprintf_s(tmp_string2, 4096, "[Verbose] %s(%d) : %s", short_file, line,  tmp_string);
-		Console::AddLog(tmp_string2);
+		sprintf_s(extendedlog, 4096, "[Verbose] %s(%d) : %s", short_file, line,  tmp_string);
+		Console::AddLog(extendedlog);
 	} // else { ignore log }
 
 }

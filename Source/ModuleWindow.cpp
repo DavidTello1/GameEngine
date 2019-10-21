@@ -37,7 +37,7 @@ bool ModuleWindow::Init(Config* config)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
-		fullscreen = config->GetBool("Fullscreen", false);
+		fullscreen = config->GetBool("Fullscreen", true);
 		resizable = config->GetBool("Resizable", true);
 		borderless = config->GetBool("Borderless", false);
 		fullscreen_desktop = config->GetBool("Fullscreen Desktop", false);
