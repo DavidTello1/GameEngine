@@ -279,7 +279,6 @@
     <ClInclude Include="par_shapes.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">
@@ -387,7 +386,6 @@
     <ClCompile Include="par_shapes.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

@@ -1,6 +1,5 @@
 #include "Application.h"
 #include "Viewport.h"
-#include "Shader.h"
 
 
 const int Viewport::default_width = 600;

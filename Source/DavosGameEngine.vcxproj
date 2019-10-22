@@ -146,7 +146,6 @@
     <ClInclude Include="parson\parson.h" />
     <ClInclude Include="Resources.h" />
     <ClInclude Include="par_shapes.h" />
-    <ClInclude Include="Shader.h" />
     <ClInclude Include="src\glew\include\GL\eglew.h" />
     <ClInclude Include="src\glew\include\GL\glew.h" />
     <ClInclude Include="src\glew\include\GL\glxew.h" />
@@ -189,7 +188,6 @@
     <ClCompile Include="parson\parson.c" />
     <ClCompile Include="Resources.cpp" />
     <ClCompile Include="par_shapes.cpp" />
-    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Viewport.cpp" />
   </ItemGroup>

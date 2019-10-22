@@ -9,14 +9,6 @@
 
 struct aiMesh;
 
-//struct Vertex
-//{
-//	GLfloat position[3];
-//	GLfloat normal[3];
-//	GLubyte color[4];
-//	GLfloat tex_coords[2];
-//};
-
 class Mesh : public Resources
 {
 public:
@@ -30,9 +22,6 @@ public:
 
 	void GenVBO(); //vertex buffer object
 	void GenIBO(); //index buffer object
-	void GenVAO(); //vertex array object
-
-	void GenShaders();
 
 public:
 	float3* vertices = nullptr;	// Array of vertices (VBO)

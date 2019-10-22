@@ -2,7 +2,6 @@
 #include "Application.h"
 #include "ModuleEditor.h"
 #include "Viewport.h"
-#include "Shader.h"
 
 #include "Assimp/include/cimport.h"
 #include "Assimp/include/scene.h"
@@ -105,8 +104,6 @@ void Mesh::ImportMesh(aiMesh* mesh)
 	GenVBO();
 	LOG("Generating IBO", 'g');
 	GenIBO();
-	LOG("Generating VAO", 'g');
-	GenVAO();
 
 	LOG("Generating Texture", 'g');
 	GenTexture();
@@ -129,8 +126,8 @@ void Mesh::ImportTexture(const char* path)
 	unsigned int imageID;
 	ilGenImages(1, &imageID);
 	ilBindImage(imageID);
-	//ilEnable(IL_ORIGIN_SET);
-	//ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 
 	bool loaded = ilLoadImage(path);
 	if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
@@ -174,81 +171,4 @@ void Mesh::GenIBO()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * num_indices, indices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void Mesh::GenVAO()
-{
-	//glGenVertexArrays(1, &VAO);
-	//glBindVertexArray(VAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, position))); //pos
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, normal))); //normal
-	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)(offsetof(Vertex, color))); //color
-	//glEnableVertexAttribArray(2);
-	//glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, tex_coords))); //texture coordinates
-	//glEnableVertexAttribArray(3);
-	///*
-	//GLint pos_attrib = glGetAttribLocation(shader_program, "position");
-	//glVertexAttribPointer(pos_attrib, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, position))); //pos
-	//glEnableVertexAttribArray(pos_attrib);
-
-	//GLint normal_attrib = glGetAttribLocation(shader_program, "normal");
-	//glVertexAttribPointer(normal_attrib, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, normal))); //normal
-	//glEnableVertexAttribArray(normal_attrib);
-
-	//GLint color_attrib = glGetAttribLocation(shader_program, "color");
-	//glVertexAttribPointer(color_attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)(offsetof(Vertex, color))); //color
-	//glEnableVertexAttribArray(color_attrib);
-
-	//GLint tex_coord_attrib = glGetAttribLocation(shader_program, "tex_coord");
-	//glVertexAttribPointer(tex_coord_attrib, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, tex_coords))); //texture coordinates
-	//glEnableVertexAttribArray(tex_coord_attrib);*/
-
-	//glBindVertexArray(0);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-void CheckShaderErrors(GLuint shader)
-{
-	// Error checking
-	GLint status;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-
-	if (status != GL_TRUE)
-	{
-		char buffer[1024];
-		glGetShaderInfoLog(shader, 1024, NULL, buffer);
-		LOG("%s", buffer, 'e');
-
-	}
-}
-void Mesh::GenShaders()
-{
-	// Create and compile the vertex shader
-	vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex_shader, 1, &Shader::vertex_source, NULL);
-	glCompileShader(vertex_shader);
-
-	//Error checking
-	CheckShaderErrors(vertex_shader);
-
-	// Create and compile the fragment shader
-	fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment_shader, 1, &Shader::fragment_source, NULL);
-	glCompileShader(fragment_shader);
-
-	//Error checking
-	CheckShaderErrors(fragment_shader);
-
-	// Link the vertex and fragment shader into a shader program
-	shader_program = glCreateProgram();
-	glAttachShader(shader_program, vertex_shader);
-	glAttachShader(shader_program, fragment_shader);
-
-	glBindFragDataLocation(shader_program, 0, "outColor");
-
-	glLinkProgram(shader_program);
-	glUseProgram(shader_program);
 }
