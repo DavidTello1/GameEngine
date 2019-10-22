@@ -25,8 +25,8 @@ bool ModuleSceneIntro::Start(Config* config)
 	
 	//m = App->resources->LoadFBX("Assets/Warrior.fbx");
 	//m = GeometryLoader::LoadModel("Assets/Warrior.fbx");
-	App->resources->LoadResource("D:/Users/William/Desktop/Assignment1_Baker_House/BakerHouse.fbx");
-	App->resources->LoadResource("D:/Users/William/Desktop/Assignment1_Baker_House/Baker_house.png");
+	App->resources->LoadResource("Assets/BakerHouse.fbx");
+	App->resources->LoadResource("Assets/Baker_house.png");
 	return ret;
 }
 

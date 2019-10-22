@@ -58,7 +58,7 @@ void Viewport::Draw()
 {
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
-	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height));
+	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
 }
 
 // Is not automatically called
