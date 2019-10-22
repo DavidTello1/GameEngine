@@ -118,22 +118,6 @@ void Mesh::GenTexture()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Mesh::ImportTexture(int width, int height, unsigned char* image)
-{
-	LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image), 'g');
-
-	glGenTextures(1, &TEX);
-	glBindTexture(GL_TEXTURE_2D, TEX);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-}
-
 void Mesh::GenVBO()
 {
 	assert(vertices != nullptr);

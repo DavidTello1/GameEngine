@@ -204,13 +204,31 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 		bool loaded = ilLoadImage(path);
 		if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
 
-		meshes.back()->ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetData());
+		GLuint tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetData());
 		ilDeleteImages(1, &imageID);
 
-		//meshes.back()->ImportTexture(path);
-		(*(meshes.begin()))->TEX = meshes.back()->TEX;
+		meshes.back()->TEX = tex;
+		(*(meshes.begin()))->TEX = tex;
 
 	}
+}
+
+GLuint ModuleResources::ImportTexture(int width, int height, unsigned char* image)
+{
+	LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image), 'g');
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	return texture;
 }
 
 void ModuleResources::UnLoadResource()

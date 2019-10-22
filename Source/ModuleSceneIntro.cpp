@@ -20,11 +20,12 @@ bool ModuleSceneIntro::Start(Config* config)
 	LOG("Loading Intro assets", 'v');
 	bool ret = true;
 
-	App->camera->Move(vec3(0, 0, 0.0f));
+	App->camera->Move(vec3(0, 7.5f, 7.5f));
 	App->camera->LookAt(vec3(0, 0, 0));
 	
 	//m = App->resources->LoadFBX("Assets/Warrior.fbx");
 	//m = GeometryLoader::LoadModel("Assets/Warrior.fbx");
+	//App->resources->LoadResource("Assets/warrior.fbx");
 	App->resources->LoadResource("Assets/BakerHouse.fbx");
 	//App->resources->LoadResource("Assets/Baker_house.png");
 	return ret;

@@ -18,7 +18,6 @@ public:
 
 	void ImportMesh(aiMesh* mesh);
 	void GenTexture();
-	void ImportTexture(int width, int height, unsigned char * image);
 
 	void GenVBO(); //vertex buffer object
 	void GenIBO(); //index buffer object
