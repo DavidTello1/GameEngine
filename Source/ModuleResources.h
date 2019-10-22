@@ -11,7 +11,7 @@ class ModuleResources : public Module
 {
 public:
 
-	void MakeCheckImage();
+	void MakeCheckTexture();
 
 	ModuleResources(bool start_enabled = true);
 	~ModuleResources();
