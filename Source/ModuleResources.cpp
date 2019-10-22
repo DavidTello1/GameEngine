@@ -27,6 +27,44 @@
 
 #include "mmgr/mmgr.h"
 
+/*  Create checkerboard texture  */
+#define checkImageWidth 256
+#define checkImageHeight 256
+static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
+
+GLuint ModuleResources::checker_texture;
+
+void ModuleResources::MakeCheckImage()
+{
+	int i, j, c;
+
+	for (i = 0; i < checkImageHeight; i++) {
+		for (j = 0; j < checkImageWidth; j++) {
+			c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
+			checkImage[i][j][0] = (GLubyte)c;
+			checkImage[i][j][1] = (GLubyte)c;
+			checkImage[i][j][2] = (GLubyte)c;
+			checkImage[i][j][3] = (GLubyte)255;
+		}
+	}
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glGenTextures(1, &checker_texture);
+	glBindTexture(GL_TEXTURE_2D, checker_texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
+		checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+		checkImage);
+
+}
+
 ModuleResources::ModuleResources(bool start_enabled) : Module("Resources", start_enabled)
 {
 }
@@ -52,6 +90,9 @@ bool ModuleResources::Start(Config* config)
 	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
 	stream.callback = AssimpLogCallback;
 	aiAttachLogStream(&stream);
+
+	MakeCheckImage();
+
 	return true;
 }
 
@@ -79,7 +120,8 @@ void ModuleResources::Draw()
 		glBindBuffer(GL_ARRAY_BUFFER, m->VBO);
 		glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-		glBindTexture(GL_TEXTURE_2D, m->TEX);
+		GLuint texture = (m->TEX != 0) ? m->TEX : checker_texture;
+		glBindTexture(GL_TEXTURE_2D, texture);
 
 		glBindBuffer(GL_ARRAY_BUFFER, m->tex_coords_id);
 		glTexCoordPointer(2, GL_FLOAT, 0, NULL);

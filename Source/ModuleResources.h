@@ -11,6 +11,8 @@ class ModuleResources : public Module
 {
 public:
 
+	void MakeCheckImage();
+
 	ModuleResources(bool start_enabled = true);
 	~ModuleResources();
 
@@ -27,6 +29,7 @@ public:
 private:
 	std::vector<Mesh*> meshes;
 
+	static GLuint checker_texture;
 };
 
 #endif
