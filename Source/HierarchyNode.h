@@ -1,30 +1,16 @@
 #pragma once
 #include "Globals.h"
-#include <vector>
+#include "GameObject.h"
 #include "ImGui/imgui.h"
 #include <vector>
 
-#define MAX_NAME_LENGTH 512
-
 class HierarchyNode
 {
-
 public:
-	long id;
-	bool is_selected;
-	char name[MAX_NAME_LENGTH];
-	HierarchyNode* parent;
-	std::vector<HierarchyNode*> childs;
-	ImGuiTreeNodeFlags flags;
-
-	HierarchyNode::HierarchyNode();
-	HierarchyNode::HierarchyNode(HierarchyNode* Parent = nullptr, const char* Name = "Object", ImGuiTreeNodeFlags Flags = leaf_flags );
-	~HierarchyNode();
+	HierarchyNode::HierarchyNode(GameObject* object = nullptr, HierarchyNode* Parent = nullptr, ImGuiTreeNodeFlags Flags = leaf_flags);	~HierarchyNode();
 
 	bool ToggleSelection();
-
 	void SetName(const char * Name);
-	
 	void LogAction(const char* Action);
 
 public:
@@ -33,15 +19,13 @@ public:
 	static const ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 	static const ImGuiTreeNodeFlags leaf_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
 
-private:
+	bool is_selected;
+	const char* name;
+	uint id;
+	HierarchyNode* parent;
+	std::vector<HierarchyNode*> childs;
+	ImGuiTreeNodeFlags flags;
 
-	long lrand()
-	{
-		if (sizeof(int) < sizeof(long))
-			return (static_cast<long>(rand()) << (sizeof(int) * 8)) |
-			rand();
-
-		return rand();
-	}
+	GameObject* obj;
 };
 

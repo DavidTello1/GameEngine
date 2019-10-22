@@ -16,6 +16,9 @@ public:
 	virtual ~GameObject();
 
 	uint GetUID() const { return uid; }
+	const char* GetName() const { return name; }
+	void SetName(const char* Name) { name = Name; }
+	bool IsActive() { return active; }
 
 	// Getters
 	float3 GetLocalPosition() const { return translation; }
@@ -43,6 +46,8 @@ public:
 
 private:
 	uint uid = 0;
+	const char* name;
+	bool active = true;
 
 	Quat rotation_quat = Quat::identity;
 	float3 rotation = float3::zero;
@@ -53,12 +58,8 @@ private:
 
 
 public:
-	bool active = true;
-	const char* name;
-	std::vector<Mesh*> meshes;
-
 	mutable bool visible = false;
-	bool flag_for_removal = false;
+	std::vector<Mesh*> meshes;
 
 };
 #endif

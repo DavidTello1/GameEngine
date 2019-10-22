@@ -20,8 +20,9 @@ public:
 	bool Draw();
 
 	GameObject* CreateGameObj();
+	void DeleteGameobj(GameObject* obj);
 	GameObject* GetSelectedGameobj() { return selected_gameobj; }
-	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj;  }
+	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }
 
 private:
 	void DrawCube();
