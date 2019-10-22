@@ -40,11 +40,22 @@ bool ModuleResources::Init(Config* config)
 	return true;
 }
 
+void AssimpLogCallback(const char *msg, char *userData) {
+	LOG("%s", msg,'g');
+}
+
 bool ModuleResources::Start(Config* config)
 {
 	ilInit();
+	// Stream log messages to Debug window
+	struct aiLogStream stream;
+	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
+	stream.callback = AssimpLogCallback;
+	aiAttachLogStream(&stream);
 	return true;
 }
+
+
 
 bool ModuleResources::CleanUp()
 {
@@ -82,27 +93,6 @@ void ModuleResources::Draw()
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
-	/*for (int i = 0; i < meshes.size(); i++)
-	{
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glBindBuffer(GL_ARRAY_BUFFER, meshes[i]->VBO);
-		glBindVertexArray(meshes[i]->VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshes[i]->IBO);
-
-		glBindTexture(GL_TEXTURE_2D, meshes[i]->TEX);
-		glBindBuffer(GL_ARRAY_BUFFER, meshes[i]->tex_coords_id);
-
-		glDrawElements(GL_TRIANGLES, meshes[i]->num_indices, GL_UNSIGNED_INT, NULL);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindVertexArray(0);
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	}*/
 }
 
 //---------------------------------
@@ -162,9 +152,22 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 	}
 	else if (type == Resources::Type::texture) // Texture
 	{
-		LOG("Resource type is texture", 'd');
-		meshes.back()->ImportTexture(path);
+		// Devil
+		unsigned int imageID;
+		ilGenImages(1, &imageID);
+		ilBindImage(imageID);
+		ilEnable(IL_ORIGIN_SET);
+		ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+
+		bool loaded = ilLoadImage(path);
+		if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
+
+		meshes.back()->ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetData());
+		ilDeleteImages(1, &imageID);
+
+		//meshes.back()->ImportTexture(path);
 		(*(meshes.begin()))->TEX = meshes.back()->TEX;
+
 	}
 }
 

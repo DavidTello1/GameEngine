@@ -105,7 +105,7 @@ void ModuleCamera3D::RotateWithMouse() {
 	int dx, dy;
 	App->input->GetMouseMotion(dx, dy);
 	dx = -dx;
-	dy = dy;
+	dy = -dy;
 
 	float Sensitivity = 0.25f;
 

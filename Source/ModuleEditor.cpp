@@ -101,11 +101,6 @@ bool ModuleEditor::Init(Config* config)
 	// Setup style
 	ImGui::StyleColorsNew();
 
-	return true;
-}
-
-bool ModuleEditor::Start(Config* config)
-{
 	// Create panels
 	panels.push_back(tab_hierarchy = new Hierarchy());
 	panels.push_back(tab_configuration = new Configuration());
@@ -114,6 +109,11 @@ bool ModuleEditor::Start(Config* config)
 	panels.push_back(tab_assets = new Assets());
 	panels.push_back(tab_viewport = new Viewport());
 
+	return true;
+}
+
+bool ModuleEditor::Start(Config* config)
+{
 	tab_viewport->GenerateFBO();
 
 	return true;

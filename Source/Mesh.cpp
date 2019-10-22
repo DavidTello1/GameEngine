@@ -8,15 +8,13 @@
 #include "Assimp/include/postprocess.h"
 #include "Assimp/include/cfileio.h"
 
+
 Mesh::Mesh() : Resources(Resources::Type::mesh)
 {
 }
 
 Mesh::~Mesh()
 {
-	glDeleteProgram(shader_program);
-	glDeleteShader(fragment_shader);
-	glDeleteShader(vertex_shader);
 }
 
 void Mesh::ImportMesh(aiMesh* mesh)
@@ -67,7 +65,7 @@ void Mesh::ImportMesh(aiMesh* mesh)
 
 		for (unsigned i = 0; i < mesh->mNumVertices; ++i)
 		{
-			LOG("Importing texture coord to vertex %u", i, 'g');
+			//LOG("Importing texture coord to vertex %u", i, 'g');
 			tex_coords[i].x = mesh->mTextureCoords[0][i].x;
 			tex_coords[i].y = mesh->mTextureCoords[0][i].y;
 		}
@@ -120,22 +118,11 @@ void Mesh::GenTexture()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Mesh::ImportTexture(const char* path)
+void Mesh::ImportTexture(int width, int height, unsigned char* image)
 {
-	// Devil
-	unsigned int imageID;
-	ilGenImages(1, &imageID);
-	ilBindImage(imageID);
-	ilEnable(IL_ORIGIN_SET);
-	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image), 'g');
 
-	bool loaded = ilLoadImage(path);
-	if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
-
-	LOG("Importing texture [%d,%d] data size: %u", ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), sizeof(ilGetData()), 'g');
-	
 	glGenTextures(1, &TEX);
-	//glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TEX);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -143,11 +130,8 @@ void Mesh::ImportTexture(const char* path)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 0, GL_RGB, GL_UNSIGNED_BYTE, ilGetData());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	ilDeleteImages(1, &imageID);
-
 }
 
 void Mesh::GenVBO()
