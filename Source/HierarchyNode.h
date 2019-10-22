@@ -19,13 +19,16 @@ public:
 	static const ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 	static const ImGuiTreeNodeFlags leaf_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
 
-	bool is_selected;
+	bool is_selected = false;
+	bool is_rename = false;
+
 	const char* name;
+	char tmp_name[120];	
 	uint id;
+
 	HierarchyNode* parent;
 	std::vector<HierarchyNode*> childs;
 	ImGuiTreeNodeFlags flags;
-
 	GameObject* obj;
 };
 

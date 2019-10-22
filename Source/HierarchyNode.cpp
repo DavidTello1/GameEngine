@@ -29,7 +29,7 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 		flags |= ImGuiTreeNodeFlags_Selected;
 		is_selected = true;
 
-		LogAction("Selected");
+		//LogAction("Selected");
 	}
 
 	else // selected
@@ -37,7 +37,7 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 		flags &= ~ImGuiTreeNodeFlags_Selected;
 		is_selected = false;
 		
-		LogAction("Unselected");
+		//LogAction("Unselected");
 	}
 
 	return is_selected;

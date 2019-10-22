@@ -159,72 +159,70 @@ bool Hierarchy::SearchAndDeleteNode(HierarchyNode* n, std::vector<HierarchyNode*
 //-------------------------------------
 void Hierarchy::DrawNodes(std::vector<HierarchyNode*>& v)
 {
-	static char buffer[512] = "";
+	static char buffer[120];
+
 	for (HierarchyNode* node : v)
 	{
-		//TODO In future to be substituited buffer by node.name only, no need to show id
-		sprintf_s(buffer, 512, "%s %ld", node->name, node->id);
-		bool is_open = ImGui::TreeNodeEx(buffer, node->flags);
+		sprintf_s(buffer, 120, "%s %ld", node->name, node->id);
+		strcpy_s(node->tmp_name, 120, node->name);
 
-		// Options menu poped up when right clicking a node
-		if (ImGui::BeginPopupContextItem(buffer))
+		if (node->is_rename == false)
 		{
-			sprintf_s(buffer, 512, "");
+			bool is_open = ImGui::TreeNodeEx(buffer, node->flags);
 
-			ImGui::Text("Options");
-			ImGui::Separator();
-			ImGui::Text("Rename");
-			ImGui::SameLine();
-
-			bool want_rename = ImGui::InputTextWithHint("", (const char*)node->name, buffer, IM_ARRAYSIZE(buffer), ImGuiInputTextFlags_EnterReturnsTrue);
-			ImGui::SameLine();
-			if (want_rename || ImGui::Button("Apply"))
+			if (ImGui::BeginPopupContextItem(buffer)) // Options menu poped up when right clicking a node
 			{
-				node->SetName(buffer);
-				ImGui::CloseCurrentPopup();
+				if (ImGui::MenuItem("Rename"))
+					node->is_rename = true;
+
+				else if (ImGui::MenuItem("Delete"))
+					DeleteNode(node);
+
+				ImGui::EndPopup();
 			}
-			//ImGui::Text("Option #2");
-			//ImGui::Text("Option #3");
-			ImGui::EndPopup();
-		}
 
-		// if treenode is clicked, check whether it is a single or multi selection
-		if (ImGui::IsItemClicked())
-		{
-			if (!ImGui::GetIO().KeyCtrl) // Single selection, clear selected nodes
+			if (ImGui::IsItemClicked()) // if treenode is clicked, check whether it is a single or multi selection
 			{
-				for (HierarchyNode* i : Hierarchy::selected_nodes)
-				{ // Selected nodes has selected state, need to unselect, toggle is safe [panaderia de pan]
-					i->ToggleSelection();
+				if (!ImGui::GetIO().KeyCtrl) // Single selection, clear selected nodes
+				{
+					for (HierarchyNode* i : Hierarchy::selected_nodes) // Selected nodes has selected state, need to unselect, toggle is safe [panaderia de pan]
+						i->ToggleSelection();
+
+					Hierarchy::selected_nodes.clear();
 				}
-				Hierarchy::selected_nodes.clear();
-				LOG("Single selection", 'v');
-			}
-			else
-			{
-				LOG("Multi Selection", 'v');
+
+				if (node->ToggleSelection()) // Always need to toggle the state of selection of the node, getting its current state
+				{
+					Hierarchy::selected_nodes.push_back(node);
+				}
+				else
+				{
+					SearchAndDeleteNode(node, Hierarchy::selected_nodes);
+				}
 			}
 
-			// Always need to toggle the state of selection of the node, getting its current state
-			if (node->ToggleSelection())
+			if (is_open)
 			{
-				Hierarchy::selected_nodes.push_back(node);
-			}
-			else
-			{
-				SearchAndDeleteNode(node, Hierarchy::selected_nodes);
-				//Hierarchy::selected_nodes.erase(Hierarchy::selected_nodes.find(node));
+
+				if (node->childs.size() > 0) // Node is open, need to draw childs if has childs
+					DrawNodes(node->childs);
+
+				ImGui::TreePop();
 			}
 		}
-
-		if (is_open)
+		else // Rename
 		{
-			// Node is open, need to draw childs if has childs
-			if (node->childs.size() > 0)
+			if (node->is_selected == false)
 			{
-				DrawNodes(node->childs);
+				node->is_rename = false;
 			}
-			ImGui::TreePop();
+
+			if (ImGui::InputText("##GameObject", node->tmp_name, 120, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+			{
+				node->obj->SetName(node->tmp_name);
+				node->SetName(node->tmp_name);
+				node->is_rename = false;
+			}
 		}
 	}
 }

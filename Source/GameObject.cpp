@@ -11,7 +11,7 @@ GameObject::GameObject(const char* name)
 
 GameObject::~GameObject()
 {
-	for (int i = 0; i < meshes.size(); i++)
+	for (uint i = 0; i < meshes.size(); i++)
 		delete meshes[i];
 	meshes.clear();
 }
