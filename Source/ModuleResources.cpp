@@ -34,7 +34,7 @@ static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
 
 GLuint ModuleResources::checker_texture;
 
-void ModuleResources::MakeCheckImage()
+void ModuleResources::MakeCheckTexture()
 {
 	int i, j, c;
 
@@ -91,7 +91,7 @@ bool ModuleResources::Start(Config* config)
 	stream.callback = AssimpLogCallback;
 	aiAttachLogStream(&stream);
 
-	MakeCheckImage();
+	MakeCheckTexture();
 
 	return true;
 }
