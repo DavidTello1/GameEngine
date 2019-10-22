@@ -1,3 +1,5 @@
+#include "ModuleSceneIntro.h"
+#include "Application.h"
 #include "HierarchyNode.h"
 
 HierarchyNode::HierarchyNode(GameObject* Obj, HierarchyNode* Parent, ImGuiTreeNodeFlags Flags) {
@@ -28,7 +30,8 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 	{
 		flags |= ImGuiTreeNodeFlags_Selected;
 		is_selected = true;
-
+		
+		App->scene_intro->SetSelectedGameobj(obj);
 		//LogAction("Selected");
 	}
 
@@ -37,6 +40,7 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 		flags &= ~ImGuiTreeNodeFlags_Selected;
 		is_selected = false;
 		
+		App->scene_intro->SetSelectedGameobj(nullptr);
 		//LogAction("Unselected");
 	}
 

@@ -99,7 +99,8 @@ GameObject* ModuleSceneIntro::CreateGameObj()
 	GameObject* obj = new GameObject(name);
 	gameobjs.push_back(obj);
 
-	App->editor->tab_hierarchy->AddNode(obj);
+	App->editor->tab_hierarchy->AddNode(obj); // add node to hierarchy
+	App->scene_intro->selected_gameobj = obj; // new obj is selected_gameobj
 
 	return obj;
 }

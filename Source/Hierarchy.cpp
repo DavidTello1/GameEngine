@@ -45,7 +45,7 @@ void Hierarchy::Draw()
 {
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::MenuItem("Add GameObject"))
+		if (ImGui::MenuItem("Create"))
 			App->scene_intro->CreateGameObj();
 
 		if (ImGui::MenuItem("Add Childs"))

@@ -77,7 +77,7 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 		type = GetResourceType(path);
 
 	if (type != Resources::Type::unknown)
-		App->scene_intro->selected_gameobj = App->scene_intro->CreateGameObj();
+		 App->scene_intro->CreateGameObj();
 
 	if (type == Resources::Type::mesh) // Mesh
 	{
