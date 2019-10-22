@@ -22,7 +22,6 @@ public:
 	GameObject* CreateGameObj();
 	GameObject* GetSelectedGameobj() { return selected_gameobj; }
 	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj;  }
-	void DeleteGameobj(GameObject* obj);
 
 private:
 	void DrawCube();
@@ -33,6 +32,7 @@ public:
 	GameObject* selected_gameobj = nullptr;
 	bool create_gameobj = false;
 
+private:
 	std::vector<GameObject*> gameobjs;
 };
 

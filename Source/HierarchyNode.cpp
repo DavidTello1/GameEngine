@@ -1,38 +1,40 @@
 #include "HierarchyNode.h"
 
-HierarchyNode::HierarchyNode(HierarchyNode* Parent, GameObject* obj, ImGuiTreeNodeFlags Flags)
+HierarchyNode::HierarchyNode()
 {
+	id = lrand();
+	is_selected = false;
+	parent = nullptr;
+	sprintf_s(name, MAX_NAME_LENGTH, "Object");
+	flags = base_flags;
+}
+
+HierarchyNode::HierarchyNode(HierarchyNode* Parent, const char* Name, ImGuiTreeNodeFlags Flags)
+{
+	id = lrand();
 	is_selected = false;
 	parent = Parent;
+	sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
 	flags = Flags;
-
-	if (obj != nullptr)
-	{
-		id = obj->GetUID();
-		name = obj->GetName();
-	}
-	else
-	{
-		id = 0;
-		name = "unknown";
-	}
 }
 
-HierarchyNode::~HierarchyNode()
-{
-}
+HierarchyNode::~HierarchyNode(){}
 
-bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns current state after toggled
+
+// Toggles the state of the node, returns current state after toggled
+bool HierarchyNode::ToggleSelection()
 {
-	if (!is_selected) //not selected
+	// if its NOT selected
+	if (!is_selected)
 	{
 		flags |= ImGuiTreeNodeFlags_Selected;
 		is_selected = true;
 
 		LogAction("Selected");
 	}
-	else //selected
-	{
+
+	// if its selected
+	else {
 		flags &= ~ImGuiTreeNodeFlags_Selected;
 		is_selected = false;
 		
@@ -44,11 +46,16 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 
 void HierarchyNode::SetName(const char* Name)
 {
-	LOG("Renaming node %d from '%s' to '%s'", id, name, Name);
-	name = Name;
+	if (strlen(Name) < MAX_NAME_LENGTH) {
+		LOG("Renaming node %ld from '%s' to '%s'", id, name, Name);
+		sprintf_s(name, MAX_NAME_LENGTH, "%s", Name);
+	}
+	else {
+		LOG("Node name exceeds max length (%d)",MAX_NAME_LENGTH ,'e');
+	}
 }
 
 void HierarchyNode::LogAction(const char * Action)
 {
-	LOG("%s node '%s', id: %dd ", Action, name, id, 'd');
+	LOG("%s node '%s', id: %ld ", Action, name, id, 'd');
 }

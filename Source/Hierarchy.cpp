@@ -1,14 +1,19 @@
-#include "Application.h"
 #include "Hierarchy.h"
 #include "Globals.h"
-
 #include "ImGui/imgui.h"
 #include "mmgr/mmgr.h"
 
-std::vector<HierarchyNode*> Hierarchy::root_nodes; // List of nodes to start drawing
-std::vector<HierarchyNode*> Hierarchy::nodes; // List of all nodes (NOT used to draw)
-std::vector<HierarchyNode*> Hierarchy::selected_nodes; // Temporary list of selected nodes
+char Hierarchy::scene_name[MAX_NAME_LENGTH];
 
+// List of nodes to start drawing
+std::vector<HierarchyNode*> Hierarchy::root_nodes;
+// List of all nodes (NOT used to draw)
+std::vector<HierarchyNode*> Hierarchy::nodes;
+// Temporary list of selected nodes
+std::vector<HierarchyNode*> Hierarchy::selected_nodes;
+
+
+// ---------------------------------------------------------
 Hierarchy::Hierarchy() : Panel("Hierarchy")
 {
 	width = default_width;
@@ -16,71 +21,29 @@ Hierarchy::Hierarchy() : Panel("Hierarchy")
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
 
-	scene_name = "Scene Name";
+	//-----------
+	SetSceneName("Recursively");
+
+	for (int i = 0; i < 6; i++) {
+		AddNode();
+	}
+	AddNode();
+	//-----------
 }
 
 Hierarchy::~Hierarchy()
 {
-	for (int i = 0; i < nodes.size(); i++) //nodes
+	for (int i = 0; i < nodes.size(); i++)
 	{
 		DeleteNode(nodes[i]);
 	}
-	nodes.clear();
-
-	for (int i = 0; i < root_nodes.size(); i++) //root nodes
-	{
-		DeleteNode(root_nodes[i]);
-	}
-	root_nodes.clear();
-
-	for (int i = 0; i < selected_nodes.size(); i++) //selected nodes
-	{
-		DeleteNode(selected_nodes[i]);
-	}
-	selected_nodes.clear();
-
-}
-
-void Hierarchy::Draw()
-{
-	if (ImGui::BeginMenuBar())
-	{
-		if (ImGui::MenuItem("Add Free Node"))
-			AddNode();
-
-		if (ImGui::MenuItem("Add Childs"))
-		{
-			for (HierarchyNode* selected : selected_nodes)
-				AddNode(selected);
-		}
-
-		if (ImGui::MenuItem("Delete"))
-			DeleteSelected();
-
-		ImGui::EndMenuBar();
-	}
-
-	ImGui::Text(scene_name);
-	ImGui::Separator();
-
-	static int prev_size = 0;
-	if (!App->scene_intro->gameobjs.empty() && prev_size < App->scene_intro->gameobjs.size())
-	{
-		prev_size = App->scene_intro->gameobjs.size();
-		for (int i = 0; i < App->scene_intro->gameobjs.size(); i++) // Add a node for each gameobject
-		{
-			AddNode(nullptr, App->scene_intro->gameobjs[i]);
-		}
-	}
-
-	DrawNodes(root_nodes);
 }
 
 // Add a new dummy node, child of the passed node or root node if parent is nullptr
 // Returns pointer to the added node
-HierarchyNode* Hierarchy::AddNode(HierarchyNode* parent, GameObject* object)
+HierarchyNode* Hierarchy::AddNode(HierarchyNode* parent)
 {
-	HierarchyNode* n = new HierarchyNode(parent, object);
+	HierarchyNode* n = new HierarchyNode(parent);
 
 	if (parent == nullptr)
 	{
@@ -104,7 +67,7 @@ HierarchyNode* Hierarchy::AddNode(HierarchyNode* parent, GameObject* object)
 
 }
 
-bool Hierarchy::SearchAndDeleteNode(HierarchyNode* n, std::vector<HierarchyNode*>& v)
+bool SearchAndDeleteNode(HierarchyNode* n, std::vector<HierarchyNode*>& v)
 {
 	if (n == nullptr) return false;
 
@@ -165,82 +128,115 @@ void Hierarchy::DeleteSelected()
 }
 
 // Problems with the last child and parent doing the same thing
-void Hierarchy::DrawNodes(std::vector<HierarchyNode*>& node)
+void DrawNodes(std::vector<HierarchyNode*>& v)
 {
-	static char buffer[120];
-	static char name[120];
-	std::vector<GameObject*> obj = App->scene_intro->gameobjs;
-
-	for (int i = 0; i < obj.size(); i++)
+	static char buffer[512] = "";
+	for (HierarchyNode* node : v)
 	{
-		sprintf_s(buffer, 120, "%s %d", obj[i]->GetName(), i + 1);
-		strcpy_s(name, 120, obj[i]->GetName());
+		//TODO In future to be substituited buffer by node.name only, no need to show id
+		sprintf_s(buffer, 512, "%s %ld", node->name, node->id);
+		bool is_open = ImGui::TreeNodeEx(buffer, node->flags);
 
-		ImVec2 pos = ImGui::GetCursorPos();
-		static bool is_rename = false;
-		bool is_open = false;
-		
-		if (obj[i]->is_rename) // Rename
+		// Options menu poped up when right clicking a node
+		if (ImGui::BeginPopupContextItem(buffer))
 		{
-			ImGui::SetCursorPos(pos);
-			if (ImGui::InputText("", name, 120, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+			sprintf_s(buffer, 512, "");
+
+			ImGui::Text("Options");
+			ImGui::Separator();
+			ImGui::Text("Rename");
+			ImGui::SameLine();
+
+			bool want_rename = ImGui::InputTextWithHint("", (const char*)node->name, buffer, IM_ARRAYSIZE(buffer), ImGuiInputTextFlags_EnterReturnsTrue);
+			ImGui::SameLine();
+			if (want_rename || ImGui::Button("Apply"))
 			{
-				obj[i]->SetName(name);
-				node[i]->SetName(name);
-				obj[i]->is_rename = false;
-			}
-		}
-		else if (ImGui::TreeNodeEx(buffer)) // Normal node
-		{
-			is_open = true;
-		}
-		
-		if (ImGui::BeginPopupContextItem(buffer)) // Options menu poped up when right clicking a node
-		{
-			if (ImGui::MenuItem("Rename"))
-			{
-				obj[i]->is_rename = true;
+				node->SetName(buffer);
 				ImGui::CloseCurrentPopup();
 			}
-			if (ImGui::MenuItem("Delete"))
-			{
-				App->scene_intro->DeleteGameobj(obj[i]);
-			}
-
+			//ImGui::Text("Option #2");
+			//ImGui::Text("Option #3");
 			ImGui::EndPopup();
 		}
 
-		//if (ImGui::IsItemClicked()) // If treenode is clicked, check whether it is a single or multi selection
-		//{
-		//	if (!ImGui::GetIO().KeyCtrl) // Single selection, clear selected nodes
-		//	{
-		//		for (HierarchyNode* i : Hierarchy::selected_nodes)
-		//			i->ToggleSelection(); // Selected nodes has selected state, need to unselect, toggle is safe [panaderia de pan]
-		//		
-		//		Hierarchy::selected_nodes.clear();
-		//		LOG("Single selection", 'v');
-		//	}
-		//	else
-		//		LOG("Multi Selection", 'v');
+		// if treenode is clicked, check whether it is a single or multi selection
+		if (ImGui::IsItemClicked())
+		{
+			if (!ImGui::GetIO().KeyCtrl) // Single selection, clear selected nodes
+			{
+				for (HierarchyNode* i : Hierarchy::selected_nodes)
+				{ // Selected nodes has selected state, need to unselect, toggle is safe [panaderia de pan]
+					i->ToggleSelection();
+				}
+				Hierarchy::selected_nodes.clear();
+				LOG("Single selection", 'v');
+			}
+			else
+			{
+				LOG("Multi Selection", 'v');
+			}
 
-		//	if (node[i]->ToggleSelection()) // Always need to toggle the state of selection of the node, getting its current state
-		//		Hierarchy::selected_nodes.push_back(node[i]);
-		//	else
-		//		SearchAndDeleteNode(node[i], Hierarchy::selected_nodes);
-		//}
+			// Always need to toggle the state of selection of the node, getting its current state
+			if (node->ToggleSelection())
+			{
+				Hierarchy::selected_nodes.push_back(node);
+			}
+			else
+			{
+				SearchAndDeleteNode(node, Hierarchy::selected_nodes);
+				//Hierarchy::selected_nodes.erase(Hierarchy::selected_nodes.find(node));
+			}
+		}
 
 		if (is_open)
 		{
-			//if (node[i]->childs.size() > 0) // Node is open, need to draw childs if has childs
-			//	DrawNodes(node[i]->childs);
-
+			// Node is open, need to draw childs if has childs
+			if (node->childs.size() > 0)
+			{
+				DrawNodes(node->childs);
+			}
 			ImGui::TreePop();
 		}
 	}
 }
 
-void Hierarchy::SetSceneName(const char* name)
+void Hierarchy::Draw()
 {
-	LOG("Renaming scene from '%s' to '%s'", scene_name, name);
-	scene_name = name;
+	if (ImGui::Button("Add Free Node"))
+		AddNode();
+	ImGui::SameLine();
+
+	if (ImGui::Button("Add Childs"))
+	{
+		for (HierarchyNode* selected : selected_nodes)
+		{
+			AddNode(selected);
+		}
+	}
+	ImGui::SameLine();
+
+	if (ImGui::Button("Delete"))
+		DeleteSelected();
+
+	ImGui::Text(scene_name);
+	ImGui::Separator();
+
+	// Actually drawing of nodes, recursively, needs only parents set
+	DrawNodes(root_nodes);
+}
+
+bool Hierarchy::SetSceneName(const char * name)
+{
+	if (strlen(name) < MAX_NAME_LENGTH)
+	{
+		LOG("Renaming scene from '%s' to '%s'", scene_name, name);
+		sprintf_s(scene_name, 512, "%s", name);
+		return true;
+	}
+	else
+	{
+		LOG("Scene name exceeds max length (%d)", MAX_NAME_LENGTH, 'e');
+		return false;
+
+	}
 }
