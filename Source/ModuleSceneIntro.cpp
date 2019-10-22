@@ -70,7 +70,7 @@ bool ModuleSceneIntro::Draw()
 	// Draw GameObjects
 	for (int i = 0; i < gameobjs.size(); i++)
 	{
-		if (gameobjs[i]->active)
+		if (gameobjs[i]->IsActive())
 		{
 			for (int j = 0; j < gameobjs[i]->meshes.size(); j++) //meshes
 			{
@@ -93,13 +93,27 @@ bool ModuleSceneIntro::Draw()
 GameObject* ModuleSceneIntro::CreateGameObj()
 {
 	create_gameobj = true;
-	std::string name = "GameObject ";
-	name.append(std::to_string(gameobjs.size()));
-
-	GameObject* obj = new GameObject(name.data());
+	const char* name = "GameObject";
+	GameObject* obj = new GameObject(name);
 	gameobjs.push_back(obj);
 
 	return obj;
+}
+
+void ModuleSceneIntro::DeleteGameobj(GameObject* obj)
+{
+	if (selected_gameobj == obj)
+		selected_gameobj = nullptr;
+	
+	for (int i = 0; i < gameobjs.size(); i++)
+	{
+		if (gameobjs[i] == obj)
+		{
+			delete gameobjs[i];
+			gameobjs.erase(gameobjs.begin() + i);
+			break;
+		}
+	}
 }
 
 

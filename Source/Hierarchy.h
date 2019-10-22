@@ -2,10 +2,10 @@
 #define __HIERARCHY_H__
 
 #include "Panel.h"
+#include "HierarchyNode.h"
 #include "Imgui/imgui.h"
 #include <random>
 #include <vector>
-#include "HierarchyNode.h"
 
 class Hierarchy : public Panel
 {
@@ -20,18 +20,20 @@ public:
 	virtual ~Hierarchy();
 
 	void Draw();
-	static HierarchyNode* AddNode(HierarchyNode* node = nullptr);
+	static HierarchyNode* AddNode(HierarchyNode* node = nullptr, GameObject* object = nullptr);
+	static bool SearchAndDeleteNode(HierarchyNode* n, std::vector<HierarchyNode*>& v);
 	static void DeleteNode(HierarchyNode * n);
-	static bool SetSceneName(const char* name);
 	static void DeleteSelected();
+	void DrawNodes(std::vector<HierarchyNode*>& v);
+	void SetSceneName(const char* name);
 
-
+public:
 	//Data
 	static std::vector<HierarchyNode*> root_nodes;
 	static std::vector<HierarchyNode*> nodes;
 	static std::vector<HierarchyNode*> selected_nodes;
 
-	static char scene_name[MAX_NAME_LENGTH];
+	const char* scene_name;
 };
 
 #endif// __HIERARCHY_H__
