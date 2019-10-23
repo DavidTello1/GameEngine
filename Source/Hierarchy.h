@@ -20,13 +20,17 @@ public:
 	virtual ~Hierarchy();
 
 	void Draw();
+
 	static HierarchyNode* AddNode(GameObject* object = nullptr, HierarchyNode* node = nullptr);
 	static void DeleteNode(HierarchyNode * n);
 	static void DeleteSelected();
 	static bool SearchAndDeleteNode(HierarchyNode* n, std::vector<HierarchyNode*>& v);
 
-	void DrawNodes(std::vector<HierarchyNode*>& v);
 	void SetSceneName(const char* name);
+
+private:
+	void DrawCreateMenu();
+	void DrawNodes(std::vector<HierarchyNode*>& v);
 
 public:
 	//Data

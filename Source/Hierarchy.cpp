@@ -45,9 +45,10 @@ void Hierarchy::Draw()
 {
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::MenuItem("Create"))
+		/*if (ImGui::MenuItem("Create"))
 			App->scene_intro->CreateGameObj();
-
+*/
+		DrawCreateMenu();
 		if (ImGui::MenuItem("Add Childs"))
 		{
 			for (HierarchyNode* selected : selected_nodes)
@@ -64,6 +65,84 @@ void Hierarchy::Draw()
 	ImGui::Separator();
 
 	DrawNodes(root_nodes);
+}
+
+void Hierarchy::DrawCreateMenu()
+{
+	if (ImGui::BeginMenu("Create"))
+	{
+		if (ImGui::MenuItem("Empty"))
+		{
+			App->scene_intro->CreateGameObj();
+		}
+		ImGui::Separator();
+		if (ImGui::BeginMenu("Basic shapes"))
+		{
+			if (ImGui::MenuItem("Cylinder"))
+			{
+				App->scene_intro->CreateShape(CYLINDER, 9, 9);
+			}
+			if (ImGui::MenuItem("Cone"))
+			{
+				App->scene_intro->CreateShape(CONE, 9, 9);
+			}
+			if (ImGui::MenuItem("Sphere"))
+			{
+				App->scene_intro->CreateShape(SPHERE, 9, 9);
+			}
+			if (ImGui::MenuItem("Plane"))
+			{
+				App->scene_intro->CreateShape(PLANE, 9, 9);
+			}
+			if (ImGui::MenuItem("Cube"))
+			{
+				App->scene_intro->CreateShape(CUBE, 9, 9);
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Extended shapes"))
+		{
+			if (ImGui::MenuItem("Torus"))
+			{
+				App->scene_intro->CreateShape(TORUS, 9, 9);
+			}
+			if (ImGui::MenuItem("Bottle"))
+			{
+				App->scene_intro->CreateShape(BOTTLE, 9, 9);
+			}
+			if (ImGui::MenuItem("Knot"))
+			{
+				App->scene_intro->CreateShape(KNOT, 9, 9);
+			}
+			if (ImGui::MenuItem("Hemisphere"))
+			{
+				App->scene_intro->CreateShape(HEMISPHERE, 9, 9);
+			}
+			if (ImGui::MenuItem("Icosahedron"))
+			{
+				App->scene_intro->CreateShape(ICOSAHEDRON, 9, 9);
+			}
+			if (ImGui::MenuItem("Dodecahedron"))
+			{
+				App->scene_intro->CreateShape(DODECAHEDRON, 9, 9);
+			}
+			if (ImGui::MenuItem("Octahedron"))
+			{
+				App->scene_intro->CreateShape(OCTAHEDRON, 9, 9);
+			}
+			if (ImGui::MenuItem("Tetrahedron"))
+			{
+				App->scene_intro->CreateShape(TETRAHEDRON, 9, 9);
+			}
+			if (ImGui::MenuItem("Rock"))
+			{
+				App->scene_intro->CreateShape(ROCK, 9, 9);
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenu();
+		
+	}
 }
 
 // Add a new dummy node, child of the passed node or root node if parent is nullptr

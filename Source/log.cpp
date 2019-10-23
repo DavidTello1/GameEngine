@@ -2,6 +2,8 @@
 #include "Globals.h"
 #include "Console.h"
 
+#define GEOMETRY_STRING "[Geometry]"
+
 void log(const char file[], int line, const char* format, ...)
 {
 	static char tmp_string[4096];
@@ -34,6 +36,7 @@ void log(const char file[], int line, const char* format, ...)
 	// geometry logs
 	if (logtype == 'g')
 	{
+		sprintf_s(extendedformat,4096,GEOMET)
 		if (Console::ShowGeometryLog) 
 		{
 			sprintf_s(extendedlog, 4096, "[Geometry] %s(%d) : %s", short_file, line, tmp_string);
@@ -52,11 +55,8 @@ void log(const char file[], int line, const char* format, ...)
 	// warning logs
 	else if (logtype == 'w')
 	{
-		if (Console::ShowDebugLog)
-		{
 			sprintf_s(extendedlog, 4096, "[Warn] %s(%d) : %s", short_file, line, tmp_string);
 			Console::AddLog(extendedlog);
-		}
 	}
 	else if (logtype == 'e') // errors can not be ignored, there's always something to learn
 	{
@@ -70,3 +70,43 @@ void log(const char file[], int line, const char* format, ...)
 	} // else { ignore log }
 
 }
+
+
+//OLD CONSOLE
+//// geometry logs
+//if (logtype == 'g')
+//{
+//	if (Console::ShowGeometryLog)
+//	{
+//		sprintf_s(extendedlog, 4096, "[Geometry] %s(%d) : %s", short_file, line, tmp_string);
+//		Console::AddLog(extendedlog);
+//	} // else { ignore log }
+//}
+//// debug logs
+//else if (logtype == 'd')
+//{
+//	if (Console::ShowDebugLog)
+//	{
+//		sprintf_s(extendedlog, 4096, "[Debug] %s(%d) : %s", short_file, line, tmp_string);
+//		Console::AddLog(extendedlog);
+//	} // else { ignore log }
+//}
+//// warning logs
+//else if (logtype == 'w')
+//{
+//	if (Console::ShowDebugLog)
+//	{
+//		sprintf_s(extendedlog, 4096, "[Warn] %s(%d) : %s", short_file, line, tmp_string);
+//		Console::AddLog(extendedlog);
+//	}
+//}
+//else if (logtype == 'e') // errors can not be ignored, there's always something to learn
+//{
+//	sprintf_s(extendedlog, 4096, "[Error] %s(%d) : %s", short_file, line, tmp_string);
+//	Console::AddLog(extendedlog);
+//}
+//// verbose logs
+//else if (Console::ShowVerboseLog) {
+//	sprintf_s(extendedlog, 4096, "[Verbose] %s(%d) : %s", short_file, line, tmp_string);
+//	Console::AddLog(extendedlog);
+//} // else { ignore log }

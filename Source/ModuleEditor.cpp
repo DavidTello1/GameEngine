@@ -177,7 +177,7 @@ void ModuleEditor::Draw()
 	static bool is_draw_menu = true;
 	static bool is_show_main_dockspace = true;
 	static bool is_show_demo = false;
-	static bool is_auto_select = false;
+	static bool is_auto_select = true;
 	static bool is_about = false;
 	static bool is_new = false;
 	static bool is_open = false;

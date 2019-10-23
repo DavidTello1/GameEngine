@@ -126,11 +126,11 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 	if (type == Resources::Type::unknown)
 		type = GetResourceType(path);
 
-	if (type != Resources::Type::unknown)
-		 App->scene_intro->CreateGameObj();
+	//if (type != Resources::Type::unknown)
 
 	if (type == Resources::Type::mesh) // Mesh
 	{
+		App->scene_intro->CreateGameObj();
 		LOG("Mesh resource type",'g');
 		const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 
@@ -169,8 +169,11 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 		GLuint tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetData());
 		ilDeleteImages(1, &imageID);
 
-		meshes.back()->TEX = tex;
-		(*(meshes.begin()))->TEX = tex;
+
+		for (Mesh* mesh : App->scene_intro->selected_gameobj->meshes)
+		{
+			mesh->TEX = tex;
+		}
 
 	}
 }

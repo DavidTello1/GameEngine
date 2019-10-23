@@ -8,6 +8,8 @@
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
+#include <vector>
+
 
 struct aiMesh;
 
@@ -29,6 +31,7 @@ enum shape_type {
 
 	UNKNOWN
 };
+
 
 class Mesh : public Resources
 {
@@ -60,4 +63,5 @@ public:
 	GLuint TEX = 0;					// Texture Buffer ID (TEX)
 
 
+	static const char* shape_to_string[shape_type::UNKNOWN];
 };

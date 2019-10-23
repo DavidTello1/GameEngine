@@ -1,6 +1,5 @@
 #include "Console.h"
 
-
 char						Console::InputBuf[256];
 ImVector<char*>				Console::Items;
 ImVector<const char*>		Console::Commands;
@@ -11,6 +10,8 @@ bool						Console::AutoScroll;
 bool						Console::ShowVerboseLog;
 bool						Console::ShowGeometryLog;
 bool						Console::ShowDebugLog;
+bool						Console::ShowWarningLog;
+bool						Console::EnableFileName;
 bool						Console::ScrollToBottom;
 
 Console::Console() : Panel("Console")
@@ -28,7 +29,9 @@ Console::Console() : Panel("Console")
 	AutoScroll		= true;
 	ShowDebugLog	= true;
 	ShowGeometryLog = true;
-	ShowVerboseLog	= true;
+	ShowVerboseLog	= false;
+	ShowWarningLog	= true;
+	EnableFileName	= false;
 	ScrollToBottom	= false;
 
 	width = default_width;
@@ -36,7 +39,24 @@ Console::Console() : Panel("Console")
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
 
+	UpdateFilters();
+
 	AddLog("Enter 'help' or '-h' for help, press TAB to use text completion.");
+}
+
+void Console::UpdateFilters()
+{
+	char filters_buffer[256] = " ";
+
+	if (!ShowDebugLog)	 strcat_s(filters_buffer, 256, "-[Debug],");
+	if (!ShowGeometryLog) strcat_s(filters_buffer, 256, "-[Geometry],");
+	if (!ShowVerboseLog)  strcat_s(filters_buffer, 256, "-[Verbose],");
+	if (!ShowWarningLog)  strcat_s(filters_buffer, 256, "-[Warning],");
+
+
+	Filter.Clear();
+	sprintf_s(Filter.InputBuf, 256, "%s", filters_buffer);
+	Filter.Build();
 }
 
 Console::~Console()
@@ -57,9 +77,10 @@ void Console::Draw()
 			in_menu = true;
 
 			ImGui::MenuItem("Auto-scroll", NULL, &AutoScroll);
-			ImGui::MenuItem("Enable Verbose Log", NULL, &ShowVerboseLog);
-			ImGui::MenuItem("Enable Geometry Log", NULL, &ShowGeometryLog);
-			ImGui::MenuItem("Enable Debug Log", NULL, &ShowDebugLog);
+			if(ImGui::MenuItem("Show Verbose Log", NULL, &ShowVerboseLog))UpdateFilters();
+			if(ImGui::MenuItem("Show Geometry Log", NULL, &ShowGeometryLog))UpdateFilters();
+			if(ImGui::MenuItem("Show Debug Log", NULL, &ShowDebugLog))UpdateFilters();
+			if(ImGui::MenuItem("Show Warning Log", NULL, &ShowWarningLog))UpdateFilters();
 
 			ImGui::EndMenu();
 		}
@@ -105,7 +126,8 @@ void Console::Draw()
 
 		// Normally you would store more information in your item (e.g. make Items[] an array of structure, store color/type etc.)
 		bool pop_color = false;
-		if (strstr(item, "[error]")) { ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f)); pop_color = true; }
+		if (strstr(item, "[Error]")) { ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f)); pop_color = true; }
+		else if (strstr(item, "[Warning]")) { ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.54f, 0.0f, 1.0f)); pop_color = true; }
 		else if (strncmp(item, "# ", 2) == 0) { ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.6f, 1.0f)); pop_color = true; }
 		ImGui::TextUnformatted(item);
 		if (pop_color)

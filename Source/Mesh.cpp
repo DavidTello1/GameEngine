@@ -11,6 +11,11 @@
 #include "par_shapes.h"
 #include "mmgr/mmgr.h"
 
+const char* Mesh::shape_to_string[shape_type::UNKNOWN] = 
+{ "Cylinder","Cone", "Torus", "Sphere", "Bottle", "Knot",
+	"Hemisphere", "Plane", "Icosahedron", "Dodecahedron",
+	"Octahedron", "Tetrahedron", "Cube", "Rock"};
+
 Mesh::Mesh() : Resources(Resources::Type::mesh)
 {
 }
@@ -101,11 +106,11 @@ void Mesh::ImportMesh(aiMesh* mesh)
 	TEX = ModuleResources::checker_texture;
 
 	
-	LOG("Generating VBO", 'g');
+	LOG("Generating VBO", 'v');
 	GenVBO();
-	LOG("Generating IBO", 'g');
+	LOG("Generating IBO", 'v');
 	GenIBO();
-	LOG("Generating Texture", 'g');
+	LOG("Generating Texture", 'v');
 	GenTexture();
 }
 
@@ -172,7 +177,7 @@ void Mesh::CreateMesh(const shape_type &type, int slices, int stacks, float x, f
 
 	par_shapes_translate(m, x, y, z);
 
-	LOG("Creating primitive '%d'", (int)type, 'd');
+	LOG("Creating primitive '%s'", shape_to_string[type], 'v');
 
 	// Vertices
 	num_vertices = m->npoints;
