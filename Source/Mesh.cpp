@@ -8,6 +8,7 @@
 #include "Assimp/include/postprocess.h"
 #include "Assimp/include/cfileio.h"
 
+#include "mmgr/mmgr.h"
 
 Mesh::Mesh() : Resources(Resources::Type::mesh)
 {

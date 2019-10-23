@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "Application.h"
+#include "ModuleSceneIntro.h"
 #include "ModuleResources.h"
 #include "ModuleFileSystem.h"
 //#include "ModuleTextures.h"
@@ -31,38 +32,11 @@
 #define checkImageWidth 256
 #define checkImageHeight 256
 static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
-
 GLuint ModuleResources::checker_texture;
 
-void ModuleResources::MakeCheckTexture()
-{
-	int i, j, c;
 
-	for (i = 0; i < checkImageHeight; i++) {
-		for (j = 0; j < checkImageWidth; j++) {
-			c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
-			checkImage[i][j][0] = (GLubyte)c;
-			checkImage[i][j][1] = (GLubyte)c;
-			checkImage[i][j][2] = (GLubyte)c;
-			checkImage[i][j][3] = (GLubyte)255;
-		}
-	}
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	glGenTextures(1, &checker_texture);
-	glBindTexture(GL_TEXTURE_2D, checker_texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-		GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
-		checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-		checkImage);
-
+void AssimpLogCallback(const char *msg, char *userData) {
+	LOG("%s", msg,'g');
 }
 
 ModuleResources::ModuleResources(bool start_enabled) : Module("Resources", start_enabled)
@@ -78,9 +52,6 @@ bool ModuleResources::Init(Config* config)
 	return true;
 }
 
-void AssimpLogCallback(const char *msg, char *userData) {
-	LOG("%s", msg,'g');
-}
 
 bool ModuleResources::Start(Config* config)
 {
@@ -91,27 +62,18 @@ bool ModuleResources::Start(Config* config)
 	stream.callback = AssimpLogCallback;
 	aiAttachLogStream(&stream);
 
-	MakeCheckTexture();
+	MakeCheckersTexture();
 
 	return true;
 }
 
-
-
 bool ModuleResources::CleanUp()
 {
-	for (int i = 0; i < meshes.size(); i++) //meshes
-	{
-		delete meshes[i];
-	}
-	meshes.clear();
-
 	return true;
 }
 
 void ModuleResources::Draw()
 {
-
 	for (const Mesh* m : meshes)
 	{
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -149,7 +111,7 @@ Resources::Type ModuleResources::GetResourceType(const char* path)
 		extension[i] = tolower(extension[i]);
 	}
 
-	if (extension == "obj" || strcmp("fbx",extension) == 0) // Mesh
+	if (strcmp("obj", extension) == 0 || strcmp("fbx",extension) == 0) // Mesh
 	{
 		return Resources::Type::mesh; 
 	}
@@ -165,10 +127,11 @@ Resources::Type ModuleResources::GetResourceType(const char* path)
 void ModuleResources::LoadResource(const char* path, Resources::Type type)
 {
 	if (type == Resources::Type::unknown)
-	{
 		type = GetResourceType(path);
-	}
-	
+
+	if (type != Resources::Type::unknown)
+		 App->scene_intro->CreateGameObj();
+
 	if (type == Resources::Type::mesh) // Mesh
 	{
 		LOG("Mesh resource type",'g');
@@ -185,6 +148,8 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 
 				new_mesh->ImportMesh(mesh);
 				meshes.push_back(new_mesh);
+
+				App->scene_intro->selected_gameobj->meshes.push_back(new_mesh);
 			}
 			aiReleaseImport(scene);
 		}
@@ -234,4 +199,34 @@ GLuint ModuleResources::ImportTexture(int width, int height, unsigned char* imag
 void ModuleResources::UnLoadResource()
 {
 
+}
+
+void ModuleResources::MakeCheckersTexture()
+{
+	int i, j, c;
+
+	for (i = 0; i < checkImageHeight; i++) {
+		for (j = 0; j < checkImageWidth; j++) {
+			c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
+			checkImage[i][j][0] = (GLubyte)c;
+			checkImage[i][j][1] = (GLubyte)c;
+			checkImage[i][j][2] = (GLubyte)c;
+			checkImage[i][j][3] = (GLubyte)255;
+		}
+	}
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glGenTextures(1, &checker_texture);
+	glBindTexture(GL_TEXTURE_2D, checker_texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
+		checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+		checkImage);
 }

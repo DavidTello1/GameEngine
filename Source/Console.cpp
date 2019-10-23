@@ -1,5 +1,4 @@
 #include "Console.h"
-#include "mmgr/mmgr.h"
 
 
 char						Console::InputBuf[256];
@@ -49,24 +48,30 @@ Console::~Console()
 
 void Console::Draw()
 {
-	// Options menu
-	if (ImGui::BeginPopup("Options"))
+	static bool copy_to_clipboard = false;
+
+	if (ImGui::BeginMenuBar())
 	{
-		ImGui::Checkbox("Auto-scroll", &AutoScroll);
-		ImGui::Checkbox("Enable Verbose Log", &ShowVerboseLog);
-		ImGui::Checkbox("Enable Geometry Log", &ShowGeometryLog);
-		ImGui::Checkbox("Enable Debug Log", &ShowDebugLog);
-		ImGui::EndPopup();
+		if (ImGui::BeginMenu("Options"))
+		{
+			in_menu = true;
+
+			ImGui::MenuItem("Auto-scroll", NULL, &AutoScroll);
+			ImGui::MenuItem("Enable Verbose Log", NULL, &ShowVerboseLog);
+			ImGui::MenuItem("Enable Geometry Log", NULL, &ShowGeometryLog);
+			ImGui::MenuItem("Enable Debug Log", NULL, &ShowDebugLog);
+
+			ImGui::EndMenu();
+		}
+		else
+			in_menu = false;
+
+		if (ImGui::MenuItem("Clear")) { ClearLog(); }
+		copy_to_clipboard = ImGui::MenuItem("Copy");
+		
+		ImGui::EndMenuBar();
 	}
 
-	// Options, Filter
-	if (ImGui::Button("Options"))
-		ImGui::OpenPopup("Options");
-	ImGui::SameLine();
-	if (ImGui::Button("Clear")) { ClearLog(); } ImGui::SameLine();
-	bool copy_to_clipboard = ImGui::Button("Copy");
-
-	ImGui::Separator();
 	Filter.Draw("Filter ('inclusion,-exclusion')", 180);
 	ImGui::Separator();
 

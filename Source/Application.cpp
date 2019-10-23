@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include "mmgr/mmgr.h"
+
 using namespace std;
 
 Application::Application()
@@ -9,13 +11,12 @@ Application::Application()
 	last_fps = -1;
 	capped_ms = 1000 / 60;
 	fps_counter = 0;
+	random = new math::LCG();
 
-	//modules.push_back(hints = new ModuleHints());
 	modules.push_back(file_system = new ModuleFileSystem(ASSETS_FOLDER));
 	modules.push_back(window = new ModuleWindow());
 	modules.push_back(resources = new ModuleResources());
 	//modules.push_back(tex = new ModuleTextures());
-	//modules.push_back(physics3D = new ModulePhysics3D());
 	modules.push_back(camera = new ModuleCamera3D());
 	modules.push_back(scene_intro = new ModuleSceneIntro());
 	modules.push_back(editor = new ModuleEditor());
@@ -25,7 +26,6 @@ Application::Application()
 	//modules.push_back(level = new ModuleLevelManager());
 	//modules.push_back(programs = new ModulePrograms(true));
 	//modules.push_back(renderer = new ModuleRenderer());
-	//modules.push_back(debug_draw = new ModuleDebugDraw());
 	modules.push_back(renderer3D = new ModuleRenderer3D());
 }
 
@@ -33,9 +33,9 @@ Application::Application()
 Application::~Application()
 {
 	for (list<Module*>::iterator it = modules.begin(); it != modules.end(); ++it)
-	{
 		RELEASE(*it);
-	}
+	
+	RELEASE(random);
 }
 
 // ---------------------------------------------

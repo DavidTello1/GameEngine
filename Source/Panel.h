@@ -22,6 +22,7 @@ public:
 public:
 	bool active = true;
 	int width, height, pos_x, pos_y;
+	bool in_menu = false;
 
 protected:
 	const char* name;

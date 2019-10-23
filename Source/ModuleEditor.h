@@ -40,20 +40,21 @@ public:
 	const char* CloseFileDialog();
 
 	// Panels
-	int GetWidth(Panel* panel) const { return panel->width; }
-	int GetHeight(Panel* panel) const { return panel->height; }
-	int GetPosX(Panel* panel) const { return panel->pos_x; }
-	int GetPosY(Panel* panel) const { return panel->pos_y; }
+	Panel* GetPanel(const char* name);
+	int GetPanelWidth(Panel* panel) const { return panel->width; }
+	int GetPanelHeight(Panel* panel) const { return panel->height; }
+	int GetPanelPosX(Panel* panel) const { return panel->pos_x; }
+	int GetPanelPosY(Panel* panel) const { return panel->pos_y; }
+	bool GetPanelActive(Panel* panel) const { return panel->active; }
 
 private:
-	Panel* GetPanel(const char* name);
 	void LoadFile(const char* filter_extension = nullptr, const char* from_dir = nullptr);
 	void DrawDirectoryRecursive(const char* directory, const char* filter_extension);
 
-	void DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import);
+	void DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_autoselect, bool &is_plane, bool &is_axis, bool &is_wireframe);
 	void DrawDemo(bool &is_show_demo);
 	void DrawAbout(bool &is_about);
-	void DrawPanels();
+	void DrawPanels(bool &is_auto_select);
 	void ConfirmExit();
 	void Shortcuts(bool &is_new, bool &is_open, bool &is_save);
 
@@ -64,6 +65,10 @@ public:
 	Inspector* tab_inspector = nullptr;
 	Viewport* tab_viewport = nullptr;
 	Assets* tab_assets = nullptr;
+
+	bool show_plane = true;
+	bool show_axis = true;
+	bool show_wireframe = false;
 
 private:
 	enum
@@ -76,12 +81,11 @@ private:
 	std::string file_dialog_filter;
 	std::string file_dialog_origin;
 
-	//bool capture_mouse = false;
-	//bool capture_keyboard = false;
 	bool in_modal = false;
 	char selected_file[FILE_MAX];
-	bool draw_menu = true;
 	bool close = false;
+
+	bool show_gizmos = false;
 };
 
 #endif
