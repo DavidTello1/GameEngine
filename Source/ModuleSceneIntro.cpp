@@ -30,7 +30,7 @@ bool ModuleSceneIntro::Start(Config* config)
 	//App->resources->LoadResource("Assets/BakerHouse.fbx");
 	for (int i = 0; i < shape_type::UNKNOWN; i++)
 	{
-		CreateShape((shape_type)i, 9, 9, i * 10, 0, 0);
+		CreateShape((shape_type)i, 9, 9, i * 7.5 -50, 2.5f, -10);
 	}
 	/*CreateShape(shape_type::SPHERE, 10, 10);
 	CreateShape(shape_type::CUBE, 1, 1,10,0,0);*/
