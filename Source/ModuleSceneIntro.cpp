@@ -1,16 +1,18 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleSceneIntro.h"
+#include "ModuleResources.h"
+#include "Hierarchy.h"
+#include "Viewport.h"
+#include "GameObject.h"
+
 #include "glew/include/GL/glew.h"
 #include "par_shapes.h"
-#include "Viewport.h"
-#include "ModuleResources.h"
+#include "mmgr/mmgr.h"
 
 
 ModuleSceneIntro::ModuleSceneIntro(bool start_enabled) : Module("SceneIntro", start_enabled)
-{
-	m = nullptr;
-}
+{}
 
 ModuleSceneIntro::~ModuleSceneIntro()
 {}
@@ -46,21 +48,103 @@ void ModuleSceneIntro::CreateShape(shape_type type, int slices, int stacks, floa
 	App->resources->meshes.push_back(m);
 
 }
-// Load assets
-bool ModuleSceneIntro::CleanUp()
-{
-	LOG("Unloading Intro scene");
-
-	return true;
-}
 
 // Update
 bool ModuleSceneIntro::Update(float dt)
 {
+	return true;
+}
+
+bool ModuleSceneIntro::PostUpdate(float dt)
+{
 
 	return true;
 }
-void DrawCube()
+
+bool ModuleSceneIntro::CleanUp()
+{
+	LOG("Unloading Intro scene");
+
+	for (uint i = 0; i < gameobjs.size(); ++i)
+	{
+		delete gameobjs[i];
+	}
+	gameobjs.clear();
+
+	return true;
+}
+
+bool ModuleSceneIntro::Draw()
+{
+	if (App->editor->show_plane) // plane
+		DrawGridPlane();
+	
+	if (App->editor->show_axis) // axis
+		DrawAxis();
+
+	if (App->editor->show_wireframe) //wireframe
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	App->resources->Draw();
+	//DrawCube();
+
+	//// Draw GameObjects
+	//for (int i = 0; i < gameobjs.size(); i++)
+	//{
+	//	if (gameobjs[i]->IsActive())
+	//	{
+	//		for (int j = 0; j < gameobjs[i]->meshes.size(); j++) //meshes
+	//		{
+	//			glEnableClientState(GL_VERTEX_ARRAY);
+	//			glBindVertexArray(gameobjs[i]->meshes[j]->VAO);
+	//			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gameobjs[i]->meshes[j]->IBO);
+
+	//			glDrawElements(GL_TRIANGLES, gameobjs[i]->meshes[j]->num_indices, GL_UNSIGNED_INT, NULL);
+
+	//			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//			glBindVertexArray(0);
+	//			glDisableClientState(GL_VERTEX_ARRAY);
+	//		}
+	//	}
+	//}
+
+	return true;
+}
+
+GameObject* ModuleSceneIntro::CreateGameObj()
+{
+	create_gameobj = true;
+
+	const char* name = "GameObject";
+	GameObject* obj = new GameObject(name);
+	gameobjs.push_back(obj);
+
+	App->editor->tab_hierarchy->AddNode(obj); // add node to hierarchy
+	App->scene_intro->selected_gameobj = obj; // new obj is selected_gameobj
+
+	return obj;
+}
+
+void ModuleSceneIntro::DeleteGameobj(GameObject* obj)
+{
+	if (selected_gameobj == obj)
+		selected_gameobj = nullptr;
+
+	for (int i = 0; i < gameobjs.size(); i++)
+	{
+		if (gameobjs[i] == obj)
+		{
+			delete gameobjs[i];
+			gameobjs.erase(gameobjs.begin() + i);
+			break;
+		}
+	}
+}
+
+//--------------------------------------------------------
+void ModuleSceneIntro::DrawCube()
 {
 	glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
 	 // Top face (y = 1.0f)
@@ -108,68 +192,48 @@ void DrawCube()
 	glEnd();  // End of drawing color-cube
 }
 
-bool ModuleSceneIntro::Draw()
+void ModuleSceneIntro::DrawGridPlane()
 {
-	//glLoadIdentity();
-	DrawGridPlane();
-	
-	//DrawCube();
-
-	App->resources->Draw();
-
-	/*par_shapes_mesh* s = par_shapes_create_cone(10, 10);
-	par_shapes_translate(s, 0, 0, 0);
-
-	GLuint my_indices = 0;
-	glGenBuffers(1, (GLuint*) &(my_indices));
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_indices);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint)*s->ntriangles, s->triangles, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_indices);
-	glDrawElements(GL_TRIANGLES, s->ntriangles, GL_UNSIGNED_INT, NULL);
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, App->editor->tab_viewport->frame_buffer.id);
-	////glBindVertexArray(s->points);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float)*s->npoints, s->points, GL_STATIC_DRAW);
-	//glEnableClientState(GL_VERTEX_ARRAY);
-	//glVertexPointer(3, GL_FLOAT, 0, NULL);
-	////glDrawArrays(GL_TRIANGLES, 0, s->npoints);
-	//glDrawElements(GL_TRIANGLES, s->npoints, GL_UNSIGNED_INT, NULL);
-	//glDisableClientState(GL_VERTEX_ARRAY);
-
-	//par_shapes_free_mesh(s);
-	*/
-	return true;
-}
-
-void DrawGridPlane()
-{
-	//PLANE -----------------------------
-	glLineWidth(3.0f);
+	glLineWidth(1.0f);
 
 	glBegin(GL_LINES);
 	glColor3ub(255, 255, 255);
 	for (float i = -20; i <= 20; ++i)
 	{
 		glVertex3f(i, 0.f, 0.f);
-		glVertex3f(i, 0, 10.f);
+		glVertex3f(i, 0, 20.f);
 
 		glVertex3f(0.f, 0.f, i);
-		glVertex3f(10.f, 0, i);
+		glVertex3f(20.f, 0, i);
 
 		glVertex3f(i, 0.f, 0.f);
-		glVertex3f(i, 0, -10.f);
+		glVertex3f(i, 0, -20.f);
 
 		glVertex3f(0.f, 0.f, i);
-		glVertex3f(-10.f, 0, i);
+		glVertex3f(-20.f, 0, i);
 	}
 	glEnd();
 }
 
-
-bool ModuleSceneIntro::PostUpdate(float dt)
+void ModuleSceneIntro::DrawAxis()
 {
-	
-	return true;
-}
+	glLineWidth(3.0f);
+	glBegin(GL_LINES);
 
+	// x
+	glColor3ub(255, 0, 0);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(1.0f, 0.0f, 0.0f);
+
+	//y
+	glColor3ub(255, 255, 0);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 1.0f);
+
+	// z
+	glColor3ub(0, 0, 255);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, -1.0f, 0.0f);
+
+	glEnd();
+}

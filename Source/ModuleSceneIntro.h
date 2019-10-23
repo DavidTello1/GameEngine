@@ -2,6 +2,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "Mesh.h"
+#include "GameObject.h"
 
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
@@ -18,12 +19,26 @@ public:
 	bool Start(Config* config = nullptr);
 	void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 	bool Update(float dt);
-	bool Draw();
 	bool PostUpdate(float dt);
 	bool CleanUp();
+	
+	bool Draw();
 
-	//Temporary mesh data
-	Mesh* m;
+	GameObject* CreateGameObj();
+	void DeleteGameobj(GameObject* obj);
+	GameObject* GetSelectedGameobj() { return selected_gameobj; }
+	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }
+
+private:
+	void DrawCube();
+	void DrawGridPlane();
+	void DrawAxis();
+
+public:
+	GameObject* selected_gameobj = nullptr;
+	bool create_gameobj = false;
+
+private:
+	std::vector<GameObject*> gameobjs;
 };
 
-void DrawGridPlane();

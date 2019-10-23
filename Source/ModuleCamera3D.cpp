@@ -3,6 +3,8 @@
 #include "ModuleCamera3D.h"
 #include "Imgui/imgui.h"
 
+#include "mmgr/mmgr.h"
+
 ModuleCamera3D::ModuleCamera3D(bool start_enabled) : Module("Camera3D", start_enabled)
 {
 	CalculateViewMatrix();
@@ -40,63 +42,67 @@ bool ModuleCamera3D::CleanUp()
 // -----------------------------------------------------------------
 bool ModuleCamera3D::Update(float dt)
 {
-	// Implement a debug camera with keys and mouse
-	// Now we can make this movememnt frame rate independant!
-
-	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN) {
-		orbit = !orbit;
-	}
-	// Camera ZOOM with MOUSE WHEEL
-	ImGuiIO io = ImGui::GetIO();
-	vec3 newPos(0, 0, 0);
-	float speed = io.MouseWheel * 75.0f * dt;
-	if (speed != 0)
+	if (viewport_focus == true)
 	{
-		newPos -= Z * speed;
-		Position += newPos;
-	}
+		if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
+		{
+			//focus camera around geometry
+		}
 
-	//Reference += newPos;
-	// Mouse motion ----------------
-
-	//Free move 
-	if(App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
-	{
-		//Camera motion with WASD, Left Shift to go faster
+		// Camera ZOOM with MOUSE WHEEL
+		ImGuiIO io = ImGui::GetIO();
 		vec3 newPos(0, 0, 0);
-		float speed = 10.0f * dt;
+		float speed = io.MouseWheel * 75.0f * dt;
+		if (speed != 0)
+		{
+			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT || App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
+				speed *= 2.0f;
 
-		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
-			speed = 15.0f * dt;
+			newPos -= Z * speed;
+			Position += newPos;
+		}
+		//Reference += newPos;
 
-		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= Z * speed;
-		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += Z * speed;
+
+		// Mouse motion ----------------
+		//Free move 
+		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+		{
+			//Camera motion with WASD, Shift to go faster
+			vec3 newPos(0, 0, 0);
+			float speed = 10.0f * dt;
+
+			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT ||
+				App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
+				speed = 15.0f * dt;
+
+			if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= Z * speed;
+			if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += Z * speed;
 
 
-		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= X * speed;
-		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += X * speed;
+			if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= X * speed;
+			if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += X * speed;
 
-		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= Y * speed;
-		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += Y * speed;
+			if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= Y * speed;
+			else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += Y * speed;
 
-		Position += newPos;
-		Reference += newPos;
+			Position += newPos;
+			Reference += newPos;
 
-		RotateWithMouse();
-		
+			RotateWithMouse();
+		}
+
+		// Orbit move
+		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))
+		{
+			RotateWithMouse();
+			// To change to the Reference we want to orbit at
+			LookAt(vec3(0, 0, 0));
+		}
+
+		// Recalculate matrix -------------
+		CalculateViewMatrix();
 	}
-
-	// Orbit move
-	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))
-	{
-		RotateWithMouse();
-		// To change to the Reference we want to orbit at
-		LookAt(vec3(0,0,0));
-	}
-
-	// Recalculate matrix -------------
-	CalculateViewMatrix();
-
 	return true;
 }
 

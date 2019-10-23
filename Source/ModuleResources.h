@@ -10,9 +10,6 @@ class Mesh;
 class ModuleResources : public Module
 {
 public:
-
-	void MakeCheckTexture();
-
 	ModuleResources(bool start_enabled = true);
 	~ModuleResources();
 
@@ -29,6 +26,8 @@ public:
 
 	static GLuint checker_texture;
 	std::vector<Mesh*> meshes;
+
+	void MakeCheckersTexture();
 
 
 };

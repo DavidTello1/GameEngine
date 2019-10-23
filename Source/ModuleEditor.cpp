@@ -103,8 +103,8 @@ bool ModuleEditor::Init(Config* config)
 
 	// Create panels
 	panels.push_back(tab_hierarchy = new Hierarchy());
-	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_inspector = new Inspector());
+	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_console = new Console());
 	panels.push_back(tab_assets = new Assets());
 	panels.push_back(tab_viewport = new Viewport());
@@ -177,18 +177,22 @@ void ModuleEditor::Draw()
 	static bool is_draw_menu = true;
 	static bool is_show_main_dockspace = true;
 	static bool is_show_demo = false;
+	static bool is_auto_select = false;
 	static bool is_about = false;
 	static bool is_new = false;
 	static bool is_open = false;
 	static bool is_save = false;
 	static bool is_import = false;
+	static bool is_plane = true;
+	static bool is_axis = true;
+	static bool is_wireframe = false;
 
 	// Draw functions
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
-	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import);
+	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import, is_auto_select, is_plane, is_axis, is_wireframe);
 	DrawDemo(is_show_demo);
 	DrawAbout(is_about);
-	DrawPanels();
+	DrawPanels(is_auto_select);
 
 	// Menu Functionalities
 	if (file_dialog == opened)
@@ -235,7 +239,7 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import)
+void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_auto_select, bool &is_plane, bool &is_axis, bool &is_wireframe)
 {
 	bool ret = true;
 
@@ -254,6 +258,7 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				if (ImGui::MenuItem("Save", "Ctrl+S"))
 					is_save = true;
 
+				ImGui::Separator();
 				if (ImGui::MenuItem("Quit", "ESC"))
 					App->input->quit = true;
 
@@ -268,7 +273,7 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("View")) //view
+			if (ImGui::BeginMenu("Windows")) //view
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &GetPanel("Hierarchy")->active);
 				ImGui::MenuItem("Configuration", NULL, &GetPanel("Configuration")->active);
@@ -279,9 +284,51 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("View")) //view
+			{
+				//if (ImGui::MenuItem("Top"))
+				//	//top
+
+				//if (ImGui::MenuItem("Bottom"))
+				//	//bottom
+
+				//if (ImGui::MenuItem("Front"))
+				//	//front
+
+				//if (ImGui::MenuItem("Back"))
+				//	//back
+
+				//if (ImGui::MenuItem("Left"))
+				//	//left
+
+				//if (ImGui::MenuItem("Right"))
+				//	//right
+
+				ImGui::EndMenu();
+			}
+
+
+			if (ImGui::BeginMenu("Options")) //options
+			{
+				ImGui::MenuItem("Autoselect windows", NULL, &is_auto_select);
+
+				ImGui::Separator();
+				if (ImGui::MenuItem("Show Plane", NULL, &is_plane))
+					show_plane = !show_plane;
+
+				if (ImGui::MenuItem("Show Axis", NULL, &is_axis))
+					show_axis = !show_axis;
+
+				if (ImGui::MenuItem("Wireframe", NULL, &is_wireframe))
+					show_wireframe = !show_wireframe;
+
+				ImGui::EndMenu();
+			}
+
 			if (ImGui::BeginMenu("Help")) //help
 			{
-				ImGui::MenuItem("Show Demo", NULL, &is_show_demo);
+				ImGui::MenuItem("ImGui Demo", NULL, &is_show_demo);
+				ImGui::Separator();
 
 				if (ImGui::MenuItem("Documentation"))
 					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine/wiki", NULL, NULL, SW_SHOWNORMAL);
@@ -293,6 +340,7 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				if (ImGui::MenuItem("Report a bug"))
 					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine/issues", NULL, NULL, SW_SHOWNORMAL);
 
+				ImGui::Separator();
 				if (ImGui::MenuItem("About"))
 					is_about = true;
 
@@ -357,15 +405,33 @@ void ModuleEditor::DrawAbout(bool &is_about)
 	}
 }
 
-void ModuleEditor::DrawPanels()
+void ModuleEditor::DrawPanels(bool &is_auto_select)
 {
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
 		if ((*it)->IsActive())
 		{
-			if (ImGui::Begin((*it)->GetName(), &(*it)->active))
+			ImGui::SetNextWindowPos(ImVec2((float)(*it)->pos_x, (float)(*it)->pos_y), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2((float)(*it)->width, (float)(*it)->height), ImGuiCond_FirstUseEver);
+
+			if ((*it)->GetName() == "Configuration" || (*it)->GetName() == "Console" || (*it)->GetName() == "Hierarchy")
 			{
-				(*it)->Draw();
+				if (ImGui::Begin((*it)->GetName(), &(*it)->active, ImGuiWindowFlags_MenuBar)) //panel has a menu bar
+					(*it)->Draw();
+			}
+			else
+			{
+				if (ImGui::Begin((*it)->GetName(), &(*it)->active))
+					(*it)->Draw();
+			}
+			
+			if (is_auto_select == true && ImGui::IsWindowHovered() == true && (*it)->in_menu == false) // auto-select
+				ImGui::SetWindowFocus();
+
+			if (App->scene_intro->create_gameobj == true && (*it)->GetName() == "Inspector") //show inspector when a gameobject is created
+			{
+				ImGui::SetWindowFocus();
+				App->scene_intro->create_gameobj = false;
 			}
 			ImGui::End();
 		}
@@ -596,9 +662,7 @@ Panel* ModuleEditor::GetPanel(const char* name)
 	for (vector<Panel*>::iterator it = panels.begin(); it != panels.end(); ++it)
 	{
 		if ((*it)->GetName() == name)
-		{
 			return (*it);
-		}
 	}
 	return nullptr;
 }

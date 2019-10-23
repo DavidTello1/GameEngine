@@ -9,7 +9,7 @@
 #include "Assimp/include/cfileio.h"
 
 #include "par_shapes.h"
-
+#include "mmgr/mmgr.h"
 
 Mesh::Mesh() : Resources(Resources::Type::mesh)
 {
