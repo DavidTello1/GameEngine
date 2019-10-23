@@ -49,6 +49,15 @@ void log(const char file[], int line, const char* format, ...)
 			Console::AddLog(extendedlog);
 		} // else { ignore log }
 	}
+	// warning logs
+	else if (logtype == 'w')
+	{
+		if (Console::ShowDebugLog)
+		{
+			sprintf_s(extendedlog, 4096, "[Warn] %s(%d) : %s", short_file, line, tmp_string);
+			Console::AddLog(extendedlog);
+		}
+	}
 	else if (logtype == 'e') // errors can not be ignored, there's always something to learn
 	{
 		sprintf_s(extendedlog, 4096, "[Error] %s(%d) : %s", short_file, line, tmp_string);

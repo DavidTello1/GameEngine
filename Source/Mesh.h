@@ -4,10 +4,31 @@
 
 #include "glew\include\GL\glew.h"
 
+
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
+
 struct aiMesh;
+
+enum shape_type {
+	CYLINDER,
+	CONE,
+	TORUS,
+	SPHERE,
+	BOTTLE,
+	KNOT,
+	HEMISPHERE,
+	PLANE,
+	ICOSAHEDRON,
+	DODECAHEDRON,
+	OCTAHEDRON,
+	TETRAHEDRON,
+	CUBE,
+	ROCK,
+
+	UNKNOWN
+};
 
 class Mesh : public Resources
 {
@@ -17,6 +38,7 @@ public:
 	virtual ~Mesh();
 
 	void ImportMesh(aiMesh* mesh);
+	void CreateMesh(const shape_type &type, int slices, int stacks, float x = 0, float y = 0, float z = 0, float radius = 0.5);
 	void GenTexture();
 
 	void GenVBO(); //vertex buffer object
@@ -36,4 +58,6 @@ public:
 	uint num_tex_coords = 0;		// Number of texture coordinates (tex_coords_id
 	GLuint tex_coords_id = 0;		// Texture coordinates ID (tex_coords_id)
 	GLuint TEX = 0;					// Texture Buffer ID (TEX)
+
+
 };

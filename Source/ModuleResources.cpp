@@ -34,6 +34,19 @@ static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
 
 GLuint ModuleResources::checker_texture;
 
+
+ModuleResources::ModuleResources(bool start_enabled) : Module("Resources", start_enabled)
+{
+}
+
+ModuleResources::~ModuleResources()
+{
+}
+
+bool ModuleResources::Init(Config* config)
+{
+	return true;
+}
 void ModuleResources::MakeCheckTexture()
 {
 	int i, j, c;
@@ -65,18 +78,6 @@ void ModuleResources::MakeCheckTexture()
 
 }
 
-ModuleResources::ModuleResources(bool start_enabled) : Module("Resources", start_enabled)
-{
-}
-
-ModuleResources::~ModuleResources()
-{
-}
-
-bool ModuleResources::Init(Config* config)
-{
-	return true;
-}
 
 void AssimpLogCallback(const char *msg, char *userData) {
 	LOG("%s", msg,'g');
@@ -85,7 +86,8 @@ void AssimpLogCallback(const char *msg, char *userData) {
 bool ModuleResources::Start(Config* config)
 {
 	ilInit();
-	// Stream log messages to Debug window
+
+	// Stream log messages to Console and default visual studio debugger
 	struct aiLogStream stream;
 	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
 	stream.callback = AssimpLogCallback;
@@ -120,9 +122,7 @@ void ModuleResources::Draw()
 		glBindBuffer(GL_ARRAY_BUFFER, m->VBO);
 		glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-		GLuint texture = (m->TEX != 0) ? m->TEX : checker_texture;
-		glBindTexture(GL_TEXTURE_2D, texture);
-
+		glBindTexture(GL_TEXTURE_2D, m->TEX);
 		glBindBuffer(GL_ARRAY_BUFFER, m->tex_coords_id);
 		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
 
@@ -135,6 +135,7 @@ void ModuleResources::Draw()
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
+
 }
 
 //---------------------------------

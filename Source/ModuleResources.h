@@ -27,10 +27,10 @@ public:
 	GLuint ImportTexture(int width, int height, unsigned char * image);
 	void UnLoadResource();
 
-private:
+	static GLuint checker_texture;
 	std::vector<Mesh*> meshes;
 
-	static GLuint checker_texture;
+
 };
 
 #endif

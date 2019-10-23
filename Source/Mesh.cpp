@@ -8,6 +8,8 @@
 #include "Assimp/include/postprocess.h"
 #include "Assimp/include/cfileio.h"
 
+#include "par_shapes.h"
+
 
 Mesh::Mesh() : Resources(Resources::Type::mesh)
 {
@@ -96,17 +98,127 @@ void Mesh::ImportMesh(aiMesh* mesh)
 	}*/
 
 	
+	TEX = ModuleResources::checker_texture;
 
 	
 	LOG("Generating VBO", 'g');
 	GenVBO();
 	LOG("Generating IBO", 'g');
 	GenIBO();
-
 	LOG("Generating Texture", 'g');
 	GenTexture();
-	//LOG("Generating shaders", 'g');
-	//GenShaders();
+}
+
+void Mesh::CreateMesh(const shape_type &type, int slices, int stacks, float x, float y, float z,float radius)
+{
+	par_shapes_mesh* m;
+
+	if (slices < 3) {
+		slices = 3;
+		LOG("Slices less than 3, setting to 3",'w');
+	}
+	if (stacks < 3) {
+		stacks = 3;
+		LOG("Stacks less than 3, setting to 3",'w');
+	}
+	switch (type)
+	{
+	case CYLINDER:
+		m = par_shapes_create_cylinder(slices, stacks);
+		break;
+	case CONE:
+		m = par_shapes_create_cone(slices, stacks);
+		break;
+	case TORUS:
+		m = par_shapes_create_torus(slices, stacks,radius);
+		break;
+	case SPHERE:
+		m = par_shapes_create_parametric_sphere(slices,stacks);
+		break;
+	case BOTTLE:
+		m = par_shapes_create_klein_bottle(slices, stacks);
+		break;
+	case KNOT:
+		m = par_shapes_create_trefoil_knot(slices, stacks,radius);
+		break;
+	case HEMISPHERE:
+		m = par_shapes_create_hemisphere(slices, stacks);
+		break;
+	case PLANE:
+		m = par_shapes_create_plane(slices, stacks);
+		break;
+	case ICOSAHEDRON:
+		m = par_shapes_create_icosahedron();
+		break;
+	case DODECAHEDRON:
+		m = par_shapes_create_dodecahedron();
+		break;
+	case OCTAHEDRON:
+		m = par_shapes_create_octahedron();
+		break;
+	case TETRAHEDRON:
+		m = par_shapes_create_tetrahedron();
+		break;
+	case CUBE:
+		m = par_shapes_create_cube();
+		break;
+	case ROCK:
+		m = par_shapes_create_rock(slices*stacks, 2);
+		break;
+
+	default:
+		break;
+	}
+
+	par_shapes_translate(m, x, y, z);
+
+	LOG("Creating primitive '%d'", (int)type, 'd');
+
+	// Vertices
+	num_vertices = m->npoints;
+	vertices = new float3[num_vertices];
+
+	for (uint i = 0; i < num_vertices; ++i)
+	{
+		int k = i * 3;
+		vertices[i].x = m->points[k];
+		vertices[i].y = m->points[k+1];
+		vertices[i].z = m->points[k+2];
+	}
+
+	// Indices
+	num_indices = m->ntriangles*3;
+	indices = new GLuint[num_indices];
+
+	for (uint i = 0; i < num_indices; ++i)
+	{
+		indices[i] = (GLuint)m->triangles[i];
+	}
+
+	if (m->tcoords != nullptr) {
+
+		// Texture Coordinates
+		num_tex_coords = m->npoints;
+		tex_coords = new float2[num_tex_coords];
+
+		for (unsigned i = 0; i < num_tex_coords; ++i)
+		{
+			int k = i * 2;
+			tex_coords[i].x = m->tcoords[k];
+			tex_coords[i].y = m->tcoords[k+1];
+		}
+	}
+	
+	par_shapes_free_mesh(m);
+
+	TEX = ModuleResources::checker_texture;
+
+	LOG("Generating VBO", 'g');
+	GenVBO();
+	LOG("Generating IBO", 'g');
+	GenIBO();
+	LOG("Generating Texture", 'g');
+	GenTexture();
 }
 
 void Mesh::GenTexture()

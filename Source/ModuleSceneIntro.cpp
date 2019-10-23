@@ -6,6 +6,7 @@
 #include "Viewport.h"
 #include "ModuleResources.h"
 
+
 ModuleSceneIntro::ModuleSceneIntro(bool start_enabled) : Module("SceneIntro", start_enabled)
 {
 	m = nullptr;
@@ -26,11 +27,25 @@ bool ModuleSceneIntro::Start(Config* config)
 	//m = App->resources->LoadFBX("Assets/Warrior.fbx");
 	//m = GeometryLoader::LoadModel("Assets/Warrior.fbx");
 	//App->resources->LoadResource("Assets/warrior.fbx");
-	App->resources->LoadResource("Assets/BakerHouse.fbx");
+	//App->resources->LoadResource("Assets/BakerHouse.fbx");
+	for (int i = 0; i < shape_type::UNKNOWN; i++)
+	{
+		CreateShape((shape_type)i, 9, 9, i * 10, 0, 0);
+	}
+	/*CreateShape(shape_type::SPHERE, 10, 10);
+	CreateShape(shape_type::CUBE, 1, 1,10,0,0);*/
 	//App->resources->LoadResource("Assets/Baker_house.png");
 	return ret;
 }
 
+void ModuleSceneIntro::CreateShape(shape_type type, int slices, int stacks, float x, float y, float z)
+{
+	// new GameObject
+	Mesh* m = new Mesh();
+	m->CreateMesh(type, slices, stacks,x,y,z);
+	App->resources->meshes.push_back(m);
+
+}
 // Load assets
 bool ModuleSceneIntro::CleanUp()
 {
