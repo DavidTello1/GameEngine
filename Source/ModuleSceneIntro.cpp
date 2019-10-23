@@ -226,14 +226,17 @@ void ModuleSceneIntro::DrawAxis()
 	glVertex3f(1.0f, 0.0f, 0.0f);
 
 	//y
-	glColor3ub(255, 255, 0);
+	glColor3ub(0, 255, 0);
 	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
 
 	// z
 	glColor3ub(0, 0, 255);
 	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, -1.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 1.0f);
+
+	glColor3ub(255, 255, 255);
+
 
 	glEnd();
 }
