@@ -45,7 +45,7 @@ bool Viewport::PreUpdate()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(App->camera->GetViewMatrix());
 
-	App->scene_intro->Draw();
+	App->scene_base->Draw();
 	App->scene->Draw();
 
 	//DrawFigures();

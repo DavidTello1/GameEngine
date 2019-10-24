@@ -17,8 +17,6 @@ public:
 	bool Start(Config* config = nullptr);
 	bool CleanUp();
 
-	void Draw();
-
 	Resources::Type GetResourceType(const char* path);
 	void LoadResource(const char* path, Resources::Type type = Resources::Type::unknown);
 	GLuint ImportTexture(int width, int height, unsigned char * image);

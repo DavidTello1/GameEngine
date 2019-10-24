@@ -5,7 +5,7 @@
 #include "Module.h"
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
-#include "ModuleSceneIntro.h"
+#include "ModuleSceneBase.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
@@ -54,13 +54,13 @@ public:
 
 	ModuleWindow* window;
 	ModuleInput* input;
-	ModuleSceneIntro* scene_intro;
+	ModuleSceneBase* scene_base;
+	ModuleScene* scene;
 	ModuleRenderer3D* renderer3D;
 	ModuleCamera3D* camera;
 	ModuleEditor* editor;
 	ModuleFileSystem* file_system;
 	ModuleResources* resources;
-	ModuleScene* scene;
 
 private:
 	Timer	ms_timer;

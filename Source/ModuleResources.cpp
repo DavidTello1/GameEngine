@@ -1,6 +1,6 @@
 #include "Globals.h"
 #include "Application.h"
-#include "ModuleSceneIntro.h"
+#include "ModuleSceneBase.h"
 #include "ModuleResources.h"
 #include "ModuleFileSystem.h"
 //#include "ModuleTextures.h"
@@ -68,11 +68,6 @@ bool ModuleResources::Start(Config* config)
 bool ModuleResources::CleanUp()
 {
 	return true;
-}
-
-void ModuleResources::Draw()
-{
-
 }
 
 //---------------------------------

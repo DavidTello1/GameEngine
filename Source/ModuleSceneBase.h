@@ -7,11 +7,11 @@
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
-class ModuleSceneIntro : public Module
+class ModuleSceneBase : public Module
 {
 public:
-	ModuleSceneIntro(bool start_enabled = true);
-	~ModuleSceneIntro();
+	ModuleSceneBase(bool start_enabled = true);
+	~ModuleSceneBase();
 
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
