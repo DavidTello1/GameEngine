@@ -106,11 +106,8 @@ void Mesh::ImportMesh(aiMesh* mesh)
 	TEX = ModuleResources::checker_texture;
 
 	
-	LOG("Generating VBO", 'v');
 	GenVBO();
-	LOG("Generating IBO", 'v');
 	GenIBO();
-	LOG("Generating Texture", 'v');
 	GenTexture();
 }
 
@@ -218,11 +215,8 @@ void Mesh::CreateMesh(const shape_type &type, int slices, int stacks, float x, f
 
 	TEX = ModuleResources::checker_texture;
 
-	LOG("Generating VBO", 'g');
 	GenVBO();
-	LOG("Generating IBO", 'g');
 	GenIBO();
-	LOG("Generating Texture", 'g');
 	GenTexture();
 }
 
