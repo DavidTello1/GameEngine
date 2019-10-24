@@ -22,6 +22,9 @@ Mesh::Mesh() : Resources(Resources::Type::mesh)
 
 Mesh::~Mesh()
 {
+	RELEASE_ARRAY(vertices);
+	RELEASE_ARRAY(indices);
+	RELEASE_ARRAY(tex_coords);
 }
 
 void Mesh::ImportMesh(aiMesh* mesh)
