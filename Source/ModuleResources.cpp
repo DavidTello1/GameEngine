@@ -95,14 +95,12 @@ Resources::Type ModuleResources::GetResourceType(const char* path)
 	return Resources::Type::unknown;
 }
 
-void ModuleResources::LoadResource(const char* path, Resources::Type type)
+void ModuleResources::LoadResource(const char* path, Resources::Type type, bool use)
 {
 	if (type == Resources::Type::unknown)
 		type = GetResourceType(path);
 
-	//if (type != Resources::Type::unknown)
-
-	if (type == Resources::Type::mesh) // Me sh
+	if (type == Resources::Type::mesh) // Mesh
 	{
 		
 		LOG("Mesh resource type",'g');
@@ -113,15 +111,23 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 			LOG("Number of meshes: %u", scene->mNumMeshes, 'g');
 
 			for (uint i = 0; i < scene->mNumMeshes; ++i)
-			{
-				//App->scene->CreateGameObj();
+			{	
 				Mesh* new_mesh = new Mesh();
 				aiMesh* mesh = scene->mMeshes[i];
 
 				new_mesh->ImportMesh(mesh);
 				meshes.push_back(new_mesh);
 
-				//App->scene->selected_gameobj->SetMesh(new_mesh);
+				if (use)
+				{
+					//name
+					const char* pos = strrchr(path, 92);
+					if (pos == nullptr) pos = strrchr(path, '/');
+
+					GameObject* o = App->scene->CreateGameObj((pos == nullptr) ? "Unkown" : pos + 1);
+					o->SetMesh(App->resources->meshes.back());
+				}
+
 			}
 			aiReleaseImport(scene);
 		}
@@ -146,11 +152,10 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 
 		textures.push_back(tex);
 
-		//App->scene->selected_gameobj->GetMesh()->TEX = tex;
-		/*for (Mesh* mesh : App->scene->selected_gameobj->meshes)
+		if (use)
 		{
-			mesh->TEX = tex;
-		}*/
+			App->scene->selected_gameobj->GetMesh()->TEX = tex;
+		}
 
 	}
 }

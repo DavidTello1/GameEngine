@@ -6,15 +6,12 @@
 GameObject::GameObject(const char* name)
 {
 	uid = App->random->Int();
-	this->name = name;
+	strcpy(this->name, name);
 }
 
 GameObject::~GameObject()
 {
 	RELEASE(mesh);
-	/*for (uint i = 0; i < meshes.size(); i++)
-		delete meshes[i];
-	meshes.clear();*/
 }
 
 Mesh * GameObject::GetMesh()

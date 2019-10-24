@@ -119,7 +119,7 @@ bool ModuleInput::PreUpdate(float dt)
 
 		case SDL_DROPFILE:
 			dir = e.drop.file;
-			App->resources->LoadResource(dir);
+			App->resources->LoadResource(dir,Resources::Type::unknown,true);
 			SDL_free(e.drop.file);
 			break;
 

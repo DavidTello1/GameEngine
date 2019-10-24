@@ -1,11 +1,14 @@
 #ifndef __GAME_OBJECT_H__
 #define __GAME_OBJECT_H__
 
+#define NAME_LENGTH 128
+
 #include "Globals.h"
 #include "Mesh.h"
 
 #include "Math.h"
 #include <list>
+
 
 class GameObject
 {
@@ -17,7 +20,7 @@ public:
 
 	uint GetUID() const { return uid; }
 	const char* GetName() const { return name; }
-	void SetName(const char* Name) { name = Name; }
+	void SetName(const char* Name) { strcpy_s(this->name, NAME_LENGTH, name); }
 	bool IsActive() { return active; }
 
 	// Getters
@@ -50,7 +53,7 @@ public:
 
 private:
 	uint uid = 0;
-	const char* name;
+	char name [NAME_LENGTH];
 	bool active = true;
 
 	Quat rotation_quat = Quat::identity;

@@ -18,7 +18,7 @@ public:
 	bool CleanUp();
 
 	Resources::Type GetResourceType(const char* path);
-	void LoadResource(const char* path, Resources::Type type = Resources::Type::unknown);
+	void LoadResource(const char* path, Resources::Type type = Resources::Type::unknown, bool use = false);
 	GLuint ImportTexture(int width, int height, unsigned char * image);
 	void UnLoadResource();
 
@@ -28,8 +28,6 @@ public:
 
 private:
 	void MakeCheckersTexture();
-
-
 };
 
 #endif

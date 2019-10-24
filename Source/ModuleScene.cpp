@@ -39,18 +39,19 @@ bool ModuleScene::Start(Config* config)
 	selected_gameobj->SetMesh(App->resources->meshes.at(0));
 	selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
 
+
+	GameObject* pparent = CreateGameObj("ParShapes");
 	for (int i = 0; i < shape_type::UNKNOWN; i++)
 	{
-		CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10);
+		CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10,pparent->GetUID());
 	}
 
 	return ret;
 }
 
-void ModuleScene::CreateShape(shape_type type, int slices, int stacks, float x, float y, float z)
+void ModuleScene::CreateShape(shape_type type, int slices, int stacks, float x, float y, float z,uint parent_id)
 {
-	// new GameObject
-	CreateGameObj(Mesh::shape_to_string[type]);
+	CreateGameObj(Mesh::shape_to_string[type],parent_id);
 
 	Mesh* m = new Mesh();
 	m->CreateMesh(type, slices, stacks, x, y, z);
