@@ -19,7 +19,8 @@ public:
 
 	Resources::Type GetResourceType(const char* path);
 	void LoadResource(const char* path, Resources::Type type = Resources::Type::unknown, bool use = false);
-	GLuint ImportTexture(int width, int height, unsigned char * image);
+	void LogImageInfo();
+	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
 	void UnLoadResource();
 
 	static GLuint checker_texture;

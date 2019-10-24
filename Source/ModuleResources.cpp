@@ -141,13 +141,16 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type, bool 
 		unsigned int imageID;
 		ilGenImages(1, &imageID);
 		ilBindImage(imageID);
+
 		ilEnable(IL_ORIGIN_SET);
 		ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 
 		bool loaded = ilLoadImage(path);
 		if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
 
-		GLuint tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetData());
+		LogImageInfo();
+
+		GLuint tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
 		ilDeleteImages(1, &imageID);
 
 		textures.push_back(tex);
@@ -160,9 +163,42 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type, bool 
 	}
 }
 
-GLuint ModuleResources::ImportTexture(int width, int height, unsigned char* image)
+void ModuleResources::LogImageInfo()
 {
-	LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image), 'g');
+	char* s;
+	char* c;
+	switch (ilGetInteger(IL_IMAGE_FORMAT)) {
+	case IL_COLOR_INDEX: s = "IL_COLOR_INDEX"; break;
+	case IL_ALPHA: s = "IL_ALPHA"; break;
+	case IL_RGB: s = "IL_RGB"; break;
+	case IL_RGBA: s = "IL_RGBA"; break;
+	case IL_BGR: s = "IL_BGR"; break;
+	case IL_BGRA: s = "IL_BGRA"; break;
+	case IL_LUMINANCE: s = "IL_LUMINANCE"; break;
+	case  IL_LUMINANCE_ALPHA: s = "IL_LUMINANCE_ALPHA"; break;
+	}
+	switch (ilGetInteger(IL_IMAGE_TYPE)) {
+	case IL_BYTE: c = "IL_BYTE"; break;
+	case IL_UNSIGNED_BYTE: c = "IL_UNSIGNED_BYTE"; break;
+	case IL_SHORT: c = "IL_SHORT"; break;
+	case IL_UNSIGNED_SHORT: c = "IL_UNSIGNED_SHORT"; break;
+	case IL_INT: c = "IL_INT"; break;
+	case IL_UNSIGNED_INT: c = "IL_UNSIGNED_INT"; break;
+	case IL_FLOAT: c = "IL_FLOAT"; break;
+	case IL_DOUBLE: c = "IL_DOUBLE"; break;
+	case IL_HALF: c = "IL_HALF"; break;
+	}
+
+	LOG("Width: %d, Height %d, Bytes per Pixel %d",
+		ilGetInteger(IL_IMAGE_WIDTH),
+		ilGetInteger(IL_IMAGE_HEIGHT),
+		ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL), 'g');
+	LOG("Original image format: %s, data type: %s", s,c, 'g');
+}
+
+GLuint ModuleResources::ImportTexture(int width, int height,int internal_format, int format, unsigned char* image)
+{
+	//LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image)*sizeof(unsigned char), 'g');
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -172,7 +208,7 @@ GLuint ModuleResources::ImportTexture(int width, int height, unsigned char* imag
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	return texture;
