@@ -46,6 +46,7 @@ bool Viewport::PreUpdate()
 	glLoadMatrixf(App->camera->GetViewMatrix());
 
 	App->scene_intro->Draw();
+	App->scene->Draw();
 
 	//DrawFigures();
 	//glDrawArrays(GL_TRIANGLES, 0, 12 * 3);

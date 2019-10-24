@@ -72,27 +72,6 @@ bool ModuleResources::CleanUp()
 
 void ModuleResources::Draw()
 {
-	for (const Mesh* m : meshes)
-	{
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glBindBuffer(GL_ARRAY_BUFFER, m->VBO);
-		glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-		glBindTexture(GL_TEXTURE_2D, m->TEX);
-		glBindBuffer(GL_ARRAY_BUFFER, m->tex_coords_id);
-		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->IBO);
-		glDrawElements(GL_TRIANGLES, m->num_indices, GL_UNSIGNED_INT, nullptr);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-	}
 
 }
 
@@ -130,7 +109,7 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 
 	if (type == Resources::Type::mesh) // Mesh
 	{
-		App->scene_intro->CreateGameObj();
+		
 		LOG("Mesh resource type",'g');
 		const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 
@@ -140,13 +119,14 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 
 			for (uint i = 0; i < scene->mNumMeshes; ++i)
 			{
+				App->scene->CreateGameObj();
 				Mesh* new_mesh = new Mesh();
 				aiMesh* mesh = scene->mMeshes[i];
 
 				new_mesh->ImportMesh(mesh);
 				meshes.push_back(new_mesh);
 
-				App->scene_intro->selected_gameobj->meshes.push_back(new_mesh);
+				App->scene->selected_gameobj->SetMesh(new_mesh);
 			}
 			aiReleaseImport(scene);
 		}
@@ -169,11 +149,11 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 		GLuint tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetData());
 		ilDeleteImages(1, &imageID);
 
-
-		for (Mesh* mesh : App->scene_intro->selected_gameobj->meshes)
+		App->scene->selected_gameobj->GetMesh()->TEX = tex;
+		/*for (Mesh* mesh : App->scene->selected_gameobj->meshes)
 		{
 			mesh->TEX = tex;
-		}
+		}*/
 
 	}
 }

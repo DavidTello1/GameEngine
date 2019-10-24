@@ -428,10 +428,10 @@ void ModuleEditor::DrawPanels(bool &is_auto_select)
 			if (is_auto_select == true && ImGui::IsWindowHovered() == true && (*it)->in_menu == false) // auto-select
 				ImGui::SetWindowFocus();
 
-			if (App->scene_intro->create_gameobj == true && (*it)->GetName() == "Inspector") //show inspector when a gameobject is created
+			if (App->scene->create_gameobj == true && (*it)->GetName() == "Inspector") //show inspector when a gameobject is created
 			{
 				ImGui::SetWindowFocus();
-				App->scene_intro->create_gameobj = false;
+				App->scene->create_gameobj = false;
 			}
 			ImGui::End();
 		}

@@ -31,7 +31,7 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 		flags |= ImGuiTreeNodeFlags_Selected;
 		is_selected = true;
 		
-		App->scene_intro->SetSelectedGameobj(obj);
+		App->scene->SetSelectedGameobj(obj);
 		//LogAction("Selected");
 	}
 
@@ -40,7 +40,7 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 		flags &= ~ImGuiTreeNodeFlags_Selected;
 		is_selected = false;
 		
-		App->scene_intro->SetSelectedGameobj(nullptr);
+		App->scene->SetSelectedGameobj(nullptr);
 		//LogAction("Unselected");
 	}
 

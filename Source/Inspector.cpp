@@ -20,7 +20,7 @@ Inspector::~Inspector()
 
 void Inspector::Draw() 
 {
-	obj = App->scene_intro->GetSelectedGameobj();		
+	obj = App->scene->GetSelectedGameobj();		
 	if (obj == nullptr)
 		position = rotation = scale = float3::zero;
 	else

@@ -11,9 +11,15 @@ GameObject::GameObject(const char* name)
 
 GameObject::~GameObject()
 {
-	for (uint i = 0; i < meshes.size(); i++)
+	RELEASE(mesh);
+	/*for (uint i = 0; i < meshes.size(); i++)
 		delete meshes[i];
-	meshes.clear();
+	meshes.clear();*/
+}
+
+Mesh * GameObject::GetMesh()
+{
+	return this->mesh;
 }
 
 void GameObject::SetLocalRotation(const float3& XYZ_euler_rotation)
@@ -35,4 +41,9 @@ void GameObject::SetLocalTransform(const float4x4 & transform)
 {
 	transform.Decompose(translation, rotation_quat, scale);
 	rotation = rotation_quat.ToEulerXYZ().Abs();
+}
+
+void GameObject::SetMesh(Mesh * mesh)
+{
+	this->mesh = mesh;
 }

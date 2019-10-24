@@ -29,11 +29,15 @@ public:
 	float3 GetVelocity() const { return velocity; }
 	const float4x4& GetGlobalTransformation() const { return transform_global; }
 	const float* GetOpenGLGlobalTransform() const { return transform_global.Transposed().ptr(); }
+	Mesh* GetMesh();
 
 	// Setters
 	void SetLocalRotation(const float3& XYZ_euler_rotation);
 	void SetLocalRotation(const Quat& rotation);
 	void SetLocalTransform(const float4x4& transform);
+
+	void SetMesh(Mesh* mesh);
+
 
 	void SetLocalPosition(const float3& position) { translation = position; }
 	void SetLocalScale(const float3& scale) { this->scale = scale; }
@@ -59,7 +63,7 @@ private:
 
 public:
 	mutable bool visible = false;
-	std::vector<Mesh*> meshes;
+	Mesh* mesh = nullptr;
 
 };
 #endif

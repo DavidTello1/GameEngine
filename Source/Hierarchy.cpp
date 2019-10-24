@@ -73,30 +73,30 @@ void Hierarchy::DrawCreateMenu()
 	{
 		if (ImGui::MenuItem("Empty"))
 		{
-			App->scene_intro->CreateGameObj();
+			App->scene->CreateGameObj();
 		}
 		ImGui::Separator();
 		if (ImGui::BeginMenu("Basic shapes"))
 		{
 			if (ImGui::MenuItem("Cylinder"))
 			{
-				App->scene_intro->CreateShape(CYLINDER, 9, 9);
+				App->scene->CreateShape(CYLINDER, 9, 9);
 			}
 			if (ImGui::MenuItem("Cone"))
 			{
-				App->scene_intro->CreateShape(CONE, 9, 9);
+				App->scene->CreateShape(CONE, 9, 9);
 			}
 			if (ImGui::MenuItem("Sphere"))
 			{
-				App->scene_intro->CreateShape(SPHERE, 9, 9);
+				App->scene->CreateShape(SPHERE, 9, 9);
 			}
 			if (ImGui::MenuItem("Plane"))
 			{
-				App->scene_intro->CreateShape(PLANE, 9, 9);
+				App->scene->CreateShape(PLANE, 9, 9);
 			}
 			if (ImGui::MenuItem("Cube"))
 			{
-				App->scene_intro->CreateShape(CUBE, 9, 9);
+				App->scene->CreateShape(CUBE, 9, 9);
 			}
 			ImGui::EndMenu();
 		}
@@ -104,39 +104,39 @@ void Hierarchy::DrawCreateMenu()
 		{
 			if (ImGui::MenuItem("Torus"))
 			{
-				App->scene_intro->CreateShape(TORUS, 9, 9);
+				App->scene->CreateShape(TORUS, 9, 9);
 			}
 			if (ImGui::MenuItem("Bottle"))
 			{
-				App->scene_intro->CreateShape(BOTTLE, 9, 9);
+				App->scene->CreateShape(BOTTLE, 9, 9);
 			}
 			if (ImGui::MenuItem("Knot"))
 			{
-				App->scene_intro->CreateShape(KNOT, 9, 9);
+				App->scene->CreateShape(KNOT, 9, 9);
 			}
 			if (ImGui::MenuItem("Hemisphere"))
 			{
-				App->scene_intro->CreateShape(HEMISPHERE, 9, 9);
+				App->scene->CreateShape(HEMISPHERE, 9, 9);
 			}
 			if (ImGui::MenuItem("Icosahedron"))
 			{
-				App->scene_intro->CreateShape(ICOSAHEDRON, 9, 9);
+				App->scene->CreateShape(ICOSAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Dodecahedron"))
 			{
-				App->scene_intro->CreateShape(DODECAHEDRON, 9, 9);
+				App->scene->CreateShape(DODECAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Octahedron"))
 			{
-				App->scene_intro->CreateShape(OCTAHEDRON, 9, 9);
+				App->scene->CreateShape(OCTAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Tetrahedron"))
 			{
-				App->scene_intro->CreateShape(TETRAHEDRON, 9, 9);
+				App->scene->CreateShape(TETRAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Rock"))
 			{
-				App->scene_intro->CreateShape(ROCK, 9, 9);
+				App->scene->CreateShape(ROCK, 9, 9);
 			}
 			ImGui::EndMenu();
 		}
@@ -175,7 +175,7 @@ HierarchyNode* Hierarchy::AddNode(GameObject* obj, HierarchyNode* parent)
 
 void Hierarchy::DeleteNode(HierarchyNode* n)
 {
-	App->scene_intro->DeleteGameobj(n->obj);
+	App->scene->DeleteGameobj(n->obj);
 
 	// if has no childs, delete the node
 	if (n->childs.empty())
