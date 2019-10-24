@@ -24,7 +24,9 @@ public:
 
 	static GLuint checker_texture;
 	std::vector<Mesh*> meshes;
+	std::vector<GLuint> textures;
 
+private:
 	void MakeCheckersTexture();
 
 

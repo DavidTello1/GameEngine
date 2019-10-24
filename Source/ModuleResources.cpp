@@ -102,7 +102,7 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 
 	//if (type != Resources::Type::unknown)
 
-	if (type == Resources::Type::mesh) // Mesh
+	if (type == Resources::Type::mesh) // Me sh
 	{
 		
 		LOG("Mesh resource type",'g');
@@ -114,14 +114,14 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 
 			for (uint i = 0; i < scene->mNumMeshes; ++i)
 			{
-				App->scene->CreateGameObj();
+				//App->scene->CreateGameObj();
 				Mesh* new_mesh = new Mesh();
 				aiMesh* mesh = scene->mMeshes[i];
 
 				new_mesh->ImportMesh(mesh);
 				meshes.push_back(new_mesh);
 
-				App->scene->selected_gameobj->SetMesh(new_mesh);
+				//App->scene->selected_gameobj->SetMesh(new_mesh);
 			}
 			aiReleaseImport(scene);
 		}
@@ -144,7 +144,9 @@ void ModuleResources::LoadResource(const char* path, Resources::Type type)
 		GLuint tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetData());
 		ilDeleteImages(1, &imageID);
 
-		App->scene->selected_gameobj->GetMesh()->TEX = tex;
+		textures.push_back(tex);
+
+		//App->scene->selected_gameobj->GetMesh()->TEX = tex;
 		/*for (Mesh* mesh : App->scene->selected_gameobj->meshes)
 		{
 			mesh->TEX = tex;

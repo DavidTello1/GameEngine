@@ -17,11 +17,12 @@ public:
 
 public:
 	Hierarchy();
+	HierarchyNode * SearchById(const uint id);
 	virtual ~Hierarchy();
 
 	void Draw();
 
-	static HierarchyNode* AddNode(GameObject* object = nullptr, HierarchyNode* node = nullptr);
+	static HierarchyNode* AddNode(GameObject* object = nullptr, HierarchyNode* node = root_node);
 	static void DeleteNode(HierarchyNode * n);
 	static void DeleteSelected();
 	static bool SearchAndDeleteNode(HierarchyNode* n, std::vector<HierarchyNode*>& v);
@@ -34,7 +35,7 @@ private:
 
 public:
 	//Data
-	static std::vector<HierarchyNode*> root_nodes;
+	static HierarchyNode* root_node;
 	static std::vector<HierarchyNode*> nodes;
 	static std::vector<HierarchyNode*> selected_nodes;
 

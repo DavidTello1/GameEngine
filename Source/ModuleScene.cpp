@@ -1,7 +1,6 @@
 #include "ModuleScene.h"
 #include "Application.h"
 #include "ModuleEditor.h"
-#include "Hierarchy.h"
 
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
@@ -25,8 +24,21 @@ bool ModuleScene::Start(Config* config)
 	//m = App->resources->LoadFBX("Assets/Warrior.fbx");
 	//m = GeometryLoader::LoadModel("Assets/Warrior.fbx");
 	//App->resources->LoadResource("Assets/warrior.fbx");
+
+	// Loading bakerhouse into the empty
+	GameObject* baker_parent = CreateGameObj("BakerHouse");
+	
 	App->resources->LoadResource("Assets/BakerHouse.fbx");
 	App->resources->LoadResource("Assets/Baker_house.png");
+
+	CreateGameObj("House", baker_parent->GetUID());
+	selected_gameobj->SetMesh(App->resources->meshes.at(1));
+	selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
+
+	CreateGameObj("Chimney", baker_parent->GetUID());
+	selected_gameobj->SetMesh(App->resources->meshes.at(0));
+	selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
+
 	for (int i = 0; i < shape_type::UNKNOWN; i++)
 	{
 		CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10);
@@ -78,8 +90,10 @@ bool ModuleScene::Draw()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	for (const GameObject* obj : gameobjs)
 	{
+		if (obj->mesh == nullptr) continue;
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -104,14 +118,15 @@ bool ModuleScene::Draw()
 	return true;
 }
 
-GameObject* ModuleScene::CreateGameObj(const char* name)
+GameObject* ModuleScene::CreateGameObj(const char* name, const uint parent_id)
 {
 	create_gameobj = true;
 
 	GameObject* obj = new GameObject(name);
 	gameobjs.push_back(obj);
 
-	App->editor->tab_hierarchy->AddNode(obj); // add node to hierarchy
+
+	App->editor->tab_hierarchy->AddNode(obj, App->editor->tab_hierarchy->SearchById(parent_id)); // add node to hierarchy
 	selected_gameobj = obj; // new obj is selected_gameobj
 
 	return obj;

@@ -3,6 +3,8 @@
 #include "Module.h"
 #include <vector>
 #include "GameObject.h"
+#include "Hierarchy.h"
+
 
 
 class ModuleScene :	public Module
@@ -24,7 +26,8 @@ public:
 
 	// GameObjects-----------
 public:
-	GameObject* CreateGameObj(const char* name = "GameObject");
+	// default parent id is root node
+	GameObject* CreateGameObj(const char* name = "GameObject",const uint parent_id = 0);
 	void DeleteGameobj(GameObject* obj);
 	GameObject* GetSelectedGameobj() { return selected_gameobj; }
 	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }
