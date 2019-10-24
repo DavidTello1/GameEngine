@@ -31,7 +31,7 @@ Console::Console() : Panel("Console")
 	ShowGeometryLog = true;
 	ShowVerboseLog	= false;
 	ShowWarningLog	= true;
-	EnableFileName	= false;
+	EnableFileName	= true;
 	ScrollToBottom	= false;
 
 	width = default_width;
