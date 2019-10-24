@@ -286,6 +286,17 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 
 			if (ImGui::BeginMenu("View")) //view
 			{
+				if (ImGui::MenuItem("Show Plane", NULL, &is_plane))
+					show_plane = !show_plane;
+
+				if (ImGui::MenuItem("Show Axis", NULL, &is_axis))
+					show_axis = !show_axis;
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Wireframe", NULL, &is_wireframe))
+					show_wireframe = !show_wireframe;
+
 				//if (ImGui::MenuItem("Top"))
 				//	//top
 
@@ -312,16 +323,6 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 			{
 				ImGui::MenuItem("Autoselect windows", NULL, &is_auto_select);
 
-				ImGui::Separator();
-				if (ImGui::MenuItem("Show Plane", NULL, &is_plane))
-					show_plane = !show_plane;
-
-				if (ImGui::MenuItem("Show Axis", NULL, &is_axis))
-					show_axis = !show_axis;
-
-				if (ImGui::MenuItem("Wireframe", NULL, &is_wireframe))
-					show_wireframe = !show_wireframe;
-
 				ImGui::EndMenu();
 			}
 
@@ -330,9 +331,11 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				ImGui::MenuItem("ImGui Demo", NULL, &is_show_demo);
 				ImGui::Separator();
 
+				if (ImGui::MenuItem("Github"))
+					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine", NULL, NULL, SW_SHOWNORMAL);
+
 				if (ImGui::MenuItem("Documentation"))
 					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine/wiki", NULL, NULL, SW_SHOWNORMAL);
-
 
 				if (ImGui::MenuItem("Latest Version"))
 					ShellExecuteA(NULL, "open", "https://github.com/ponspack9/GameEngine/releases", NULL, NULL, SW_SHOWNORMAL);
@@ -368,10 +371,11 @@ void ModuleEditor::DrawAbout(bool &is_about)
 		ImGui::OpenPopup("About");
 		if (ImGui::BeginPopupModal("About"))
 		{
-			ImGui::Text("Davos Game Engine");
-			ImGui::Text("Description");
-			ImGui::Text("By");
-			ImGui::SameLine();
+			//ImGui::Text("Davos Game Engine");
+			CreateLink("Davos Game Engine", "https://github.com/ponspack9/GameEngine");
+			ImGui::Text("Davos is a game engine developed by two students of CITM:");
+			//ImGui::Text("By");
+			//ImGui::SameLine();
 			CreateLink("Oscar Pons", "https://github.com/ponspack9");
 			ImGui::SameLine();
 			ImGui::Text("&");
