@@ -11,15 +11,15 @@
 void log(const char file[], int line, const char* format, ...)
 {
 	static char tmp_string[4096];
-	static char tmp_string2[4096];
+	static char final_log[4096];
+	static char log_type[4096];
+
 	static va_list  ap;
 	// Construct the string from variable arguments
 	va_start(ap, format);
 	vsprintf_s(tmp_string, 4096, format, ap);
 
 	// Filtering
-	static char final_log[4096];
-	static char log_type[4096];
 	strcpy(log_type, format);
 	strcat(log_type, "%c");
 	vsprintf(final_log, log_type, ap);
@@ -28,8 +28,8 @@ void log(const char file[], int line, const char* format, ...)
 	va_end(ap);
 
 	//Default visual studio logging
-	sprintf_s(tmp_string2, 4096, "\n%s(%d) : %s", file, line, tmp_string);
-	OutputDebugString(tmp_string2);
+	sprintf_s(final_log, 4096, "\n%s(%d) : %s", file, line, tmp_string);
+	OutputDebugString(final_log);
 
 	//Console log system
 

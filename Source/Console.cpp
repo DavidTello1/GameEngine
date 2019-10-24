@@ -31,7 +31,7 @@ Console::Console() : Panel("Console")
 	ShowGeometryLog = true;
 	ShowVerboseLog	= false;
 	ShowWarningLog	= true;
-	EnableFileName	= true;
+	EnableFileName	= false;
 	ScrollToBottom	= false;
 
 	width = default_width;
@@ -77,10 +77,15 @@ void Console::Draw()
 			in_menu = true;
 
 			ImGui::MenuItem("Auto-scroll", NULL, &AutoScroll);
-			if(ImGui::MenuItem("Show Verbose Log", NULL, &ShowVerboseLog))UpdateFilters();
-			if(ImGui::MenuItem("Show Geometry Log", NULL, &ShowGeometryLog))UpdateFilters();
-			if(ImGui::MenuItem("Show Debug Log", NULL, &ShowDebugLog))UpdateFilters();
-			if(ImGui::MenuItem("Show Warning Log", NULL, &ShowWarningLog))UpdateFilters();
+			ImGui::Separator();
+
+			if(ImGui::MenuItem("Show verbose log", NULL, &ShowVerboseLog))UpdateFilters();
+			if(ImGui::MenuItem("Show geometry log", NULL, &ShowGeometryLog))UpdateFilters();
+			if(ImGui::MenuItem("Show debug log", NULL, &ShowDebugLog))UpdateFilters();
+			if (ImGui::MenuItem("Show warning log", NULL, &ShowWarningLog))UpdateFilters();
+
+			ImGui::Separator();
+			ImGui::MenuItem("Enable file name", NULL, &EnableFileName);
 
 			ImGui::EndMenu();
 		}
