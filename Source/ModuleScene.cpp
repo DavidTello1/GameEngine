@@ -44,7 +44,7 @@ bool ModuleScene::Start(Config* config)
 	GameObject* pparent = CreateGameObj("ParShapes");
 	for (int i = 0; i < shape_type::UNKNOWN; i++)
 	{
-		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10,0.5f, pparent->GetUID());
+		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10, 0.5f, pparent->GetUID());
 	}
 
 	return ret;
@@ -81,6 +81,12 @@ bool ModuleScene::CleanUp()
 		delete gameobjs[i];
 	}
 	gameobjs.clear();
+
+	for (uint i = 0; i < materials.size(); ++i)
+	{
+		delete materials[i];
+	}
+	materials.clear();
 
 	return true;
 }
@@ -130,7 +136,7 @@ void ModuleScene::DeleteGameobj(GameObject* obj)
 	if (selected_gameobj == obj)
 		selected_gameobj = nullptr;
 
-	for (int i = 0; i < gameobjs.size(); i++)
+	for (uint i = 0; i < gameobjs.size(); i++)
 	{
 		if (gameobjs[i] == obj)
 		{

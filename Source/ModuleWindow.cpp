@@ -143,8 +143,8 @@ uint ModuleWindow::GetRefreshRate() const
 
 void ModuleWindow::GetMaxMinSize(uint & min_width, uint & min_height, uint & max_width, uint & max_height) const
 {
-	min_width = 640;
-	min_height = 480;
+	min_width = 480;
+	min_height = 320;
 	max_width = 3000;
 	max_height = 2000;
 

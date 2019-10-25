@@ -11,8 +11,3 @@ ComponentMaterial::~ComponentMaterial()
 {
 	glDeleteTextures(1, (GLuint*)&tex_id);
 }
-
-void ComponentMaterial::FreeTexture()
-{
-	glDeleteTextures(1, (GLuint*)&tex_id);
-}

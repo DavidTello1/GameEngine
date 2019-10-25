@@ -7,9 +7,13 @@
 #include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
 #include "ModuleFileSystem.h"
+#include "ModuleScene.h"
+#include "ComponentMaterial.h"
+
+#include "gpudetect/DeviceId.h"
+#include "Devil/include/IL/il.h"
 
 #include "mmgr/mmgr.h"
-#include "gpudetect/DeviceId.h"
 
 using namespace std;
 
@@ -63,29 +67,10 @@ void Configuration::Draw()
 	if (InitModuleDraw(App->input))
 		DrawModuleInput(App->input);
 
-	if (InitModuleDraw(App->renderer3D))
-		DrawModuleRenderer(App->renderer3D);
+	DrawTextures();
 	
 	if (InitModuleDraw(App->file_system))
 		DrawModuleFileSystem(App->file_system);
-
-	//if (InitModuleDraw(App->audio))
-	//	DrawModuleAudio(App->audio);
-
-	//if (InitModuleDraw(App->camera))
-	//	DrawModuleCamera(App->camera);
-
-	//if (InitModuleDraw(App->physics3D))
-	//	DrawModulePhysics(App->physics3D);
-
-	//if (InitModuleDraw(App->tex))
-	//	DrawModuleTextures(App->tex);
-
-	//if (InitModuleDraw(App->level))
-	//	DrawModuleLevel(App->level);
-
-	//if (InitModuleDraw(App->hints))
-	//	DrawModuleHints(App->hints);
 }
 
 bool Configuration::InitModuleDraw(Module* module)
@@ -146,8 +131,8 @@ void Configuration::DrawApplication()
 
 			// Devil
 			ImGui::BulletText("DevIL Version:");
-			//ImGui::SameLine();
-			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", IL_VERSION);
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", IL_VERSION);
 
 			ImGui::TreePop();
 		}
@@ -156,6 +141,10 @@ void Configuration::DrawApplication()
 		// FPS 
 		if (ImGui::TreeNode("FPS"))
 		{
+			bool vsync = App->renderer3D->GetVSync();
+			if (ImGui::Checkbox("Vertical Sync", &vsync))
+				App->renderer3D->SetVSync(vsync);
+
 			int max_fps = App->GetFramerateLimit();
 			if (ImGui::SliderInt("Max FPS", &max_fps, 0, 120))
 				App->SetFramerateLimit(max_fps);
@@ -262,15 +251,13 @@ void Configuration::DrawModuleWindow(ModuleWindow* module)
 	if (ImGui::SliderFloat("Brightness", &brightness, 0.0f, 1.0f))
 		App->window->SetBrightness(brightness);
 
-	uint w, h, min_w, min_h, max_w, max_h;
+	uint min_w, min_h, max_w, max_h;
 	App->window->GetMaxMinSize(min_w, min_h, max_w, max_h);
-	w = App->window->GetWidth();
-	h = App->window->GetHeight();
 
-	static int width = (int)w;
-	static int height = (int)h;
+	static int width = (int)App->window->GetWidth();
+	static int height = (int)App->window->GetHeight();
 
-	if (ImGui::InputInt("Width", &width, 1, 1))
+	if (ImGui::DragInt("Width", &width, 1, min_w, max_w))
 	{
 		if ((uint)width > max_w)
 			width = int(max_w);
@@ -280,7 +267,7 @@ void Configuration::DrawModuleWindow(ModuleWindow* module)
 		App->window->SetWidth((uint)width);
 	}
 
-	if (ImGui::InputInt("Height", &height, 1, 1))
+	if (ImGui::DragInt("Height", &height, 1, min_h, max_h))
 	{
 		if ((uint)height > max_h)
 			height = max_h;
@@ -348,15 +335,35 @@ void Configuration::DrawModuleInput(ModuleInput* module)
 	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", wheel);
 }
 
-void Configuration::DrawModuleRenderer(ModuleRenderer3D* module)
+void Configuration::DrawTextures()
 {
-	ImGui::Text("Driver:");
-	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), App->renderer3D->GetDriver());
+	if (ImGui::CollapsingHeader("Textures"))
+	{
+		if (App->scene->materials.empty())
+			return;
 
-	bool vsync = App->renderer3D->GetVSync();
-	if (ImGui::Checkbox("Vertical Sync", &vsync))
-		App->renderer3D->SetVSync(vsync);
+		char buffer[120];
+		for (uint i = 0; i < App->scene->materials.size(); i++)
+		{
+			sprintf_s(buffer, 120, "Texture %d", i);
+
+			if (ImGui::TreeNode(buffer))
+			{
+				ImGui::Text("Size: ");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i, %i", App->scene->materials[i]->width, App->scene->materials[i]->height);
+
+				ImGui::Text("Path: ");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", App->scene->materials[i]->path);
+
+				ImGui::Text("Image:");
+
+
+				ImGui::TreePop();
+			}
+		}
+	}
 }
 
 void Configuration::DrawModuleFileSystem(ModuleFileSystem* module)

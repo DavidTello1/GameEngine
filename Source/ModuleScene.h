@@ -43,13 +43,10 @@ public:
 
 	void EraseFromSelected(GameObject* go);
 	std::vector<GameObject*> selected_go;
+	std::vector<ComponentMaterial*> materials;
+	std::vector<GameObject*> gameobjs;
 
 private:
 	GameObject* selected_gameobj = nullptr;
-	std::vector<GameObject*> gameobjs;
-
-	// -----------------
-	std::vector<ComponentMaterial*> materials;
-	std::vector<ComponentMesh*> meshes;
 };
 

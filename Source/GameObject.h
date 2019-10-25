@@ -24,6 +24,7 @@ public:
 
 	Component* GetComponent(Component::Type type);
 	Component* AddComponent(Component::Type type);
+	bool HasComponent(Component::Type type);
 	void DeleteComponent(Component* component);
 
 	float3 GetPosition() const { return translation; }

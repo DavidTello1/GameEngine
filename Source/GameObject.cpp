@@ -9,15 +9,14 @@
 GameObject::GameObject(const char* name)
 {
 	uid = App->random->Int();
-	strcpy(this->name, name);
+	strcpy_s(this->name, name);
 }
 
 GameObject::~GameObject()
 {
 	for (uint i = 0; i < components.size(); i++)
-	{
 		delete components[i];
-	}
+
 }
 
 Component* GameObject::GetComponent(Component::Type type)
@@ -67,6 +66,16 @@ Component* GameObject::AddComponent(Component::Type type)
 		return new_component;
 	}
 	return nullptr;
+}
+
+bool GameObject::HasComponent(Component::Type type)
+{
+	for (uint i = 0; i < components.size(); i++)
+	{
+		if (components[i]->GetType() == type)
+			return true;
+	}
+	return false;
 }
 
 // ---------------------

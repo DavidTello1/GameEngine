@@ -18,14 +18,6 @@ class ModuleWindow;
 class ModuleInput;
 class ModuleRenderer3D;
 class ModuleFileSystem;
-//class ModuleAudio;
-//class ModuleEditorCamera;
-//class ModulePhysics3D;
-//class ModuleTextures;
-//class ModuleMeshes;
-//class ModuleLevelManager;
-//class ModuleHints;
-//class QuadtreeNode;
 
 struct hardware_info 
 {
@@ -72,17 +64,9 @@ public:
 	void DrawHardware();
 	void DrawModuleWindow(ModuleWindow * module);
 	void DrawModuleInput(ModuleInput * module);
-	void DrawModuleRenderer(ModuleRenderer3D * module);
+	void DrawTextures();
 	void DrawModuleFileSystem(ModuleFileSystem * module);
-	//void DrawModuleAudio(ModuleAudio * module);
-	//void DrawModuleCamera(ModuleEditorCamera * module);
-	//void DrawModulePhysics(ModulePhysics3D * module);
-	//void DrawModuleTextures(ModuleTextures * module);
-	//void DrawModuleLevel(ModuleLevelManager * module);
-	//void DrawModuleHints(ModuleHints * module);
 
-	//void RecursiveDrawQuadtree(QuadtreeNode* node);
-	//void AddInput(const char* entry);
 	void AddFPS(float fps, float ms);
 
 	void GetHardware();

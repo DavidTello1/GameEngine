@@ -4,15 +4,12 @@
 
 #include "glew\include\GL\glew.h"
 
-struct aiScene;
 class ComponentMaterial : public Component
 {
 public:
 
 	ComponentMaterial(GameObject* obj);
 	virtual ~ComponentMaterial();
-
-	void FreeTexture();
 
 public:
 	uint  tex_id = 0;
