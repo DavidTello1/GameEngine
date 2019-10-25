@@ -30,8 +30,11 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0);
+	//glEnable(GL_TEXTURE_2D);
+	//glActiveTexture(GL_TEXTURE0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
 	ComponentMaterial* material = (ComponentMaterial*)mesh.GetGameobj()->GetComponent(Component::Type::Material);
 	if(material != nullptr && material->IsActive())
@@ -41,12 +44,17 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 		else
 			glBindTexture(GL_TEXTURE_2D, mesh.TEX);
 		
-		glBindBuffer(GL_ARRAY_BUFFER, mesh.tex_coords_id);
-		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
 	}
+	else
+	{
+		if (show_checkers)
+			glBindTexture(GL_TEXTURE_2D, App->resources->checker_texture);
+		else
+			glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.tex_coords_id);
+	glTexCoordPointer(2, GL_FLOAT, 0, NULL);
 
-	glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-	glVertexPointer(3, GL_FLOAT, 0, NULL);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.IBO);
 	glDrawElements(GL_TRIANGLES, mesh.num_indices, GL_UNSIGNED_INT, nullptr);
 
@@ -54,8 +62,8 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	glDisable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0);
+	/*glDisable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);*/
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }

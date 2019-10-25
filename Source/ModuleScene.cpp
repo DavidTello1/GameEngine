@@ -41,12 +41,12 @@ bool ModuleScene::Start(Config* config)
 	//selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
 
 
-	//GameObject* pparent = CreateGameObj("ParShapes");
-	/*for (int i = 0; i < shape_type::UNKNOWN; i++)
+	GameObject* pparent = CreateGameObj("ParShapes");
+	for (int i = 0; i < shape_type::UNKNOWN; i++)
 	{
-		CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10,pparent->GetUID());
+		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10,0.5f, pparent->GetUID());
 	}
-*/
+
 	return ret;
 }
 
@@ -108,11 +108,14 @@ bool ModuleScene::Draw()
 	return true;
 }
 
-GameObject* ModuleScene::CreateGameObj(const char* name, const uint parent_id)
+GameObject* ModuleScene::CreateGameObj(const char* name, const uint parent_id, bool visible)
 {
 	create_gameobj = true;
 
 	GameObject* obj = new GameObject(name);
+	if (visible)
+		obj->AddComponent(Component::Type::Renderer);
+
 	gameobjs.push_back(obj);
 
 

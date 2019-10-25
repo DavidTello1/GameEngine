@@ -30,7 +30,7 @@ public:
 	// GameObjects-----------
 public:
 	// default parent id is root node
-	GameObject* CreateGameObj(const char* name = "GameObject",const uint parent_id = 0);
+	GameObject* CreateGameObj(const char* name = "GameObject",const uint parent_id = 0, bool visible = false);
 	void DeleteGameobj(GameObject* obj);
 	GameObject* GetSelectedGameobj() { return selected_gameobj; }
 	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }

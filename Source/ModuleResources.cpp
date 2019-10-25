@@ -95,7 +95,6 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 
 	if (type == Component::Type::Mesh) // Mesh
 	{
-
 		LOG("Mesh resource type",'g');
 		const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 
@@ -107,13 +106,9 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			{	
 				if (use)
 				{
-					//GameObject* o = App->scene->CreateGameObj((pos == nullptr) ? "Unkown" : pos + 1);
-					//o->SetMesh(App->resources->meshes.back());
-					
 					//name
 					const char* pos = strrchr(path, 92);
 					if (pos == nullptr) pos = strrchr(path, '/');
-
 
 					object = App->scene->CreateGameObj(pos+1);
 					ComponentMesh* mesh_component = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
@@ -132,7 +127,6 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 	}
 	else if (type == Component::Type::Material) // Texture
 	{
-		//object = App->scene_intro->GetSelectedGameobj();
 		if (!App->scene->selected_go.empty())
 		{
 			// Devil
@@ -145,19 +139,16 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			bool loaded = ilLoadImage(path);
 			if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
 
-
 			LogImageInfo();
 
 			GLuint tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
 			ilDeleteImages(1, &imageID);
 
-			//textures.push_back(tex);
-
 			if (use)
 			{
-				//App->scene->selected_gameobj->GetMesh()->TEX = tex;
 				for (GameObject* object : App->scene->selected_go)
 				{
+					// Check if has a mesh component (to be replaced by boolean)
 					for (uint i = 0; i < object->components.size(); i++)
 					{
 						if (object->components[i]->GetType() == Component::Type::Mesh)
@@ -195,15 +186,9 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 		mesh_component->vertices[i].z = mesh->mVertices[i].z;
 	}
 
-	// Generate VBO
-	LOG("Generating VBO", 'g');
-	glGenBuffers(1, &mesh_component->VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float3)* mesh_component->num_vertices, mesh_component->vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	GenVBO(mesh_component);
 
 
-		
 	// Indices -----------------------
 	mesh_component->num_indices = mesh->mNumFaces * 3;
 	mesh_component->indices = new GLuint[mesh_component->num_indices];
@@ -214,12 +199,7 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 		memcpy(&mesh_component->indices[i * 3], mesh->mFaces[i].mIndices, 3 * sizeof(GLuint));
 	}
 
-	// Generate IBO
-	LOG("Generating IBO", 'g');
-	glGenBuffers(1, &mesh_component->IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_component->IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * mesh_component->num_indices, mesh_component->indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	GenIBO(mesh_component);
 
 	// Texture Coordinates -----------------------
 	if (mesh->HasTextureCoords(0))
@@ -234,12 +214,7 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 		}
 	}
 
-	// Generate Textures
-	LOG("Generating Texture", 'g');
-	glGenBuffers(1, &mesh_component->tex_coords_id);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->tex_coords_id);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float2) * mesh_component->num_tex_coords, mesh_component->tex_coords, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	GenTexture(mesh_component);
 
 	//// Normals
 	//if (mesh->HasNormals())
@@ -279,8 +254,6 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 	}*/
 }
 
-
-
 GLuint ModuleResources::ImportTexture(int width, int height,int internal_format, int format, unsigned char* image)
 {
 	//LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image)*sizeof(unsigned char), 'g');
@@ -304,6 +277,151 @@ void ModuleResources::UnLoadResource()
 
 }
 
+void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, uint parent_id)
+{
+	par_shapes_mesh* m;
+
+	if (slices < 3)
+	{
+		slices = 3;
+		LOG("Slices less than 3, setting to 3", 'w');
+	}
+	if (stacks < 3)
+	{
+		stacks = 3;
+		LOG("Stacks less than 3, setting to 3", 'w');
+	}
+
+	switch (type)
+	{
+	case CYLINDER:
+		m = par_shapes_create_cylinder(slices, stacks);
+		break;
+	case CONE:
+		m = par_shapes_create_cone(slices, stacks);
+		break;
+	case TORUS:
+		m = par_shapes_create_torus(slices, stacks, radius);
+		break;
+	case SPHERE:
+		m = par_shapes_create_parametric_sphere(slices, stacks);
+		break;
+	case BOTTLE:
+		m = par_shapes_create_klein_bottle(slices, stacks);
+		break;
+	case KNOT:
+		m = par_shapes_create_trefoil_knot(slices, stacks, radius);
+		break;
+	case HEMISPHERE:
+		m = par_shapes_create_hemisphere(slices, stacks);
+		break;
+	case PLANE:
+		m = par_shapes_create_plane(slices, stacks);
+		break;
+	case ICOSAHEDRON:
+		m = par_shapes_create_icosahedron();
+		break;
+	case DODECAHEDRON:
+		m = par_shapes_create_dodecahedron();
+		break;
+	case OCTAHEDRON:
+		m = par_shapes_create_octahedron();
+		break;
+	case TETRAHEDRON:
+		m = par_shapes_create_tetrahedron();
+		break;
+	case CUBE:
+		m = par_shapes_create_cube();
+		break;
+	case ROCK:
+		m = par_shapes_create_rock(slices*stacks, 2);
+		break;
+
+	default:
+		break;
+	}
+
+	par_shapes_translate(m, x, y, z);
+
+	LOG("Creating primitive '%s'", GetShapeName(type), 'v');
+
+	GameObject* object = App->scene->CreateGameObj(GetShapeName(type), parent_id, true);
+	ComponentMesh* mesh = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
+
+	// Vertices ------------------
+	mesh->num_vertices = m->npoints;
+	mesh->vertices = new float3[mesh->num_vertices];
+
+	for (uint i = 0; i < mesh->num_vertices; ++i)
+	{
+		int k = i * 3;
+		mesh->vertices[i].x = m->points[k];
+		mesh->vertices[i].y = m->points[k + 1];
+		mesh->vertices[i].z = m->points[k + 2];
+	}
+
+	GenVBO(mesh);
+
+
+	// Indices ---------------------
+	mesh->num_indices = m->ntriangles * 3;
+	mesh->indices = new GLuint[mesh->num_indices];
+
+	for (uint i = 0; i < mesh->num_indices; ++i)
+	{
+		mesh->indices[i] = (GLuint)m->triangles[i];
+	}
+
+	GenIBO(mesh);
+
+	// Texture -----------------------
+	if (m->tcoords != nullptr) {
+
+		mesh->num_tex_coords = m->npoints;
+		mesh->tex_coords = new float2[mesh->num_tex_coords];
+
+		for (unsigned i = 0; i < mesh->num_tex_coords; ++i)
+		{
+			int k = i * 2;
+			mesh->tex_coords[i].x = m->tcoords[k];
+			mesh->tex_coords[i].y = m->tcoords[k + 1];
+		}
+	}
+
+	GenTexture(mesh);
+
+	par_shapes_free_mesh(m);
+
+}
+void ModuleResources::GenVBO(ComponentMesh * mesh_component)
+{
+	// Generate VBO
+	LOG("Generating VBO", 'g');
+	glGenBuffers(1, &mesh_component->VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float3)* mesh_component->num_vertices, mesh_component->vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void ModuleResources::GenIBO(ComponentMesh * mesh_component)
+{
+	// Generate IBO
+	LOG("Generating IBO", 'g');
+	glGenBuffers(1, &mesh_component->IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_component->IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * mesh_component->num_indices, mesh_component->indices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void ModuleResources::GenTexture(ComponentMesh * mesh_component)
+{
+	// Generate Textures
+	LOG("Generating Texture", 'g');
+	glGenBuffers(1, &mesh_component->tex_coords_id);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->tex_coords_id);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float2) * mesh_component->num_tex_coords, mesh_component->tex_coords, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
 void ModuleResources::MakeCheckersTexture()
 {
 	const int checkImageWidth = 256;
@@ -370,112 +488,4 @@ void ModuleResources::LogImageInfo()
 		ilGetInteger(IL_IMAGE_HEIGHT),
 		ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL), 'g');
 	LOG("Original image format: %s, data type: %s", s, c, 'g');
-}
-
-void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z,float radius)
-{
-	//par_shapes_mesh* m;
-
-	//if (slices < 3) 
-	//{
-	//	slices = 3;
-	//	LOG("Slices less than 3, setting to 3",'w');
-	//}
-	//if (stacks < 3) 
-	//{
-	//	stacks = 3;
-	//	LOG("Stacks less than 3, setting to 3",'w');
-	//}
-
-	//switch (type)
-	//{
-	//case CYLINDER:
-	//	m = par_shapes_create_cylinder(slices, stacks);
-	//	break;
-	//case CONE:
-	//	m = par_shapes_create_cone(slices, stacks);
-	//	break;
-	//case TORUS:
-	//	m = par_shapes_create_torus(slices, stacks,radius);
-	//	break;
-	//case SPHERE:
-	//	m = par_shapes_create_parametric_sphere(slices,stacks);
-	//	break;
-	//case BOTTLE:
-	//	m = par_shapes_create_klein_bottle(slices, stacks);
-	//	break;
-	//case KNOT:
-	//	m = par_shapes_create_trefoil_knot(slices, stacks,radius);
-	//	break;
-	//case HEMISPHERE:
-	//	m = par_shapes_create_hemisphere(slices, stacks);
-	//	break;
-	//case PLANE:
-	//	m = par_shapes_create_plane(slices, stacks);
-	//	break;
-	//case ICOSAHEDRON:
-	//	m = par_shapes_create_icosahedron();
-	//	break;
-	//case DODECAHEDRON:
-	//	m = par_shapes_create_dodecahedron();
-	//	break;
-	//case OCTAHEDRON:
-	//	m = par_shapes_create_octahedron();
-	//	break;
-	//case TETRAHEDRON:
-	//	m = par_shapes_create_tetrahedron();
-	//	break;
-	//case CUBE:
-	//	m = par_shapes_create_cube();
-	//	break;
-	//case ROCK:
-	//	m = par_shapes_create_rock(slices*stacks, 2);
-	//	break;
-
-	//default:
-	//	break;
-	//}
-
-	//par_shapes_translate(m, x, y, z);
-
-	//LOG("Creating primitive '%d'", (int)type, 'd');
-
-	//// Vertices
-	//num_vertices = m->npoints;
-	//vertices = new float3[num_vertices];
-
-	//for (uint i = 0; i < num_vertices; ++i)
-	//{
-	//	int k = i * 3;
-	//	vertices[i].x = m->points[k];
-	//	vertices[i].y = m->points[k+1];
-	//	vertices[i].z = m->points[k+2];
-	//}
-
-	//// Indices
-	//num_indices = m->ntriangles*3;
-	//indices = new GLuint[num_indices];
-
-	//for (uint i = 0; i < num_indices; ++i)
-	//{
-	//	indices[i] = (GLuint)m->triangles[i];
-	//}
-
-	//if (m->tcoords != nullptr) {
-
-	//	// Texture Coordinates
-	//	num_tex_coords = m->npoints;
-	//	tex_coords = new float2[num_tex_coords];
-
-	//	for (unsigned i = 0; i < num_tex_coords; ++i)
-	//	{
-	//		int k = i * 2;
-	//		tex_coords[i].x = m->tcoords[k];
-	//		tex_coords[i].y = m->tcoords[k+1];
-	//	}
-	//}
-	//
-	//par_shapes_free_mesh(m);
-
-	//TEX = checker_texture;
 }
