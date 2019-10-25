@@ -1,20 +1,19 @@
-#ifndef __GAME_OBJECT_H__
-#define __GAME_OBJECT_H__
+#pragma once
 
 #define NAME_LENGTH 128
 
 #include "Globals.h"
-#include "Mesh.h"
+#include "Component.h"
 
 #include "Math.h"
-#include <list>
+#include <vector>
+
+class ComponentMaterial;
 
 
 class GameObject
 {
 public:
-	ALIGN_CLASS_TO_16
-
 	GameObject(const char* name);
 	virtual ~GameObject();
 
@@ -23,50 +22,43 @@ public:
 	void SetName(const char* Name) { strcpy_s(this->name, NAME_LENGTH, name); }
 	bool IsActive() { return active; }
 
-	// Getters
-	float3 GetLocalPosition() const { return translation; }
-	float3 GetGlobalPosition() const { return transform_global.TranslatePart(); }
-	float3 GetLocalRotation() const { return rotation; }
-	Quat GetLocalRotationQ() const { return rotation_quat; }
-	float3 GetLocalScale() const { return scale; }
-	float3 GetVelocity() const { return velocity; }
-	const float4x4& GetGlobalTransformation() const { return transform_global; }
-	const float* GetOpenGLGlobalTransform() const { return transform_global.Transposed().ptr(); }
-	Mesh* GetMesh();
+	Component* GetComponent(Component::Type type);
+	Component* AddComponent(Component::Type type);
+	void DeleteComponent(Component* component);
 
-	// Setters
-	void SetLocalRotation(const float3& XYZ_euler_rotation);
-	void SetLocalRotation(const Quat& rotation);
-	void SetLocalTransform(const float4x4& transform);
+	float3 GetPosition() const { return translation; }
+	float3 GetRotation() const { return rotation; }
+	Quat GetRotationQ() const { return rotation_quat; }
+	float3 GetScale() const { return scale; }
+	float4x4 GetLocalTransform() {return local_transform; }
+	//float3 GetVelocity() const { return velocity; }
 
-	void SetMesh(Mesh* mesh);
-
+	void SetRotation(const float3& XYZ_euler_rotation);
+	void SetRotation(const Quat& rotation);
+	void SetTransform(const float4x4& transform);
 
 	void SetLocalPosition(const float3& position) { translation = position; }
 	void SetLocalScale(const float3& scale) { this->scale = scale; }
-	
-	// Functions
+
 	void Move(const float3& velocity) { translation += velocity; }
-	void Rotate(float angular_velocity){ rotation_quat = rotation_quat * Quat::RotateY(angular_velocity); }
-
-
+	void Rotate(float angular_velocity) { rotation_quat = rotation_quat * Quat::RotateY(angular_velocity); }
 
 private:
 	uint uid = 0;
 	char name [NAME_LENGTH];
 	bool active = true;
 
+	float3 translation = float3::zero;
+
 	Quat rotation_quat = Quat::identity;
 	float3 rotation = float3::zero;
-	float4x4 transform_global;
-	float3 translation = float3::zero;
+	
 	float3 scale = float3::one;
-	float3 velocity = float3::zero;
-
+	
+	float4x4 local_transform = math::float4x4::identity;
+	
+	//float3 velocity = float3::zero;
 
 public:
-	mutable bool visible = false;
-	Mesh* mesh = nullptr;
-
+	std::vector<Component*> components;
 };
-#endif

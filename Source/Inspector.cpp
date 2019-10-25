@@ -12,6 +12,8 @@ Inspector::Inspector() : Panel("Inspector")
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
+
+	has_menubar = true;
 }
 
 Inspector::~Inspector()
@@ -25,15 +27,33 @@ void Inspector::Draw()
 		position = rotation = scale = float3::zero;
 	else
 	{
-		position = obj->GetLocalPosition();
-		rotation = obj->GetLocalRotation();
-		scale = obj->GetLocalScale();
+		position = obj->GetPosition();
+		rotation = obj->GetRotation();
+		scale = obj->GetScale();
+
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("Add Component"))
+			{
+				in_menu = true;
+
+				ImGui::MenuItem("Mesh");
+				ImGui::MenuItem("Material");
+				ImGui::MenuItem("Light", nullptr, false, false);
+				ImGui::MenuItem("Renderer");
+
+				ImGui::EndMenu();
+			}
+			else
+				in_menu = false;
+
+			ImGui::EndMenuBar();
+		}
 
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// Position
 			ImGui::Text("Position");
-
 			ImGui::SetNextItemWidth(60);
 			if (ImGui::InputFloat("x##1", &position.x))
 				SetPosition(obj, position);

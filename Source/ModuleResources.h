@@ -1,11 +1,39 @@
 #ifndef __MODULE_RESOURCES_H__
 #define __MODULE_RESOURCES_H__
 
-#include <vector>
 #include "Module.h"
-#include "Resources.h"
+#include "GameObject.h"
+#include "Component.h"
+#include <vector>
 
-class Mesh;
+#include "glew\include\GL\glew.h"
+
+#include "MathGeoLib/include/MathBuildConfig.h"
+#include "MathGeoLib/include/MathGeoLib.h"
+
+enum shape_type {
+	CYLINDER,
+	CONE,
+	TORUS,
+	SPHERE,
+	BOTTLE,
+	KNOT,
+	HEMISPHERE,
+	PLANE,
+	ICOSAHEDRON,
+	DODECAHEDRON,
+	OCTAHEDRON,
+	TETRAHEDRON,
+	CUBE,
+	ROCK,
+
+	UNKNOWN
+};
+
+struct aiMesh;
+struct aiScene;
+class ComponentMesh;
+class ComponentMaterial;
 
 class ModuleResources : public Module
 {
@@ -17,16 +45,22 @@ public:
 	bool Start(Config* config = nullptr);
 	bool CleanUp();
 
-	Resources::Type GetResourceType(const char* path);
-	void LoadResource(const char* path, Resources::Type type = Resources::Type::unknown, bool use = false);
+	Component::Type GetType(const char* path);
+
 	void LogImageInfo();
-	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
+	void LoadResource(const char* path, Component::Type type = Component::Type::Unknown, bool use = false);
 	void UnLoadResource();
 
-	static GLuint checker_texture;
-	std::vector<Mesh*> meshes;
-	std::vector<GLuint> textures;
+	void ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component);
+	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
+	//void ImportModel(aiMesh* mesh, ComponentMesh* mesh_component, aiScene* material, ComponentMaterial* material_component);
 
+	void CreateShape(const shape_type &type, int slices, int stacks, float x = 0, float y = 0, float z = 0, float radius = 0.5);
+
+public:
+	GLuint checker_texture;
+
+	static const char* shape_to_string[shape_type::UNKNOWN];
 private:
 	void MakeCheckersTexture();
 };

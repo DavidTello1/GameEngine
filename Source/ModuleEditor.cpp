@@ -418,9 +418,9 @@ void ModuleEditor::DrawPanels(bool &is_auto_select)
 			ImGui::SetNextWindowPos(ImVec2((float)(*it)->pos_x, (float)(*it)->pos_y), ImGuiCond_FirstUseEver);
 			ImGui::SetNextWindowSize(ImVec2((float)(*it)->width, (float)(*it)->height), ImGuiCond_FirstUseEver);
 
-			if ((*it)->GetName() == "Configuration" || (*it)->GetName() == "Console" || (*it)->GetName() == "Hierarchy")
+			if ((*it)->has_menubar) //panel has a menu bar
 			{
-				if (ImGui::Begin((*it)->GetName(), &(*it)->active, ImGuiWindowFlags_MenuBar)) //panel has a menu bar
+				if (ImGui::Begin((*it)->GetName(), &(*it)->active, ImGuiWindowFlags_MenuBar))
 					(*it)->Draw();
 			}
 			else
@@ -444,42 +444,43 @@ void ModuleEditor::DrawPanels(bool &is_auto_select)
 
 void ModuleEditor::ConfirmExit()
 {
-	if (App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_UP)
+	static ImVec2 size = ImVec2(0, 0);
+	static float pos = 0.0f;
+
+	if (App->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		close = true;
 
 	ImGui::OpenPopup("Quit");
 	if (ImGui::BeginPopupModal("Quit", &App->input->quit, ImGuiWindowFlags_NoResize))
 	{
+		size = ImGui::GetContentRegionAvail();
+
 		ImGui::Text("Are you sure you want to Quit?");
 		ImGui::NewLine();
-		//ImGui::Text("  ");
-		//ImGui::SameLine();
 
-		//if (ImGui::Button("Save"))
+		//pos = ImGui::GetCursorPosX();
+		//if (ImGui::Button("Save", ImVec2(size.x / 3, 20)))
 		//{
 		//	//Save
 		//	ImGui::CloseCurrentPopup();
 
-		//	LOG("SAVING APPLICATION AND EXITING");
-		//	quit = true;
-		//	return false;
+		//	LOG("SAVING APPLICATION AND EXITING", 'd');
+		//	close = true;
 		//}
 		//ImGui::SameLine();
-		//ImGui::Text("");
-		//ImGui::SameLine();
 
-		if (ImGui::Button("Close"))
+		//ImGui::SetCursorPosX(pos + ImGui::GetItemRectSize().x + 1);
+		pos = ImGui::GetCursorPosX();
+		if (ImGui::Button("Close", ImVec2(size.x / 2, 20)))
 		{
 			ImGui::CloseCurrentPopup();
 
-			LOG("EXITING APPLICATION");
+			LOG("EXITING APPLICATION", 'd');
 			close = true;
 		}
 		ImGui::SameLine();
-		ImGui::Text("");
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel"))
+		ImGui::SetCursorPosX(pos + ImGui::GetItemRectSize().x + 1);
+		if (ImGui::Button("Cancel", ImVec2(size.x / 2, 20)))
 		{
 			ImGui::CloseCurrentPopup();
 			LOG("CANCEL EXIT");

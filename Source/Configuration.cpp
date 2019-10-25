@@ -21,6 +21,8 @@ Configuration::Configuration() : Panel("Configuration"), fps_log(FPS_LOG_SIZE), 
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
 
+	has_menubar = true;
+
 	GetHardware(); //init hardware detection
 	info_hw = GetHardwareInfo();
 }

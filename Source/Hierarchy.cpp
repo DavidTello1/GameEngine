@@ -17,6 +17,8 @@ Hierarchy::Hierarchy() : Panel("Hierarchy")
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
 
+	has_menubar = true;
+
 	scene_name = "Scene Name";
 
 	root_node = new HierarchyNode(nullptr,nullptr);

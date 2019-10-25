@@ -2,10 +2,13 @@
 
 #include "Module.h"
 #include <vector>
+#include "Globals.h"
 #include "GameObject.h"
 #include "Hierarchy.h"
+#include "ModuleResources.h"
 
-
+class ComponentRenderer;
+class ComponentMesh;
 
 class ModuleScene :	public Module
 {
@@ -33,21 +36,20 @@ public:
 	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }
 
 
+	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 
 public:
-	GameObject* selected_gameobj = nullptr;
 	bool create_gameobj = false;
 
 	void EraseFromSelected(GameObject* go);
 	std::vector<GameObject*> selected_go;
+
 private:
+	GameObject* selected_gameobj = nullptr;
 	std::vector<GameObject*> gameobjs;
 
 	// -----------------
-
-
-
-
-
+	std::vector<ComponentMaterial*> materials;
+	std::vector<ComponentMesh*> meshes;
 };
 

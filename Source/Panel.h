@@ -21,10 +21,11 @@ public:
 
 public:
 	bool active = true;
+	bool has_menubar;
 	int width, height, pos_x, pos_y;
 	bool in_menu = false;
 
-protected:
+private:
 	const char* name;
 	SDL_Scancode shortcut = SDL_SCANCODE_UNKNOWN;
 };

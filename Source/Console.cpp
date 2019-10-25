@@ -33,6 +33,7 @@ Console::Console() : Panel("Console")
 	ShowWarningLog	= true;
 	EnableFileName	= false;
 	ScrollToBottom	= false;
+	has_menubar 	= true;
 
 	width = default_width;
 	height = default_height;

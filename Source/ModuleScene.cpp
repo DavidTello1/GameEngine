@@ -1,6 +1,7 @@
 #include "ModuleScene.h"
 #include "Application.h"
 #include "ModuleEditor.h"
+#include "ComponentRenderer.h"
 
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
@@ -26,38 +27,38 @@ bool ModuleScene::Start(Config* config)
 	//App->resources->LoadResource("Assets/warrior.fbx");
 
 	// Loading bakerhouse into the empty
-	GameObject* baker_parent = CreateGameObj("BakerHouse");
+	//GameObject* baker_parent = CreateGameObj("BakerHouse");
 	
-	App->resources->LoadResource("Assets/BakerHouse.fbx");
-	App->resources->LoadResource("Assets/Baker_house.png");
+	App->resources->LoadResource("Assets/BakerHouse.fbx",Component::Type::Mesh,true);
+	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
 
-	CreateGameObj("House", baker_parent->GetUID());
-	selected_gameobj->SetMesh(App->resources->meshes.at(1));
-	selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
+	//CreateGameObj("House", baker_parent->GetUID());
+	//selected_gameobj->SetMesh(App->resources->meshes.at(1));
+	//selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
 
-	CreateGameObj("Chimney", baker_parent->GetUID());
-	selected_gameobj->SetMesh(App->resources->meshes.at(0));
-	selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
+	//CreateGameObj("Chimney", baker_parent->GetUID());
+	//selected_gameobj->SetMesh(App->resources->meshes.at(0));
+	//selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
 
 
-	GameObject* pparent = CreateGameObj("ParShapes");
-	for (int i = 0; i < shape_type::UNKNOWN; i++)
+	//GameObject* pparent = CreateGameObj("ParShapes");
+	/*for (int i = 0; i < shape_type::UNKNOWN; i++)
 	{
 		CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10,pparent->GetUID());
 	}
-
+*/
 	return ret;
 }
 
 void ModuleScene::CreateShape(shape_type type, int slices, int stacks, float x, float y, float z,uint parent_id)
 {
-	CreateGameObj(Mesh::shape_to_string[type],parent_id);
+	/*CreateGameObj(Mesh::shape_to_string[type],parent_id);
 
 	Mesh* m = new Mesh();
 	m->CreateMesh(type, slices, stacks, x, y, z);
 
 	App->resources->meshes.push_back(m);
-	selected_gameobj->SetMesh(m);
+	selected_gameobj->SetMesh(m);*/
 
 }
 
@@ -92,29 +93,17 @@ bool ModuleScene::Draw()
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	for (const GameObject* obj : gameobjs)
+	// Draw GameObjects
+	for (uint i = 0; i < gameobjs.size(); ++i)
 	{
-		if (obj->mesh == nullptr) continue;
+		glPushMatrix();
+		glMultMatrixf(gameobjs[i]->GetLocalTransform().ptr());
 
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		ComponentRenderer* Renderer = (ComponentRenderer*)gameobjs[i]->GetComponent(Component::Type::Renderer);
+		if (Renderer != nullptr && gameobjs[i]->GetComponent(Component::Type::Renderer)->IsActive())
+			Renderer->Draw();
 
-		glBindBuffer(GL_ARRAY_BUFFER, obj->mesh->VBO);
-		glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-		glBindTexture(GL_TEXTURE_2D, obj->mesh->TEX);
-		glBindBuffer(GL_ARRAY_BUFFER, obj->mesh->tex_coords_id);
-		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->mesh->IBO);
-		glDrawElements(GL_TRIANGLES, obj->mesh->num_indices, GL_UNSIGNED_INT, nullptr);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-		
+		glPopMatrix();
 	}
 	return true;
 }

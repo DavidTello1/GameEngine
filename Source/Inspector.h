@@ -18,7 +18,7 @@ public:
 
 	void Draw();
 	void SetPosition(GameObject* Object, float3 Position) { Object->SetLocalPosition(Position); }
-	void SetRotation(GameObject* Object, float3 Rotation) { Object->SetLocalRotation(Rotation); }
+	void SetRotation(GameObject* Object, float3 Rotation) { Object->SetRotation(Rotation); }
 	void SetScale(GameObject* Object, float3 Scale) { Object->SetLocalScale(Scale); }
 
 	//void GetTriangles();
