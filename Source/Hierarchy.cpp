@@ -251,9 +251,10 @@ void Hierarchy::DrawNodes(std::vector<HierarchyNode*>& v)
 		if (node->is_rename == false)
 		{
 			bool is_open = ImGui::TreeNodeEx(buffer, node->flags);
-
-			if (ImGui::BeginPopupContextItem(buffer)) // Options menu poped up when right clicking a node
+			in_menu = ImGui::BeginPopupContextItem(buffer);
+			if (in_menu) // Options menu poped up when right clicking a node
 			{
+				in_menu = true;
 				if (ImGui::MenuItem("Rename"))
 					node->is_rename = true;
 
@@ -290,14 +291,15 @@ void Hierarchy::DrawNodes(std::vector<HierarchyNode*>& v)
 				}
 			}
 
+			in_menu = is_open;
 			if (is_open)
 			{
-
 				if (node->childs.size() > 0) // Node is open, need to draw childs if has childs
 					DrawNodes(node->childs);
 
 				ImGui::TreePop();
 			}
+
 		}
 		else // Rename
 		{
