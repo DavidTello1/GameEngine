@@ -192,6 +192,7 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 		LOG("Mesh has no vertices", 'e');
 		return;
 	}
+
 	LOG("Importing vertices %u", mesh->mNumVertices, 'g');
 	for (uint i = 0; i < mesh->mNumVertices; ++i)
 	{
@@ -208,9 +209,9 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 		if (y < mesh_component->min_vertex.y) mesh_component->min_vertex.y = y;
 		if (x < mesh_component->min_vertex.z) mesh_component->min_vertex.z = z;
 
-		if (x > mesh_component->max_vertex.x) mesh_component->min_vertex.x = x;
-		if (y > mesh_component->max_vertex.y) mesh_component->min_vertex.y = y;
-		if (x > mesh_component->max_vertex.z) mesh_component->min_vertex.z = z;
+		if (x > mesh_component->max_vertex.x) mesh_component->max_vertex.x = x;
+		if (y > mesh_component->max_vertex.y) mesh_component->max_vertex.y = y;
+		if (x > mesh_component->max_vertex.z) mesh_component->max_vertex.z = z;
 		
 	}
 
@@ -287,18 +288,18 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 void ModuleResources::GenBoundingBox(ComponentMesh * mesh_component)
 {
 	//Bounding box
-	float3* min = &mesh_component->min_vertex;
-	float3* max = &mesh_component->max_vertex;
+	float3 min = mesh_component->min_vertex;
+	float3 max = mesh_component->max_vertex;
 
-	mesh_component->bounding_box[0] = { min->x,min->y,min->z };
-	mesh_component->bounding_box[1] = { min->x,min->y,max->z };
-	mesh_component->bounding_box[2] = { max->x,min->y,max->z };
-	mesh_component->bounding_box[3] = { max->x,min->y,min->z };
+	mesh_component->bounding_box[0] = { min.x,min.y,min.z };
+	mesh_component->bounding_box[1] = { min.x,min.y,max.z };
+	mesh_component->bounding_box[2] = { max.x,min.y,max.z };
+	mesh_component->bounding_box[3] = { max.x,min.y,min.z };
 
-	mesh_component->bounding_box[4] = { min->x,max->y,min->z };
-	mesh_component->bounding_box[5] = { min->x,max->y,max->z };
-	mesh_component->bounding_box[6] = { max->x,max->y,max->z };
-	mesh_component->bounding_box[7] = { max->x,max->y,min->z };
+	mesh_component->bounding_box[4] = { min.x,max.y,min.z };
+	mesh_component->bounding_box[5] = { min.x,max.y,max.z };
+	mesh_component->bounding_box[6] = { max.x,max.y,max.z };
+	mesh_component->bounding_box[7] = { max.x,max.y,min.z };
 
 	// VBO
 	glGenBuffers(1, &mesh_component->bb_VBO);
