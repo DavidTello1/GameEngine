@@ -96,23 +96,23 @@ void Hierarchy::DrawCreateMenu()
 		{
 			if (ImGui::MenuItem("Cylinder"))
 			{
-				App->scene->CreateShape(CYLINDER, 9, 9);
+				App->resources->CreateShape(CYLINDER, 9, 9);
 			}
 			if (ImGui::MenuItem("Cone"))
 			{
-				App->scene->CreateShape(CONE, 9, 9);
+				App->resources->CreateShape(CONE, 9, 9);
 			}
 			if (ImGui::MenuItem("Sphere"))
 			{
-				App->scene->CreateShape(SPHERE, 9, 9);
+				App->resources->CreateShape(SPHERE, 9, 9);
 			}
 			if (ImGui::MenuItem("Plane"))
 			{
-				App->scene->CreateShape(PLANE, 9, 9);
+				App->resources->CreateShape(PLANE, 9, 9);
 			}
 			if (ImGui::MenuItem("Cube"))
 			{
-				App->scene->CreateShape(CUBE, 9, 9);
+				App->resources->CreateShape(CUBE, 9, 9);
 			}
 			ImGui::EndMenu();
 		}
@@ -120,39 +120,39 @@ void Hierarchy::DrawCreateMenu()
 		{
 			if (ImGui::MenuItem("Torus"))
 			{
-				App->scene->CreateShape(TORUS, 9, 9);
+				App->resources->CreateShape(TORUS, 9, 9);
 			}
 			if (ImGui::MenuItem("Bottle"))
 			{
-				App->scene->CreateShape(BOTTLE, 9, 9);
+				App->resources->CreateShape(BOTTLE, 9, 9);
 			}
 			if (ImGui::MenuItem("Knot"))
 			{
-				App->scene->CreateShape(KNOT, 9, 9);
+				App->resources->CreateShape(KNOT, 9, 9);
 			}
 			if (ImGui::MenuItem("Hemisphere"))
 			{
-				App->scene->CreateShape(HEMISPHERE, 9, 9);
+				App->resources->CreateShape(HEMISPHERE, 9, 9);
 			}
 			if (ImGui::MenuItem("Icosahedron"))
 			{
-				App->scene->CreateShape(ICOSAHEDRON, 9, 9);
+				App->resources->CreateShape(ICOSAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Dodecahedron"))
 			{
-				App->scene->CreateShape(DODECAHEDRON, 9, 9);
+				App->resources->CreateShape(DODECAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Octahedron"))
 			{
-				App->scene->CreateShape(OCTAHEDRON, 9, 9);
+				App->resources->CreateShape(OCTAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Tetrahedron"))
 			{
-				App->scene->CreateShape(TETRAHEDRON, 9, 9);
+				App->resources->CreateShape(TETRAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Rock"))
 			{
-				App->scene->CreateShape(ROCK, 9, 9);
+				App->resources->CreateShape(ROCK, 9, 9);
 			}
 			ImGui::EndMenu();
 		}

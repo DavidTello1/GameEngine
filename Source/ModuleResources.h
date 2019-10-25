@@ -59,7 +59,7 @@ public:
 	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
 	//void ImportModel(aiMesh* mesh, ComponentMesh* mesh_component, aiScene* material, ComponentMaterial* material_component);
 
-	void CreateShape(const shape_type & type, int slices, int stacks, float x, float y, float z, float radius = 0.5f, uint parent_id = 0);
+	void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, uint parent_id = 0);
 
 public:
 	GLuint checker_texture;
@@ -75,11 +75,12 @@ private:
 	void MakeCheckersTexture();
 
 public:
-	const GLuint bbox_indices[24] =
+	const GLuint bbox_indices[42] =
 	{
 		0,1,2,3,0,3,1,2,
 		4,5,6,7,4,7,5,6,
-		0,4,1,5,2,6,3,7
+		0,4,1,5,2,6,3,7,
+		0,8,1,8,2,8,3,8,4,8,5,8,6,8,7,8
 	};
 };
 

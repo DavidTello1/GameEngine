@@ -2,7 +2,9 @@
 #include "Application.h"
 #include "ModuleCamera3D.h"
 #include "Imgui/imgui.h"
-
+#include "Component.h"
+#include "ComponentMesh.h"
+#include "ModuleScene.h"
 #include "mmgr/mmgr.h"
 
 ModuleCamera3D::ModuleCamera3D(bool start_enabled) : Module("Camera3D", start_enabled)
@@ -97,7 +99,24 @@ bool ModuleCamera3D::Update(float dt)
 		{
 			RotateWithMouse();
 			// To change to the Reference we want to orbit at
-			LookAt(vec3(0, 0, 0));
+			if (!App->scene->selected_go.empty())
+			{
+				vec3 look_at = { 0,0,0 };
+				const GameObject* object = App->scene->selected_go.at(0);
+
+				// Check if has a mesh component (TODO improve)
+				for (uint i = 0; i < object->components.size(); i++)
+				{
+					if (object->components[i]->GetType() == Component::Type::Mesh)
+					{
+						ComponentMesh* mesh = (ComponentMesh*)object->components[i];
+						look_at = { mesh->center.x, mesh->center.y,mesh->center.z };
+						break;
+					}
+				}
+				LookAt(look_at);
+				
+			}
 		}
 
 		// Recalculate matrix -------------

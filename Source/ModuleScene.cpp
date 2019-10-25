@@ -50,18 +50,6 @@ bool ModuleScene::Start(Config* config)
 	return ret;
 }
 
-void ModuleScene::CreateShape(shape_type type, int slices, int stacks, float x, float y, float z,uint parent_id)
-{
-	/*CreateGameObj(Mesh::shape_to_string[type],parent_id);
-
-	Mesh* m = new Mesh();
-	m->CreateMesh(type, slices, stacks, x, y, z);
-
-	App->resources->meshes.push_back(m);
-	selected_gameobj->SetMesh(m);*/
-
-}
-
 bool ModuleScene::Update(float dt)
 {
 	return true;

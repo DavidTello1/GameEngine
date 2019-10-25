@@ -245,7 +245,6 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 
 	GenTexture(mesh_component);
 
-	
 	GenBoundingBox(mesh_component);
 
 	//// Normals
@@ -301,6 +300,9 @@ void ModuleResources::GenBoundingBox(ComponentMesh * mesh_component)
 	mesh_component->bounding_box[5] = { min.x,max.y,max.z };
 	mesh_component->bounding_box[6] = { max.x,max.y,max.z };
 	mesh_component->bounding_box[7] = { max.x,max.y,min.z };
+
+	mesh_component->center = (mesh_component->min_vertex + mesh_component->max_vertex) / 2;
+	mesh_component->bounding_box[8] = mesh_component->center;
 
 	// VBO
 	glGenBuffers(1, &mesh_component->bb_VBO);
@@ -485,7 +487,7 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 
 	GenTexture(mesh);
 
-	if (type < 8)
+	if (type < 8) //idk but has to be like this for now
 		GenBoundingBox(mesh);
 
 

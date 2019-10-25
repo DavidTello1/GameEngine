@@ -20,7 +20,6 @@ public:
 
 
 	bool Start(Config* config = nullptr);
-	void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0, uint parent_id = 0);
 	bool Update(float dt);
 	bool PostUpdate(float dt);
 	bool CleanUp();

@@ -28,8 +28,9 @@ public:
 
 	float3 min_vertex = { 0,0,0 };
 	float3 max_vertex = { 0,0,0 };
+	float3 center = { 0,0,0 };
 
-	float3 bounding_box[8];
+	float3 bounding_box[9];
 	GLuint bb_VBO = 0;
 	GLuint bb_IBO = 0;
 	
