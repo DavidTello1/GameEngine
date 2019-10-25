@@ -21,31 +21,19 @@ bool ModuleScene::Start(Config* config)
 
 	App->camera->Move(vec3(0, 7.5f, 7.5f));
 	App->camera->LookAt(vec3(0, 0, 0));
-
-	//m = App->resources->LoadFBX("Assets/Warrior.fbx");
-	//m = GeometryLoader::LoadModel("Assets/Warrior.fbx");
-	//App->resources->LoadResource("Assets/warrior.fbx");
-
-	// Loading bakerhouse into the empty
-	//GameObject* baker_parent = CreateGameObj("BakerHouse");
 	
-	App->resources->LoadResource("Assets/BakerHouse.fbx",Component::Type::Mesh,true);
-	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
+	GameObject* bparent = CreateGameObj("BakerHouse");
 
-	//CreateGameObj("House", baker_parent->GetUID());
-	//selected_gameobj->SetMesh(App->resources->meshes.at(1));
-	//selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
-
-	//CreateGameObj("Chimney", baker_parent->GetUID());
-	//selected_gameobj->SetMesh(App->resources->meshes.at(0));
-	//selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
-
+	App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true,bparent->GetUID());
+	App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
 
 	GameObject* pparent = CreateGameObj("ParShapes");
 	for (int i = 0; i < shape_type::UNKNOWN; i++)
 	{
 		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10,0.5f, pparent->GetUID());
 	}
+
+	App->editor->tab_hierarchy->UnSelectAll();
 
 	return ret;
 }

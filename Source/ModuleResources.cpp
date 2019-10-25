@@ -86,9 +86,13 @@ Component::Type ModuleResources::GetType(const char* path)
 	return Component::Type::Unknown;
 }
 
-void ModuleResources::LoadResource(const char* path, Component::Type type, bool use)
+void ModuleResources::LoadResource(const char* path, Component::Type type, bool use, uint parent_id)
 {
 	GameObject* object = nullptr;
+	//name
+	const char* file_name = strrchr(path, 92) ;
+	if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "GameObject";
+	file_name++;
 
 	if (type == Component::Type::Unknown)
 		type = GetType(path);
@@ -106,11 +110,7 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			{	
 				if (use)
 				{
-					//name
-					const char* pos = strrchr(path, 92);
-					if (pos == nullptr) pos = strrchr(path, '/');
-
-					object = App->scene->CreateGameObj(pos+1);
+					object = App->scene->CreateGameObj(file_name,parent_id);
 					ComponentMesh* mesh_component = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
 					aiMesh* mesh = scene->mMeshes[i];
 
@@ -148,6 +148,7 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			{
 				for (GameObject* object : App->scene->selected_go)
 				{
+					bool has_mesh = false;
 					// Check if has a mesh component (to be replaced by boolean)
 					for (uint i = 0; i < object->components.size(); i++)
 					{
@@ -155,7 +156,14 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 						{
 							ComponentMesh* mesh = (ComponentMesh*)object->components[i];
 							mesh->TEX = tex;
+							has_mesh = true;
+							LOG("Texture %s applied to object %s %u", file_name, object->GetName(), object->GetUID(),'d');
+							break;
 						}
+					}
+					if (!has_mesh)
+					{
+						LOG("Object '%s %u' is missing 'Mesh' component, could not apply texture",object->GetName(),object->GetUID(),'e');
 					}
 				}
 				

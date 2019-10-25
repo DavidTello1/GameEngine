@@ -48,7 +48,7 @@ public:
 	Component::Type GetType(const char* path);
 
 	void LogImageInfo();
-	void LoadResource(const char* path, Component::Type type = Component::Type::Unknown, bool use = false);
+	void LoadResource(const char* path, Component::Type type = Component::Type::Unknown, bool use = false, uint parent_id = 0);
 	void UnLoadResource();
 
 	void ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component);

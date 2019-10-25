@@ -27,6 +27,8 @@ public:
 	static void DeleteSelected();
 	static bool SearchAndDeleteNode(HierarchyNode* n, std::vector<HierarchyNode*>& v);
 
+	void UnSelectAll(HierarchyNode* keep_selected = nullptr);
+
 	void SetSceneName(const char* name);
 
 private:
