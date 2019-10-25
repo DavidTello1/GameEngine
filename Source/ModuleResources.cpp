@@ -207,11 +207,11 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 		// Bounding box setting up
 		if (x < mesh_component->min_vertex.x) mesh_component->min_vertex.x = x;
 		if (y < mesh_component->min_vertex.y) mesh_component->min_vertex.y = y;
-		if (x < mesh_component->min_vertex.z) mesh_component->min_vertex.z = z;
+		if (z < mesh_component->min_vertex.z) mesh_component->min_vertex.z = z;
 
 		if (x > mesh_component->max_vertex.x) mesh_component->max_vertex.x = x;
 		if (y > mesh_component->max_vertex.y) mesh_component->max_vertex.y = y;
-		if (x > mesh_component->max_vertex.z) mesh_component->max_vertex.z = z;
+		if (z > mesh_component->max_vertex.z) mesh_component->max_vertex.z = z;
 		
 	}
 
@@ -245,6 +245,7 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 
 	GenTexture(mesh_component);
 
+	
 	GenBoundingBox(mesh_component);
 
 	//// Normals
@@ -310,7 +311,7 @@ void ModuleResources::GenBoundingBox(ComponentMesh * mesh_component)
 	//IBO
 	glGenBuffers(1, &mesh_component->bb_IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_component->bb_IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mesh_component->bbox_indices), mesh_component->bbox_indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(App->resources->bbox_indices), App->resources->bbox_indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
@@ -318,7 +319,7 @@ void ModuleResources::GenBoundingBox(ComponentMesh * mesh_component)
 
 	for (int i = 0; i < 8; i++)
 	{
-		LOG("{%f,%f,%f}", mesh_component->bounding_box[i].x, mesh_component->bounding_box[i].y, mesh_component->bounding_box[i].z, 'd');
+		LOG("{ %f , %f , %f }", mesh_component->bounding_box[i].x, mesh_component->bounding_box[i].y, mesh_component->bounding_box[i].z, 'd');
 	}
 }
 
@@ -419,13 +420,38 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 	// Vertices ------------------
 	mesh->num_vertices = m->npoints;
 	mesh->vertices = new float3[mesh->num_vertices];
-
+	if (mesh->num_vertices >= 3)
+	{
+		mesh->min_vertex.x = m->points[0];
+		mesh->min_vertex.y = m->points[1];
+		mesh->min_vertex.z = m->points[2];
+		mesh->max_vertex.x = m->points[0];
+		mesh->max_vertex.y = m->points[1];
+		mesh->max_vertex.z = m->points[2];
+	}
+	else {
+		LOG("Mesh has no vertices", 'e');
+		return;
+	}
 	for (uint i = 0; i < mesh->num_vertices; ++i)
 	{
 		int k = i * 3;
-		mesh->vertices[i].x = m->points[k];
-		mesh->vertices[i].y = m->points[k + 1];
-		mesh->vertices[i].z = m->points[k + 2];
+		float x = m->points[k];
+		float y = m->points[k + 1];
+		float z = m->points[k + 2];
+
+		mesh->vertices[i].x = x; 
+		mesh->vertices[i].y = y; 
+		mesh->vertices[i].z = z; 
+
+		// Bounding box setting up
+		if (x < mesh->min_vertex.x) mesh->min_vertex.x = x;
+		if (y < mesh->min_vertex.y) mesh->min_vertex.y = y;
+		if (z < mesh->min_vertex.z) mesh->min_vertex.z = z;
+
+		if (x > mesh->max_vertex.x) mesh->max_vertex.x = x;
+		if (y > mesh->max_vertex.y) mesh->max_vertex.y = y;
+		if (z > mesh->max_vertex.z) mesh->max_vertex.z = z;
 	}
 
 	GenVBO(mesh);
@@ -455,10 +481,13 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 			mesh->tex_coords[i].y = m->tcoords[k + 1];
 		}
 	}
+	par_shapes_free_mesh(m);
 
 	GenTexture(mesh);
 
-	par_shapes_free_mesh(m);
+	if (type < 8)
+		GenBoundingBox(mesh);
+
 
 
 }

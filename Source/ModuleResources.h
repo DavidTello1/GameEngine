@@ -73,6 +73,14 @@ private:
 		"Octahedron", "Tetrahedron", "Cube", "Rock" };
 
 	void MakeCheckersTexture();
+
+public:
+	const GLuint bbox_indices[24] =
+	{
+		0,1,2,3,0,3,1,2,
+		4,5,6,7,4,7,5,6,
+		0,4,1,5,2,6,3,7
+	};
 };
 
 #endif
