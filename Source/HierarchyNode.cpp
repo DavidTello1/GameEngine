@@ -32,6 +32,7 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 		is_selected = true;
 		
 		App->scene->SetSelectedGameobj(obj);
+		App->scene->selected_go.push_back(obj);
 		//LogAction("Selected");
 	}
 
@@ -41,6 +42,7 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 		is_selected = false;
 		
 		App->scene->SetSelectedGameobj(nullptr);
+		App->scene->EraseFromSelected(obj);
 		//LogAction("Unselected");
 	}
 

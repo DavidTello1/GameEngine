@@ -148,3 +148,17 @@ void ModuleScene::DeleteGameobj(GameObject* obj)
 		}
 	}
 }
+
+void ModuleScene::EraseFromSelected(GameObject * go)
+{
+	if (go == nullptr) return;
+
+	for (uint i = 0; i < selected_go.size(); i++)
+	{
+		if (selected_go[i] != nullptr && selected_go[i]->GetUID() == go->GetUID())
+		{
+			selected_go.erase(selected_go.begin() + i);
+			return;
+		}
+	}
+}

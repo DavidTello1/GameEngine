@@ -32,12 +32,17 @@ public:
 	GameObject* GetSelectedGameobj() { return selected_gameobj; }
 	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }
 
+
+
 public:
 	GameObject* selected_gameobj = nullptr;
 	bool create_gameobj = false;
 
+	void EraseFromSelected(GameObject* go);
+	std::vector<GameObject*> selected_go;
 private:
 	std::vector<GameObject*> gameobjs;
+
 	// -----------------
 
 

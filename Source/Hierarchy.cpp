@@ -220,6 +220,7 @@ void Hierarchy::DeleteSelected()
 		DeleteNode(n);
 	}
 	selected_nodes.clear();
+	App->scene->selected_go.clear();
 }
 
 bool Hierarchy::SearchAndDeleteNode(HierarchyNode* n, std::vector<HierarchyNode*>& v)
