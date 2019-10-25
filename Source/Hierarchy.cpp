@@ -82,8 +82,6 @@ void Hierarchy::Draw()
 
 void Hierarchy::DrawCreateMenu()
 {
-	in_menu = false;
-
 	if (ImGui::BeginMenu("Create"))
 	{
 		in_menu = true;
@@ -96,23 +94,23 @@ void Hierarchy::DrawCreateMenu()
 		{
 			if (ImGui::MenuItem("Cylinder"))
 			{
-				App->scene->CreateShape(CYLINDER, 9, 9);
+				App->resources->CreateShape(CYLINDER, 9, 9);
 			}
 			if (ImGui::MenuItem("Cone"))
 			{
-				App->scene->CreateShape(CONE, 9, 9);
+				App->resources->CreateShape(CONE, 9, 9);
 			}
 			if (ImGui::MenuItem("Sphere"))
 			{
-				App->scene->CreateShape(SPHERE, 9, 9);
+				App->resources->CreateShape(SPHERE, 9, 9);
 			}
 			if (ImGui::MenuItem("Plane"))
 			{
-				App->scene->CreateShape(PLANE, 9, 9);
+				App->resources->CreateShape(PLANE, 9, 9);
 			}
 			if (ImGui::MenuItem("Cube"))
 			{
-				App->scene->CreateShape(CUBE, 9, 9);
+				App->resources->CreateShape(CUBE, 9, 9);
 			}
 			ImGui::EndMenu();
 		}
@@ -120,44 +118,48 @@ void Hierarchy::DrawCreateMenu()
 		{
 			if (ImGui::MenuItem("Torus"))
 			{
-				App->scene->CreateShape(TORUS, 9, 9);
+				App->resources->CreateShape(TORUS, 9, 9);
 			}
 			if (ImGui::MenuItem("Bottle"))
 			{
-				App->scene->CreateShape(BOTTLE, 9, 9);
+				App->resources->CreateShape(BOTTLE, 9, 9);
 			}
 			if (ImGui::MenuItem("Knot"))
 			{
-				App->scene->CreateShape(KNOT, 9, 9);
+				App->resources->CreateShape(KNOT, 9, 9);
 			}
 			if (ImGui::MenuItem("Hemisphere"))
 			{
-				App->scene->CreateShape(HEMISPHERE, 9, 9);
+				App->resources->CreateShape(HEMISPHERE, 9, 9);
 			}
 			if (ImGui::MenuItem("Icosahedron"))
 			{
-				App->scene->CreateShape(ICOSAHEDRON, 9, 9);
+				App->resources->CreateShape(ICOSAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Dodecahedron"))
 			{
-				App->scene->CreateShape(DODECAHEDRON, 9, 9);
+				App->resources->CreateShape(DODECAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Octahedron"))
 			{
-				App->scene->CreateShape(OCTAHEDRON, 9, 9);
+				App->resources->CreateShape(OCTAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Tetrahedron"))
 			{
-				App->scene->CreateShape(TETRAHEDRON, 9, 9);
+				App->resources->CreateShape(TETRAHEDRON, 9, 9);
 			}
 			if (ImGui::MenuItem("Rock"))
 			{
-				App->scene->CreateShape(ROCK, 9, 9);
+				App->resources->CreateShape(ROCK, 9, 9);
 			}
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenu();
 		
+	}
+	else
+	{
+		in_menu = false;
 	}
 }
 
@@ -174,6 +176,7 @@ HierarchyNode* Hierarchy::AddNode(GameObject* obj, HierarchyNode* parent)
 	n->LogAction("Added child");
 	parent->LogAction("to parent");
 
+	n->ToggleSelection();
 	// General list of all nodes, not used for printing
 	nodes.push_back(n);
 	return n;
@@ -253,8 +256,8 @@ void Hierarchy::DrawNodes(std::vector<HierarchyNode*>& v)
 		if (node->is_rename == false)
 		{
 			bool is_open = ImGui::TreeNodeEx(buffer, node->flags);
-			in_menu = ImGui::BeginPopupContextItem(buffer);
-			if (in_menu) // Options menu poped up when right clicking a node
+
+			if (ImGui::BeginPopupContextItem(buffer)) // Options menu poped up when right clicking a node
 			{
 				in_menu = true;
 				if (ImGui::MenuItem("Rename"))
@@ -264,6 +267,10 @@ void Hierarchy::DrawNodes(std::vector<HierarchyNode*>& v)
 					DeleteNode(node);
 
 				ImGui::EndPopup();
+			}
+			else
+			{
+				in_menu = false;
 			}
 
 			if (ImGui::IsItemClicked()) // if treenode is clicked, check whether it is a single or multi selection
@@ -276,10 +283,10 @@ void Hierarchy::DrawNodes(std::vector<HierarchyNode*>& v)
 
 					if (!ImGui::GetIO().KeyCtrl) // Single selection, clear selected nodes
 					{
-						for (HierarchyNode* i : Hierarchy::selected_nodes) // Selected nodes has selected state, need to unselect, toggle is safe [panaderia de pan]
-							i->ToggleSelection();
+						//for (HierarchyNode* i : Hierarchy::selected_nodes) // Selected nodes has selected state, need to unselect, toggle is safe [panaderia de pan]
+						//	i->ToggleSelection();
 
-						Hierarchy::selected_nodes.clear();
+						UnSelectAll(node);
 					}
 
 					if (node->ToggleSelection()) // Always need to toggle the state of selection of the node, getting its current state
@@ -292,15 +299,16 @@ void Hierarchy::DrawNodes(std::vector<HierarchyNode*>& v)
 					}
 				}
 			}
-
-			in_menu = is_open;
 			if (is_open)
 			{
+				in_menu = true;
 				if (node->childs.size() > 0) // Node is open, need to draw childs if has childs
 					DrawNodes(node->childs);
 
 				ImGui::TreePop();
 			}
+			else
+				in_menu = false;
 
 		}
 		else // Rename
@@ -320,6 +328,32 @@ void Hierarchy::DrawNodes(std::vector<HierarchyNode*>& v)
 	}
 }
 
+void Hierarchy::UnSelectAll(HierarchyNode* keep_selected)
+{
+	if (keep_selected == nullptr) {
+
+		for (HierarchyNode* i : Hierarchy::nodes)
+		{
+			if (i->is_selected)
+			{
+				i->ToggleSelection();
+			}
+		}
+	}
+	else {
+
+		for (HierarchyNode* i : Hierarchy::nodes)
+		{
+			if (i->is_selected)
+			{
+				if (i->id == keep_selected->id) continue;
+				i->ToggleSelection();
+			}
+		}
+	}
+	Hierarchy::selected_nodes.clear();
+	App->scene->selected_go.clear();
+}
 void Hierarchy::SetSceneName(const char* name)
 {
 	LOG("Renaming scene from '%s' to '%s'", scene_name, name);
