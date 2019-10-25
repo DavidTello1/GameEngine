@@ -18,5 +18,6 @@ public:
 	bool show_vertex_normals = false;
 	bool show_face_normals = false;
 	bool show_checkers = false;
+	bool show_bounding_box = true;
 
 };

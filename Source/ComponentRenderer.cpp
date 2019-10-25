@@ -64,6 +64,24 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 
 	/*glDisable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);*/
-	glDisableClientState(GL_VERTEX_ARRAY);
+	
+	
+
+	if (show_bounding_box && mesh.bb_VBO != 0)
+	{
+		glColor3ub(255, 0, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.bb_VBO);
+		glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.bb_IBO);
+		glDrawElements(GL_TRIANGLES, sizeof(mesh.bbox_indices), GL_UNSIGNED_INT, nullptr);
+
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glColor3ub(255, 255, 255);
+	}
+
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
