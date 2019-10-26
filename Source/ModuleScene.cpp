@@ -58,7 +58,8 @@ bool ModuleScene::CleanUp()
 
 	for (uint i = 0; i < materials.size(); ++i)
 	{
-		RELEASE(materials[i]);
+		if (!DeleteMaterial(materials[i]))
+			RELEASE(materials[i]);
 	}
 	materials.clear();
 
@@ -145,13 +146,17 @@ ComponentMaterial* ModuleScene::GetMaterial(const char* path) const
 	return nullptr;
 }
 
-void ModuleScene::DeleteMaterial(ComponentMaterial* material)
+bool ModuleScene::DeleteMaterial(ComponentMaterial* material)
 {
 	for (uint i = 0; i < materials.size(); i++)
 	{
 		if (materials[i] == material)
+		{
 			materials.erase(materials.begin() + i);
+			return true;
+		}
 	}
+	return false;
 }
 
 void ModuleScene::EraseFromSelected(GameObject * go)

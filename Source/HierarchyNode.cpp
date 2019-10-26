@@ -16,7 +16,7 @@ HierarchyNode::HierarchyNode(GameObject* Obj, HierarchyNode* Parent, ImGuiTreeNo
 	else
 	{
 		id = 0;
-		name = "Unknown";
+		name = "GameObject";
 	}
 }
 
@@ -51,7 +51,7 @@ bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns 
 
 void HierarchyNode::SetName(const char* Name)
 {
-	LOG("Renaming node %d from '%s' to '%s'", id, name, Name);
+	LOG("Renaming node %d from '%s' to '%s'", id, name, Name,'v');
 	name = Name;
 }
 

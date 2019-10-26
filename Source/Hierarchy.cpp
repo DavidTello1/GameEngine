@@ -62,12 +62,6 @@ void Hierarchy::Draw()
 	{
 		DrawCreateMenu();
 
-		if (ImGui::MenuItem("Add Childs"))
-		{
-			for (HierarchyNode* selected : selected_nodes)
-				AddNode(nullptr, selected);
-		}
-
 		if (ImGui::MenuItem("Delete") || App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
 			DeleteSelected();
 

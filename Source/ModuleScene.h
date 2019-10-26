@@ -36,7 +36,7 @@ public:
 
 	bool IsMaterialLoaded(const char* path);
 	ComponentMaterial* GetMaterial(const char* path) const;
-	void DeleteMaterial(ComponentMaterial* material);
+	bool DeleteMaterial(ComponentMaterial* material);
 
 	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 
