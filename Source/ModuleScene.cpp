@@ -54,13 +54,13 @@ bool ModuleScene::CleanUp()
 
 	for (uint i = 0; i < gameobjs.size(); ++i)
 	{
-		RELEASE( gameobjs[i]);
+		RELEASE(gameobjs[i]);
 	}
 	gameobjs.clear();
 
 	for (uint i = 0; i < materials.size(); ++i)
 	{
-		RELEASE( materials[i]);
+		RELEASE(materials[i]);
 	}
 	materials.clear();
 
@@ -69,22 +69,22 @@ bool ModuleScene::CleanUp()
 
 bool ModuleScene::Draw()
 {
-
-	if (App->editor->show_wireframe) //wireframe
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	else
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
 	// Draw GameObjects
 	for (uint i = 0; i < gameobjs.size(); ++i)
 	{
 		glPushMatrix();
 		glMultMatrixf(gameobjs[i]->GetLocalTransform().ptr());
 
-		ComponentRenderer* Renderer = (ComponentRenderer*)gameobjs[i]->GetComponent(Component::Type::Renderer);
-		if (Renderer != nullptr && gameobjs[i]->GetComponent(Component::Type::Renderer)->IsActive())
-			Renderer->Draw();
+		ComponentRenderer* renderer = (ComponentRenderer*)gameobjs[i]->GetComponent(Component::Type::Renderer);
+		if (renderer != nullptr && renderer->IsActive())
+		{
+			if (renderer->show_wireframe) //wireframe
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+			renderer->Draw();
+		}
 		glPopMatrix();
 	}
 	return true;
@@ -127,10 +127,20 @@ bool ModuleScene::IsMaterialLoaded(const char* path)
 {
 	for (uint i = 0; i < materials.size(); i++)
 	{
-		if (strcmp(App->scene->materials[i]->path, path) == 0)
+		if (strcmp(materials[i]->path, path) == 0)
 			return true;
 	}
 	return false;
+}
+
+ComponentMaterial* ModuleScene::GetMaterial(const char* path) const
+{
+	for (uint i = 0; i < materials.size(); ++i)
+	{
+		if (strcmp(materials[i]->path, path) == 0)
+			return materials[i];
+	}
+	return nullptr;
 }
 
 void ModuleScene::DeleteMaterial(ComponentMaterial* material)

@@ -340,8 +340,14 @@ void Configuration::DrawTextures()
 	if (ImGui::CollapsingHeader("Textures"))
 	{
 		if (App->scene->materials.empty())
-			return;
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
+			ImGui::TextWrapped("No textures loaded");
+			ImGui::PopStyleColor();
+			ImGui::NewLine();
 
+			return;
+		}
 		char buffer[120];
 		for (uint i = 0; i < App->scene->materials.size(); i++)
 		{

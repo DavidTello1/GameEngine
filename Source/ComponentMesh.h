@@ -40,6 +40,5 @@ public:
 	float3 bounding_box[13];
 	GLuint bb_VBO = 0;
 	GLuint bb_IBO = 0;
-	
-};
+	};
 

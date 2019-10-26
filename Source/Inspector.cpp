@@ -49,10 +49,9 @@ void Inspector::Draw()
 	if (has_renderer = obj->HasComponent(Component::Type::Renderer))
 		renderer = (ComponentRenderer*)obj->GetComponent(Component::Type::Renderer);
 
-
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("Add Component"))
+		if (ImGui::BeginMenu("Add"))
 		{
 			in_menu = true;
 
@@ -72,13 +71,35 @@ void Inspector::Draw()
 
 			ImGui::EndMenu();
 		}
+		else if (ImGui::BeginMenu("Remove"))
+		{
+			in_menu = true;
+
+			if (has_mesh)
+			{
+				if (ImGui::MenuItem("Mesh"))
+					obj->DeleteComponent(Component::Type::Mesh);
+			}
+			if (has_material)
+			{
+				if (ImGui::MenuItem("Material"))
+					obj->DeleteComponent(Component::Type::Material);
+			}
+			if (has_renderer)
+			{
+				if (ImGui::MenuItem("Renderer"))
+					obj->DeleteComponent(Component::Type::Renderer);
+			}
+			//if (has_light)
+			//{
+			//	if (ImGui::MenuItem("Light"))
+			//		//obj->DeleteComponent(Component::Type::Light);
+			//}
+
+			ImGui::EndMenu();
+		}
 		else
 			in_menu = false;
-
-		//if (ImGui::MenuItem("Remove Component"))
-		//{
-		//	obj->DeleteComponent(selected_component->GetType());
-		//}
 
 		ImGui::EndMenuBar();
 	}
@@ -138,8 +159,6 @@ void Inspector::Draw()
 			SetScale(obj, scale);
 
 		ImGui::Separator();
-		ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
-		ImGui::Separator();
 	}
 
 	if (has_mesh)
@@ -183,12 +202,6 @@ void Inspector::Draw()
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->height);
 
-			ImGui::Text("Path: ");
-			ImGui::SameLine();
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-			ImGui::TextWrapped("%s", (const char*)material->path);
-			ImGui::PopStyleColor();
-
 			if (ImGui::TreeNode("Image"))
 			{
 				ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100));
@@ -208,7 +221,8 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Renderer"))
 		{
-			ImGui::Separator();
+			ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
+			ImGui::Checkbox("Wireframe", &renderer->show_wireframe);
 		}
 	}
 }
