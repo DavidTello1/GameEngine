@@ -17,4 +17,4 @@
 
 ## License
 Copyright 2019. Òscar Pons and David Tello
-Licensed under the [MIT License](https://github.com/ponspack9/LICENSE.txt).
+Licensed under the [MIT License](https://github.com/ponspack9/GameEngine/LICENSE.txt).
