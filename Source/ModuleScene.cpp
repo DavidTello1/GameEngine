@@ -5,13 +5,11 @@
 #include "ComponentMaterial.h"
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
-{
-}
+{}
 
 
 ModuleScene::~ModuleScene()
-{
-}
+{}
 
 // Load assets
 bool ModuleScene::Start(Config* config)
@@ -78,8 +76,12 @@ bool ModuleScene::Draw()
 		ComponentRenderer* renderer = (ComponentRenderer*)gameobjs[i]->GetComponent(Component::Type::Renderer);
 		if (renderer != nullptr && renderer->IsActive())
 		{
-			if (renderer->show_wireframe) //wireframe
+			if (renderer->show_wireframe || show_all_wireframe) //wireframe
+			{
+				glColor3ub(wireframe_color[0]*255.0f, wireframe_color[1] * 255.0f, wireframe_color[2] * 255.0f);
+				glLineWidth(wireframe_width);
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
 			else
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
