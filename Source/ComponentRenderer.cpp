@@ -38,8 +38,8 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	//glEnable(GL_TEXTURE_2D);
-	//glActiveTexture(GL_TEXTURE0);
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);

@@ -149,12 +149,22 @@ void ModuleScene::DeleteGameobj(GameObject* obj)
 
 bool ModuleScene::IsMaterialLoaded(const char* path)
 {
-	for (uint i = 0; i < materials.size(); i++)
+	for (uint i = 0; i < materials.size(); ++i)
 	{
-		if (strcmp(App->scene->materials[i]->path, path) == 0)
+		if (strcmp(materials[i]->path, path) == 0)
 			return true;
 	}
 	return false;
+}
+
+ComponentMaterial* ModuleScene::GetMaterial(const char* path) const
+{
+	for (uint i = 0; i < materials.size(); ++i)
+	{
+		if (strcmp(materials[i]->path, path) == 0)
+			return materials[i];
+	}
+	return nullptr;
 }
 
 void ModuleScene::DeleteMaterial(ComponentMaterial* material)
