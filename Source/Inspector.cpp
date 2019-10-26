@@ -76,19 +76,26 @@ void Inspector::Draw()
 		{
 			in_menu = true;
 
-			if (ImGui::MenuItem("Mesh", nullptr, false, has_mesh))
-				obj->DeleteComponent(Component::Type::Mesh);
-
-			if (ImGui::MenuItem("Material", nullptr, false, has_material))
-				obj->DeleteComponent(Component::Type::Material);
-
-			if (ImGui::MenuItem("Renderer", nullptr, false, has_renderer))
-				obj->DeleteComponent(Component::Type::Renderer);
-
-			if (ImGui::MenuItem("Light", nullptr, false, false))
+			if (has_mesh)
 			{
-				//obj->DeleteComponent(Component::Type::Light);
+				if (ImGui::MenuItem("Mesh"))
+					obj->DeleteComponent(Component::Type::Mesh);
 			}
+			if (has_material)
+			{
+				if (ImGui::MenuItem("Material"))
+					obj->DeleteComponent(Component::Type::Material);
+			}
+			if (has_renderer)
+			{
+				if (ImGui::MenuItem("Renderer"))
+					obj->DeleteComponent(Component::Type::Renderer);
+			}
+			//if (has_light)
+			//{
+			//	if (ImGui::MenuItem("Light"))
+			//		//obj->DeleteComponent(Component::Type::Light);
+			//}
 
 			ImGui::EndMenu();
 		}
