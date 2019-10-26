@@ -14,6 +14,7 @@
 - Add/Remove Components from Inspector panel
 - Hierarchy panel has trees
 - Extensive primitives creation options
+- Hardware detection & Memory statistics
 
 ## License
 MIT License
