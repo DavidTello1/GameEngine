@@ -59,6 +59,8 @@ public:
 
 	void Draw();
 
+	void DrawScene();
+
 	bool InitModuleDraw(Module* module);
 	void DrawApplication();
 	void DrawHardware();

@@ -71,6 +71,25 @@ void Configuration::Draw()
 	
 	if (InitModuleDraw(App->file_system))
 		DrawModuleFileSystem(App->file_system);
+
+	DrawScene();
+}
+
+void Configuration::DrawScene()
+{
+	if (ImGui::CollapsingHeader("Scene"))
+	{
+		ImGui::Checkbox("Show all wireframe", &App->scene->show_all_wireframe);
+		ImGui::ColorEdit3("Wireframe color", (float*)&App->scene->wireframe_color);
+		ImGui::DragFloat("Wireframe width", &App->scene->wireframe_width, 0.1f, 0.1f, 5.0f);
+
+		ImGui::Separator();
+
+		ImGui::Checkbox("Show all bounding boxes", &App->scene->show_all_bounding_box);
+		ImGui::ColorEdit3("Bounding box color", (float*)&App->scene->bounding_box_color);
+		ImGui::DragFloat("Bounding box width", &App->scene->bounding_box_width, 0.1f,0.1f,5.0f);
+
+	}
 }
 
 bool Configuration::InitModuleDraw(Module* module)

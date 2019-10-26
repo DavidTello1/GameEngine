@@ -45,7 +45,11 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
 	ComponentMaterial* material = (ComponentMaterial*)mesh.GetGameobj()->GetComponent(Component::Type::Material);
-	if(material != nullptr && material->IsActive())
+	if (show_wireframe || App->scene->show_all_wireframe)
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	else if(material != nullptr && material->IsActive())
 	{
 		if (show_checkers)
 			glBindTexture(GL_TEXTURE_2D, App->resources->checker_texture); // start using texture
@@ -75,9 +79,11 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 	
 	
 
-	if (mesh.GetGameobj()->show_bounding_box && mesh.bb_VBO != 0)
+	if ((mesh.GetGameobj()->show_bounding_box || App->scene->show_all_bounding_box) && mesh.bb_VBO != 0)
 	{
-		glColor3ub(255, 0, 0);
+		glColor3ub(App->scene->bounding_box_color[0]*255.0f, App->scene->bounding_box_color[1]*255.0f, App->scene->bounding_box_color[2]*255.0f);
+		glLineWidth(App->scene->bounding_box_width);
+
 		glBindBuffer(GL_ARRAY_BUFFER, mesh.bb_VBO);
 		glVertexPointer(3, GL_FLOAT, 0, NULL);
 
