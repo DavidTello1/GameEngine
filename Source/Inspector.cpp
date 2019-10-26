@@ -104,6 +104,9 @@ void Inspector::Draw()
 		ImGui::EndMenuBar();
 	}
 
+	ImGui::Text(obj->GetName());
+	ImGui::Separator();
+
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		// Position
