@@ -13,6 +13,8 @@ public:
 
 private:
 	void DrawMesh(ComponentMesh& mesh) const;
+	void DrawFaceNormals();
+	void DrawVertexNormals();
 
 public:
 	bool show_vertex_normals = false;
@@ -20,4 +22,6 @@ public:
 	bool show_checkers = false;
 	bool show_bounding_box = true;
 
+private:
+	float normals_size = 0.5f;
 };

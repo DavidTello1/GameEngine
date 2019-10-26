@@ -34,6 +34,8 @@ public:
 	GameObject* GetSelectedGameobj() { return selected_gameobj; }
 	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }
 
+	bool IsMaterialLoaded(const char* path);
+	void DeleteMaterial(ComponentMaterial* material);
 
 	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 
@@ -42,13 +44,10 @@ public:
 
 	void EraseFromSelected(GameObject* go);
 	std::vector<GameObject*> selected_go;
+	std::vector<ComponentMaterial*> materials;
+	std::vector<GameObject*> gameobjs;
 
 private:
 	GameObject* selected_gameobj = nullptr;
-	std::vector<GameObject*> gameobjs;
-
-	// -----------------
-	std::vector<ComponentMaterial*> materials;
-	std::vector<ComponentMesh*> meshes;
 };
 

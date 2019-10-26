@@ -9,15 +9,15 @@
 GameObject::GameObject(const char* name)
 {
 	uid = App->random->Int();
-	strcpy(this->name, name);
+	strcpy_s(this->name, name);
 }
 
 GameObject::~GameObject()
 {
 	for (uint i = 0; i < components.size(); i++)
-	{
 		delete components[i];
-	}
+
+	components.clear();
 }
 
 Component* GameObject::GetComponent(Component::Type type)
@@ -68,6 +68,30 @@ Component* GameObject::AddComponent(Component::Type type)
 	}
 	return nullptr;
 }
+
+bool GameObject::HasComponent(Component::Type type)
+{
+	for (uint i = 0; i < components.size(); i++)
+	{
+		if (components[i]->GetType() == type)
+			return true;
+	}
+	return false;
+}
+
+void GameObject::DeleteComponent(Component::Type type)
+{
+	for (uint i = 0; i < components.size(); i++)
+	{
+		if (components[i]->GetType() == type)
+		{
+			RELEASE(components[i]);
+			components.erase(components.begin() + i);
+			break;
+		}
+	}
+}
+
 
 // ---------------------
 void GameObject::SetRotation(const float3& XYZ_euler_rotation)

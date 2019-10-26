@@ -3,6 +3,11 @@
 #include "Panel.h"
 #include "Math.h"
 #include "GameObject.h"
+#include "Component.h"
+
+class ComponentMesh;
+class ComponentMaterial;
+class ComponentRenderer;
 
 class Inspector : public Panel
 {
@@ -26,4 +31,11 @@ public:
 private:
 	GameObject* obj = nullptr;
 	float3 position, rotation, scale;
+
+	Component* selected_component;
+
+	ComponentMesh* mesh;
+	ComponentMaterial* material;
+	ComponentRenderer* renderer;
+
 };

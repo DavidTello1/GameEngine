@@ -29,8 +29,8 @@ public:
 	uint GetWidth() const { return screen_width; }
 	uint GetHeight() const { return screen_height; }
 	void SetTitle(const char* title){ SDL_SetWindowTitle(window, title); }
-	void SetWidth(uint width) { SDL_SetWindowSize(window, width, GetHeight()); }
-	void SetHeigth(uint height) { SDL_SetWindowSize(window, GetWidth(), height); }
+	void SetWidth(uint width) { SDL_SetWindowSize(window, width, GetHeight()); screen_width = width; }
+	void SetHeigth(uint height) { SDL_SetWindowSize(window, GetWidth(), height); screen_height = height;  }
 	uint GetRefreshRate() const;
 	void GetMaxMinSize(uint& min_width, uint& min_height, uint& max_width, uint& max_height) const;
 

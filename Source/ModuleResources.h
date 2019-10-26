@@ -72,6 +72,8 @@ private:
 		"Hemisphere", "Plane", "Icosahedron", "Dodecahedron",
 		"Octahedron", "Tetrahedron", "Cube", "Rock" };
 
+	uint tex_height, tex_width;
+
 	void MakeCheckersTexture();
 
 public:

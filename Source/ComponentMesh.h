@@ -24,6 +24,8 @@ public:
 	GLuint tex_coords_id = 0;		// Texture coordinates ID (tex_coords_id)
 	GLuint TEX = 0;					// Texture Buffer ID (TEX)
 
+	float3* normals = nullptr;
+	uint num_normals = 0;
 public:
 
 	float3 min_vertex = { 0,0,0 };
@@ -38,6 +40,8 @@ public:
 	float3 bounding_box[14];
 	GLuint bb_VBO = 0;
 	GLuint bb_IBO = 0;
+	
+
 	
 
 };

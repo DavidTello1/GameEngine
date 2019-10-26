@@ -21,7 +21,6 @@ public:
 
 	void SetVSync(bool vsync);
 	bool GetVSync() const { return vsync; }
-	const char* GetDriver() const { return SDL_GetCurrentVideoDriver(); }
 
 public:
 	SDL_GLContext context;

@@ -23,6 +23,7 @@ public:
 	virtual void Disable() { active = false; }
 
 	bool IsActive() { return active; }
+	void SwitchActive() { active = !active; }
 
 	Component::Type GetType() { return type; }
 	GameObject* GetGameobj() { return object; }

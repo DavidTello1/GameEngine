@@ -29,10 +29,10 @@ ComponentMesh::~ComponentMesh()
 		RELEASE_ARRAY(tex_coords);
 		tex_coords = nullptr;
 	}
-	//if (Normals)
-	//{
-	//	delete Normals;
-	//	Normals = nullptr;
-	//}
+	if (normals)
+	{
+		RELEASE_ARRAY(normals);
+		normals = nullptr;
+	}
 }
 

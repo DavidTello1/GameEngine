@@ -2,7 +2,7 @@
 #include "Application.h"
 #include "ModuleEditor.h"
 #include "ComponentRenderer.h"
-
+#include "ComponentMaterial.h"
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 {
@@ -30,7 +30,7 @@ bool ModuleScene::Start(Config* config)
 	GameObject* pparent = CreateGameObj("ParShapes");
 	for (int i = 0; i < shape_type::UNKNOWN; i++)
 	{
-		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10,0.5f, pparent->GetUID());
+		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10, 0.5f, pparent->GetUID());
 	}
 
 	App->editor->tab_hierarchy->UnSelectAll();
@@ -57,6 +57,12 @@ bool ModuleScene::CleanUp()
 		delete gameobjs[i];
 	}
 	gameobjs.clear();
+
+	for (uint i = 0; i < materials.size(); ++i)
+	{
+		delete materials[i];
+	}
+	materials.clear();
 
 	return true;
 }
@@ -106,14 +112,33 @@ void ModuleScene::DeleteGameobj(GameObject* obj)
 	if (selected_gameobj == obj)
 		selected_gameobj = nullptr;
 
-	for (int i = 0; i < gameobjs.size(); i++)
+	for (uint i = 0; i < gameobjs.size(); i++)
 	{
 		if (gameobjs[i] == obj)
 		{
-			delete gameobjs[i];
+			RELEASE( gameobjs[i]);
 			gameobjs.erase(gameobjs.begin() + i);
 			break;
 		}
+	}
+}
+
+bool ModuleScene::IsMaterialLoaded(const char* path)
+{
+	for (uint i = 0; i < materials.size(); i++)
+	{
+		if (strcmp(App->scene->materials[i]->path, path) == 0)
+			return true;
+	}
+	return false;
+}
+
+void ModuleScene::DeleteMaterial(ComponentMaterial* material)
+{
+	for (uint i = 0; i < materials.size(); i++)
+	{
+		if (materials[i] == material)
+			materials.erase(materials.begin() + i);
 	}
 }
 
