@@ -250,13 +250,13 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 		{
 			if (ImGui::BeginMenu("File")) //file
 			{
-				if (ImGui::MenuItem("New", "Ctrl+N"))
+				if (ImGui::MenuItem("New", "Ctrl+N",&is_new,false))
 					is_new = true;
 
-				if (ImGui::MenuItem("Open", "Ctrl+O"))
+				if (ImGui::MenuItem("Open", "Ctrl+O",&is_open,false))
 					is_open = true;
 
-				if (ImGui::MenuItem("Save", "Ctrl+S"))
+				if (ImGui::MenuItem("Save", "Ctrl+S",&is_save,false))
 					is_save = true;
 
 				ImGui::Separator();
@@ -268,7 +268,7 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 
 			if (ImGui::BeginMenu("Edit")) //edit
 			{
-				if (ImGui::MenuItem("Import"))
+				if (ImGui::MenuItem("Import",NULL,&is_import,false))
 					is_import = true;
 
 				ImGui::EndMenu();
