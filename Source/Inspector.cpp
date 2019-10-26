@@ -51,6 +51,8 @@ void Inspector::Draw()
 
 	if (ImGui::BeginMenuBar())
 	{
+		in_menu = false;
+
 		if (ImGui::BeginMenu("Add"))
 		{
 			in_menu = true;
@@ -71,7 +73,8 @@ void Inspector::Draw()
 
 			ImGui::EndMenu();
 		}
-		else if (ImGui::BeginMenu("Remove"))
+		
+		if (ImGui::BeginMenu("Remove", !obj->components.empty()))
 		{
 			in_menu = true;
 
@@ -98,9 +101,6 @@ void Inspector::Draw()
 
 			ImGui::EndMenu();
 		}
-		else
-			in_menu = false;
-
 		ImGui::EndMenuBar();
 	}
 
@@ -208,18 +208,27 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Material"))
 		{
-			ImGui::Text("Size: ");
-			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->width);
-			ImGui::SameLine();
-			ImGui::Text("x");
-			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->height);
-
-			if (ImGui::TreeNode("Image"))
+			if (material == nullptr)
 			{
-				ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100));
-				ImGui::TreePop();
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
+				ImGui::TextWrapped("Material not loaded");
+				ImGui::PopStyleColor();
+			}
+			else
+			{
+				ImGui::Text("Size: ");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->width);
+				ImGui::SameLine();
+				ImGui::Text("x");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->height);
+
+				if (ImGui::TreeNode("Image"))
+				{
+					ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100));
+					ImGui::TreePop();
+				}
 			}
 
 			ImGui::NewLine();

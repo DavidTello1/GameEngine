@@ -345,7 +345,6 @@ void Configuration::DrawTextures()
 			ImGui::TextWrapped("No textures loaded");
 			ImGui::PopStyleColor();
 			ImGui::NewLine();
-
 			return;
 		}
 		char buffer[120];
