@@ -54,13 +54,13 @@ bool ModuleScene::CleanUp()
 
 	for (uint i = 0; i < gameobjs.size(); ++i)
 	{
-		delete gameobjs[i];
+		RELEASE( gameobjs[i]);
 	}
 	gameobjs.clear();
 
 	for (uint i = 0; i < materials.size(); ++i)
 	{
-		delete materials[i];
+		RELEASE( materials[i]);
 	}
 	materials.clear();
 

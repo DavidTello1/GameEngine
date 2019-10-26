@@ -64,20 +64,19 @@ bool ModuleCamera3D::Update(float dt)
 			// To change to the Reference we want to orbit at
 			if (!App->scene->selected_go.empty())
 			{
-				const GameObject* object = App->scene->selected_go.at(0);
-				ComponentMesh* mesh = nullptr;
+				GameObject* object = App->scene->selected_go.at(0);
+				const ComponentMesh* mesh = (ComponentMesh*)(object->GetComponent(Component::Type::Mesh));
 				// Check if has a mesh component (TODO improve)
-				for (uint i = 0; i < object->components.size(); i++)
+				/*for (uint i = 0; i < object->components.size(); i++)
 				{
 					if (object->components[i]->GetType() == Component::Type::Mesh)
 					{
 						mesh = (ComponentMesh*)object->components[i];
 						break;
 					}
-				}
+				}*/
 				if (mesh)
 				{
-					
 					float3 c = { Position.x,Position.y,Position.z };
 					float3 p = mesh->bounding_box[9] - c;
 
@@ -106,29 +105,24 @@ bool ModuleCamera3D::Update(float dt)
 					case 10:
 						Position = new_p - c_X * offset;
 						break;
-					/*case 11:
-						Position = new_p + c_Y * offset;
-						break;*/
 					case 11:
 						Position = new_p + c_X * offset;
 						break;
 					case 12:
 						Position = new_p + c_Z * offset;
 						break;
-					/*case 14:
-						Position = new_p - c_Y * offset;
-						break;*/
 					default:
-						LOG("No face", 'e');
+						LOG("Could not detect closest face", 'e');
 						break;
 					}
-					mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
-					App->resources->bbox_indices[25] = face;
-					App->resources->GenBoundingBox(mesh);
+					//mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
+					//App->resources->bbox_indices[25] = face;
+					//App->resources->GenBoundingBox(mesh);
 
-					LOG("FACE %i", face, 'd');
-					LOG("To [%f,%f,%f]", Position.x, Position.y, Position.z, 'd');
-					LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'd');
+					LOG("FACE %i", face, 'v');
+					LOG("To [%f,%f,%f]", Position.x, Position.y, Position.z, 'v');
+					LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'v');
+
 					LookAt(new_p);
 				}
 				

@@ -24,8 +24,9 @@ public:
 	GLuint tex_coords_id = 0;		// Texture coordinates ID (tex_coords_id)
 	GLuint TEX = 0;					// Texture Buffer ID (TEX)
 
-	float3* normals = nullptr;
-	uint num_normals = 0;
+	float3* normals = nullptr;		// Array of normal coordinates
+	uint num_normals = 0;			// Number of normal coordinates
+
 public:
 
 	float3 min_vertex = { 0,0,0 };
@@ -36,13 +37,9 @@ public:
 	//0-7 Box vertex
 	//8 Box center
 	//9-12 Faces center
-	//13 Camera pos
-	float3 bounding_box[14];
+	float3 bounding_box[13];
 	GLuint bb_VBO = 0;
 	GLuint bb_IBO = 0;
 	
-
-	
-
 };
 

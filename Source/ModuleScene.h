@@ -26,9 +26,9 @@ public:
 
 	bool Draw();
 
-	// GameObjects-----------
+	
 public:
-	// default parent id is root node
+	// GameObjects-----------
 	GameObject* CreateGameObj(const char* name = "GameObject",const uint parent_id = 0, bool visible = false);
 	void DeleteGameobj(GameObject* obj);
 	GameObject* GetSelectedGameobj() { return selected_gameobj; }
@@ -36,8 +36,6 @@ public:
 
 	bool IsMaterialLoaded(const char* path);
 	void DeleteMaterial(ComponentMaterial* material);
-
-	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 
 public:
 	bool create_gameobj = false;
