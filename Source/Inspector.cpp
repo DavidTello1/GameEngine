@@ -52,7 +52,7 @@ void Inspector::Draw()
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("Add Component"))
+		if (ImGui::BeginMenu("Add"))
 		{
 			in_menu = true;
 
@@ -72,13 +72,28 @@ void Inspector::Draw()
 
 			ImGui::EndMenu();
 		}
+		else if (ImGui::BeginMenu("Remove"))
+		{
+			in_menu = true;
+
+			if (ImGui::MenuItem("Mesh", nullptr, false, has_mesh))
+				obj->DeleteComponent(Component::Type::Mesh);
+
+			if (ImGui::MenuItem("Material", nullptr, false, has_material))
+				obj->DeleteComponent(Component::Type::Material);
+
+			if (ImGui::MenuItem("Renderer", nullptr, false, has_renderer))
+				obj->DeleteComponent(Component::Type::Renderer);
+
+			if (ImGui::MenuItem("Light", nullptr, false, false))
+			{
+				//obj->DeleteComponent(Component::Type::Light);
+			}
+
+			ImGui::EndMenu();
+		}
 		else
 			in_menu = false;
-
-		//if (ImGui::MenuItem("Remove Component"))
-		//{
-		//	obj->DeleteComponent(selected_component->GetType());
-		//}
 
 		ImGui::EndMenuBar();
 	}
