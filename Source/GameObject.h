@@ -9,8 +9,6 @@
 #include <vector>
 
 class ComponentMaterial;
-
-
 class GameObject
 {
 public:

@@ -96,6 +96,7 @@ bool ModuleEditor::Init(Config* config)
 
 
 	ImGui_ImplSDL2_InitForOpenGL(App->window->GetWindow(), App->renderer3D->context);
+	LOG("Loading ImGui", 'd');
 	ImGui_ImplOpenGL3_Init();
 
 	// Setup style

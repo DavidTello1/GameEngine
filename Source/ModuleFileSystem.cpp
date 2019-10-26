@@ -15,6 +15,7 @@ ModuleFileSystem::ModuleFileSystem(const char* game_path) : Module("FileSystem",
 {
 	// needs to be created before Init so other modules can use it
 	char* base_path = SDL_GetBasePath();
+	LOG("Loading PhysFS", 'd');
 	PHYSFS_init(base_path);
 	SDL_free(base_path);
 

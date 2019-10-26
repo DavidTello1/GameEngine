@@ -28,7 +28,7 @@ ModuleInput::~ModuleInput()
 // Called before render is available
 bool ModuleInput::Init(Config* config)
 {
-	LOG("Init SDL input event system");
+	LOG("Init SDL input event system", 'd');
 	bool ret = true;
 	SDL_Init(0);
 

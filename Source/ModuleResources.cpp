@@ -44,6 +44,7 @@ bool ModuleResources::Init(Config* config)
 
 bool ModuleResources::Start(Config* config)
 {
+	LOG("Loading DevIL", 'd');
 	ilInit();
 
 	// Stream log messages to Console and default visual studio debugger

@@ -39,6 +39,7 @@ bool ModuleRenderer3D::Init(Config* config)
 	}
 	// Initialize glew
 	GLenum error = glewInit();
+	LOG("Loading glew", 'd');
 	
 	/*glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
