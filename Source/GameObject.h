@@ -25,7 +25,7 @@ public:
 	Component* GetComponent(Component::Type type);
 	Component* AddComponent(Component::Type type);
 	bool HasComponent(Component::Type type);
-	void DeleteComponent(Component* component);
+	void DeleteComponent(Component::Type type);
 
 	float3 GetPosition() const { return translation; }
 	float3 GetRotation() const { return rotation; }

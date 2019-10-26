@@ -13,7 +13,7 @@ public:
 
 public:
 	uint  tex_id = 0;
-	const char* path;
+	char path[256];
 	uint width = 0;
 	uint height = 0;
 };

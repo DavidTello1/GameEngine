@@ -17,6 +17,7 @@ GameObject::~GameObject()
 	for (uint i = 0; i < components.size(); i++)
 		delete components[i];
 
+	components.clear();
 }
 
 Component* GameObject::GetComponent(Component::Type type)
@@ -77,6 +78,20 @@ bool GameObject::HasComponent(Component::Type type)
 	}
 	return false;
 }
+
+void GameObject::DeleteComponent(Component::Type type)
+{
+	for (uint i = 0; i < components.size(); i++)
+	{
+		if (components[i]->GetType() == type)
+		{
+			RELEASE(components[i]);
+			components.erase(components.begin() + i);
+			break;
+		}
+	}
+}
+
 
 // ---------------------
 void GameObject::SetRotation(const float3& XYZ_euler_rotation)

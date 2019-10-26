@@ -66,7 +66,7 @@ Component::Type ModuleResources::GetType(const char* path)
 {
 	char extension[32];
 	const char* last_dot = strrchr(path, '.');
-	strcpy(extension, last_dot + 1);
+	strcpy_s(extension, last_dot + 1);
 
 	for (int i = 0; i < strlen(extension); i++)
 	{
@@ -115,7 +115,6 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 					aiMesh* mesh = scene->mMeshes[i];
 
 					ImportMesh(mesh, mesh_component);
-					object->AddComponent(Component::Type::Material);
 					object->AddComponent(Component::Type::Renderer);
 				}
 			}
@@ -148,17 +147,26 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			{
 				for (GameObject* object : App->scene->selected_go)
 				{
-					// Check if has a mesh component (to be replaced by boolean)
-					for (uint i = 0; i < object->components.size(); i++)
+					if (object->HasComponent(Component::Type::Mesh))
 					{
-						if (object->components[i]->GetType() == Component::Type::Mesh)
+						ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
+						mesh->TEX = tex;
+
+						if (!object->HasComponent(Component::Type::Material))
 						{
-							ComponentMesh* mesh = (ComponentMesh*)object->components[i];
-							mesh->TEX = tex;
+							object->AddComponent(Component::Type::Material);
+							ComponentMaterial* material = (ComponentMaterial*)object->GetComponent(Component::Type::Material);
+
+							strcpy_s(material->path, 256, path);
+							material->tex_id = tex;
+							material->width = tex_width;
+							material->height = tex_height;
+
+							if (!App->scene->IsMaterialLoaded(path))
+								App->scene->materials.push_back(material);
 						}
 					}
 				}
-				
 			}
 		}
 		else
@@ -166,8 +174,6 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			LOG("Cannot load texture without GameObject", 'e');
 		}
 	}
-
-	
 }
 
 void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
@@ -216,17 +222,20 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 
 	GenTexture(mesh_component);
 
-	//// Normals
-	//if (mesh->HasNormals())
-	//{
-	//	LOG("Importing normals %u",mesh->mNumVertices , 'g');
-	//	for (unsigned i = 0; i < mesh->mNumVertices; ++i)
-	//	{
-	//		this->vertices[i].normal[0] = *((GLfloat*)&mesh->mNormals[i].x);
-	//		this->vertices[i].normal[1] = *((GLfloat*)&mesh->mNormals[i].y);
-	//		this->vertices[i].normal[2] = *((GLfloat*)&mesh->mNormals[i].z);
-	//	}
-	//}
+	// Normals -----------------------
+	if (mesh->HasNormals())
+	{
+		LOG("Importing normals %u",mesh->mNumVertices , 'g');
+		mesh_component->num_normals = mesh->mNumVertices;
+		mesh_component->normals = new float3[mesh_component->num_normals];
+
+		for (uint i = 0; i < mesh->mNumVertices; ++i)
+		{
+			mesh_component->normals[i].x = mesh->mNormals[i].x;
+			mesh_component->normals[i].y = mesh->mNormals[i].y;
+			mesh_component->normals[i].z = mesh->mNormals[i].z;
+		}
+	}
 
 	/*if (new_mesh->HasTextureCoords(0))
 	{
@@ -269,6 +278,8 @@ GLuint ModuleResources::ImportTexture(int width, int height,int internal_format,
 	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
+	tex_height = height;
+	tex_width = width;
 	return texture;
 }
 

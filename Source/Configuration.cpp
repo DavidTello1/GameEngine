@@ -132,7 +132,7 @@ void Configuration::DrawApplication()
 			// Devil
 			ImGui::BulletText("DevIL Version:");
 			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", IL_VERSION);
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", IL_VERSION);
 
 			ImGui::TreePop();
 		}
@@ -355,13 +355,16 @@ void Configuration::DrawTextures()
 
 				ImGui::Text("Path: ");
 				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", App->scene->materials[i]->path);
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+				ImGui::TextWrapped("%s", App->scene->materials[i]->path);
+				ImGui::PopStyleColor();
+
 
 				ImGui::Text("Image:");
-
-
+				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100));
 				ImGui::TreePop();
 			}
+			ImGui::Separator();
 		}
 	}
 }

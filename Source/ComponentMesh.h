@@ -24,5 +24,8 @@ public:
 	GLuint tex_coords_id = 0;		// Texture coordinates ID (tex_coords_id)
 	GLuint TEX = 0;					// Texture Buffer ID (TEX)
 
+	float3* normals = nullptr;
+	uint num_normals = 0;
+
 };
 

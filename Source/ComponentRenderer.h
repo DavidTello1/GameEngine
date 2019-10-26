@@ -13,10 +13,14 @@ public:
 
 private:
 	void DrawMesh(ComponentMesh& mesh) const;
+	void DrawFaceNormals();
+	void DrawVertexNormals();
 
 public:
 	bool show_vertex_normals = false;
 	bool show_face_normals = false;
 	bool show_checkers = false;
 
+private:
+	float normals_size = 0.5f;
 };

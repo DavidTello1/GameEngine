@@ -2,7 +2,7 @@
 #include "Application.h"
 #include "ModuleEditor.h"
 #include "ComponentRenderer.h"
-
+#include "ComponentMaterial.h"
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 {
@@ -29,7 +29,6 @@ bool ModuleScene::Start(Config* config)
 	// Loading bakerhouse into the empty
 	//GameObject* baker_parent = CreateGameObj("BakerHouse");
 	
-	App->resources->LoadResource("Assets/BakerHouse.fbx",Component::Type::Mesh,true);
 	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
 
 	//CreateGameObj("House", baker_parent->GetUID());
@@ -41,11 +40,12 @@ bool ModuleScene::Start(Config* config)
 	//selected_gameobj->GetMesh()->TEX = App->resources->textures.back();
 
 
-	GameObject* pparent = CreateGameObj("ParShapes");
-	for (int i = 0; i < shape_type::UNKNOWN; i++)
-	{
-		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10, 0.5f, pparent->GetUID());
-	}
+	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true);
+	//GameObject* pparent = CreateGameObj("ParShapes");
+	//for (int i = 0; i < shape_type::UNKNOWN; i++)
+	//{
+	//	App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10, 0.5f, pparent->GetUID());
+	//}
 
 	return ret;
 }
@@ -144,6 +144,25 @@ void ModuleScene::DeleteGameobj(GameObject* obj)
 			gameobjs.erase(gameobjs.begin() + i);
 			break;
 		}
+	}
+}
+
+bool ModuleScene::IsMaterialLoaded(const char* path)
+{
+	for (uint i = 0; i < materials.size(); i++)
+	{
+		if (strcmp(App->scene->materials[i]->path, path) == 0)
+			return true;
+	}
+	return false;
+}
+
+void ModuleScene::DeleteMaterial(ComponentMaterial* material)
+{
+	for (uint i = 0; i < materials.size(); i++)
+	{
+		if (materials[i] == material)
+			materials.erase(materials.begin() + i);
 	}
 }
 
