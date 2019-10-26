@@ -151,7 +151,7 @@ void Configuration::DrawApplication()
 			// Devil
 			ImGui::BulletText("DevIL Version:");
 			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", IL_VERSION);
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", IL_VERSION);
 
 			ImGui::TreePop();
 		}
