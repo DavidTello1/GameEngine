@@ -170,15 +170,29 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Mesh"))
 		{
-			ImGui::Text("Triangles count: ");
+			ImGui::Text("Triangles: ");
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_indices / 3));
+
+			ImGui::Text("Vertices: ");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_vertices));
+
+			ImGui::Text("Normals: ");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_normals));
+
+			ImGui::Text("Tex Coords: ");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_tex_coords));
 			ImGui::NewLine();
 
 			if (has_renderer)
 			{
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 				ImGui::Checkbox("Face Normals", &renderer->show_face_normals);
-				ImGui::SameLine();
+
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 				ImGui::Checkbox("Vertex Normals", &renderer->show_vertex_normals);
 			}
 			ImGui::Separator();
@@ -208,6 +222,8 @@ void Inspector::Draw()
 				ImGui::TreePop();
 			}
 
+			ImGui::NewLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 			ImGui::Checkbox("Checkers Material", &renderer->show_checkers);
 			ImGui::Separator();
 		}
@@ -226,6 +242,7 @@ void Inspector::Draw()
 
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 			ImGui::Checkbox("Wireframe", &renderer->show_wireframe);
+			ImGui::Separator();
 		}
 	}
 }
