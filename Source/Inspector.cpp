@@ -138,6 +138,8 @@ void Inspector::Draw()
 			SetScale(obj, scale);
 
 		ImGui::Separator();
+		ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
+		ImGui::Separator();
 	}
 
 	if (has_mesh)

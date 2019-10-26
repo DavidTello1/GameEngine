@@ -62,4 +62,6 @@ private:
 
 public:
 	std::vector<Component*> components;
+
+	bool show_bounding_box = false;
 };

@@ -75,7 +75,7 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 	
 	
 
-	if (show_bounding_box && mesh.bb_VBO != 0)
+	if (mesh.GetGameobj()->show_bounding_box && mesh.bb_VBO != 0)
 	{
 		glColor3ub(255, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, mesh.bb_VBO);
