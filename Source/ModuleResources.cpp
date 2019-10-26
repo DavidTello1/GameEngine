@@ -509,16 +509,14 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 
 	GenTexture(mesh);
 
-	//if (type < 8) //idk but has to be like this for now
-		//GenBoundingBox(mesh);
-
-
+	if (type < 8) //idk but has to be like this for now, otherwise ImGui crashes
+		GenBoundingBox(mesh);
 
 }
 void ModuleResources::GenVBO(ComponentMesh * mesh_component)
 {
 	// Generate VBO
-	LOG("Generating VBO", 'g');
+	LOG("Generating VBO", 'v');
 	glGenBuffers(1, &mesh_component->VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float3)* mesh_component->num_vertices, mesh_component->vertices, GL_STATIC_DRAW);
@@ -528,7 +526,7 @@ void ModuleResources::GenVBO(ComponentMesh * mesh_component)
 void ModuleResources::GenIBO(ComponentMesh * mesh_component)
 {
 	// Generate IBO
-	LOG("Generating IBO", 'g');
+	LOG("Generating IBO", 'v');
 	glGenBuffers(1, &mesh_component->IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_component->IBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * mesh_component->num_indices, mesh_component->indices, GL_STATIC_DRAW);
@@ -538,7 +536,7 @@ void ModuleResources::GenIBO(ComponentMesh * mesh_component)
 void ModuleResources::GenTexture(ComponentMesh * mesh_component)
 {
 	// Generate Textures
-	LOG("Generating Texture", 'g');
+	LOG("Generating Texture", 'v');
 	glGenBuffers(1, &mesh_component->tex_coords_id);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->tex_coords_id);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float2) * mesh_component->num_tex_coords, mesh_component->tex_coords, GL_STATIC_DRAW);

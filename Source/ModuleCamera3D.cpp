@@ -96,7 +96,8 @@ bool ModuleCamera3D::Update(float dt)
 					}
 
 					vec3 new_p = { mesh->bounding_box[face].x,mesh->bounding_box[face].y,mesh->bounding_box[face].z };
-					float offset = 30.0f;// *mesh->size.MaxElement();
+					float size = mesh->size.MaxElement();
+					float offset = Sqrt((size*size) - (size*size / 4));
 					switch (face)
 					{
 					case 9:
@@ -124,6 +125,7 @@ bool ModuleCamera3D::Update(float dt)
 					mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
 					App->resources->bbox_indices[25] = face;
 					App->resources->GenBoundingBox(mesh);
+
 					LOG("FACE %i", face, 'd');
 					LOG("To [%f,%f,%f]", Position.x, Position.y, Position.z, 'd');
 					LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'd');
