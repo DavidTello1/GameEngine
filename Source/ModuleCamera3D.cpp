@@ -11,14 +11,12 @@ ModuleCamera3D::ModuleCamera3D(bool start_enabled) : Module("Camera3D", start_en
 {
 	CalculateViewMatrix();
 
-	X = vec3(1.0f, 0.0f, 0.0f);
-	Y = vec3(0.0f, 1.0f, 0.0f);
-	Z = vec3(0.0f, 0.0f, 1.0f);
+	//X = vec3(1.0f, 0.0f, 0.0f);
+	//Y = vec3(0.0f, 1.0f, 0.0f);
+	//Z = vec3(0.0f, 0.0f, 1.0f);
 
 	Position = vec3(0.0f, 0.0f, 5.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
-
-	orbit = false;
 }
 
 ModuleCamera3D::~ModuleCamera3D()
@@ -46,15 +44,10 @@ bool ModuleCamera3D::Update(float dt)
 {
 	if (viewport_focus == true)
 	{
-		if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
-		{
-			//focus camera around geometry
-		}
-
 		// Camera ZOOM with MOUSE WHEEL
 		ImGuiIO io = ImGui::GetIO();
 		vec3 newPos(0, 0, 0);
-		float speed = io.MouseWheel * 75.0f * dt;
+		float speed = io.MouseWheel * 75.0f * dt; // TODO Not hardcoded speed
 		if (speed != 0)
 		{
 			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT || App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
@@ -65,6 +58,80 @@ bool ModuleCamera3D::Update(float dt)
 		}
 		//Reference += newPos;
 
+		if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
+		{
+			LOG("Centering camera from [%f,%f,%f]", Position.x, Position.y, Position.z,'d');
+			// To change to the Reference we want to orbit at
+			if (!App->scene->selected_go.empty())
+			{
+				const GameObject* object = App->scene->selected_go.at(0);
+				ComponentMesh* mesh = nullptr;
+				// Check if has a mesh component (TODO improve)
+				for (uint i = 0; i < object->components.size(); i++)
+				{
+					if (object->components[i]->GetType() == Component::Type::Mesh)
+					{
+						mesh = (ComponentMesh*)object->components[i];
+						break;
+					}
+				}
+				if (mesh)
+				{
+					
+					float3 c = { Position.x,Position.y,Position.z };
+					float3 p = mesh->bounding_box[9] - c;
+
+					float l = length(vec3(p.x, p.y, p.z));
+					float min = l;
+					int face = 9;
+
+					for (int i = 10; i < 13; i++)
+					{
+						p = mesh->bounding_box[i] - c;
+						l = length(vec3(p.x, p.y, p.z));
+						if (l < min) {
+							min = l;
+							face = i;
+						}
+					}
+
+					vec3 new_p = { mesh->bounding_box[face].x,mesh->bounding_box[face].y,mesh->bounding_box[face].z };
+					float offset = 30.0f;// *mesh->size.MaxElement();
+					switch (face)
+					{
+					case 9:
+						Position = new_p - c_Z * offset;
+						break;
+					case 10:
+						Position = new_p - c_X * offset;
+						break;
+					/*case 11:
+						Position = new_p + c_Y * offset;
+						break;*/
+					case 11:
+						Position = new_p + c_X * offset;
+						break;
+					case 12:
+						Position = new_p + c_Z * offset;
+						break;
+					/*case 14:
+						Position = new_p - c_Y * offset;
+						break;*/
+					default:
+						LOG("No face", 'e');
+						break;
+					}
+					mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
+					App->resources->bbox_indices[25] = face;
+					App->resources->GenBoundingBox(mesh);
+					LOG("FACE %i", face, 'd');
+					LOG("To [%f,%f,%f]", Position.x, Position.y, Position.z, 'd');
+					LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'd');
+					LookAt(new_p);
+				}
+				
+			}
+		}
 
 		// Mouse motion ----------------
 		//Free move 
@@ -76,7 +143,7 @@ bool ModuleCamera3D::Update(float dt)
 
 			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT ||
 				App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
-				speed = 15.0f * dt;
+				speed *= 2.0f;
 
 			if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= Z * speed;
 			if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += Z * speed;

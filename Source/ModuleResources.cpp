@@ -309,8 +309,21 @@ void ModuleResources::GenBoundingBox(ComponentMesh * mesh_component)
 	mesh_component->bounding_box[6] = { max.x,max.y,max.z };
 	mesh_component->bounding_box[7] = { max.x,max.y,min.z };
 
-	mesh_component->center = (mesh_component->min_vertex + mesh_component->max_vertex) / 2;
+	float3 c = (mesh_component->min_vertex + mesh_component->max_vertex) / 2;
+	mesh_component->center = c;
 	mesh_component->bounding_box[8] = mesh_component->center;
+
+	mesh_component->bounding_box[9]  = { c.x,c.y,min.z };  //Face 0437 center
+	mesh_component->bounding_box[10]  = { min.x,c.y,c.z };  //Face 0415 center
+	mesh_component->bounding_box[11] = { max.x,c.y,c.z }; //Face 3726 center
+	mesh_component->bounding_box[12] = { c.x,c.y,max.z }; //Face 1256 center
+	//mesh_component->bounding_box[13] = { 0,0,0 }; // camera
+	//mesh_component->bounding_box[11] = { c.x,max.y,c.z }; //Face 4567 center (top face)
+	//mesh_component->bounding_box[14] = { c.x,min.y,c.z }; //Face 0123 center (bot face)
+
+
+
+	mesh_component->size = mesh_component->max_vertex - mesh_component->min_vertex;
 
 	// VBO
 	glGenBuffers(1, &mesh_component->bb_VBO);
@@ -426,6 +439,7 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 
 	GameObject* object = App->scene->CreateGameObj(GetShapeName(type), parent_id, true);
 	ComponentMesh* mesh = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
+	object->AddComponent(Component::Type::Material);
 
 	// Vertices ------------------
 	mesh->num_vertices = m->npoints;
@@ -495,8 +509,8 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 
 	GenTexture(mesh);
 
-	if (type < 8) //idk but has to be like this for now
-		GenBoundingBox(mesh);
+	//if (type < 8) //idk but has to be like this for now
+		//GenBoundingBox(mesh);
 
 
 

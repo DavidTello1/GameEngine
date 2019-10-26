@@ -21,10 +21,16 @@ public:
 
 private:
 	void CalculateViewMatrix();
-	bool orbit;
 
 public:
-	vec3 X, Y, Z, Position, Reference;
+	vec3 X = {1.0f, 0.0f, 0.0f};
+	vec3 Y = {0.0f, 1.0f, 0.0f};
+	vec3 Z = {0.0f, 0.0f, 1.0f};
+
+	const vec3 c_X = { 1.0f, 0.0f, 0.0f };
+	const vec3 c_Y = { 0.0f, 1.0f, 0.0f };
+	const vec3 c_Z = { 0.0f, 0.0f, 1.0f };
+	vec3 Position, Reference;
 	bool viewport_focus;
 
 private:

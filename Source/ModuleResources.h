@@ -75,12 +75,14 @@ private:
 	void MakeCheckersTexture();
 
 public:
-	const GLuint bbox_indices[42] =
+	GLuint bbox_indices[26] =
 	{
 		0,1,2,3,0,3,1,2,
 		4,5,6,7,4,7,5,6,
 		0,4,1,5,2,6,3,7,
-		0,8,1,8,2,8,3,8,4,8,5,8,6,8,7,8
+		13,9
+		//9,10,9,12,9,14,9,11,13,10,13,11,13,12,13,14
+
 	};
 };
 

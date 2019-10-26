@@ -29,8 +29,13 @@ public:
 	float3 min_vertex = { 0,0,0 };
 	float3 max_vertex = { 0,0,0 };
 	float3 center = { 0,0,0 };
+	float3 size = { 0,0,0 };
 
-	float3 bounding_box[9];
+	//0-7 Box vertex
+	//8 Box center
+	//9-12 Faces center
+	//13 Camera pos
+	float3 bounding_box[14];
 	GLuint bb_VBO = 0;
 	GLuint bb_IBO = 0;
 	
