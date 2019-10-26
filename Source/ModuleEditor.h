@@ -68,7 +68,6 @@ public:
 
 	bool show_plane = true;
 	bool show_axis = true;
-	bool show_wireframe = false;
 
 private:
 	enum

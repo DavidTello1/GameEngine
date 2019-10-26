@@ -294,9 +294,6 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 
 				ImGui::Separator();
 
-				if (ImGui::MenuItem("Wireframe", NULL, &is_wireframe))
-					show_wireframe = !show_wireframe;
-
 				//if (ImGui::MenuItem("Top"))
 				//	//top
 
@@ -317,7 +314,6 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 
 				ImGui::EndMenu();
 			}
-
 
 			if (ImGui::BeginMenu("Options")) //options
 			{
