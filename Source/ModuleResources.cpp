@@ -117,6 +117,11 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 
 					ImportMesh(mesh, mesh_component);
 					object->AddComponent(Component::Type::Renderer);
+
+					if (parent_id != 0)
+					{
+						App->scene->FindById(parent_id)->ChildAdded(object);
+					}
 				}
 			}
 			aiReleaseImport(scene);
@@ -210,6 +215,7 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 {
 	LOG("Importing mesh '%s'", (mesh->mName.C_Str()), 'g');
+	GameObject* go = mesh_component->GetGameobj();
 
 	// Vertices -----------------------
 	mesh_component->num_vertices = mesh->mNumVertices;
@@ -217,13 +223,13 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 
 	if (mesh_component->num_vertices > 0)
 	{
-		mesh_component->min_vertex.x = mesh->mVertices[0].x;
-		mesh_component->min_vertex.y = mesh->mVertices[0].y;
-		mesh_component->min_vertex.z = mesh->mVertices[0].z;
+		go->min_vertex.x = mesh->mVertices[0].x;
+		go->min_vertex.y = mesh->mVertices[0].y;
+		go->min_vertex.z = mesh->mVertices[0].z;
 
-		mesh_component->max_vertex.x = mesh->mVertices[0].x;
-		mesh_component->max_vertex.y = mesh->mVertices[0].y;
-		mesh_component->max_vertex.z = mesh->mVertices[0].z;
+		go->max_vertex.x = mesh->mVertices[0].x;
+		go->max_vertex.y = mesh->mVertices[0].y;
+		go->max_vertex.z = mesh->mVertices[0].z;
 	}
 	else {
 		LOG("Mesh has no vertices", 'e');
@@ -242,13 +248,13 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 		mesh_component->vertices[i].z = z;
 
 		// Bounding box setting up
-		if (x < mesh_component->min_vertex.x) mesh_component->min_vertex.x = x;
-		if (y < mesh_component->min_vertex.y) mesh_component->min_vertex.y = y;
-		if (z < mesh_component->min_vertex.z) mesh_component->min_vertex.z = z;
+		if (x < go->min_vertex.x) go->min_vertex.x = x;
+		if (y < go->min_vertex.y) go->min_vertex.y = y;
+		if (z < go->min_vertex.z) go->min_vertex.z = z;
 
-		if (x > mesh_component->max_vertex.x) mesh_component->max_vertex.x = x;
-		if (y > mesh_component->max_vertex.y) mesh_component->max_vertex.y = y;
-		if (z > mesh_component->max_vertex.z) mesh_component->max_vertex.z = z;
+		if (x > go->max_vertex.x) go->max_vertex.x = x;
+		if (y > go->max_vertex.y) go->max_vertex.y = y;
+		if (z > go->max_vertex.z) go->max_vertex.z = z;
 		
 	}
 
@@ -282,8 +288,6 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 
 	GenTexture(mesh_component);
 
-	GenBoundingBox(mesh_component);
-
 	// Normals -----------------------
 	if (mesh->HasNormals())
 	{
@@ -298,72 +302,9 @@ void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
 			mesh_component->normals[i].z = mesh->mNormals[i].z;
 		}
 	}
-
-	// Colors
-	/*for (unsigned i = 0; i < mesh->mNumVertices; ++i)
-	{
-		if (mesh->HasVertexColors(i))
-		{
-			LOG("Importing colors to vertex %u", i , 'g');
-			this->vertices[i].color[0] = *((GLfloat*)&mesh->mColors[i]->r);
-			this->vertices[i].color[1] = *((GLfloat*)&mesh->mColors[i]->g);
-			this->vertices[i].color[2] = *((GLfloat*)&mesh->mColors[i]->b);
-			this->vertices[i].color[3] = *((GLfloat*)&mesh->mColors[i]->a);
-		}
-	}*/
-}
-
-void ModuleResources::GenBoundingBox(ComponentMesh * mesh_component)
-{
-	//Bounding box
-	float3 min = mesh_component->min_vertex;
-	float3 max = mesh_component->max_vertex;
-
-	mesh_component->bounding_box[0] = { min.x,min.y,min.z };
-	mesh_component->bounding_box[1] = { min.x,min.y,max.z };
-	mesh_component->bounding_box[2] = { max.x,min.y,max.z };
-	mesh_component->bounding_box[3] = { max.x,min.y,min.z };
-
-	mesh_component->bounding_box[4] = { min.x,max.y,min.z };
-	mesh_component->bounding_box[5] = { min.x,max.y,max.z };
-	mesh_component->bounding_box[6] = { max.x,max.y,max.z };
-	mesh_component->bounding_box[7] = { max.x,max.y,min.z };
-
-	float3 c = (mesh_component->min_vertex + mesh_component->max_vertex) / 2;
-	mesh_component->center = c;
-	mesh_component->bounding_box[8] = mesh_component->center;
-
-	mesh_component->bounding_box[9]  = { c.x,c.y,min.z };  //Face 0437 center
-	mesh_component->bounding_box[10]  = { min.x,c.y,c.z };  //Face 0415 center
-	mesh_component->bounding_box[11] = { max.x,c.y,c.z }; //Face 3726 center
-	mesh_component->bounding_box[12] = { c.x,c.y,max.z }; //Face 1256 center
-	//mesh_component->bounding_box[13] = { 0,0,0 }; // camera
-	//mesh_component->bounding_box[11] = { c.x,max.y,c.z }; //Face 4567 center (top face)
-	//mesh_component->bounding_box[14] = { c.x,min.y,c.z }; //Face 0123 center (bot face)
-
-
-
-	mesh_component->size = mesh_component->max_vertex - mesh_component->min_vertex;
-
-	// VBO
-	glGenBuffers(1, &mesh_component->bb_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->bb_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(mesh_component->bounding_box), mesh_component->bounding_box, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//IBO
-	glGenBuffers(1, &mesh_component->bb_IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_component->bb_IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(App->resources->bbox_indices), App->resources->bbox_indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-	LOG("BoundingBox vertices", 'd');
-
-	for (int i = 0; i < 8; i++)
-	{
-		LOG("{ %f , %f , %f }", mesh_component->bounding_box[i].x, mesh_component->bounding_box[i].y, mesh_component->bounding_box[i].z, 'd');
-	}
+	go->GenBoundingBox();
+	go->is_valid_dimensions = true;
+	
 }
 
 GLuint ModuleResources::ImportTexture(int width, int height,int internal_format, int format, unsigned char* image)
@@ -468,12 +409,12 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 	mesh->vertices = new float3[mesh->num_vertices];
 	if (mesh->num_vertices >= 3)
 	{
-		mesh->min_vertex.x = m->points[0];
-		mesh->min_vertex.y = m->points[1];
-		mesh->min_vertex.z = m->points[2];
-		mesh->max_vertex.x = m->points[0];
-		mesh->max_vertex.y = m->points[1];
-		mesh->max_vertex.z = m->points[2];
+		object->min_vertex.x = m->points[0];
+		object->min_vertex.y = m->points[1];
+		object->min_vertex.z = m->points[2];
+		object->max_vertex.x = m->points[0];
+		object->max_vertex.y = m->points[1];
+		object->max_vertex.z = m->points[2];
 	}
 	else {
 		LOG("Mesh has no vertices", 'e');
@@ -491,13 +432,13 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 		mesh->vertices[i].z = z; 
 
 		// Bounding box setting up
-		if (x < mesh->min_vertex.x) mesh->min_vertex.x = x;
-		if (y < mesh->min_vertex.y) mesh->min_vertex.y = y;
-		if (z < mesh->min_vertex.z) mesh->min_vertex.z = z;
+		if (x < object->min_vertex.x) object->min_vertex.x = x;
+		if (y < object->min_vertex.y) object->min_vertex.y = y;
+		if (z < object->min_vertex.z) object->min_vertex.z = z;
 
-		if (x > mesh->max_vertex.x) mesh->max_vertex.x = x;
-		if (y > mesh->max_vertex.y) mesh->max_vertex.y = y;
-		if (z > mesh->max_vertex.z) mesh->max_vertex.z = z;
+		if (x > object->max_vertex.x) object->max_vertex.x = x;
+		if (y > object->max_vertex.y) object->max_vertex.y = y;
+		if (z > object->max_vertex.z) object->max_vertex.z = z;
 	}
 
 	GenVBO(mesh);
@@ -532,8 +473,14 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 	GenTexture(mesh);
 
 	if (type < 8) //idk but has to be like this for now, otherwise ImGui crashes
-		GenBoundingBox(mesh);
-
+	{
+		object->GenBoundingBox();
+		object->is_valid_dimensions = true;
+	}
+	if (parent_id != 0)
+	{
+		object->ChildAdded(object);
+	}
 }
 void ModuleResources::GenVBO(ComponentMesh * mesh_component)
 {

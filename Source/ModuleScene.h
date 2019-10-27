@@ -28,6 +28,7 @@ public:
 
 	
 public:
+	GameObject * FindById(uint id);
 	// GameObjects-----------
 	GameObject* CreateGameObj(const char* name = "GameObject",const uint parent_id = 0, bool visible = false);
 	void DeleteGameobj(GameObject* obj);

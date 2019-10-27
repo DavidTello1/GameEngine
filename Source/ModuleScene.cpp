@@ -87,11 +87,38 @@ bool ModuleScene::Draw()
 
 			renderer->Draw();
 		}
+		GameObject* obj = gameobjs[i];
+		glEnableClientState(GL_VERTEX_ARRAY);
+		if ((obj->show_bounding_box || App->scene->show_all_bounding_box) && obj->bb_VBO != 0)
+		{
+			glColor3ub(App->scene->bounding_box_color[0] * 255.0f, App->scene->bounding_box_color[1] * 255.0f, App->scene->bounding_box_color[2] * 255.0f);
+			glLineWidth(App->scene->bounding_box_width);
+
+			glBindBuffer(GL_ARRAY_BUFFER, obj->bb_VBO);
+			glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->bb_IBO);
+			glDrawElements(GL_LINES, sizeof(App->resources->bbox_indices), GL_UNSIGNED_INT, nullptr);
+
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glColor3ub(255, 255, 255);
+		}
+		glDisableClientState(GL_VERTEX_ARRAY);
+
 		glPopMatrix();
 	}
 	return true;
 }
 
+GameObject* ModuleScene::FindById(uint id)
+{
+	for (int i = 0; i < gameobjs.size(); i++)
+		if (gameobjs[i]->GetUID() == id) return gameobjs[i];
+
+	return nullptr;
+}
 GameObject* ModuleScene::CreateGameObj(const char* name, const uint parent_id, bool visible)
 {
 	create_gameobj = true;

@@ -77,24 +77,6 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 	/*glDisable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);*/
 	
-	
-
-	if ((mesh.GetGameobj()->show_bounding_box || App->scene->show_all_bounding_box) && mesh.bb_VBO != 0)
-	{
-		glColor3ub(App->scene->bounding_box_color[0]*255.0f, App->scene->bounding_box_color[1]*255.0f, App->scene->bounding_box_color[2]*255.0f);
-		glLineWidth(App->scene->bounding_box_width);
-
-		glBindBuffer(GL_ARRAY_BUFFER, mesh.bb_VBO);
-		glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.bb_IBO);
-		glDrawElements(GL_LINES, sizeof(App->resources->bbox_indices), GL_UNSIGNED_INT, nullptr);
-
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glColor3ub(255, 255, 255);
-	}
 
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
