@@ -104,7 +104,7 @@ void Inspector::Draw()
 		ImGui::EndMenuBar();
 	}
 
-	ImGui::TextColored(ImVec4(0.3f, 0.7f, 1.0f, 1.0f), obj->GetName());
+	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), obj->GetName());
 	ImGui::Separator();
 
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
@@ -181,7 +181,7 @@ void Inspector::Draw()
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_vertices));
 
-			ImGui::Text("Normals: ");
+			ImGui::Text("Vertex Normals: ");
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_normals));
 
