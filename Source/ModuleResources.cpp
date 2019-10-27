@@ -479,7 +479,7 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 	}
 	if (parent_id != 0)
 	{
-		object->ChildAdded(object);
+		App->scene->FindById(parent_id)->ChildAdded(object);
 	}
 }
 void ModuleResources::GenVBO(ComponentMesh * mesh_component)

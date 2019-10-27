@@ -87,6 +87,8 @@ bool ModuleScene::Draw()
 
 			renderer->Draw();
 		}
+
+		// Bounding boxes
 		GameObject* obj = gameobjs[i];
 		glEnableClientState(GL_VERTEX_ARRAY);
 		if ((obj->show_bounding_box || App->scene->show_all_bounding_box) && obj->bb_VBO != 0)

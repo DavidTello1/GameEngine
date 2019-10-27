@@ -196,3 +196,8 @@ void GameObject::GenBoundingBox()
 		LOG("{ %f , %f , %f }", bounding_box[i].x, bounding_box[i].y, bounding_box[i].z, 'd');
 	}
 }
+
+bool GameObject::HasChilds()
+{
+	return !App->editor->tab_hierarchy->SearchById(uid)->childs.empty();
+}

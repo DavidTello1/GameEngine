@@ -89,16 +89,28 @@ bool ModuleCamera3D::Update(float dt)
 				switch (face)
 				{
 				case 9:
-					Position = new_p - c_Z * offset;
+					if (object->HasChilds())
+						Position = new_p + c_Z * offset;
+					else
+						Position = new_p - c_Z * offset;
 					break;
 				case 10:
-					Position = new_p - c_X * offset;
+					if (object->HasChilds())
+						Position = new_p + c_X * offset;
+					else
+						Position = new_p - c_X * offset;
 					break;
 				case 11:
-					Position = new_p + c_X * offset;
+					if (object->HasChilds())
+						Position = new_p - c_X * offset;
+					else
+						Position = new_p + c_X * offset;
 					break;
 				case 12:
-					Position = new_p + c_Z * offset;
+					if (object->HasChilds())
+						Position = new_p - c_Z * offset;
+					else
+						Position = new_p + c_Z * offset;
 					break;
 				default:
 					LOG("Could not detect closest face", 'e');

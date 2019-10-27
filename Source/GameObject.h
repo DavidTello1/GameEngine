@@ -66,6 +66,8 @@ public:
 
 	void GenBoundingBox();
 
+	bool HasChilds();
+
 	// Dimensions
 	bool is_valid_dimensions = false;
 	float3 min_vertex = { 0,0,0 };
