@@ -52,7 +52,6 @@ public:
 	void UnLoadResource();
 
 	void ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component);
-	void GenBoundingBox(ComponentMesh * mesh_component);
 	void GenVBO(ComponentMesh * mesh_component);
 	void GenIBO(ComponentMesh * mesh_component);
 	void GenTexture(ComponentMesh * mesh_component);

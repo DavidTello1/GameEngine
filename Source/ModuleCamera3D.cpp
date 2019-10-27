@@ -65,66 +65,67 @@ bool ModuleCamera3D::Update(float dt)
 			if (!App->scene->selected_go.empty())
 			{
 				GameObject* object = App->scene->selected_go.at(0);
-				const ComponentMesh* mesh = (ComponentMesh*)(object->GetComponent(Component::Type::Mesh));
-				// Check if has a mesh component (TODO improve)
-				/*for (uint i = 0; i < object->components.size(); i++)
+				
+				float3 c = { Position.x,Position.y,Position.z };
+				float3 p = object->bounding_box[9] - c;
+
+				float l = length(vec3(p.x, p.y, p.z));
+				float min = l;
+				int face = 9;
+
+				for (int i = 10; i < 13; i++)
 				{
-					if (object->components[i]->GetType() == Component::Type::Mesh)
-					{
-						mesh = (ComponentMesh*)object->components[i];
-						break;
+					p = object->bounding_box[i] - c;
+					l = length(vec3(p.x, p.y, p.z));
+					if (l < min) {
+						min = l;
+						face = i;
 					}
-				}*/
-				if (mesh)
-				{
-					float3 c = { Position.x,Position.y,Position.z };
-					float3 p = mesh->bounding_box[9] - c;
-
-					float l = length(vec3(p.x, p.y, p.z));
-					float min = l;
-					int face = 9;
-
-					for (int i = 10; i < 13; i++)
-					{
-						p = mesh->bounding_box[i] - c;
-						l = length(vec3(p.x, p.y, p.z));
-						if (l < min) {
-							min = l;
-							face = i;
-						}
-					}
-
-					vec3 new_p = { mesh->bounding_box[face].x,mesh->bounding_box[face].y,mesh->bounding_box[face].z };
-					float size = mesh->size.MaxElement();
-					float offset = Sqrt((size*size) - (size*size / 4));
-					switch (face)
-					{
-					case 9:
-						Position = new_p - c_Z * offset;
-						break;
-					case 10:
-						Position = new_p - c_X * offset;
-						break;
-					case 11:
-						Position = new_p + c_X * offset;
-						break;
-					case 12:
-						Position = new_p + c_Z * offset;
-						break;
-					default:
-						LOG("Could not detect closest face", 'e');
-						break;
-					}
-					//mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
-					//App->resources->bbox_indices[25] = face;
-					//App->resources->GenBoundingBox(mesh);
-
-					LOG("FACE %i", face, 'v');
-					LOG("To [%f,%f,%f]", Position.x, Position.y, Position.z, 'v');
-					LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'v');
-
-					LookAt(new_p);
 				}
+
+				vec3 new_p = { object->bounding_box[face].x,object->bounding_box[face].y,object->bounding_box[face].z };
+				float size = object->size.MaxElement();
+				float offset = Sqrt((size*size) - (size*size / 4));
+				switch (face)
+				{
+				case 9:
+					if (object->HasChilds())
+						Position = new_p + c_Z * offset;
+					else
+						Position = new_p - c_Z * offset;
+					break;
+				case 10:
+					if (object->HasChilds())
+						Position = new_p + c_X * offset;
+					else
+						Position = new_p - c_X * offset;
+					break;
+				case 11:
+					if (object->HasChilds())
+						Position = new_p - c_X * offset;
+					else
+						Position = new_p + c_X * offset;
+					break;
+				case 12:
+					if (object->HasChilds())
+						Position = new_p - c_Z * offset;
+					else
+						Position = new_p + c_Z * offset;
+					break;
+				default:
+					LOG("Could not detect closest face", 'e');
+					break;
+				}
+				//mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
+				//App->resources->bbox_indices[25] = face;
+				//App->resources->GenBoundingBox(mesh);
+
+				LOG("FACE %i", face, 'v');
+				LOG("To [%f,%f,%f]", Position.x, Position.y, Position.z, 'v');
+				LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'v');
+
+				LookAt(new_p);
+				
 				
 			}
 		}
@@ -164,20 +165,19 @@ bool ModuleCamera3D::Update(float dt)
 			// To change to the Reference we want to orbit at
 			if (!App->scene->selected_go.empty())
 			{
-				vec3 look_at = { 0,0,0 };
 				const GameObject* object = App->scene->selected_go.at(0);
 
-				// Check if has a mesh component (TODO improve)
-				for (uint i = 0; i < object->components.size(); i++)
-				{
-					if (object->components[i]->GetType() == Component::Type::Mesh)
-					{
-						ComponentMesh* mesh = (ComponentMesh*)object->components[i];
-						look_at = { mesh->center.x, mesh->center.y,mesh->center.z };
-						break;
-					}
-				}
-				LookAt(look_at);
+				//// Check if has a mesh component (TODO improve)
+				//for (uint i = 0; i < object->components.size(); i++)
+				//{
+				//	if (object->components[i]->GetType() == Component::Type::Mesh)
+				//	{
+				//		ComponentMesh* mesh = (ComponentMesh*)object->components[i];
+				//		look_at = { mesh->center.x, mesh->center.y,mesh->center.z };
+				//		break;
+				//	}
+				//}
+				LookAt({ object->center.x, object->center.y,object->center.z });
 				
 			}
 		}

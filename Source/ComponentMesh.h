@@ -26,19 +26,6 @@ public:
 
 	float3* normals = nullptr;		// Array of normal coordinates
 	uint num_normals = 0;			// Number of normal coordinates
-
-public:
-
-	float3 min_vertex = { 0,0,0 };
-	float3 max_vertex = { 0,0,0 };
-	float3 center = { 0,0,0 };
-	float3 size = { 0,0,0 };
-
-	//0-7 Box vertex
-	//8 Box center
-	//9-12 Faces center
-	float3 bounding_box[13];
-	GLuint bb_VBO = 0;
-	GLuint bb_IBO = 0;
-	};
+	
+};
 

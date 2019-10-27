@@ -4,6 +4,7 @@
 
 #include "Globals.h"
 #include "Component.h"
+#include "glew\include\GL\glew.h"
 
 #include "Math.h"
 #include <vector>
@@ -36,6 +37,8 @@ public:
 	void SetRotation(const Quat& rotation);
 	void SetTransform(const float4x4& transform);
 
+	void ChildAdded(GameObject * child);
+
 	void SetLocalPosition(const float3& position) { translation = position; }
 	void SetLocalScale(const float3& scale) { this->scale = scale; }
 
@@ -60,6 +63,24 @@ private:
 
 public:
 	std::vector<Component*> components;
+
+	void GenBoundingBox();
+
+	bool HasChilds();
+
+	// Dimensions
+	bool is_valid_dimensions = false;
+	float3 min_vertex = { 0,0,0 };
+	float3 max_vertex = { 0,0,0 };
+	float3 center = { 0,0,0 };
+	float3 size = { 0,0,0 };
+
+	//0-7 Box vertex
+	//8 Box center
+	//9-12 Faces center
+	float3 bounding_box[13];
+	GLuint bb_VBO = 0;
+	GLuint bb_IBO = 0;
 
 	bool show_bounding_box = false;
 };

@@ -162,6 +162,11 @@ void Inspector::Draw()
 			SetScale(obj, scale);
 
 		ImGui::Separator();
+
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
+		ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
+
+		ImGui::Separator();
 	}
 
 	if (has_mesh)
@@ -253,9 +258,6 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Renderer"))
 		{
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
-			ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
-
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 			ImGui::Checkbox("Wireframe", &renderer->show_wireframe);
 			ImGui::Separator();

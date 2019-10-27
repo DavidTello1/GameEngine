@@ -94,10 +94,29 @@ HierarchyNode* Hierarchy::AddNode(GameObject* obj, HierarchyNode* parent)
 	n->ToggleSelection();
 	// General list of all nodes, not used for printing
 	nodes.push_back(n);
+
+	/*if (parent->id != 0)
+		ChildAdded(obj,parent);*/
 	return n;
 
 }
 
+void Hierarchy::ChildAdded(GameObject* child, HierarchyNode* to)
+{
+	if (to->id == 0) return;
+
+	// Checking if new child node is not an empty node
+	if (child->is_valid_dimensions)
+	{
+		to->obj->min_vertex = child->min_vertex;
+		to->obj->max_vertex = child->max_vertex;
+
+		GetMinMaxVertex(to, &to->obj->min_vertex, &to->obj->max_vertex);
+
+		to->obj->GenBoundingBox();
+
+	}
+}
 void Hierarchy::DeleteNode(HierarchyNode* n)
 {
 	// if has no childs, delete the node
@@ -273,4 +292,27 @@ void Hierarchy::SetSceneName(const char* name)
 {
 	LOG("Renaming scene from '%s' to '%s'", scene_name, name);
 	scene_name = name;
+}
+
+void Hierarchy::GetMinMaxVertex(const HierarchyNode* node,float3* abs_max, float3* abs_min)
+{
+	if (node->childs.empty())
+	{
+		GameObject* go = node->obj;
+		if (!go->is_valid_dimensions) return;
+		if (go->min_vertex.x < abs_min->x) abs_min->x = go->min_vertex.x;
+		if (go->min_vertex.y < abs_min->y) abs_min->y = go->min_vertex.y;
+		if (go->min_vertex.z < abs_min->z) abs_min->z = go->min_vertex.z;
+
+		if (go->max_vertex.x > abs_max->x) abs_max->x = go->max_vertex.x;
+		if (go->max_vertex.y > abs_max->y) abs_max->y = go->max_vertex.y;
+		if (go->max_vertex.z > abs_max->z) abs_max->z = go->max_vertex.z;
+	}
+	else {
+		for (HierarchyNode* child : node->childs)
+		{
+			GetMinMaxVertex(child, abs_max, abs_min);
+		}
+
+	}
 }

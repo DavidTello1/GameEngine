@@ -32,13 +32,11 @@ bool Viewport::PreUpdate()
 
 		GenerateFBO(ImVec2(width, height));
 		OnResize(width, height);
-
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
-	//GREEN
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
 	glLoadIdentity();
@@ -49,19 +47,13 @@ bool Viewport::PreUpdate()
 	App->scene_base->Draw();
 	App->scene->Draw();
 
-	//DrawFigures();
-	//glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 	return true;
 }
 
 
 void Viewport::Draw() 
 {
-	if (ImGui::IsWindowFocused() == true) // only accept camera controls if viewport is selected
-		App->camera->viewport_focus = true;
-	else
-		App->camera->viewport_focus = false;
-
+	App->camera->viewport_focus = ImGui::IsWindowFocused();
 
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
@@ -71,9 +63,8 @@ void Viewport::Draw()
 // Is not automatically called
 bool Viewport::PostUpdate()
 {
-	// second step
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-	// BLUE
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -84,14 +75,12 @@ bool Viewport::CleanUp()
 {
 	RemoveBuffer(frame_buffer);
 
-	
-
 	return true;
 }
 
 bool Viewport::GenerateFBO(ImVec2 size)
 {
-	
+	RemoveBuffer(frame_buffer);
 	//Generate the FBO and bind it, continue if FBO is complete
 	glGenFramebuffers(1, &frame_buffer.id);
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
@@ -106,12 +95,11 @@ bool Viewport::GenerateFBO(ImVec2 size)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frame_buffer.tex, 0);
 
 	//Generate RenderBufferObject
-	unsigned int rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glGenRenderbuffers(1, &frame_buffer.depth);
+	glBindRenderbuffer(GL_RENDERBUFFER, frame_buffer.depth);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.x, size.y);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, frame_buffer.depth);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
