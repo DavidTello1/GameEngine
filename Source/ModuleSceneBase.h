@@ -23,7 +23,5 @@ private:
 
 	void DrawGridPlane();
 	void DrawAxis();
-
-
 };
 

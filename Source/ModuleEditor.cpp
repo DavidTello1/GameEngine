@@ -196,11 +196,6 @@ void ModuleEditor::Draw()
 	DrawPanels(is_auto_select);
 
 	// Menu Functionalities
-	if (file_dialog == opened)
-		LoadFile((file_dialog_filter.length() > 0) ? file_dialog_filter.c_str() : nullptr);
-	else
-		in_modal = false;
-
 	if (is_new)
 	{
 		//...
@@ -250,13 +245,13 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 		{
 			if (ImGui::BeginMenu("File")) //file
 			{
-				if (ImGui::MenuItem("New", "Ctrl+N"))
+				if (ImGui::MenuItem("New", "Ctrl+N", false, false))
 					is_new = true;
 
-				if (ImGui::MenuItem("Open", "Ctrl+O"))
+				if (ImGui::MenuItem("Open", "Ctrl+O", false, false))
 					is_open = true;
 
-				if (ImGui::MenuItem("Save", "Ctrl+S"))
+				if (ImGui::MenuItem("Save", "Ctrl+S", false, false))
 					is_save = true;
 
 				ImGui::Separator();
@@ -268,20 +263,41 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 
 			if (ImGui::BeginMenu("Edit")) //edit
 			{
-				if (ImGui::MenuItem("Import"))
-					is_import = true;
+				if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false))
+				{
+				}
 
+				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false))
+				{
+				}
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Import", NULL, false, false))
+				{
+				}
+
+				if (ImGui::MenuItem("Export", NULL, false, false))
+				{
+				}
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Cut", "Ctrl+X", false, false))
+				{
+				}
+
+				if (ImGui::MenuItem("Copy", "Ctrl+C", false, false))
+				{
+				}
+
+				if (ImGui::MenuItem("Paste", "Ctrl+V", false, false))
+				{
+				}
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Windows")) //view
+			if (ImGui::BeginMenu("GameObjects")) //gameobject
 			{
-				ImGui::MenuItem("Hierarchy", NULL, &GetPanel("Hierarchy")->active);
-				ImGui::MenuItem("Configuration", NULL, &GetPanel("Configuration")->active);
-				ImGui::MenuItem("Inspector", NULL, &GetPanel("Inspector")->active);
-				ImGui::MenuItem("Console", NULL, &GetPanel("Console")->active);
-				ImGui::MenuItem("Assets", NULL, &GetPanel("Assets")->active);
-
+				DrawCreateMenu();
 				ImGui::EndMenu();
 			}
 
@@ -319,6 +335,17 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 			if (ImGui::BeginMenu("Options")) //options
 			{
 				ImGui::MenuItem("Autoselect windows", NULL, &is_auto_select);
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Windows")) //windows
+			{
+				ImGui::MenuItem("Hierarchy", NULL, &GetPanel("Hierarchy")->active);
+				ImGui::MenuItem("Configuration", NULL, &GetPanel("Configuration")->active);
+				ImGui::MenuItem("Inspector", NULL, &GetPanel("Inspector")->active);
+				ImGui::MenuItem("Console", NULL, &GetPanel("Console")->active);
+				ImGui::MenuItem("Assets", NULL, &GetPanel("Assets")->active);
 
 				ImGui::EndMenu();
 			}
@@ -549,113 +576,62 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 	}
 }
 
-bool ModuleEditor::FileDialog(const char * extension, const char* from_folder)
+void ModuleEditor::DrawCreateMenu()
 {
-	bool ret = true;
+	if (ImGui::MenuItem("Empty"))
+		App->scene->CreateGameObj();
 
-	switch (file_dialog)
+	ImGui::Separator();
+	if (ImGui::BeginMenu("Basic shapes"))
 	{
-	case closed:
-		selected_file[0] = '\0';
-		file_dialog_filter = (extension) ? extension : "";
-		file_dialog_origin = (from_folder) ? from_folder : "";
-		file_dialog = opened;
-	case opened:
-		ret = false;
-		break;
+		if (ImGui::MenuItem("Cylinder"))
+			App->resources->CreateShape(CYLINDER, 9, 9);
+
+		if (ImGui::MenuItem("Cone"))
+			App->resources->CreateShape(CONE, 9, 9);
+
+		if (ImGui::MenuItem("Sphere"))
+			App->resources->CreateShape(SPHERE, 9, 9);
+
+		if (ImGui::MenuItem("Plane"))
+			App->resources->CreateShape(PLANE, 9, 9);
+
+		if (ImGui::MenuItem("Cube"))
+			App->resources->CreateShape(CUBE, 9, 9);
+
+		ImGui::EndMenu();
 	}
 
-	return ret;
-}
-
-const char * ModuleEditor::CloseFileDialog()
-{
-	if (file_dialog == ready_to_close)
+	if (ImGui::BeginMenu("Extended shapes"))
 	{
-		file_dialog = closed;
-		return selected_file[0] ? selected_file : nullptr;
-	}
-	return nullptr;
-}
+		if (ImGui::MenuItem("Torus"))
+			App->resources->CreateShape(TORUS, 9, 9);
 
-void ModuleEditor::LoadFile(const char* filter_extension, const char* from_dir)
-{
-	ImGui::OpenPopup("Load File");
-	if (ImGui::BeginPopupModal("Load File", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		in_modal = true;
+		if (ImGui::MenuItem("Bottle"))
+			App->resources->CreateShape(BOTTLE, 9, 9);
 
-		ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
-		ImGui::BeginChild("File Browser", ImVec2(0, 300), true);
-		DrawDirectoryRecursive(from_dir, filter_extension);
-		ImGui::EndChild();
-		ImGui::PopStyleVar();
+		if (ImGui::MenuItem("Knot"))
+			App->resources->CreateShape(KNOT, 9, 9);
 
-		ImGui::PushItemWidth(250.f);
-		if (ImGui::InputText("##file_selector", selected_file, FILE_MAX, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
-			file_dialog = ready_to_close;
+		if (ImGui::MenuItem("Hemisphere"))
+			App->resources->CreateShape(HEMISPHERE, 9, 9);
 
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-		if (ImGui::Button("Ok", ImVec2(50, 20)))
-			file_dialog = ready_to_close;
-		ImGui::SameLine();
+		if (ImGui::MenuItem("Icosahedron"))
+			App->resources->CreateShape(ICOSAHEDRON, 9, 9);
 
-		if (ImGui::Button("Cancel", ImVec2(50, 20)))
-		{
-			file_dialog = ready_to_close;
-			selected_file[0] = '\0';
-		}
+		if (ImGui::MenuItem("Dodecahedron"))
+			App->resources->CreateShape(DODECAHEDRON, 9, 9);
 
-		ImGui::EndPopup();
-	}
-	else
-	{
-		in_modal = false;
-	}
-}
+		if (ImGui::MenuItem("Octahedron"))
+			App->resources->CreateShape(OCTAHEDRON, 9, 9);
 
-void ModuleEditor::DrawDirectoryRecursive(const char* directory, const char* filter_extension)
-{
-	vector<string> files;
-	vector<string> dirs;
+		if (ImGui::MenuItem("Tetrahedron"))
+			App->resources->CreateShape(TETRAHEDRON, 9, 9);
 
-	std::string dir((directory) ? directory : "");
-	dir += "/";
+		if (ImGui::MenuItem("Rock"))
+			App->resources->CreateShape(ROCK, 9, 9);
 
-	App->file_system->DiscoverFiles(dir.c_str(), files, dirs);
-
-	for (vector<string>::const_iterator it = dirs.begin(); it != dirs.end(); ++it)
-	{
-		if (ImGui::TreeNodeEx((dir + (*it)).c_str(), 0, "%s/", (*it).c_str()))
-		{
-			DrawDirectoryRecursive((dir + (*it)).c_str(), filter_extension);
-			ImGui::TreePop();
-		}
-	}
-
-	std::sort(files.begin(), files.end());
-
-	for (vector<string>::const_iterator it = files.begin(); it != files.end(); ++it)
-	{
-		const string& str = *it;
-
-		bool ok = true;
-
-		if (filter_extension && str.substr(str.find_last_of(".") + 1) != filter_extension)
-			ok = false;
-
-		if (ok && ImGui::TreeNodeEx(str.c_str(), ImGuiTreeNodeFlags_Leaf))
-		{
-			if (ImGui::IsItemClicked()) {
-				sprintf_s(selected_file, FILE_MAX, "%s%s", dir.c_str(), str.c_str());
-
-				if (ImGui::IsMouseDoubleClicked(0))
-					file_dialog = ready_to_close;
-			}
-
-			ImGui::TreePop();
-		}
+		ImGui::EndMenu();
 	}
 }
 

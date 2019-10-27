@@ -111,7 +111,7 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			{	
 				if (use)
 				{
-					object = App->scene->CreateGameObj(file_name,parent_id);
+					object = App->scene->CreateGameObj(file_name, parent_id);
 					ComponentMesh* mesh_component = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
 					aiMesh* mesh = scene->mMeshes[i];
 
@@ -129,20 +129,28 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 	{
 		if (!App->scene->selected_go.empty())
 		{
-			// Devil
-			uint imageID;
-			ilGenImages(1, &imageID);
-			ilBindImage(imageID);
-			ilEnable(IL_ORIGIN_SET);
-			ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+			ComponentMaterial* material_loaded = nullptr;
+			GLuint tex;
 
-			bool loaded = ilLoadImage(path);
-			if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
+			if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
+				material_loaded = App->scene->GetMaterial(path);
+			else
+			{
+				// Devil
+				uint imageID;
+				ilGenImages(1, &imageID);
+				ilBindImage(imageID);
+				ilEnable(IL_ORIGIN_SET);
+				ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 
-			LogImageInfo();
+				bool loaded = ilLoadImage(path);
+				if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
 
-			GLuint tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
-			ilDeleteImages(1, &imageID);
+				LogImageInfo();
+
+				tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
+				ilDeleteImages(1, &imageID);
+			}
 
 			if (use)
 			{
@@ -151,31 +159,41 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 					if (object->HasComponent(Component::Type::Mesh))
 					{
 						ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
-						mesh->TEX = tex;
-
-						if (!object->HasComponent(Component::Type::Material))
+						if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
 						{
-							object->AddComponent(Component::Type::Material);
-							ComponentMaterial* material = (ComponentMaterial*)object->GetComponent(Component::Type::Material);
+							material_loaded = App->scene->GetMaterial(path);
+							mesh->TEX = material_loaded->tex_id;
+						}
+						else
+							mesh->TEX = tex;
+					}
 
+					if (App->editor->tab_hierarchy->SearchById(object->GetUID())->childs.empty()) //if object is parent
+					{
+						if (!object->HasComponent(Component::Type::Material)) //if object has not got material add one
+							object->AddComponent(Component::Type::Material);
+
+						ComponentMaterial* material = (ComponentMaterial*)object->GetComponent(Component::Type::Material);
+						if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
+						{
+							material_loaded = App->scene->GetMaterial(path);
+							strcpy_s(material->path, 256, material_loaded->path);
+							material->tex_id = material_loaded->tex_id;
+							material->width = material_loaded->width;
+							material->height = material_loaded->height;
+						}
+						else
+						{
 							strcpy_s(material->path, 256, path);
 							material->tex_id = tex;
 							material->width = tex_width;
 							material->height = tex_height;
 
-							if (!App->scene->IsMaterialLoaded(path))
-							{
-								App->scene->materials.push_back(material);
-								LOG("Texture %s loaded", file_name, 'd');
+							App->scene->materials.push_back(material);
 
-							}
-							LOG("Texture %s applied to object %s %u", file_name, object->GetName(), object->GetUID(),'d');
-
+							LOG("Texture %s loaded", file_name, 'd');
+							LOG("Texture %s applied to object %s %u", file_name, object->GetName(), object->GetUID(), 'd');
 						}
-					}
-					else
-					{
-						LOG("Object '%s %u' is missing 'Mesh' component, could not apply texture",object->GetName(),object->GetUID(),'e');
 					}
 				}
 			}

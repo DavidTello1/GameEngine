@@ -35,10 +35,6 @@ public:
 	void CreateLink(const char* text, const char* url, bool bullet = false);
 	void LogFPS(float fps, float ms);
 	 
-	// File System
-	bool FileDialog(const char* extension = nullptr, const char* from_folder = nullptr);
-	const char* CloseFileDialog();
-
 	// Panels
 	Panel* GetPanel(const char* name);
 	int GetPanelWidth(Panel* panel) const { return panel->width; }
@@ -48,15 +44,13 @@ public:
 	bool GetPanelActive(Panel* panel) const { return panel->active; }
 
 private:
-	void LoadFile(const char* filter_extension = nullptr, const char* from_dir = nullptr);
-	void DrawDirectoryRecursive(const char* directory, const char* filter_extension);
-
 	void DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_autoselect, bool &is_plane, bool &is_axis, bool &is_wireframe);
 	void DrawDemo(bool &is_show_demo);
 	void DrawAbout(bool &is_about);
 	void DrawPanels(bool &is_auto_select);
 	void ConfirmExit();
 	void Shortcuts(bool &is_new, bool &is_open, bool &is_save);
+	void DrawCreateMenu();
 
 public:
 	Configuration* tab_configuration = nullptr;
@@ -70,21 +64,7 @@ public:
 	bool show_axis = true;
 
 private:
-	enum
-	{
-		closed,
-		opened,
-		ready_to_close
-	} file_dialog = closed;
-
-	std::string file_dialog_filter;
-	std::string file_dialog_origin;
-
-	bool in_modal = false;
-	char selected_file[FILE_MAX];
 	bool close = false;
-
-	bool show_gizmos = false;
 };
 
 #endif

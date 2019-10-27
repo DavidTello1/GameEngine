@@ -60,7 +60,11 @@ void Hierarchy::Draw()
 {
 	if (ImGui::BeginMenuBar())
 	{
-		DrawCreateMenu();
+		//if (ImGui::MenuItem("Add Childs"))
+		//{
+		//	for (HierarchyNode* selected : selected_nodes)
+		//		AddNode(nullptr, selected);
+		//}
 
 		if (ImGui::MenuItem("Delete") || App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
 			DeleteSelected();
@@ -72,89 +76,6 @@ void Hierarchy::Draw()
 	ImGui::Separator();
 
 	DrawNodes(root_node->childs);
-}
-
-void Hierarchy::DrawCreateMenu()
-{
-	if (ImGui::BeginMenu("Create"))
-	{
-		in_menu = true;
-		if (ImGui::MenuItem("Empty"))
-		{
-			App->scene->CreateGameObj();
-		}
-		ImGui::Separator();
-		if (ImGui::BeginMenu("Basic shapes"))
-		{
-			if (ImGui::MenuItem("Cylinder"))
-			{
-				App->resources->CreateShape(CYLINDER, 9, 9);
-			}
-			if (ImGui::MenuItem("Cone"))
-			{
-				App->resources->CreateShape(CONE, 9, 9);
-			}
-			if (ImGui::MenuItem("Sphere"))
-			{
-				App->resources->CreateShape(SPHERE, 9, 9);
-			}
-			if (ImGui::MenuItem("Plane"))
-			{
-				App->resources->CreateShape(PLANE, 9, 9);
-			}
-			if (ImGui::MenuItem("Cube"))
-			{
-				App->resources->CreateShape(CUBE, 9, 9);
-			}
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Extended shapes"))
-		{
-			if (ImGui::MenuItem("Torus"))
-			{
-				App->resources->CreateShape(TORUS, 9, 9);
-			}
-			if (ImGui::MenuItem("Bottle"))
-			{
-				App->resources->CreateShape(BOTTLE, 9, 9);
-			}
-			if (ImGui::MenuItem("Knot"))
-			{
-				App->resources->CreateShape(KNOT, 9, 9);
-			}
-			if (ImGui::MenuItem("Hemisphere"))
-			{
-				App->resources->CreateShape(HEMISPHERE, 9, 9);
-			}
-			if (ImGui::MenuItem("Icosahedron"))
-			{
-				App->resources->CreateShape(ICOSAHEDRON, 9, 9);
-			}
-			if (ImGui::MenuItem("Dodecahedron"))
-			{
-				App->resources->CreateShape(DODECAHEDRON, 9, 9);
-			}
-			if (ImGui::MenuItem("Octahedron"))
-			{
-				App->resources->CreateShape(OCTAHEDRON, 9, 9);
-			}
-			if (ImGui::MenuItem("Tetrahedron"))
-			{
-				App->resources->CreateShape(TETRAHEDRON, 9, 9);
-			}
-			if (ImGui::MenuItem("Rock"))
-			{
-				App->resources->CreateShape(ROCK, 9, 9);
-			}
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenu();
-		
-	}
-	else
-	{
-		in_menu = false;
-	}
 }
 
 // Add a new dummy node, child of the passed node or root node if parent is missing

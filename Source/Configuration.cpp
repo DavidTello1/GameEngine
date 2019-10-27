@@ -151,7 +151,7 @@ void Configuration::DrawApplication()
 			// Devil
 			ImGui::BulletText("DevIL Version:");
 			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", IL_VERSION);
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", IL_VERSION);
 
 			ImGui::TreePop();
 		}
@@ -364,7 +364,6 @@ void Configuration::DrawTextures()
 			ImGui::TextWrapped("No textures loaded");
 			ImGui::PopStyleColor();
 			ImGui::NewLine();
-
 			return;
 		}
 		char buffer[120];
@@ -386,7 +385,7 @@ void Configuration::DrawTextures()
 
 
 				ImGui::Text("Image:");
-				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100));
+				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 				ImGui::TreePop();
 			}
 			ImGui::Separator();
