@@ -26,10 +26,7 @@
 - All loading actions can be automatically made drag and dropping the file directly to the editor
 
 ## Model loading instructions
-### Tank
-- First load the _tank.fbx_ model. 
-- Load _tankTracks.dds_ texture to the meshes 1,2
-- Load any _tank#.dds_ texture to the meshes 3,4,5,6
+
 ### T90
 - First load the _T90.fbx_ model. 
 - Load _T90-Tracks.dds_ texture to the meshes 3,4
