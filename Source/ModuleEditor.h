@@ -35,10 +35,6 @@ public:
 	void CreateLink(const char* text, const char* url, bool bullet = false);
 	void LogFPS(float fps, float ms);
 	 
-	// File System
-	bool FileDialog(const char* extension = nullptr, const char* from_folder = nullptr);
-	const char* CloseFileDialog();
-
 	// Panels
 	Panel* GetPanel(const char* name);
 	int GetPanelWidth(Panel* panel) const { return panel->width; }
@@ -48,9 +44,6 @@ public:
 	bool GetPanelActive(Panel* panel) const { return panel->active; }
 
 private:
-	void LoadFile(const char* filter_extension = nullptr, const char* from_dir = nullptr);
-	void DrawDirectoryRecursive(const char* directory, const char* filter_extension);
-
 	void DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_autoselect, bool &is_plane, bool &is_axis, bool &is_wireframe);
 	void DrawDemo(bool &is_show_demo);
 	void DrawAbout(bool &is_about);

@@ -385,7 +385,7 @@ void Configuration::DrawTextures()
 
 
 				ImGui::Text("Image:");
-				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100));
+				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 				ImGui::TreePop();
 			}
 			ImGui::Separator();

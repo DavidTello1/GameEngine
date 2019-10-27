@@ -233,7 +233,7 @@ void Inspector::Draw()
 
 				if (ImGui::TreeNode("Image"))
 				{
-					ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100));
+					ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 					ImGui::TreePop();
 				}
 			}
