@@ -57,6 +57,7 @@ private:
 	void DrawPanels(bool &is_auto_select);
 	void ConfirmExit();
 	void Shortcuts(bool &is_new, bool &is_open, bool &is_save);
+	void DrawCreateMenu();
 
 public:
 	Configuration* tab_configuration = nullptr;
@@ -70,21 +71,7 @@ public:
 	bool show_axis = true;
 
 private:
-	enum
-	{
-		closed,
-		opened,
-		ready_to_close
-	} file_dialog = closed;
-
-	std::string file_dialog_filter;
-	std::string file_dialog_origin;
-
-	bool in_modal = false;
-	char selected_file[FILE_MAX];
 	bool close = false;
-
-	bool show_gizmos = false;
 };
 
 #endif

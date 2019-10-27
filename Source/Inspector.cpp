@@ -211,7 +211,7 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Material"))
 		{
-			if (material == nullptr)
+			if (material->tex_id == NULL)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
 				ImGui::TextWrapped("Material not loaded");
