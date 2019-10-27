@@ -60,7 +60,7 @@ bool ModuleCamera3D::Update(float dt)
 
 		if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
 		{
-			LOG("Centering camera from [%f,%f,%f]", Position.x, Position.y, Position.z,'d');
+			LOG("Centering camera from [%f,%f,%f]", Position.x, Position.y, Position.z,'v');
 			// To change to the Reference we want to orbit at
 			if (!App->scene->selected_go.empty())
 			{
