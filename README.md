@@ -21,7 +21,7 @@
 
 ## Features
 - Multiple game objects can be selected (with Left CTRL) to make texture loading process faster
-- Selected game objects can be deleted with button _Delete_ or with the key _SUPR_
+- Selected game objects can be deleted with button _Delete_ or with the key _SUPR_ (*may cause some problems [WIP]*)
 - If a game object is selected inside _Hierarchy_, the new gameobjects will be created as childs of it
 - All loading actions can be automatically made drag and dropping the file directly to the editor
 
