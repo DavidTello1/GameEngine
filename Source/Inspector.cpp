@@ -219,6 +219,10 @@ void Inspector::Draw()
 			}
 			else
 			{
+				ImGui::Text("Path: ");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", material->path);
+
 				ImGui::Text("Size: ");
 				ImGui::SameLine();
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->width);
