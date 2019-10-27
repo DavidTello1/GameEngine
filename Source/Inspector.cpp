@@ -104,7 +104,7 @@ void Inspector::Draw()
 		ImGui::EndMenuBar();
 	}
 
-	ImGui::Text(obj->GetName());
+	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), obj->GetName());
 	ImGui::Separator();
 
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
@@ -186,7 +186,7 @@ void Inspector::Draw()
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_vertices));
 
-			ImGui::Text("Normals: ");
+			ImGui::Text("Vertex Normals: ");
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_normals));
 
@@ -216,7 +216,7 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Material"))
 		{
-			if (material == nullptr)
+			if (material->tex_id == NULL)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
 				ImGui::TextWrapped("Material not loaded");
@@ -224,6 +224,10 @@ void Inspector::Draw()
 			}
 			else
 			{
+				ImGui::Text("Path: ");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", material->path);
+
 				ImGui::Text("Size: ");
 				ImGui::SameLine();
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->width);
@@ -234,7 +238,7 @@ void Inspector::Draw()
 
 				if (ImGui::TreeNode("Image"))
 				{
-					ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100));
+					ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 					ImGui::TreePop();
 				}
 			}

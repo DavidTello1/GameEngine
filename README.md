@@ -10,11 +10,13 @@
 - Holding SHIFT duplicates movement speed
 
 ## Innovation
-- Option to automatically focus to window hovered
+- Option to automatically focus to window hovered *may cause some problems (WIP)*
 - Add/Remove Components from Inspector panel
 - Hierarchy panel has trees
+- Rename GameObjects from Hierarchy panel (Double-click)
 - Extensive primitives creation options
-- Hardware detection & Memory statistics
+- GPU detection & Memory statistics
+- Bounding Box for each mesh (with editable options in Configuration panel)
 
 ## License
 MIT License

@@ -14,7 +14,7 @@ GameObject::GameObject(const char* name)
 
 GameObject::~GameObject()
 {
-	for (uint i = 0; i < components.size(); i++)
+	for (uint i = 0; i < components.size(); ++i)
 		delete components[i];
 
 	components.clear();
