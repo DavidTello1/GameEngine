@@ -5,8 +5,8 @@
 - While Right clicking, “WASD” fps-like movement and free look around.
 - SPACE to go upwards, LCTRL + SPACE to go downwards
 - Mouse wheel to zoom in and out
-- Alt+Left click/Right click to orbit the object
-- Pressing “f” focuses the camera around the geometry (_WIP phase when parent is selected_)
+- Alt + Right-click to orbit the object
+- Pressing “f” focuses the camera around the geometry closest side (_WIP phase when parent is selected_)
 - Holding SHIFT duplicates movement speed
 
 ## Innovation
@@ -20,7 +20,7 @@
 - Bounding Box for parent of meshes *WIP*
 
 ## Features
-- You can select multiple game objects (with Left CTRL) to make texture loading process faster
+- Multiple game objects can be selected (with Left CTRL) to make texture loading process faster
 - Selected game objects can be deleted with button _Delete_ or with the key _SUPR_
 - If a game object is selected inside _Hierarchy_, the new gameobjects will be created as childs of it
 - All loading actions can be automatically made drag and dropping the file directly to the editor
