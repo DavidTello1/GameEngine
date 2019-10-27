@@ -104,7 +104,7 @@ void Inspector::Draw()
 		ImGui::EndMenuBar();
 	}
 
-	ImGui::Text(obj->GetName());
+	ImGui::TextColored(ImVec4(0.3f, 0.7f, 1.0f, 1.0f), obj->GetName());
 	ImGui::Separator();
 
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
