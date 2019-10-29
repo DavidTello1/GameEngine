@@ -17,12 +17,11 @@ public:
 
 public:
 	Hierarchy();
-	HierarchyNode * SearchById(const uint id);
 	virtual ~Hierarchy();
 
 	void Draw();
 
-	static HierarchyNode* AddNode(GameObject* object = nullptr, HierarchyNode* node = root_node);
+	static HierarchyNode* AddNode(GameObject* object, GameObject* parent = nullptr);
 	static void ChildAdded(GameObject* child, HierarchyNode * to);
 	static void DeleteNode(HierarchyNode * n);
 	static void DeleteSelected();
@@ -32,6 +31,7 @@ public:
 
 	void SetSceneName(const char* name);
 
+	HierarchyNode * SearchById(const uint id);
 
 	static void GetMinMaxVertex(const HierarchyNode* node, float3 * abs_min, float3 * abs_max);
 
@@ -41,11 +41,11 @@ private:
 
 public:
 	//Data
-	static HierarchyNode* root_node;
-	static std::vector<HierarchyNode*> nodes;
-	static std::vector<HierarchyNode*> selected_nodes;
+	static GameObject* root_node;
 
-	const char* scene_name;
+	static std::vector<GameObject*> nodes;
+
+	char scene_name[NAME_LENGTH];
 };
 
 #endif// __HIERARCHY_H__

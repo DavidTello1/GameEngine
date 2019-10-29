@@ -7,28 +7,31 @@
 class HierarchyNode
 {
 public:
-	HierarchyNode::HierarchyNode(GameObject* object = nullptr, HierarchyNode* Parent = nullptr, ImGuiTreeNodeFlags Flags = leaf_flags);	~HierarchyNode();
+	HierarchyNode(GameObject * gameObject = nullptr, GameObject * Parent = nullptr);
+	~HierarchyNode();
 
+	bool Select();
+	bool UnSelect();
 	bool ToggleSelection();
-	void SetName(const char * Name);
+
+	// Debug
 	void LogAction(const char* Action);
 
 public:
-
-	// flags
-	static const ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-	static const ImGuiTreeNodeFlags leaf_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+	uint position = 0;
 
 	bool is_selected = false;
 	bool is_rename = false;
 
-	const char* name;
-	char tmp_name[120];	
-	uint id;
+	// Objects
+	GameObject* parent;
+	GameObject* object;
+	std::vector<GameObject*> childs;
 
-	HierarchyNode* parent;
-	std::vector<HierarchyNode*> childs;
+	// flags
 	ImGuiTreeNodeFlags flags;
-	GameObject* obj;
+
+	static const ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+	static const ImGuiTreeNodeFlags leaf_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
 };
 

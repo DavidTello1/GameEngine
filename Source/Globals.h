@@ -83,3 +83,5 @@ typedef unsigned long long UID;
 #define LIBRARY_MODEL_FOLDER "/Library/Models/"
 #define LIBRARY_MATERIAL_FOLDER "/Library/Materials/"
 #define LIBRARY_STATE_MACHINE_FOLDER "/Library/StateMachines/"
+
+#define NAME_LENGTH 128

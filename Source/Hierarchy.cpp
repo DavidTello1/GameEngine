@@ -5,9 +5,10 @@
 #include "ImGui/imgui.h"
 #include "mmgr/mmgr.h"
 
-HierarchyNode* Hierarchy::root_node; // Root node to start drawing
-std::vector<HierarchyNode*> Hierarchy::nodes; // List of all nodes (NOT used to draw)
-std::vector<HierarchyNode*> Hierarchy::selected_nodes; // Temporary list of selected nodes
+// Root node to start drawing
+GameObject* Hierarchy::root_node; 
+// List of all nodes (NOT used to draw)
+std::vector<GameObject*> Hierarchy::nodes; 
 
 // ---------------------------------------------------------
 Hierarchy::Hierarchy() : Panel("Hierarchy")
@@ -19,39 +20,26 @@ Hierarchy::Hierarchy() : Panel("Hierarchy")
 
 	has_menubar = true;
 
-	scene_name = "Scene Name";
+	strcpy_s(scene_name, NAME_LENGTH, "GameObject");
 
-	root_node = new HierarchyNode(nullptr,nullptr);
-	nodes.push_back(root_node);
+	//root_node = new HierarchyNode(nullptr,nullptr);
+	//nodes.push_back(root_node);
 }
 
 Hierarchy::~Hierarchy()
 {
 	for (uint i = 0; i < nodes.size(); i++) //nodes
 	{
-		DeleteNode(nodes[i]);
+		DeleteNode(nodes[i]->node);
 	}
-	nodes.clear();
-
-	//for (uint i = 0; i < root_nodes.size(); i++) //root nodes
-	//{
-	//	DeleteNode(root_nodes[i]);
-	//}
-	//root_nodes.clear();
-
-	selected_nodes.clear();
-	//for (uint i = 0; i < selected_nodes.size(); i++) //selected nodes
-	//{
-	//	DeleteNode(selected_nodes[i]);
-	//}
 }
 
 HierarchyNode* Hierarchy::SearchById(const uint id)
 {
-	for (HierarchyNode* n : nodes)
+	for (GameObject* n : nodes)
 	{
-		if (n->id == id)
-			return n;
+		if (n->GetUID == id)
+			return n->node;
 	}
 	return nullptr;
 }
@@ -80,8 +68,14 @@ void Hierarchy::Draw()
 
 // Add a new dummy node, child of the passed node or root node if parent is missing
 // Returns pointer to the added node
-HierarchyNode* Hierarchy::AddNode(GameObject* obj, HierarchyNode* parent)
+HierarchyNode* Hierarchy::AddNode(GameObject* object, GameObject* parent)
 {
+	if (object == nullptr) 
+	{
+		LOG("Cannot create node with empty gameobject", 'e');
+		return nullptr;
+	}
+
 	HierarchyNode* n = new HierarchyNode(obj, parent);
 
 	parent->childs.push_back(n);
@@ -291,7 +285,7 @@ void Hierarchy::UnSelectAll(HierarchyNode* keep_selected)
 void Hierarchy::SetSceneName(const char* name)
 {
 	LOG("Renaming scene from '%s' to '%s'", scene_name, name);
-	scene_name = name;
+	strcpy_s(scene_name, name);
 }
 
 void Hierarchy::GetMinMaxVertex(const HierarchyNode* node,float3* abs_max, float3* abs_min)

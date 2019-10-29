@@ -1,7 +1,5 @@
 #pragma once
 
-#define NAME_LENGTH 128
-
 #include "Globals.h"
 #include "Component.h"
 #include "glew\include\GL\glew.h"
@@ -62,6 +60,8 @@ private:
 	//float3 velocity = float3::zero;
 
 public:
+	HierarchyNode* node;
+
 	std::vector<Component*> components;
 
 	void GenBoundingBox();

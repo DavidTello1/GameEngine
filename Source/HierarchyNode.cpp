@@ -2,60 +2,56 @@
 #include "Application.h"
 #include "HierarchyNode.h"
 
-HierarchyNode::HierarchyNode(GameObject* Obj, HierarchyNode* Parent, ImGuiTreeNodeFlags Flags) {
-	is_selected = false;
-	parent = Parent;
-	flags = Flags;
+HierarchyNode::HierarchyNode(GameObject* gameObject, GameObject* Parent ){
 
-	obj = Obj;
-	if (obj != nullptr)
+	is_selected = false;
+	is_rename = false;
+	flags = leaf_flags;
+	object = gameObject;
+	parent = Parent;
+
+	if (parent != nullptr)
 	{
-		id = obj->GetUID();
-		name = obj->GetName();
+		parent->node->flags &= ~ImGuiTreeNodeFlags_Leaf;
 	}
-	else
-	{
-		id = 0;
-		name = "GameObject";
-	}
+
 }
 
 HierarchyNode::~HierarchyNode()
 {
+	if (parent != nullptr && !parent->HasChilds())
+	{
+		parent->node->flags |= ImGuiTreeNodeFlags_Leaf;
+	}
+}
+
+bool HierarchyNode::Select()
+{
+	flags |= ImGuiTreeNodeFlags_Selected;
+	is_selected = true;
+}
+
+bool HierarchyNode::UnSelect()
+{
+	flags &= ~ImGuiTreeNodeFlags_Selected;
+	is_selected = false;
 }
 
 bool HierarchyNode::ToggleSelection() // Toggles the state of the node, returns current state after toggled
 {
 	if (!is_selected) // not selected
 	{
-		flags |= ImGuiTreeNodeFlags_Selected;
-		is_selected = true;
-		
-		App->scene->SetSelectedGameobj(obj);
-		App->scene->selected_go.push_back(obj);
-		//LogAction("Selected");
+		Select();
 	}
-
 	else // selected
 	{
-		flags &= ~ImGuiTreeNodeFlags_Selected;
-		is_selected = false;
-		
-		App->scene->SetSelectedGameobj(nullptr);
-		App->scene->EraseFromSelected(obj);
-		//LogAction("Unselected");
+		UnSelect();
 	}
 
 	return is_selected;
 }
 
-void HierarchyNode::SetName(const char* Name)
-{
-	LOG("Renaming node %d from '%s' to '%s'", id, name, Name,'v');
-	name = Name;
-}
-
 void HierarchyNode::LogAction(const char * Action)
 {
-	LOG("%s node '%s', id: %ld ", Action, name, id, 'd');
+	LOG("%s node '%s', id: %ld ", Action, object->GetName(), object->GetUID(), 'd');
 }
