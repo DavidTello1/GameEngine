@@ -66,9 +66,11 @@ public:
 	float bounding_box_width = 1.0f;
 	bool show_all_bounding_box = false;
 	   
+	static GameObject* root_object;
 private:
 	GameObject* selected_gameobj = nullptr;
 
 	//Hierarchy --------------------------------
+
 public:
 };

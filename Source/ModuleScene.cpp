@@ -4,6 +4,8 @@
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
 
+GameObject* ModuleScene::root_object;
+
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 {}
 
@@ -15,6 +17,9 @@ ModuleScene::~ModuleScene()
 bool ModuleScene::Start(Config* config)
 {
 	LOG("Loading main scene", 'v');
+
+	root_object = new GameObject("Root", nullptr);
+	root_object->uid = 0;
 
 	App->camera->Move(vec3(0, 7.5f, 7.5f));
 	App->camera->LookAt(vec3(0, 0, 0));
@@ -126,6 +131,8 @@ GameObject* ModuleScene::FindById(uint id)
 GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent, bool visible)
 {
 	create_gameobj = true;
+
+	if (parent == nullptr) parent = root_object;
 
 	GameObject* obj = new GameObject(name, parent);
 

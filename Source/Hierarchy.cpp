@@ -15,21 +15,10 @@ Hierarchy::Hierarchy() : Panel("Hierarchy")
 
 	has_menubar = true;
 
-	/*strcpy_s(scene_name, NAME_LENGTH, "Scene Name");
-
-	root_obj = new GameObject("Root");
-	root_obj->uid = 0;
-
-	nodes.push_back(root_obj);*/
 }
 
 Hierarchy::~Hierarchy()
-{
-	//for (uint i = 0; i < nodes.size(); i++) //nodes
-	//{
-	//	DeleteNode(nodes[i]);
-	//}
-}
+{}
 
 void Hierarchy::Draw()
 {
@@ -45,106 +34,9 @@ void Hierarchy::Draw()
 	ImGui::Separator();
 
 	// Drawing scene gameobjects as nodes
-	DrawNodes(App->scene->gameObjects);
+	DrawNodes(ModuleScene::root_object->childs);
 }
 
-// Add a new dummy node, child of the passed node or root node if parent is missing
-// Returns pointer to the added node
-//void Hierarchy::AddNode(GameObject* object, GameObject* parent)
-//{
-//	if (object == nullptr) 
-//	{
-//		LOG("Cannot create node with empty gameobject", 'e');
-//		return;
-//	}
-//	if (parent == nullptr) parent = root_obj;
-//
-//	//HierarchyNode* n = new HierarchyNode(object, parent);
-//
-//	parent->childs.push_back(object);
-//
-//	object->Select();
-//
-//	// General list of all nodes, not used for printing
-//	nodes.push_back(object);
-//
-//	object->LogAction("Added child");
-//	parent->LogAction("to parent");
-//
-//	if (parent != root_obj)
-//		parent->ChildAdded(object);
-//
-//}
-
-// MUST NOT BE CALLED BY ANYONE BUT ~GameObject
-//void Hierarchy::DeleteNode(GameObject* obj)
-//{
-//
-//	SearchAndDeleteNode(obj, root_obj->childs);
-//	SearchAndDeleteNode(obj, nodes);
-//
-//	obj->LogAction("Deleted");
-//}
-
-//void Hierarchy::DeleteNode(GameObject* obj)
-//{
-//	// if has no childs, delete the node
-//	if (obj->childs.empty())
-//	{
-//		SearchAndDeleteNode(obj, root_obj->childs);
-//		SearchAndDeleteNode(obj, nodes);
-//
-//		if (obj->parent)	SearchAndDeleteNode(obj, obj->parent->childs);
-//
-//		obj->LogAction("Deleted");
-//
-//		//App->scene->DeleteGameobj(obj);
-//		//delete(obj);
-//	}
-//	else
-//	{
-//		// Delete childs before the actual node
-//		for (int i = obj->childs.size()-1; i >= 0; i--)
-//		{
-//			DeleteNode(obj->childs[i]);
-//		}
-//
-//		obj->childs.clear();
-//		DeleteNode(obj);
-//	}
-//}
-
-//void Hierarchy::DeleteSelected()
-//{
-//	for (GameObject* obj : nodes)
-//	{
-//		if (obj->is_selected)
-//		{
-//			DeleteNode(obj);
-//			App->scene->DeleteGameObject(obj);
-//		}
-//	}
-//
-//	App->scene->selected_go.clear();
-//}
-
-// returns true if deleted, false otherwise
-//bool Hierarchy::SearchAndDeleteNode(GameObject* n, std::vector<GameObject*>& v)
-//{
-//	if (n == nullptr | v.empty()) return false;
-//
-//	for (int i = 0; i < v.size(); i++)
-//	{
-//		if (v[i] != nullptr && v[i]->GetUID() == n->GetUID())
-//		{
-//			v.erase(v.begin() + i);
-//			return true;
-//		}
-//	}
-//	return false;
-//}
-
-//-------------------------------------
 void Hierarchy::DrawNodes(std::vector<GameObject*>& v)
 {
 	for (GameObject* obj : v)
@@ -225,25 +117,3 @@ void Hierarchy::DrawNodes(std::vector<GameObject*>& v)
 		}
 	}
 }
-
-//void Hierarchy::UnSelectAll(GameObject* keep_selected)
-//{
-//	if (keep_selected == nullptr) {
-//
-//		for (GameObject* i : nodes)
-//		{
-//			i->UnSelect();
-//		}
-//	}
-//	else {
-//
-//		for (GameObject* i : nodes)
-//		{
-//			if (i->GetUID() == keep_selected->GetUID()) 
-//				continue;
-//			i->UnSelect();
-//		}
-//	}
-//
-//	App->scene->selected_go.clear();
-//}

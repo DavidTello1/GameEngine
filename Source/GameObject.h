@@ -15,6 +15,7 @@ class GameObject
 	friend class ModuleScene;
 
 private:
+
 	GameObject(const char* name, GameObject* Parent);
 	virtual ~GameObject();
 

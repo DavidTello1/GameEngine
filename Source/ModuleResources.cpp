@@ -90,17 +90,19 @@ Component::Type ModuleResources::GetType(const char* path)
 void ModuleResources::LoadResource(const char* path, Component::Type type, bool use, GameObject* parent)
 {
 	GameObject* object = nullptr;
-	//name
+
+	// name
 	const char* file_name = strrchr(path, 92) ;
 	if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "GameObject";
 	file_name++;
+	// name ------
 
 	if (type == Component::Type::Unknown)
 		type = GetType(path);
 
 	if (type == Component::Type::Mesh) // Mesh
 	{
-		LOG("Mesh resource type",'g');
+		LOG("Mesh resource type",'v');
 		const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 
 		if (scene != nullptr && scene->HasMeshes())
@@ -122,7 +124,7 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			aiReleaseImport(scene);
 		}
 		else
-			LOG("Error loading mesh %s", path, 'e');
+			LOG("Cannot import mesh or mesh is empty %s", path, 'e');
 
 	}
 	else if (type == Component::Type::Material) // Texture
