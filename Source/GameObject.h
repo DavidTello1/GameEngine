@@ -3,20 +3,27 @@
 #include "Globals.h"
 #include "Component.h"
 #include "glew\include\GL\glew.h"
+#include "Hierarchy.h"
 
 #include "Math.h"
 #include <vector>
 
 class ComponentMaterial;
+
 class GameObject
 {
-public:
-	GameObject(const char* name);
+	friend class ModuleScene;
+
+private:
+	GameObject(const char* name, GameObject* Parent);
 	virtual ~GameObject();
+
+
+public:
+	void SetName(const char* Name) { strcpy_s(this->name, NAME_LENGTH, name); }
 
 	uint GetUID() const { return uid; }
 	const char* GetName() const { return name; }
-	void SetName(const char* Name) { strcpy_s(this->name, NAME_LENGTH, name); }
 	bool IsActive() { return active; }
 
 	Component* GetComponent(Component::Type type);
@@ -34,6 +41,8 @@ public:
 	void SetRotation(const float3& XYZ_euler_rotation);
 	void SetRotation(const Quat& rotation);
 	void SetTransform(const float4x4& transform);
+
+	void GetMinMaxVertex(GameObject * obj, float3 * abs_max, float3 * abs_min);
 
 	void ChildAdded(GameObject * child);
 
@@ -60,7 +69,10 @@ private:
 	//float3 velocity = float3::zero;
 
 public:
-	HierarchyNode* node;
+
+	// Objects
+	GameObject* parent;
+	std::vector<GameObject*> childs;
 
 	std::vector<Component*> components;
 
@@ -83,4 +95,25 @@ public:
 	GLuint bb_IBO = 0;
 
 	bool show_bounding_box = false;
+
+	//Hierachy --------------------------------------
+public: 
+	void Select();
+	void UnSelect();
+	bool ToggleSelection();
+
+	// Debug
+	void LogAction(const char* Action);
+
+	ImGuiTreeNodeFlags hierarchy_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+	uint hierarchy_pos = 0;
+	bool is_rename = false;
+	bool is_selected = false;
+
+	// flags
+
+	//static const ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+	//static const ImGuiTreeNodeFlags leaf_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+
 };

@@ -6,10 +6,26 @@
 
 #include "mmgr/mmgr.h"
 
-GameObject::GameObject(const char* name)
+GameObject::GameObject(const char* name, GameObject* Parent)
 {
 	uid = App->random->Int();
 	strcpy_s(this->name, name);
+
+	is_selected = false;
+	is_rename = false;
+
+	// Leaf flags
+	hierarchy_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+	LogAction("Created object");
+
+	parent = Parent;
+	if (parent != nullptr)
+	{
+		parent->childs.push_back(this);
+		parent->hierarchy_flags &= ~ImGuiTreeNodeFlags_Leaf;
+		parent->ChildAdded(this);
+		parent->LogAction("To parent");
+	}
 }
 
 GameObject::~GameObject()
@@ -18,6 +34,38 @@ GameObject::~GameObject()
 		delete components[i];
 
 	components.clear();
+}
+void GameObject::Select()
+{
+	hierarchy_flags |= ImGuiTreeNodeFlags_Selected;
+	is_selected = true;
+	App->scene->SetSelectedGameobj(this);
+}
+
+void GameObject::UnSelect()
+{
+	hierarchy_flags &= ~ImGuiTreeNodeFlags_Selected;
+	is_selected = false;
+	if (App->scene->GetSelectedGameobj() == this)
+		App->scene->SetSelectedGameobj(nullptr);
+}
+
+bool GameObject::ToggleSelection() // Toggles the state of the node, returns current state after toggled
+{
+	if (!is_selected) // not selected
+	{
+		Select();
+	}
+	else // selected
+	{
+		UnSelect();
+	}
+
+	return is_selected;
+}
+void GameObject::LogAction(const char * Action)
+{
+	LOG("%s node '%s', id: %ld ", Action, name, uid, 'd');
 }
 
 Component* GameObject::GetComponent(Component::Type type)
@@ -115,15 +163,43 @@ void GameObject::SetTransform(const float4x4 & transform)
 	rotation = rotation_quat.ToEulerXYZ().Abs();
 }
 
+void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_min)
+{
+	if (!obj->HasChilds())
+	{
+		if (!obj->is_valid_dimensions) return;
+		if (obj->min_vertex.x < abs_min->x) abs_min->x = obj->min_vertex.x;
+		if (obj->min_vertex.y < abs_min->y) abs_min->y = obj->min_vertex.y;
+		if (obj->min_vertex.z < abs_min->z) abs_min->z = obj->min_vertex.z;
+
+		if (obj->max_vertex.x > abs_max->x) abs_max->x = obj->max_vertex.x;
+		if (obj->max_vertex.y > abs_max->y) abs_max->y = obj->max_vertex.y;
+		if (obj->max_vertex.z > abs_max->z) abs_max->z = obj->max_vertex.z;
+	}
+	else {
+		for (GameObject* child : obj->childs)
+		{
+			GetMinMaxVertex(child, abs_max, abs_min);
+		}
+
+	}
+}
+
+// child to be replaced by childs.back()
 void GameObject::ChildAdded(GameObject* child)
 {
+	if (child->uid == 0) {
+		LOG("Child added to root node", 'e');
+		return;
+	}
+
 	// Checking if new child node is not an empty node and parent not root node
 	if (uid == 0 || !child->is_valid_dimensions) return;
 
 	min_vertex = child->min_vertex;
 	max_vertex = child->max_vertex;
 
-	App->editor->tab_hierarchy->GetMinMaxVertex(App->editor->tab_hierarchy->SearchById(uid), &min_vertex, &max_vertex);
+	GetMinMaxVertex(this, &min_vertex, &max_vertex);
 
 	GenBoundingBox();
 
@@ -199,5 +275,5 @@ void GameObject::GenBoundingBox()
 
 bool GameObject::HasChilds()
 {
-	return !App->editor->tab_hierarchy->SearchById(uid)->childs.empty();
+	return !childs.empty();
 }

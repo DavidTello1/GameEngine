@@ -144,9 +144,6 @@
     <ClInclude Include="Configuration.h">
       <Filter>Sources\Panels</Filter>
     </ClInclude>
-    <ClInclude Include="HierarchyNode.h">
-      <Filter>Sources\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="Hierarchy.h">
       <Filter>Sources\Panels</Filter>
     </ClInclude>
@@ -556,9 +553,6 @@
     </ClCompile>
     <ClCompile Include="Inspector.cpp">
       <Filter>Sources\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="HierarchyNode.cpp">
-      <Filter>Sources\Tools</Filter>
     </ClCompile>
     <ClCompile Include="Panel.cpp">
       <Filter>Sources\Panels</Filter>

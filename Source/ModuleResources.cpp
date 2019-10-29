@@ -87,7 +87,7 @@ Component::Type ModuleResources::GetType(const char* path)
 	return Component::Type::Unknown;
 }
 
-void ModuleResources::LoadResource(const char* path, Component::Type type, bool use, uint parent_id)
+void ModuleResources::LoadResource(const char* path, Component::Type type, bool use, GameObject* parent)
 {
 	GameObject* object = nullptr;
 	//name
@@ -111,17 +111,12 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			{	
 				if (use)
 				{
-					object = App->scene->CreateGameObj(file_name, parent_id);
+					object = App->scene->CreateGameObject(file_name, parent);
 					ComponentMesh* mesh_component = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
 					aiMesh* mesh = scene->mMeshes[i];
 
 					ImportMesh(mesh, mesh_component);
 					object->AddComponent(Component::Type::Renderer);
-
-					if (parent_id != 0)
-					{
-						App->scene->FindById(parent_id)->ChildAdded(object);
-					}
 				}
 			}
 			aiReleaseImport(scene);
@@ -173,7 +168,7 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 							mesh->TEX = tex;
 					}
 
-					if (App->editor->tab_hierarchy->SearchById(object->GetUID())->childs.empty()) //if object is parent
+					if (object->HasChilds()) //if object is parent
 					{
 						if (!object->HasComponent(Component::Type::Material)) //if object has not got material add one
 							object->AddComponent(Component::Type::Material);
@@ -330,7 +325,7 @@ void ModuleResources::UnLoadResource()
 
 }
 
-void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, uint parent_id)
+void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
 {
 	par_shapes_mesh* m;
 
@@ -398,7 +393,7 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 
 	LOG("Creating primitive '%s'", GetShapeName(type), 'v');
 
-	GameObject* object = App->scene->CreateGameObj(GetShapeName(type), parent_id, true);
+	GameObject* object = App->scene->CreateGameObject(GetShapeName(type), parent, true);
 	ComponentMesh* mesh = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
 	object->AddComponent(Component::Type::Material);
 
@@ -474,10 +469,6 @@ void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks
 	{
 		object->GenBoundingBox();
 		object->is_valid_dimensions = true;
-	}
-	if (parent_id != 0)
-	{
-		App->scene->FindById(parent_id)->ChildAdded(object);
 	}
 }
 void ModuleResources::GenVBO(ComponentMesh * mesh_component)

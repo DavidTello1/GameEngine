@@ -30,10 +30,14 @@ public:
 public:
 	GameObject * FindById(uint id);
 	// GameObjects-----------
-	GameObject* CreateGameObj(const char* name = "GameObject",const uint parent_id = 0, bool visible = false);
-	void DeleteGameobj(GameObject* obj);
+	GameObject* CreateGameObject(const char* name = "GameObject", GameObject* parent = nullptr, bool visible = false);
+	void DeleteGameObject(GameObject* obj);
+	void DeleteSelected();
 	GameObject* GetSelectedGameobj() { return selected_gameobj; }
 	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }
+
+
+	void UnSelectAll(GameObject * keep_selected = nullptr);
 
 	bool IsMaterialLoaded(const char* path);
 	ComponentMaterial* GetMaterial(const char* path) const;
@@ -42,12 +46,15 @@ public:
 	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 
 public:
+	char scene_name[NAME_LENGTH];
+	void SetSceneName(const char* name)	{strcpy_s(scene_name, name);}
+
 	bool create_gameobj = false;
 
 	void EraseFromSelected(GameObject* go);
 	std::vector<GameObject*> selected_go;
 	std::vector<ComponentMaterial*> materials;
-	std::vector<GameObject*> gameobjs;
+	std::vector<GameObject*> gameObjects;
 
 
 	// Misc
@@ -61,4 +68,7 @@ public:
 	   
 private:
 	GameObject* selected_gameobj = nullptr;
+
+	//Hierarchy --------------------------------
+public:
 };

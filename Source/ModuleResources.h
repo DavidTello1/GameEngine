@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "Component.h"
 #include <vector>
+#include "Hierarchy.h"
 
 #include "glew\include\GL\glew.h"
 
@@ -48,7 +49,7 @@ public:
 	Component::Type GetType(const char* path);
 
 	void LogImageInfo();
-	void LoadResource(const char* path, Component::Type type = Component::Type::Unknown, bool use = false, uint parent_id = 0);
+	void LoadResource(const char* path, Component::Type type = Component::Type::Unknown, bool use = false, GameObject* parent = nullptr);
 	void UnLoadResource();
 
 	void ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component);
@@ -58,7 +59,7 @@ public:
 	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
 	//void ImportModel(aiMesh* mesh, ComponentMesh* mesh_component, aiScene* material, ComponentMaterial* material_component);
 
-	void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, uint parent_id = 0);
+	void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, GameObject* parent = nullptr);
 
 public:
 	GLuint checker_texture;

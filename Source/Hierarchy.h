@@ -2,8 +2,8 @@
 #define __HIERARCHY_H__
 
 #include "Panel.h"
-#include "HierarchyNode.h"
 #include "Imgui/imgui.h"
+#include "Math.h"
 #include <random>
 #include <vector>
 
@@ -20,32 +20,32 @@ public:
 	virtual ~Hierarchy();
 
 	void Draw();
+	void DrawNodes(std::vector<GameObject*>& v);
 
-	static HierarchyNode* AddNode(GameObject* object, GameObject* parent = nullptr);
-	static void ChildAdded(GameObject* child, HierarchyNode * to);
-	static void DeleteNode(HierarchyNode * n);
-	static void DeleteSelected();
-	static bool SearchAndDeleteNode(HierarchyNode* n, std::vector<HierarchyNode*>& v);
+	char buffer[120];
 
-	void UnSelectAll(HierarchyNode* keep_selected = nullptr);
+	//static void AddNode(GameObject* object, GameObject* parent = root_obj);
+	//static void DeleteNode(GameObject * n);
+	//static void DeleteSelected();
+	//static bool SearchAndDeleteNode(GameObject* n, std::vector<GameObject*>& v);
 
-	void SetSceneName(const char* name);
+	//void UnSelectAll(GameObject* keep_selected = nullptr);
 
-	HierarchyNode * SearchById(const uint id);
+	//void SetSceneName(const char* name);
 
-	static void GetMinMaxVertex(const HierarchyNode* node, float3 * abs_min, float3 * abs_max);
+	//static void GetMinMaxVertex(GameObject* node, float3 * abs_min, float3 * abs_max);
 
 private:
-	void DrawCreateMenu();
-	void DrawNodes(std::vector<HierarchyNode*>& v);
+	//void DrawCreateMenu();
 
 public:
 	//Data
-	static GameObject* root_node;
+	//static GameObject* root_obj;
 
-	static std::vector<GameObject*> nodes;
+	// JUST A REFERENCE TO THE SCENE GAMEOBJECTS
+	//std::vector<GameObject*>* nodes;
 
-	char scene_name[NAME_LENGTH];
+	//char scene_name[NAME_LENGTH];
 };
 
 #endif// __HIERARCHY_H__

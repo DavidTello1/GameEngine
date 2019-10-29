@@ -12,9 +12,9 @@ ComponentMaterial::ComponentMaterial(GameObject* gameobj) : Component(Component:
 ComponentMaterial::~ComponentMaterial()
 {
 	bool erase = true;
-	for (uint i = 0; i < App->scene->gameobjs.size(); i++)
+	for (uint i = 0; i < App->scene->gameObjects.size(); i++)
 	{
-		ComponentMaterial* material = (ComponentMaterial*)App->scene->gameobjs[i]->GetComponent(Component::Type::Material);
+		ComponentMaterial* material = (ComponentMaterial*)App->scene->gameObjects[i]->GetComponent(Component::Type::Material);
 		if (material != nullptr && material != this && material->tex_id == tex_id)
 		{
 			erase = false;

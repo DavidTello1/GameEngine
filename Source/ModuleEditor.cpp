@@ -580,10 +580,9 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 void ModuleEditor::DrawCreateMenu()
 {
 	if (ImGui::MenuItem("Empty"))
-		App->scene->CreateGameObj();
+		App->scene->CreateGameObject();
 
-	GameObject* go = App->scene->GetSelectedGameobj();
-	uint parent = (go != nullptr) ? go->GetUID() : 0;
+	GameObject* parent = App->scene->GetSelectedGameobj();
 
 	ImGui::Separator();
 	if (ImGui::BeginMenu("Basic shapes"))

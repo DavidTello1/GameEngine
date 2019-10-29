@@ -14,26 +14,26 @@ ModuleScene::~ModuleScene()
 // Load assets
 bool ModuleScene::Start(Config* config)
 {
-	LOG("Loading Intro assets", 'v');
-	bool ret = true;
+	LOG("Loading main scene", 'v');
 
 	App->camera->Move(vec3(0, 7.5f, 7.5f));
 	App->camera->LookAt(vec3(0, 0, 0));
-	
-	GameObject* bparent = CreateGameObj("BakerHouse");
+		
+	GameObject* bparent = CreateGameObject("BakerHouse");
 
-	App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent->GetUID());
+	App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
 	App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
 
+	// ParShapes 
 	/*GameObject* pparent = CreateGameObj("ParShapes");
 	for (int i = 0; i < shape_type::UNKNOWN; i++)
 	{
 		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10, 0.5f, pparent->GetUID());
 	}*/
 
-	App->editor->tab_hierarchy->UnSelectAll();
+	UnSelectAll();
 
-	return ret;
+	return true;
 }
 
 bool ModuleScene::Update(float dt)
@@ -50,11 +50,11 @@ bool ModuleScene::CleanUp()
 {
 	LOG("Unloading Main scene");
 
-	for (uint i = 0; i < gameobjs.size(); ++i)
+	for (uint i = 0; i < gameObjects.size(); ++i)
 	{
-		RELEASE(gameobjs[i]);
+		RELEASE(gameObjects[i]);
 	}
-	gameobjs.clear();
+	gameObjects.clear();
 
 	for (uint i = 0; i < materials.size(); ++i)
 	{
@@ -69,12 +69,12 @@ bool ModuleScene::CleanUp()
 bool ModuleScene::Draw()
 {
 	// Draw GameObjects
-	for (uint i = 0; i < gameobjs.size(); ++i)
+	for (uint i = 0; i < gameObjects.size(); ++i)
 	{
 		glPushMatrix();
-		glMultMatrixf(gameobjs[i]->GetLocalTransform().ptr());
+		glMultMatrixf(gameObjects[i]->GetLocalTransform().ptr());
 
-		ComponentRenderer* renderer = (ComponentRenderer*)gameobjs[i]->GetComponent(Component::Type::Renderer);
+		ComponentRenderer* renderer = (ComponentRenderer*)gameObjects[i]->GetComponent(Component::Type::Renderer);
 		if (renderer != nullptr && renderer->IsActive())
 		{
 			if (renderer->show_wireframe || show_all_wireframe) //wireframe
@@ -90,7 +90,7 @@ bool ModuleScene::Draw()
 		}
 
 		// Bounding boxes
-		GameObject* obj = gameobjs[i];
+		GameObject* obj = gameObjects[i];
 		glEnableClientState(GL_VERTEX_ARRAY);
 		if ((obj->show_bounding_box || App->scene->show_all_bounding_box) && obj->bb_VBO != 0)
 		{
@@ -117,44 +117,124 @@ bool ModuleScene::Draw()
 
 GameObject* ModuleScene::FindById(uint id)
 {
-	for (int i = 0; i < gameobjs.size(); i++)
-		if (gameobjs[i]->GetUID() == id) return gameobjs[i];
+	for (int i = 0; i < gameObjects.size(); i++)
+		if (gameObjects[i]->GetUID() == id) return gameObjects[i];
 
 	return nullptr;
 }
-GameObject* ModuleScene::CreateGameObj(const char* name, const uint parent_id, bool visible)
+
+GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent, bool visible)
 {
 	create_gameobj = true;
 
-	GameObject* obj = new GameObject(name);
+	GameObject* obj = new GameObject(name, parent);
+
 	if (visible)
 		obj->AddComponent(Component::Type::Renderer);
 
-	gameobjs.push_back(obj);
-
-
-	App->editor->tab_hierarchy->AddNode(obj, App->editor->tab_hierarchy->SearchById(parent_id)); // add node to hierarchy
+	gameObjects.push_back(obj);
 	selected_gameobj = obj; // new obj is selected_gameobj
 
 	return obj;
 }
 
-void ModuleScene::DeleteGameobj(GameObject* obj)
+//void ModuleScene::DeleteGameobj(GameObject* obj)
+//{
+//	if (selected_gameobj == obj)
+//		selected_gameobj = nullptr;
+//
+//	for (uint i = 0; i < gameobjs.size(); i++)
+//	{
+//		if (gameobjs[i] == obj)
+//		{
+//			RELEASE( gameobjs[i]);
+//			gameobjs.erase(gameobjs.begin() + i);
+//			break;
+//		}
+//	}
+//}
+
+void ModuleScene::DeleteGameObject(GameObject* obj)
 {
+	// If any child of the game object is the selected -> unselect
 	if (selected_gameobj == obj)
 		selected_gameobj = nullptr;
 
-	for (uint i = 0; i < gameobjs.size(); i++)
+	// Actual deletion of gameobject
+	if (!obj->HasChilds())
 	{
-		if (gameobjs[i] == obj)
+		// Delete from scene gameobjects
+		for (uint i = 0; i < gameObjects.size(); i++)
 		{
-			RELEASE( gameobjs[i]);
-			gameobjs.erase(gameobjs.begin() + i);
-			break;
+			if (gameObjects[i] == obj)
+			{
+				gameObjects.erase(gameObjects.begin() + i);
+				break;
+			}
+		}
+		// Delete from parent
+		if (obj->parent)
+		{
+			for (uint i = 0; i < obj->parent->childs.size(); i++)
+			{
+				if (obj->parent->childs[i] == obj)
+				{
+					gameObjects.erase(gameObjects.begin() + i);
+					break;
+				}
+			}
+			if (!obj->parent->HasChilds())
+				obj->parent->hierarchy_flags |= ImGuiTreeNodeFlags_Leaf;
+		}
+		obj->LogAction("Deleted");
+		RELEASE(obj);
+
+	}
+	// Delete childs
+	else
+	{
+		for (int i = obj->childs.size() - 1; i >= 0; i--)
+		{
+			DeleteGameObject(obj->childs[i]);
+		}
+			
+		obj->childs.clear();
+		DeleteGameObject(obj);
+	}
+}
+
+void ModuleScene::DeleteSelected()
+{
+	for (GameObject* obj : gameObjects)
+	{
+		if (obj->is_selected)
+		{
+			DeleteGameObject(obj);
 		}
 	}
 }
 
+void ModuleScene::UnSelectAll(GameObject* keep_selected)
+{
+	if (keep_selected == nullptr) {
+
+		for (GameObject* i : gameObjects)
+		{
+			i->UnSelect();
+		}
+	}
+	else {
+
+		for (GameObject* i : gameObjects)
+		{
+			if (i->GetUID() == keep_selected->GetUID())
+				continue;
+			i->UnSelect();
+		}
+	}
+
+	App->scene->selected_go.clear();
+}
 bool ModuleScene::IsMaterialLoaded(const char* path)
 {
 	for (uint i = 0; i < materials.size(); i++)
