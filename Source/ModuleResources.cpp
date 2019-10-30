@@ -113,12 +113,10 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 			{	
 				if (use)
 				{
-					object = App->scene->CreateGameObject(file_name, parent);
+					object = App->scene->CreateGameObject(file_name, parent,true);
 					ComponentMesh* mesh_component = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
 					aiMesh* mesh = scene->mMeshes[i];
-
 					ImportMesh(mesh, mesh_component);
-					object->AddComponent(Component::Type::Renderer);
 				}
 			}
 			aiReleaseImport(scene);
@@ -129,81 +127,77 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 	}
 	else if (type == Component::Type::Material) // Texture
 	{
-		if (!App->scene->selected_go.empty())
-		{
-			ComponentMaterial* material_loaded = nullptr;
-			GLuint tex;
+		ComponentMaterial* material_loaded = nullptr;
+		GLuint tex;
 
-			if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-				material_loaded = App->scene->GetMaterial(path);
-			else
-			{
-				// Devil
-				uint imageID;
-				ilGenImages(1, &imageID);
-				ilBindImage(imageID);
-				ilEnable(IL_ORIGIN_SET);
-				ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-
-				bool loaded = ilLoadImage(path);
-				if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
-
-				LogImageInfo();
-
-				tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
-				ilDeleteImages(1, &imageID);
-			}
-
-			if (use)
-			{
-				for (GameObject* object : App->scene->selected_go)
-				{
-					if (object->HasComponent(Component::Type::Mesh))
-					{
-						ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
-						if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-						{
-							material_loaded = App->scene->GetMaterial(path);
-							mesh->TEX = material_loaded->tex_id;
-						}
-						else
-							mesh->TEX = tex;
-					}
-
-					if (object->HasChilds()) //if object is parent
-					{
-						if (!object->HasComponent(Component::Type::Material)) //if object has not got material add one
-							object->AddComponent(Component::Type::Material);
-
-						ComponentMaterial* material = (ComponentMaterial*)object->GetComponent(Component::Type::Material);
-						if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-						{
-							material_loaded = App->scene->GetMaterial(path);
-							strcpy_s(material->path, 256, material_loaded->path);
-							material->tex_id = material_loaded->tex_id;
-							material->width = material_loaded->width;
-							material->height = material_loaded->height;
-						}
-						else
-						{
-							strcpy_s(material->path, 256, path);
-							material->tex_id = tex;
-							material->width = tex_width;
-							material->height = tex_height;
-
-							App->scene->materials.push_back(material);
-
-							LOG("Texture %s loaded", file_name, 'd');
-							LOG("Texture %s applied to object %s %u", file_name, object->GetName(), object->GetUID(), 'd');
-						}
-					}
-				}
-			}
-		}
+		if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
+			material_loaded = App->scene->GetMaterial(path);
 		else
 		{
-			LOG("Cannot load texture without GameObject", 'e');
+			// Devil
+			uint imageID;
+			ilGenImages(1, &imageID);
+			ilBindImage(imageID);
+			ilEnable(IL_ORIGIN_SET);
+			ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+
+			bool loaded = ilLoadImage(path);
+			if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
+
+			LogImageInfo();
+
+			tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
+			ilDeleteImages(1, &imageID);
+			LOG("Texture %s loaded", file_name, 'd');
 		}
+
+		if (use)
+		{
+			for (GameObject* object : App->scene->gameObjects)
+			{
+				if (!object->is_selected) continue;
+
+				if (object->HasComponent(Component::Type::Mesh))
+				{
+					ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
+					if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
+					{
+						material_loaded = App->scene->GetMaterial(path);
+						mesh->TEX = material_loaded->tex_id;
+					}
+					else
+						mesh->TEX = tex;
+				}
+
+				//if (object->HasChilds()) //if object is parent
+				//{
+					if (!object->HasComponent(Component::Type::Material)) //if object has not got material add one
+						object->AddComponent(Component::Type::Material);
+
+					ComponentMaterial* material = (ComponentMaterial*)object->GetComponent(Component::Type::Material);
+					if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
+					{
+						material_loaded = App->scene->GetMaterial(path);
+						strcpy_s(material->path, 256, material_loaded->path);
+						material->tex_id = material_loaded->tex_id;
+						material->width = material_loaded->width;
+						material->height = material_loaded->height;
+					}
+					else
+					{
+						strcpy_s(material->path, 256, path);
+						material->tex_id = tex;
+						material->width = tex_width;
+						material->height = tex_height;
+
+						App->scene->materials.push_back(material);
+
+						LOG("Texture %s applied to object %s %u", file_name, object->GetName(), object->GetUID(), 'd');
+					}
+				//}
+			}
+		}
+		
 	}
 }
 

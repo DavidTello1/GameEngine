@@ -48,6 +48,18 @@ bool ModuleScene::Update(float dt)
 
 bool ModuleScene::PostUpdate(float dt)
 {
+	// Do all remaining actions activated by flags
+	for (int i = 0; i < gameObjects.size(); i++)
+	{
+		GameObject* obj = gameObjects[i];
+
+		if (obj->flags & ProcessNewChild)
+		{
+			obj->ChildAdded();
+			obj->flags &= ~ProcessNewChild;
+		}
+	}
+
 	return true;
 }
 
@@ -140,7 +152,7 @@ GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent, 
 		obj->AddComponent(Component::Type::Renderer);
 
 	gameObjects.push_back(obj);
-	selected_gameobj = obj; // new obj is selected_gameobj
+	//selected_gameobj = obj; // new obj is selected_gameobj
 
 	return obj;
 }
@@ -186,7 +198,7 @@ void ModuleScene::DeleteGameObject(GameObject* obj)
 			{
 				if (obj->parent->childs[i] == obj)
 				{
-					gameObjects.erase(gameObjects.begin() + i);
+					obj->parent->childs.erase(obj->parent->childs.begin() + i);
 					break;
 				}
 			}
@@ -212,11 +224,12 @@ void ModuleScene::DeleteGameObject(GameObject* obj)
 
 void ModuleScene::DeleteSelected()
 {
-	for (GameObject* obj : gameObjects)
+	uint size = gameObjects.size();
+	for (uint i = 0; i < size; i++)
 	{
-		if (obj->is_selected)
-		{
-			DeleteGameObject(obj);
+		if (gameObjects[i]->is_selected) {
+			DeleteGameObject(gameObjects[i]);
+			size = gameObjects.size();
 		}
 	}
 }

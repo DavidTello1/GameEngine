@@ -10,6 +10,13 @@
 
 class ComponentMaterial;
 
+enum GameObjectFlags
+{
+	NoFlags			= 0,
+	ProcessNewChild = 1 << 0
+
+};
+
 class GameObject
 {
 	friend class ModuleScene;
@@ -45,7 +52,7 @@ public:
 
 	void GetMinMaxVertex(GameObject * obj, float3 * abs_max, float3 * abs_min);
 
-	void ChildAdded(GameObject * child);
+	void ChildAdded();
 
 	void SetLocalPosition(const float3& position) { translation = position; }
 	void SetLocalScale(const float3& scale) { this->scale = scale; }
@@ -74,6 +81,7 @@ public:
 	// Objects
 	GameObject* parent;
 	std::vector<GameObject*> childs;
+	int flags = NoFlags;
 
 	std::vector<Component*> components;
 

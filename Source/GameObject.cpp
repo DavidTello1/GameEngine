@@ -23,7 +23,7 @@ GameObject::GameObject(const char* name, GameObject* Parent)
 	{
 		parent->childs.push_back(this);
 		parent->hierarchy_flags &= ~ImGuiTreeNodeFlags_Leaf;
-		parent->ChildAdded(this);
+		parent->flags |= ProcessNewChild;
 		parent->LogAction("To parent");
 	}
 }
@@ -39,15 +39,12 @@ void GameObject::Select()
 {
 	hierarchy_flags |= ImGuiTreeNodeFlags_Selected;
 	is_selected = true;
-	App->scene->SetSelectedGameobj(this);
 }
 
 void GameObject::UnSelect()
 {
 	hierarchy_flags &= ~ImGuiTreeNodeFlags_Selected;
 	is_selected = false;
-	if (App->scene->GetSelectedGameobj() == this)
-		App->scene->SetSelectedGameobj(nullptr);
 }
 
 bool GameObject::ToggleSelection() // Toggles the state of the node, returns current state after toggled
@@ -186,18 +183,17 @@ void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_m
 }
 
 // child to be replaced by childs.back()
-void GameObject::ChildAdded(GameObject* child)
+void GameObject::ChildAdded()
 {
-	if (child->uid == 0) {
-		LOG("Child added to root node", 'e');
+	// Checking if new child node is not an empty node and parent not root node
+	if (childs.back()->uid == 0) {
+		LOG("Child is root node", 'e');
 		return;
 	}
+	if (uid == 0 || !childs.back()->is_valid_dimensions) return;
 
-	// Checking if new child node is not an empty node and parent not root node
-	if (uid == 0 || !child->is_valid_dimensions) return;
-
-	min_vertex = child->min_vertex;
-	max_vertex = child->max_vertex;
+	min_vertex = childs.back()->min_vertex;
+	max_vertex = childs.back()->max_vertex;
 
 	GetMinMaxVertex(this, &min_vertex, &max_vertex);
 
@@ -222,7 +218,7 @@ void GameObject::GenBoundingBox()
 	bounding_box[7] = { max.x,max.y,min.z };
 
 	float3 c = (min_vertex + max_vertex) / 2;
-	center = c;
+	center = c; // gameobject variable
 	bounding_box[8] = center;
 
 	bounding_box[9] = { c.x,c.y,min.z };  //Face 0437 center

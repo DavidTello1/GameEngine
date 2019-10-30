@@ -33,9 +33,13 @@ public:
 	GameObject* CreateGameObject(const char* name = "GameObject", GameObject* parent = nullptr, bool visible = false);
 	void DeleteGameObject(GameObject* obj);
 	void DeleteSelected();
-	GameObject* GetSelectedGameobj() { return selected_gameobj; }
-	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }
 
+	GameObject* GetSelectedGameObject() { 
+		for (int i=0;i<gameObjects.size();i++)
+			if (gameObjects[i]->is_selected)
+				return gameObjects[i];
+		return nullptr;
+	}
 
 	void UnSelectAll(GameObject * keep_selected = nullptr);
 

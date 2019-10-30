@@ -30,7 +30,7 @@ void Inspector::Draw()
 	static bool has_material = false;
 	static bool has_renderer = false;
 
-	obj = App->scene->GetSelectedGameobj();
+	obj = App->scene->GetSelectedGameObject();
 	if (obj == nullptr)
 	{
 		position = rotation = scale = float3::zero;
