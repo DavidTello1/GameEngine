@@ -58,6 +58,11 @@ bool ModuleScene::PostUpdate(float dt)
 			obj->ChildAdded();
 			obj->flags &= ~ProcessNewChild;
 		}
+		if (obj->flags & ProcessDeletedChild)
+		{
+			obj->ChildDeleted();
+			obj->flags &= ~ProcessDeletedChild;
+		}
 	}
 
 	return true;
@@ -152,26 +157,10 @@ GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent, 
 		obj->AddComponent(Component::Type::Renderer);
 
 	gameObjects.push_back(obj);
-	//selected_gameobj = obj; // new obj is selected_gameobj
 
 	return obj;
 }
 
-//void ModuleScene::DeleteGameobj(GameObject* obj)
-//{
-//	if (selected_gameobj == obj)
-//		selected_gameobj = nullptr;
-//
-//	for (uint i = 0; i < gameobjs.size(); i++)
-//	{
-//		if (gameobjs[i] == obj)
-//		{
-//			RELEASE( gameobjs[i]);
-//			gameobjs.erase(gameobjs.begin() + i);
-//			break;
-//		}
-//	}
-//}
 
 void ModuleScene::DeleteGameObject(GameObject* obj)
 {
@@ -191,21 +180,7 @@ void ModuleScene::DeleteGameObject(GameObject* obj)
 				break;
 			}
 		}
-		// Delete from parent
-		if (obj->parent)
-		{
-			for (uint i = 0; i < obj->parent->childs.size(); i++)
-			{
-				if (obj->parent->childs[i] == obj)
-				{
-					obj->parent->childs.erase(obj->parent->childs.begin() + i);
-					break;
-				}
-			}
-			if (!obj->parent->HasChilds())
-				obj->parent->hierarchy_flags |= ImGuiTreeNodeFlags_Leaf;
-		}
-		obj->LogAction("Deleted");
+		// Deleted from parent inside destructor
 		RELEASE(obj);
 
 	}

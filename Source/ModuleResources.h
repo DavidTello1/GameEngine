@@ -52,12 +52,12 @@ public:
 	void LoadResource(const char* path, Component::Type type = Component::Type::Unknown, bool use = false, GameObject* parent = nullptr);
 	void UnLoadResource();
 
-	void ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component);
 	void GenVBO(ComponentMesh * mesh_component);
 	void GenIBO(ComponentMesh * mesh_component);
 	void GenTexture(ComponentMesh * mesh_component);
+
+	void ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component);
 	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
-	//void ImportModel(aiMesh* mesh, ComponentMesh* mesh_component, aiScene* material, ComponentMaterial* material_component);
 
 	void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, GameObject* parent = nullptr);
 

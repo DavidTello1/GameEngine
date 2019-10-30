@@ -10,12 +10,14 @@
 
 class ComponentMaterial;
 
+//Dealt at scene post update
 enum GameObjectFlags
 {
 	NoFlags				= 0,
 	ProcessNewChild		= 1 << 0,
-	UnusedFlagNumber2	= 1 << 1,
-	UnusedFlagNumber3	= 1 << 2
+	ProcessDeletedChild	= 1 << 1,
+	UnusedFlagNumber2	= 1 << 2,
+	UnusedFlagNumber3	= 1 << 3
 
 };
 
@@ -28,8 +30,8 @@ private:
 	GameObject(const char* name, GameObject* Parent);
 	virtual ~GameObject();
 
-
 public:
+
 	void SetName(const char* Name) { strcpy_s(this->name, NAME_LENGTH, name); }
 
 	uint GetUID() const { return uid; }
@@ -87,7 +89,9 @@ public:
 
 	std::vector<Component*> components;
 
-	void GenBoundingBox();
+	void ChildDeleted();
+
+	void GenBoundingBox(bool to_delete = false);
 
 	bool HasChilds();
 
