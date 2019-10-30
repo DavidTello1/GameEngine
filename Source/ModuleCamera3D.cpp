@@ -62,10 +62,9 @@ bool ModuleCamera3D::Update(float dt)
 		{
 			LOG("Centering camera from [%f,%f,%f]", Position.x, Position.y, Position.z,'v');
 			// To change to the Reference we want to orbit at
-			if (!App->scene->selected_go.empty())
+			GameObject* object = App->scene->GetSelectedGameObject();
+			if (object != nullptr)
 			{
-				GameObject* object = App->scene->selected_go.at(0);
-				
 				float3 c = { Position.x,Position.y,Position.z };
 				float3 p = object->bounding_box[9] - c;
 
@@ -163,22 +162,10 @@ bool ModuleCamera3D::Update(float dt)
 		{
 			RotateWithMouse();
 			// To change to the Reference we want to orbit at
-			if (!App->scene->selected_go.empty())
+			GameObject* object = App->scene->GetSelectedGameObject();
+			if (object != nullptr)
 			{
-				const GameObject* object = App->scene->selected_go.at(0);
-
-				//// Check if has a mesh component (TODO improve)
-				//for (uint i = 0; i < object->components.size(); i++)
-				//{
-				//	if (object->components[i]->GetType() == Component::Type::Mesh)
-				//	{
-				//		ComponentMesh* mesh = (ComponentMesh*)object->components[i];
-				//		look_at = { mesh->center.x, mesh->center.y,mesh->center.z };
-				//		break;
-				//	}
-				//}
 				LookAt({ object->center.x, object->center.y,object->center.z });
-				
 			}
 		}
 

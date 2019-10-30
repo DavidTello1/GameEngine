@@ -12,8 +12,10 @@ class ComponentMaterial;
 
 enum GameObjectFlags
 {
-	NoFlags			= 0,
-	ProcessNewChild = 1 << 0
+	NoFlags				= 0,
+	ProcessNewChild		= 1 << 0,
+	UnusedFlagNumber2	= 1 << 1,
+	UnusedFlagNumber3	= 1 << 2
 
 };
 
@@ -91,15 +93,12 @@ public:
 
 	// Dimensions
 	bool is_valid_dimensions = false;
-	float3 min_vertex = { 0,0,0 };
-	float3 max_vertex = { 0,0,0 };
-	float3 center = { 0,0,0 };
-	float3 size = { 0,0,0 };
+	float3 min_vertex	= { 0,0,0 };
+	float3 max_vertex	= { 0,0,0 };
+	float3 center		= { 0,0,0 };
+	float3 size			= { 0,0,0 };
 
-	//0-7 Box vertex
-	//8 Box center
-	//9-12 Faces center
-	float3 bounding_box[13];
+	float3 bounding_box[13];//0-7 Box vertex//8 Box center//9-12 Faces center
 	GLuint bb_VBO = 0;
 	GLuint bb_IBO = 0;
 
@@ -114,15 +113,12 @@ public:
 	// Debug
 	void LogAction(const char* Action);
 
+public:
+
 	ImGuiTreeNodeFlags hierarchy_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 	uint hierarchy_pos = 0;
 	bool is_rename = false;
 	bool is_selected = false;
-
-	// flags
-
-	//static const ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-	//static const ImGuiTreeNodeFlags leaf_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
 
 };
