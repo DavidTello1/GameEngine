@@ -14,6 +14,13 @@ class Inspector;
 class Assets;
 class Viewport;
 
+enum Style {
+	NEW,
+	CLASSIC,
+	DARK,
+	LIGHT
+};
+
 class ModuleEditor : public Module
 {
 private:
@@ -29,6 +36,9 @@ public:
 	bool Update(float dt);
 	bool PostUpdate(float dt);
 	bool CleanUp();
+
+	void Save(Config* config) const override;
+	void Load(Config* config) override;
 
 	void Draw();
 
@@ -65,6 +75,7 @@ public:
 
 private:
 	bool close = false;
+	uint style;
 };
 
 #endif
