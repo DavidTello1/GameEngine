@@ -99,8 +99,19 @@ bool ModuleEditor::Init(Config* config)
 	LOG("Loading ImGui", 'd');
 	ImGui_ImplOpenGL3_Init();
 
-	// Setup style
-	ImGui::StyleColorsNew();
+	// Set style
+	Load(config);
+	if (style == Style::NEW)
+		ImGui::StyleColorsNew();
+
+	else if (style == Style::DARK)
+		ImGui::StyleColorsDark();
+
+	else if (style == Style::CLASSIC)
+		ImGui::StyleColorsClassic();
+
+	else if (style == Style::LIGHT)
+		ImGui::StyleColorsLight();
 
 	// Create panels
 	panels.push_back(tab_hierarchy = new Hierarchy());
@@ -162,6 +173,17 @@ bool ModuleEditor::CleanUp()
 	ImGui::DestroyContext();
 
 	return true;
+}
+
+
+void ModuleEditor::Save(Config* config) const
+{
+	config->AddInt("Style", style);
+}
+
+void ModuleEditor::Load(Config* config)
+{
+	style = config->GetInt("Style", Style::NEW);
 }
 
 // Drawing of the FULL gui
@@ -337,6 +359,34 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 			{
 				ImGui::MenuItem("Autoselect windows", NULL, &is_auto_select);
 
+				if (ImGui::BeginMenu("Style"))
+				{
+					if (ImGui::MenuItem("New", NULL, style == Style::NEW))
+					{
+						ImGui::StyleColorsNew();
+						style = Style::NEW;
+					}
+
+					if (ImGui::MenuItem("Classic", NULL, style == Style::CLASSIC))
+					{
+						ImGui::StyleColorsClassic();
+						style = Style::CLASSIC;
+					}
+
+					if (ImGui::MenuItem("Dark", NULL, style == Style::DARK))
+					{
+						ImGui::StyleColorsDark();
+						style = Style::DARK;
+					}
+
+					if (ImGui::MenuItem("Light", NULL, style == Style::LIGHT))
+					{
+						ImGui::StyleColorsLight();
+						style = Style::LIGHT;
+					}
+
+					ImGui::EndMenu();
+				}
 				ImGui::EndMenu();
 			}
 
