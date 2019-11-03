@@ -32,7 +32,7 @@ private:
 
 public:
 
-	void SetName(const char* Name) { strcpy_s(this->name, NAME_LENGTH, name); }
+	void SetName(const char* Name) { strcpy_s(this->name, NAME_LENGTH, Name); }
 
 	uint GetUID() const { return uid; }
 	const char* GetName() const { return name; }
