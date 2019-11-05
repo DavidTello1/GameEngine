@@ -19,6 +19,9 @@ public:
 
 	void Draw();
 	void ImportAsset();
+
+private:
+	std::vector<uint> selected_assets;
 };
 
 #endif// __ASSETS_H__
