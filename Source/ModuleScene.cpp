@@ -199,12 +199,12 @@ void ModuleScene::DeleteGameObject(GameObject* obj)
 
 void ModuleScene::DeleteSelected()
 {
-	uint size = gameObjects.size();
-	for (uint i = 0; i < size; i++)
+	//uint size = gameObjects.size();
+	for (int i = gameObjects.size()-1; i >= 0; i--)
 	{
 		if (gameObjects[i]->is_selected) {
 			DeleteGameObject(gameObjects[i]);
-			size = gameObjects.size();
+			//size = gameObjects.size();
 		}
 	}
 }
