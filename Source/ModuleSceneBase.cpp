@@ -20,8 +20,8 @@ ModuleSceneBase::~ModuleSceneBase()
 // Load assets
 bool ModuleSceneBase::Start(Config* config)
 {
-	App->camera->Move(vec3(0, 7.5f, 7.5f));
-	App->camera->LookAt(vec3(0, 0, 0));
+	/*App->camera->Move(vec3(0, 7.5f, 7.5f));
+	App->camera->LookAt(vec3(0, 0, 0));*/
 
 	return true;
 }

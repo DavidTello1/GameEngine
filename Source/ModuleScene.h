@@ -21,15 +21,14 @@ public:
 
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
+	void UpdateMainCamera(float dt);
 	bool PostUpdate(float dt);
 	bool CleanUp();
 
 	bool Draw();
 
-	
 public:
 	GameObject * FindById(uint id);
-	// GameObjects-----------
 	GameObject* CreateGameObject(const char* name = "GameObject", GameObject* parent = nullptr, bool visible = false);
 	void DeleteGameObject(GameObject* obj);
 	void DeleteSelected();
@@ -55,8 +54,6 @@ public:
 
 	bool create_gameobj = false;
 
-	void EraseFromSelected(GameObject* go);
-	std::vector<GameObject*> selected_go;
 	std::vector<ComponentMaterial*> materials;
 	std::vector<GameObject*> gameObjects;
 
@@ -71,6 +68,10 @@ public:
 	bool show_all_bounding_box = false;
 	   
 	static GameObject* root_object;
+	static GameObject* main_camera;
+
+	float zoom_speed = 75.0f;
+
 private:
 	GameObject* selected_gameobj = nullptr;
 

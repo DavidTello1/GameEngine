@@ -3,6 +3,7 @@
 #include "ComponentMesh.h"
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
+#include "ComponentCamera.h"
 
 #include "mmgr/mmgr.h"
 
@@ -127,6 +128,12 @@ Component* GameObject::AddComponent(Component::Type type)
 	else if (type == Component::Type::Renderer)
 	{
 		new_component = new ComponentRenderer(this);
+		components.push_back(new_component);
+		return new_component;
+	}
+	else if (type == Component::Type::Camera)
+	{
+		new_component = new ComponentCamera(this);
 		components.push_back(new_component);
 		return new_component;
 	}

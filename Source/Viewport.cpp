@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Viewport.h"
+#include "ComponentCamera.h"
 #include "mmgr/mmgr.h"
 
 const int Viewport::default_width = 600;
@@ -42,7 +43,10 @@ bool Viewport::PreUpdate()
 	glLoadIdentity();
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(App->camera->GetViewMatrix());
+	ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
+	glLoadMatrixf(camera->GetViewMatrix());
+
+	camera->viewport_focus = ImGui::IsWindowFocused();
 
 	App->scene_base->Draw();
 	App->scene->Draw();
@@ -53,8 +57,6 @@ bool Viewport::PreUpdate()
 
 void Viewport::Draw() 
 {
-	App->camera->viewport_focus = ImGui::IsWindowFocused();
-
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));

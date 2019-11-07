@@ -3,8 +3,10 @@
 #include "ModuleEditor.h"
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
+#include "ComponentCamera.h"
 
 GameObject* ModuleScene::root_object;
+GameObject* ModuleScene::main_camera;
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 {}
@@ -21,8 +23,10 @@ bool ModuleScene::Start(Config* config)
 	root_object = new GameObject("Root", nullptr);
 	root_object->uid = 0;
 
-	App->camera->Move(vec3(0, 7.5f, 7.5f));
-	App->camera->LookAt(vec3(0, 0, 0));
+	// Create game objects after this ----------
+
+	main_camera = CreateGameObject("Camera");
+	main_camera->AddComponent(Component::Type::Camera);
 		
 	GameObject* bparent = CreateGameObject("BakerHouse");
 
@@ -43,7 +47,137 @@ bool ModuleScene::Start(Config* config)
 
 bool ModuleScene::Update(float dt)
 {
+	UpdateMainCamera(dt);
+
 	return true;
+}
+
+void ModuleScene::UpdateMainCamera(float dt)
+{
+	if (main_camera == nullptr) return;
+
+	ComponentCamera* camera = (ComponentCamera*)main_camera->GetComponent(Component::Type::Camera);
+
+	if (camera == nullptr || camera->viewport_focus == false) return;
+
+	// TODO Change library glmath to math
+
+	// Camera ZOOM with MOUSE WHEEL
+	ImGuiIO io = ImGui::GetIO();
+	vec3 newPos(0, 0, 0);
+	float speed = io.MouseWheel * zoom_speed * dt; // TODO Not hardcoded speed
+	if (speed != 0)
+	{
+		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT || App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
+			speed *= 2.0f;
+
+		newPos -= camera->Z * speed;
+		camera->Position += newPos;
+	}
+
+	// Center camera to selected gameobject with F
+	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
+	{
+		LOG("Centering camera from [%f,%f,%f]", camera->Position.x, camera->Position.y, camera->Position.z, 'v');
+		// To change to the Reference we want to orbit at
+		GameObject* object = GetSelectedGameObject();
+		if (object != nullptr)
+		{
+			float3 c = { camera->Position.x,camera->Position.y,camera->Position.z };
+			float3 p = object->bounding_box[9] - c;
+
+			float l = length(vec3(p.x, p.y, p.z));
+			float min = l;
+			int face = 9;
+
+			for (int i = 10; i < 13; i++)
+			{
+				p = object->bounding_box[i] - c;
+				l = length(vec3(p.x, p.y, p.z));
+				if (l < min) {
+					min = l;
+					face = i;
+				}
+			}
+
+			vec3 new_p = { object->bounding_box[face].x,object->bounding_box[face].y,object->bounding_box[face].z };
+			float size = object->size.MaxElement();
+			float offset = Sqrt((size*size) - (size*size / 4));
+			float parent = (object->HasChilds()) ? 1.0f : -1.0f;
+			
+			switch (face)
+			{
+			case 9:
+				camera->Position = new_p + (camera->c_Z * offset * parent);
+				break;
+			case 10:
+				camera->Position = new_p + (camera->c_X * offset* parent);
+				break;
+			case 11:
+				camera->Position = new_p - (camera->c_X * offset* parent);
+				break;
+			case 12:
+				camera->Position = new_p - (camera->c_Z * offset* parent);
+				break;
+			default:
+				LOG("Could not detect closest face", 'e');
+				break;
+			}
+			//mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
+			//App->resources->bbox_indices[25] = face;
+			//App->resources->GenBoundingBox(mesh);
+
+			LOG("FACE %i", face, 'v');
+			LOG("To [%f,%f,%f]", camera->Position.x, camera->Position.y, camera->Position.z, 'v');
+			LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'v');
+
+			camera->LookAt(new_p);
+
+
+		}
+	}
+	//Free move 
+	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+	{
+		//Camera motion with WASD, Shift to go faster
+		vec3 newPos(0, 0, 0);
+		float speed = 10.0f * dt;
+
+		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT ||
+			App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
+			speed *= 2.0f;
+
+		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= camera->Z * speed;
+		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += camera->Z * speed;
+
+
+		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= camera->X * speed;
+		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += camera->X * speed;
+
+		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= camera->Y * speed;
+		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += camera->Y * speed;
+
+		camera->Position += newPos;
+		camera->Reference += newPos;
+
+		camera->RotateWithMouse();
+	}
+
+	// Orbit move
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))
+	{
+		camera->RotateWithMouse();
+		// To change to the Reference we want to orbit at
+		GameObject* object = GetSelectedGameObject();
+		if (object != nullptr)
+		{
+			camera->LookAt({ object->center.x, object->center.y,object->center.z });
+		}
+	}
+
+	// Recalculate matrix -------------
+	camera->CalculateViewMatrix();
+
 }
 
 bool ModuleScene::PostUpdate(float dt)
@@ -199,13 +333,11 @@ void ModuleScene::DeleteGameObject(GameObject* obj)
 
 void ModuleScene::DeleteSelected()
 {
-	//uint size = gameObjects.size();
 	for (int i = gameObjects.size()-1; i >= 0; i--)
 	{
-		if (gameObjects[i]->is_selected) {
+		if (gameObjects[i]->is_selected) 
 			DeleteGameObject(gameObjects[i]);
-			//size = gameObjects.size();
-		}
+		
 	}
 }
 
@@ -228,7 +360,6 @@ void ModuleScene::UnSelectAll(GameObject* keep_selected)
 		}
 	}
 
-	App->scene->selected_go.clear();
 }
 bool ModuleScene::IsMaterialLoaded(const char* path)
 {
@@ -263,16 +394,3 @@ bool ModuleScene::DeleteMaterial(ComponentMaterial* material)
 	return false;
 }
 
-void ModuleScene::EraseFromSelected(GameObject * go)
-{
-	if (go == nullptr) return;
-
-	for (uint i = 0; i < selected_go.size(); i++)
-	{
-		if (selected_go[i] != nullptr && selected_go[i]->GetUID() == go->GetUID())
-		{
-			selected_go.erase(selected_go.begin() + i);
-			return;
-		}
-	}
-}

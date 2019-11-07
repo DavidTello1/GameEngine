@@ -1,3 +1,45 @@
+#pragma once
+
+#include "Component.h"
+
+#include "Globals.h"
+#include "glmath.h"
+
+class ComponentCamera : public Component
+{
+public:
+
+	ComponentCamera(GameObject* gameObject);
+	~ComponentCamera();
+
+	void RotateWithMouse();
+
+	void Look(const vec3 &Position, const vec3 &Reference, bool RotateAroundReference = false);
+	void LookAt(const vec3 &Spot);
+	void Move(const vec3 &Movement);
+	float* GetViewMatrix();
+
+	void CalculateViewMatrix();
+
+public:
+	vec3 X = { 1.0f, 0.0f, 0.0f };
+	vec3 Y = { 0.0f, 1.0f, 0.0f };
+	vec3 Z = { 0.0f, 0.0f, 1.0f };
+
+	const vec3 c_X = { 1.0f, 0.0f, 0.0f };
+	const vec3 c_Y = { 0.0f, 1.0f, 0.0f };
+	const vec3 c_Z = { 0.0f, 0.0f, 1.0f };
+
+	vec3 Position, Reference;
+	bool viewport_focus;
+
+private:
+
+	mat4x4 ViewMatrix;
+};
+
+
+// ----------------------------- New camera as component draft ------------------------------------------
 //#pragma once
 //
 //#include "Component.h"
