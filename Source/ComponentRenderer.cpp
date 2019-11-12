@@ -45,7 +45,7 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
 	ComponentMaterial* material = (ComponentMaterial*)mesh.GetGameobj()->GetComponent(Component::Type::Material);
-	if (show_wireframe || App->scene->show_all_wireframe)
+	if (show_wireframe || App->scene_base->show_all_wireframe)
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

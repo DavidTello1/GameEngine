@@ -78,22 +78,20 @@ void Configuration::DrawScene()
 {
 	if (ImGui::CollapsingHeader("Scene"))
 	{
-		ImGui::Checkbox("Show all wireframe", &App->scene->show_all_wireframe);
-		ImGui::ColorEdit3("Wireframe color", (float*)&App->scene->wireframe_color);
-		ImGui::DragFloat("Wireframe width", &App->scene->wireframe_width, 0.1f, 0.1f, 5.0f);
+		ImGui::Checkbox("Show all wireframe", &App->scene_base->show_all_wireframe);
+		ImGui::ColorEdit3("Wireframe color", (float*)&App->scene_base->wireframe_color);
+		ImGui::DragFloat("Wireframe width", &App->scene_base->wireframe_width, 0.1f, 0.1f, 5.0f);
 
 		ImGui::Separator();
 
-		ImGui::Checkbox("Show all bounding boxes", &App->scene->show_all_bounding_box);
-		ImGui::ColorEdit3("Bounding box color", (float*)&App->scene->bounding_box_color);
-		ImGui::DragFloat("Bounding box width", &App->scene->bounding_box_width, 0.1f,0.1f,5.0f);
+		ImGui::Checkbox("Show all bounding boxes", &App->scene_base->show_all_bounding_box);
+		ImGui::ColorEdit3("Bounding box color", (float*)&App->scene_base->bounding_box_color);
+		ImGui::DragFloat("Bounding box width", &App->scene_base->bounding_box_width, 0.1f,0.1f,5.0f);
 
 		ImGui::Separator();
 
 		ImGui::DragFloat("Plane length", &App->scene_base->plane_length, 1.0f, 0.0f, 5000.0f);
 		ImGui::DragFloat("Axis length", &App->scene_base->axis_length, 1.0f, 0.0f, 5000.0f);
-		//ImGui::InputFloat("Axis length", &App->scene_base->axis_length, 1.0f, 5.0f, 0);
-		//ImGui::InputFloat("Plane length", &App->scene_base->plane_length, 1.0f, 5.0f, 0);
 	}
 }
 

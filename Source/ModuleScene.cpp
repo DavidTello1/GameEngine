@@ -233,10 +233,11 @@ bool ModuleScene::Draw()
 		ComponentRenderer* renderer = (ComponentRenderer*)gameObjects[i]->GetComponent(Component::Type::Renderer);
 		if (renderer != nullptr && renderer->IsActive())
 		{
-			if (renderer->show_wireframe || show_all_wireframe) //wireframe
+			if (renderer->show_wireframe || App->scene_base->show_all_wireframe) //wireframe
 			{
-				glColor3ub(wireframe_color[0]*255.0f, wireframe_color[1] * 255.0f, wireframe_color[2] * 255.0f);
-				glLineWidth(wireframe_width);
+
+				glColor3ub(App->scene_base->wireframe_color[0]*255.0f, App->scene_base->wireframe_color[1] * 255.0f, App->scene_base->wireframe_color[2] * 255.0f);
+				glLineWidth(App->scene_base->wireframe_width);
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			}
 			else
@@ -248,10 +249,10 @@ bool ModuleScene::Draw()
 		// Bounding boxes
 		GameObject* obj = gameObjects[i];
 		glEnableClientState(GL_VERTEX_ARRAY);
-		if ((obj->show_bounding_box || App->scene->show_all_bounding_box) && obj->bb_VBO != 0)
+		if ((obj->show_bounding_box || App->scene_base->show_all_bounding_box) && obj->bb_VBO != 0)
 		{
-			glColor3ub(App->scene->bounding_box_color[0] * 255.0f, App->scene->bounding_box_color[1] * 255.0f, App->scene->bounding_box_color[2] * 255.0f);
-			glLineWidth(App->scene->bounding_box_width);
+			glColor3ub(App->scene_base->bounding_box_color[0] * 255.0f, App->scene_base->bounding_box_color[1] * 255.0f, App->scene_base->bounding_box_color[2] * 255.0f);
+			glLineWidth(App->scene_base->bounding_box_width);
 
 			glBindBuffer(GL_ARRAY_BUFFER, obj->bb_VBO);
 			glVertexPointer(3, GL_FLOAT, 0, NULL);

@@ -56,16 +56,6 @@ public:
 
 	std::vector<ComponentMaterial*> materials;
 	std::vector<GameObject*> gameObjects;
-
-
-	// Misc
-	float wireframe_color[3] = { 1.0f, 1.0f, 1.0f };
-	float wireframe_width = 1.0f;
-	bool show_all_wireframe = false;
-
-	float bounding_box_color[3] = { 1.0f, 0.0f, 0.0f };
-	float bounding_box_width = 1.0f;
-	bool show_all_bounding_box = false;
 	   
 	static GameObject* root_object;
 	static GameObject* main_camera;

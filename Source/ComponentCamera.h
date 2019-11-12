@@ -35,11 +35,14 @@ public:
 
 private:
 
+	float z_near;
+	float z_far;
+
 	mat4x4 ViewMatrix;
 };
 
 
-// ----------------------------- New camera as component draft ------------------------------------------
+// ----------------------------- camera as component draft ------------------------------------------
 //#pragma once
 //
 //#include "Component.h"
