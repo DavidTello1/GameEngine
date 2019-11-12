@@ -49,7 +49,7 @@ bool ModuleScene::Update(float dt)
 bool ModuleScene::PostUpdate(float dt)
 {
 	// Do all remaining actions activated by flags
-	for (int i = 0; i < gameObjects.size(); i++)
+	for (uint i = 0; i < gameObjects.size(); i++)
 	{
 		GameObject* obj = gameObjects[i];
 
@@ -139,7 +139,7 @@ bool ModuleScene::Draw()
 
 GameObject* ModuleScene::FindById(uint id)
 {
-	for (int i = 0; i < gameObjects.size(); i++)
+	for (uint i = 0; i < gameObjects.size(); i++)
 		if (gameObjects[i]->GetUID() == id) return gameObjects[i];
 
 	return nullptr;

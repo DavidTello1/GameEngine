@@ -1,18 +1,13 @@
 #include "Globals.h"
 #include "Application.h"
-#include "ModuleSceneBase.h"
 #include "ModuleResources.h"
-//#include "ModuleFileSystem.h"
-#include "GameObject.h"
-#include "ComponentMesh.h"
-#include "ComponentMaterial.h"
+#include "ModuleFileSystem.h"
+
+#include "ResourceModel.h"
+#include "ResourceMesh.h"
+#include "ResourceMaterial.h"
 #include "Config.h"
 #include <string>
-
-#include "Devil/include/IL/il.h"
-#pragma comment (lib, "Devil/lib/x86/DevIL.lib")
-#pragma comment (lib, "Devil/lib/x86/ILU.lib")
-#pragma comment (lib, "Devil/lib/x86/ILUT.lib")
 
 #include "Assimp/include/cimport.h"
 #include "Assimp/include/scene.h"
@@ -20,7 +15,10 @@
 #include "Assimp/include/cfileio.h"
 #pragma comment (lib, "Assimp/libx86/assimp.lib")
 
-#include "par_shapes.h"
+#include "Devil/include/IL/il.h"
+#pragma comment (lib, "Devil/lib/x86/DevIL.lib")
+#pragma comment (lib, "Devil/lib/x86/ILU.lib")
+#pragma comment (lib, "Devil/lib/x86/ILUT.lib")
 
 #include "mmgr/mmgr.h"
 
@@ -53,7 +51,7 @@ bool ModuleResources::Start(Config* config)
 	stream.callback = AssimpLogCallback;
 	aiAttachLogStream(&stream);
 
-	MakeCheckersTexture();
+	//MakeCheckersTexture();
 	return true;
 }
 
@@ -62,32 +60,7 @@ bool ModuleResources::CleanUp()
 	return true;
 }
 
-//---------------------------------
-Component::Type ModuleResources::GetType(const char* path)
-{
-	char extension[32];
-	const char* last_dot = strrchr(path, '.');
-	strcpy_s(extension, last_dot + 1);
-
-	for (int i = 0; i < strlen(extension); i++)
-	{
-		extension[i] = tolower(extension[i]);
-	}
-
-	if (strcmp("obj", extension) == 0 || strcmp("fbx",extension) == 0) // Mesh
-	{
-		return Component::Type::Mesh;
-	}
-	else if (strcmp("dds", extension) == 0 || strcmp("png", extension) == 0 || strcmp("jpg", extension) == 0) // Texture
-	{
-		return Component::Type::Material;
-	}
-
-	LOG("File format not supported", 'e');
-	return Component::Type::Unknown;
-}
-
-void ModuleResources::LoadResource(const char* path, Component::Type type, bool use, GameObject* parent)
+void ModuleResources::ImportResource(const char* path)
 {
 	GameObject* object = nullptr;
 
@@ -95,471 +68,340 @@ void ModuleResources::LoadResource(const char* path, Component::Type type, bool 
 	const char* file_name = strrchr(path, 92) ;
 	if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "GameObject";
 	file_name++;
-	// name ------
 
-	if (type == Component::Type::Unknown)
-		type = GetType(path);
+	//type
+	char extension[32];
+	const char* last_dot = strrchr(path, '.');
+	strcpy_s(extension, last_dot + 1);
 
-	if (type == Component::Type::Mesh) // Mesh
+	for (uint i = 0; i < strlen(extension); i++)
 	{
-		LOG("Mesh resource type",'v');
-		const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
-
-		if (scene != nullptr && scene->HasMeshes())
-		{
-			LOG("Number of meshes: %u", scene->mNumMeshes, 'g');
-
-			for (uint i = 0; i < scene->mNumMeshes; ++i)
-			{	
-				if (use)
-				{
-					object = App->scene->CreateGameObject(file_name, parent,true);
-					ComponentMesh* mesh_component = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
-					aiMesh* mesh = scene->mMeshes[i];
-					ImportMesh(mesh, mesh_component);
-				}
-			}
-			aiReleaseImport(scene);
-		}
-		else
-			LOG("Cannot import mesh or mesh is empty %s", path, 'e');
-
+		extension[i] = tolower(extension[i]);
 	}
-	else if (type == Component::Type::Material) // Texture
+
+	if (strcmp("obj", extension) == 0 || strcmp("fbx", extension) == 0) // Model
 	{
-		ComponentMaterial* material_loaded = nullptr;
-		GLuint tex;
-
-		if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-			material_loaded = App->scene->GetMaterial(path);
-		else
-		{
-			// Devil
-			uint imageID;
-			ilGenImages(1, &imageID);
-			ilBindImage(imageID);
-			ilEnable(IL_ORIGIN_SET);
-			ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-
-			bool loaded = ilLoadImage(path);
-			if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
-
-			LogImageInfo();
-
-			tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
-			ilDeleteImages(1, &imageID);
-			LOG("Texture %s loaded", file_name, 'd');
-		}
-
-		if (use)
-		{
-			for (GameObject* object : App->scene->gameObjects)
-			{
-				if (!object->is_selected) continue;
-
-				if (object->HasComponent(Component::Type::Mesh))
-				{
-					ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
-					if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-					{
-						material_loaded = App->scene->GetMaterial(path);
-						mesh->TEX = material_loaded->tex_id;
-					}
-					else
-						mesh->TEX = tex;
-				}
-
-				//if (object->HasChilds()) //if object is parent
-				//{
-					if (!object->HasComponent(Component::Type::Material)) //if object has not got material add one
-						object->AddComponent(Component::Type::Material);
-
-					ComponentMaterial* material = (ComponentMaterial*)object->GetComponent(Component::Type::Material);
-					if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-					{
-						material_loaded = App->scene->GetMaterial(path);
-						strcpy_s(material->path, 256, material_loaded->path);
-						material->tex_id = material_loaded->tex_id;
-						material->width = material_loaded->width;
-						material->height = material_loaded->height;
-					}
-					else
-					{
-						strcpy_s(material->path, 256, path);
-						material->tex_id = tex;
-						material->width = tex_width;
-						material->height = tex_height;
-
-						App->scene->materials.push_back(material);
-
-						LOG("Texture %s applied to object %s %u", file_name, object->GetName(), object->GetUID(), 'd');
-					}
-				//}
-			}
-		}
-		
+		ResourceModel* model = new ResourceModel();
 	}
-}
-
-void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
-{
-	LOG("Importing mesh '%s'", (mesh->mName.C_Str()), 'g');
-	GameObject* go = mesh_component->GetGameobj();
-
-	// Vertices -----------------------
-	mesh_component->num_vertices = mesh->mNumVertices;
-	mesh_component->vertices = new float3[mesh->mNumVertices];
-
-	if (mesh_component->num_vertices > 0)
+	else if (strcmp("dds", extension) == 0 || strcmp("png", extension) == 0 || strcmp("jpg", extension) == 0) // Texture
 	{
-		go->min_vertex.x = mesh->mVertices[0].x;
-		go->min_vertex.y = mesh->mVertices[0].y;
-		go->min_vertex.z = mesh->mVertices[0].z;
-
-		go->max_vertex.x = mesh->mVertices[0].x;
-		go->max_vertex.y = mesh->mVertices[0].y;
-		go->max_vertex.z = mesh->mVertices[0].z;
+		ResourceMaterial* material = new ResourceMaterial();
 	}
-	else {
-		LOG("Mesh has no vertices", 'e');
-		return;
-	}
-
-	LOG("Importing vertices %u", mesh->mNumVertices, 'g');
-	for (uint i = 0; i < mesh->mNumVertices; ++i)
-	{
-		float x = mesh->mVertices[i].x;
-		float y = mesh->mVertices[i].y;
-		float z = mesh->mVertices[i].z;
-
-		mesh_component->vertices[i].x = x;
-		mesh_component->vertices[i].y = y;
-		mesh_component->vertices[i].z = z;
-
-		// Bounding box setting up
-		if (x < go->min_vertex.x) go->min_vertex.x = x;
-		if (y < go->min_vertex.y) go->min_vertex.y = y;
-		if (z < go->min_vertex.z) go->min_vertex.z = z;
-
-		if (x > go->max_vertex.x) go->max_vertex.x = x;
-		if (y > go->max_vertex.y) go->max_vertex.y = y;
-		if (z > go->max_vertex.z) go->max_vertex.z = z;
-		
-	}
-
-	GenVBO(mesh_component);
+	else
+		LOG("File format not supported", 'e');
 
 
-	// Indices -----------------------
-	mesh_component->num_indices = mesh->mNumFaces * 3;
-	mesh_component->indices = new GLuint[mesh_component->num_indices];
+	//else if (type == Component::Type::Material) // Texture
+	//{
+	//	ComponentMaterial* material_loaded = nullptr;
+	//	GLuint tex;
 
-	for (uint i = 0; i < mesh->mNumFaces; ++i)
-	{
-		assert(mesh->mFaces[i].mNumIndices == 3); // assert if face is not a triangle
-		memcpy(&mesh_component->indices[i * 3], mesh->mFaces[i].mIndices, 3 * sizeof(GLuint));
-	}
+	//	if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
+	//		material_loaded = App->scene->GetMaterial(path);
+	//	else
+	//	{
+	//		// Devil
+	//		uint imageID;
+	//		ilGenImages(1, &imageID);
+	//		ilBindImage(imageID);
+	//		ilEnable(IL_ORIGIN_SET);
+	//		ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 
-	GenIBO(mesh_component);
+	//		bool loaded = ilLoadImage(path);
+	//		if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
 
-	// Texture Coordinates -----------------------
-	if (mesh->HasTextureCoords(0))
-	{
-		mesh_component->num_tex_coords = mesh->mNumVertices;
-		mesh_component->tex_coords = new float2[mesh_component->num_tex_coords * 2];
+	//		LogImageInfo();
 
-		for (uint i = 0; i < mesh->mNumVertices; ++i)
-		{
-			mesh_component->tex_coords[i].x = mesh->mTextureCoords[0][i].x;
-			mesh_component->tex_coords[i].y = mesh->mTextureCoords[0][i].y;
-		}
-	}
+	//		tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
+	//		ilDeleteImages(1, &imageID);
+	//		LOG("Texture %s loaded", file_name, 'd');
+	//	}
 
-	GenTexture(mesh_component);
+	//	if (use)
+	//	{
+	//		for (GameObject* object : App->scene->gameObjects)
+	//		{
+	//			if (!object->is_selected) continue;
 
-	// Normals -----------------------
-	if (mesh->HasNormals())
-	{
-		LOG("Importing normals %u",mesh->mNumVertices , 'g');
-		mesh_component->num_normals = mesh->mNumVertices;
-		mesh_component->normals = new float3[mesh_component->num_normals];
+	//			if (object->HasComponent(Component::Type::Mesh))
+	//			{
+	//				ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
+	//				if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
+	//				{
+	//					material_loaded = App->scene->GetMaterial(path);
+	//					mesh->TEX = material_loaded->tex_id;
+	//				}
+	//				else
+	//					mesh->TEX = tex;
+	//			}
 
-		for (uint i = 0; i < mesh->mNumVertices; ++i)
-		{
-			mesh_component->normals[i].x = mesh->mNormals[i].x;
-			mesh_component->normals[i].y = mesh->mNormals[i].y;
-			mesh_component->normals[i].z = mesh->mNormals[i].z;
-		}
-	}
-	go->GenBoundingBox();
-	go->is_valid_dimensions = true;
-	
-}
+	//			//if (object->HasChilds()) //if object is parent
+	//			//{
+	//				if (!object->HasComponent(Component::Type::Material)) //if object has not got material add one
+	//					object->AddComponent(Component::Type::Material);
 
-GLuint ModuleResources::ImportTexture(int width, int height,int internal_format, int format, unsigned char* image)
-{
-	//LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image)*sizeof(unsigned char), 'g');
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	//				ComponentMaterial* material = (ComponentMaterial*)object->GetComponent(Component::Type::Material);
+	//				if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
+	//				{
+	//					material_loaded = App->scene->GetMaterial(path);
+	//					strcpy_s(material->path, 256, material_loaded->path);
+	//					material->tex_id = material_loaded->tex_id;
+	//					material->width = material_loaded->width;
+	//					material->height = material_loaded->height;
+	//				}
+	//				else
+	//				{
+	//					strcpy_s(material->path, 256, path);
+	//					material->tex_id = tex;
+	//					material->width = tex_width;
+	//					material->height = tex_height;
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//					App->scene->materials.push_back(material);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	tex_height = height;
-	tex_width = width;
-	return texture;
+	//					LOG("Texture %s applied to object %s %u", file_name, object->GetName(), object->GetUID(), 'd');
+	//				}
+	//			//}
+	//		}
+	//	}
+	//	
+	//}
 }
 
 void ModuleResources::UnLoadResource()
 {
-
 }
 
-void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
-{
-	par_shapes_mesh* m;
+//GLuint ModuleResources::ImportTexture(int width, int height,int internal_format, int format, unsigned char* image)
+//{
+//	//LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image)*sizeof(unsigned char), 'g');
+//	GLuint texture;
+//	glGenTextures(1, &texture);
+//	glBindTexture(GL_TEXTURE_2D, texture);
+//
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//
+//	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
+//	glGenerateMipmap(GL_TEXTURE_2D);
+//
+//	tex_height = height;
+//	tex_width = width;
+//	return texture;
+//}
 
-	if (slices < 3)
-	{
-		slices = 3;
-		LOG("Slices less than 3, setting to 3", 'w');
-	}
-	if (stacks < 3)
-	{
-		stacks = 3;
-		LOG("Stacks less than 3, setting to 3", 'w');
-	}
-
-	switch (type)
-	{
-	case CYLINDER:
-		m = par_shapes_create_cylinder(slices, stacks);
-		break;
-	case CONE:
-		m = par_shapes_create_cone(slices, stacks);
-		break;
-	case TORUS:
-		m = par_shapes_create_torus(slices, stacks, radius);
-		break;
-	case SPHERE:
-		m = par_shapes_create_parametric_sphere(slices, stacks);
-		break;
-	case BOTTLE:
-		m = par_shapes_create_klein_bottle(slices, stacks);
-		break;
-	case KNOT:
-		m = par_shapes_create_trefoil_knot(slices, stacks, radius);
-		break;
-	case HEMISPHERE:
-		m = par_shapes_create_hemisphere(slices, stacks);
-		break;
-	case PLANE:
-		m = par_shapes_create_plane(slices, stacks);
-		break;
-	case ICOSAHEDRON:
-		m = par_shapes_create_icosahedron();
-		break;
-	case DODECAHEDRON:
-		m = par_shapes_create_dodecahedron();
-		break;
-	case OCTAHEDRON:
-		m = par_shapes_create_octahedron();
-		break;
-	case TETRAHEDRON:
-		m = par_shapes_create_tetrahedron();
-		break;
-	case CUBE:
-		m = par_shapes_create_cube();
-		break;
-	case ROCK:
-		m = par_shapes_create_rock(slices*stacks, 2);
-		break;
-
-	default:
-		break;
-	}
-
-	par_shapes_translate(m, x, y, z);
-
-	LOG("Creating primitive '%s'", GetShapeName(type), 'v');
-
-	GameObject* object = App->scene->CreateGameObject(GetShapeName(type), parent, true);
-	ComponentMesh* mesh = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
-	object->AddComponent(Component::Type::Material);
-
-	// Vertices ------------------
-	mesh->num_vertices = m->npoints;
-	mesh->vertices = new float3[mesh->num_vertices];
-	if (mesh->num_vertices >= 3)
-	{
-		object->min_vertex.x = m->points[0];
-		object->min_vertex.y = m->points[1];
-		object->min_vertex.z = m->points[2];
-		object->max_vertex.x = m->points[0];
-		object->max_vertex.y = m->points[1];
-		object->max_vertex.z = m->points[2];
-	}
-	else {
-		LOG("Mesh has no vertices", 'e');
-		return;
-	}
-	for (uint i = 0; i < mesh->num_vertices; ++i)
-	{
-		int k = i * 3;
-		float x = m->points[k];
-		float y = m->points[k + 1];
-		float z = m->points[k + 2];
-
-		mesh->vertices[i].x = x; 
-		mesh->vertices[i].y = y; 
-		mesh->vertices[i].z = z; 
-
-		// Bounding box setting up
-		if (x < object->min_vertex.x) object->min_vertex.x = x;
-		if (y < object->min_vertex.y) object->min_vertex.y = y;
-		if (z < object->min_vertex.z) object->min_vertex.z = z;
-
-		if (x > object->max_vertex.x) object->max_vertex.x = x;
-		if (y > object->max_vertex.y) object->max_vertex.y = y;
-		if (z > object->max_vertex.z) object->max_vertex.z = z;
-	}
-
-	GenVBO(mesh);
-
-
-	// Indices ---------------------
-	mesh->num_indices = m->ntriangles * 3;
-	mesh->indices = new GLuint[mesh->num_indices];
-
-	for (uint i = 0; i < mesh->num_indices; ++i)
-	{
-		mesh->indices[i] = (GLuint)m->triangles[i];
-	}
-
-	GenIBO(mesh);
-
-	// Texture -----------------------
-	if (m->tcoords != nullptr) {
-
-		mesh->num_tex_coords = m->npoints;
-		mesh->tex_coords = new float2[mesh->num_tex_coords];
-
-		for (unsigned i = 0; i < mesh->num_tex_coords; ++i)
-		{
-			int k = i * 2;
-			mesh->tex_coords[i].x = m->tcoords[k];
-			mesh->tex_coords[i].y = m->tcoords[k + 1];
-		}
-	}
-	par_shapes_free_mesh(m);
-
-	GenTexture(mesh);
-
-	if (type < 8) //idk but has to be like this for now, otherwise ImGui crashes
-	{
-		object->GenBoundingBox();
-		object->is_valid_dimensions = true;
-	}
-}
-void ModuleResources::GenVBO(ComponentMesh * mesh_component)
-{
-	// Generate VBO
-	LOG("Generating VBO", 'v');
-	glGenBuffers(1, &mesh_component->VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float3)* mesh_component->num_vertices, mesh_component->vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void ModuleResources::GenIBO(ComponentMesh * mesh_component)
-{
-	// Generate IBO
-	LOG("Generating IBO", 'v');
-	glGenBuffers(1, &mesh_component->IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_component->IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * mesh_component->num_indices, mesh_component->indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void ModuleResources::GenTexture(ComponentMesh * mesh_component)
-{
-	// Generate Textures
-	LOG("Generating Texture", 'v');
-	glGenBuffers(1, &mesh_component->tex_coords_id);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->tex_coords_id);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float2) * mesh_component->num_tex_coords, mesh_component->tex_coords, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-void ModuleResources::MakeCheckersTexture()
-{
-	const int checkImageWidth = 256;
-	const int checkImageHeight = 256;
-	static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
-
-	int c;
-	for (int i = 0; i < checkImageHeight; i++)
-	{
-		for (int j = 0; j < checkImageWidth; j++)
-		{
-			c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
-			checkImage[i][j][0] = (GLubyte)c;
-			checkImage[i][j][1] = (GLubyte)c;
-			checkImage[i][j][2] = (GLubyte)c;
-			checkImage[i][j][3] = (GLubyte)255;
-		}
-	}
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	glGenTextures(1, &checker_texture);
-	glBindTexture(GL_TEXTURE_2D, checker_texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-		GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
-		checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-		checkImage);
-}
-
-void ModuleResources::LogImageInfo()
-{
-	char* s;
-	char* c;
-	switch (ilGetInteger(IL_IMAGE_FORMAT)) {
-	case IL_COLOR_INDEX: s = "IL_COLOR_INDEX"; break;
-	case IL_ALPHA: s = "IL_ALPHA"; break;
-	case IL_RGB: s = "IL_RGB"; break;
-	case IL_RGBA: s = "IL_RGBA"; break;
-	case IL_BGR: s = "IL_BGR"; break;
-	case IL_BGRA: s = "IL_BGRA"; break;
-	case IL_LUMINANCE: s = "IL_LUMINANCE"; break;
-	case  IL_LUMINANCE_ALPHA: s = "IL_LUMINANCE_ALPHA"; break;
-	}
-	switch (ilGetInteger(IL_IMAGE_TYPE)) {
-	case IL_BYTE: c = "IL_BYTE"; break;
-	case IL_UNSIGNED_BYTE: c = "IL_UNSIGNED_BYTE"; break;
-	case IL_SHORT: c = "IL_SHORT"; break;
-	case IL_UNSIGNED_SHORT: c = "IL_UNSIGNED_SHORT"; break;
-	case IL_INT: c = "IL_INT"; break;
-	case IL_UNSIGNED_INT: c = "IL_UNSIGNED_INT"; break;
-	case IL_FLOAT: c = "IL_FLOAT"; break;
-	case IL_DOUBLE: c = "IL_DOUBLE"; break;
-	case IL_HALF: c = "IL_HALF"; break;
-	}
-
-	LOG("Width: %d, Height %d, Bytes per Pixel %d",
-		ilGetInteger(IL_IMAGE_WIDTH),
-		ilGetInteger(IL_IMAGE_HEIGHT),
-		ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL), 'g');
-	LOG("Original image format: %s, data type: %s", s, c, 'g');
-}
+//void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
+//{
+//	par_shapes_mesh* m;
+//
+//	if (slices < 3)
+//	{
+//		slices = 3;
+//		LOG("Slices less than 3, setting to 3", 'w');
+//	}
+//	if (stacks < 3)
+//	{
+//		stacks = 3;
+//		LOG("Stacks less than 3, setting to 3", 'w');
+//	}
+//
+//	switch (type)
+//	{
+//	case CYLINDER:
+//		m = par_shapes_create_cylinder(slices, stacks);
+//		break;
+//	case CONE:
+//		m = par_shapes_create_cone(slices, stacks);
+//		break;
+//	case TORUS:
+//		m = par_shapes_create_torus(slices, stacks, radius);
+//		break;
+//	case SPHERE:
+//		m = par_shapes_create_parametric_sphere(slices, stacks);
+//		break;
+//	case BOTTLE:
+//		m = par_shapes_create_klein_bottle(slices, stacks);
+//		break;
+//	case KNOT:
+//		m = par_shapes_create_trefoil_knot(slices, stacks, radius);
+//		break;
+//	case HEMISPHERE:
+//		m = par_shapes_create_hemisphere(slices, stacks);
+//		break;
+//	case PLANE:
+//		m = par_shapes_create_plane(slices, stacks);
+//		break;
+//	case ICOSAHEDRON:
+//		m = par_shapes_create_icosahedron();
+//		break;
+//	case DODECAHEDRON:
+//		m = par_shapes_create_dodecahedron();
+//		break;
+//	case OCTAHEDRON:
+//		m = par_shapes_create_octahedron();
+//		break;
+//	case TETRAHEDRON:
+//		m = par_shapes_create_tetrahedron();
+//		break;
+//	case CUBE:
+//		m = par_shapes_create_cube();
+//		break;
+//	case ROCK:
+//		m = par_shapes_create_rock(slices*stacks, 2);
+//		break;
+//
+//	default:
+//		break;
+//	}
+//
+//	par_shapes_translate(m, x, y, z);
+//
+//	LOG("Creating primitive '%s'", GetShapeName(type), 'v');
+//
+//	GameObject* object = App->scene->CreateGameObject(GetShapeName(type), parent, true);
+//	ComponentMesh* mesh = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
+//	object->AddComponent(Component::Type::Material);
+//
+//	// Vertices ------------------
+//	mesh->num_vertices = m->npoints;
+//	mesh->vertices = new float3[mesh->num_vertices];
+//	if (mesh->num_vertices >= 3)
+//	{
+//		object->min_vertex.x = m->points[0];
+//		object->min_vertex.y = m->points[1];
+//		object->min_vertex.z = m->points[2];
+//		object->max_vertex.x = m->points[0];
+//		object->max_vertex.y = m->points[1];
+//		object->max_vertex.z = m->points[2];
+//	}
+//	else {
+//		LOG("Mesh has no vertices", 'e');
+//		return;
+//	}
+//	for (uint i = 0; i < mesh->num_vertices; ++i)
+//	{
+//		int k = i * 3;
+//		float x = m->points[k];
+//		float y = m->points[k + 1];
+//		float z = m->points[k + 2];
+//
+//		mesh->vertices[i].x = x; 
+//		mesh->vertices[i].y = y; 
+//		mesh->vertices[i].z = z; 
+//
+//		// Bounding box setting up
+//		if (x < object->min_vertex.x) object->min_vertex.x = x;
+//		if (y < object->min_vertex.y) object->min_vertex.y = y;
+//		if (z < object->min_vertex.z) object->min_vertex.z = z;
+//
+//		if (x > object->max_vertex.x) object->max_vertex.x = x;
+//		if (y > object->max_vertex.y) object->max_vertex.y = y;
+//		if (z > object->max_vertex.z) object->max_vertex.z = z;
+//	}
+//
+//	GenVBO(mesh);
+//
+//
+//	// Indices ---------------------
+//	mesh->num_indices = m->ntriangles * 3;
+//	mesh->indices = new GLuint[mesh->num_indices];
+//
+//	for (uint i = 0; i < mesh->num_indices; ++i)
+//	{
+//		mesh->indices[i] = (GLuint)m->triangles[i];
+//	}
+//
+//	GenIBO(mesh);
+//
+//	// Texture -----------------------
+//	if (m->tcoords != nullptr) {
+//
+//		mesh->num_tex_coords = m->npoints;
+//		mesh->tex_coords = new float2[mesh->num_tex_coords];
+//
+//		for (unsigned i = 0; i < mesh->num_tex_coords; ++i)
+//		{
+//			int k = i * 2;
+//			mesh->tex_coords[i].x = m->tcoords[k];
+//			mesh->tex_coords[i].y = m->tcoords[k + 1];
+//		}
+//	}
+//	par_shapes_free_mesh(m);
+//
+//	GenTexture(mesh);
+//
+//	if (type < 8) //idk but has to be like this for now, otherwise ImGui crashes
+//	{
+//		object->GenBoundingBox();
+//		object->is_valid_dimensions = true;
+//	}
+//}
+//
+//void ModuleResources::MakeCheckersTexture()
+//{
+//	const int checkImageWidth = 256;
+//	const int checkImageHeight = 256;
+//	static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
+//
+//	int c;
+//	for (int i = 0; i < checkImageHeight; i++)
+//	{
+//		for (int j = 0; j < checkImageWidth; j++)
+//		{
+//			c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
+//			checkImage[i][j][0] = (GLubyte)c;
+//			checkImage[i][j][1] = (GLubyte)c;
+//			checkImage[i][j][2] = (GLubyte)c;
+//			checkImage[i][j][3] = (GLubyte)255;
+//		}
+//	}
+//
+//	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+//
+//	glGenTextures(1, &checker_texture);
+//	glBindTexture(GL_TEXTURE_2D, checker_texture);
+//
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+//		GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+//		GL_NEAREST);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
+//		checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+//		checkImage);
+//}
+//
+//void ModuleResources::LogImageInfo()
+//{
+//	char* s;
+//	char* c;
+//	switch (ilGetInteger(IL_IMAGE_FORMAT)) {
+//	case IL_COLOR_INDEX: s = "IL_COLOR_INDEX"; break;
+//	case IL_ALPHA: s = "IL_ALPHA"; break;
+//	case IL_RGB: s = "IL_RGB"; break;
+//	case IL_RGBA: s = "IL_RGBA"; break;
+//	case IL_BGR: s = "IL_BGR"; break;
+//	case IL_BGRA: s = "IL_BGRA"; break;
+//	case IL_LUMINANCE: s = "IL_LUMINANCE"; break;
+//	case  IL_LUMINANCE_ALPHA: s = "IL_LUMINANCE_ALPHA"; break;
+//	}
+//	switch (ilGetInteger(IL_IMAGE_TYPE)) {
+//	case IL_BYTE: c = "IL_BYTE"; break;
+//	case IL_UNSIGNED_BYTE: c = "IL_UNSIGNED_BYTE"; break;
+//	case IL_SHORT: c = "IL_SHORT"; break;
+//	case IL_UNSIGNED_SHORT: c = "IL_UNSIGNED_SHORT"; break;
+//	case IL_INT: c = "IL_INT"; break;
+//	case IL_UNSIGNED_INT: c = "IL_UNSIGNED_INT"; break;
+//	case IL_FLOAT: c = "IL_FLOAT"; break;
+//	case IL_DOUBLE: c = "IL_DOUBLE"; break;
+//	case IL_HALF: c = "IL_HALF"; break;
+//	}
+//
+//	LOG("Width: %d, Height %d, Bytes per Pixel %d",
+//		ilGetInteger(IL_IMAGE_WIDTH),
+//		ilGetInteger(IL_IMAGE_HEIGHT),
+//		ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL), 'g');
+//	LOG("Original image format: %s, data type: %s", s, c, 'g');
+//}

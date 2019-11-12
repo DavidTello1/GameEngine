@@ -12,7 +12,6 @@ ComponentRenderer::ComponentRenderer(GameObject* gameobj) : Component(Component:
 
 ComponentRenderer::~ComponentRenderer()
 {
-
 }
 
 void ComponentRenderer::Draw()
@@ -41,7 +40,7 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->VBO);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
 	ComponentMaterial* material = (ComponentMaterial*)mesh.GetGameobj()->GetComponent(Component::Type::Material);
@@ -54,7 +53,7 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 		if (show_checkers)
 			glBindTexture(GL_TEXTURE_2D, App->resources->checker_texture); // start using texture
 		else
-			glBindTexture(GL_TEXTURE_2D, mesh.TEX);
+			glBindTexture(GL_TEXTURE_2D, mesh.GetMesh()->TEX);
 		
 	}
 	else
@@ -64,11 +63,11 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 		else
 			glBindTexture(GL_TEXTURE_2D, 0);
 	}
-	glBindBuffer(GL_ARRAY_BUFFER, mesh.tex_coords_id);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->tex_coords_id);
 	glTexCoordPointer(2, GL_FLOAT, 0, NULL);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.IBO);
-	glDrawElements(GL_TRIANGLES, mesh.num_indices, GL_UNSIGNED_INT, nullptr);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.GetMesh()->IBO);
+	glDrawElements(GL_TRIANGLES, mesh.GetMesh()->num_indices, GL_UNSIGNED_INT, nullptr);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -76,7 +75,7 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 
 	/*glDisable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);*/
-	
+
 
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
@@ -91,11 +90,11 @@ void ComponentRenderer::DrawFaceNormals()
 	Triangle face;
 	ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
 
-	for (uint i = 0; i < mesh->num_indices / 3; ++i)
+	for (uint i = 0; i < mesh->GetMesh()->num_indices / 3; ++i)
 	{
-		face.a = mesh->vertices[mesh->indices[i * 3]];
-		face.b = mesh->vertices[mesh->indices[(i * 3) + 1]];
-		face.c = mesh->vertices[mesh->indices[(i * 3) + 2]];
+		face.a = mesh->GetMesh()->vertices[mesh->GetMesh()->indices[i * 3]];
+		face.b = mesh->GetMesh()->vertices[mesh->GetMesh()->indices[(i * 3) + 1]];
+		face.c = mesh->GetMesh()->vertices[mesh->GetMesh()->indices[(i * 3) + 2]];
 
 		float3 center = face.Centroid();
 		float3 normal = Cross(face.b - face.a, face.c - face.b);
@@ -120,17 +119,17 @@ void ComponentRenderer::DrawVertexNormals()
 
 	ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
 
-	if (mesh->normals)
+	if (mesh->GetMesh()->normals)
 	{
-		for (uint i = 0; i < mesh->num_indices; ++i)
+		for (uint i = 0; i < mesh->GetMesh()->num_indices; ++i)
 		{
-			glVertex3f(mesh->vertices[mesh->indices[i]].x, 
-					   mesh->vertices[mesh->indices[i]].y, 
-					   mesh->vertices[mesh->indices[i]].z);
+			glVertex3f(mesh->GetMesh()->vertices[mesh->GetMesh()->indices[i]].x,
+				mesh->GetMesh()->vertices[mesh->GetMesh()->indices[i]].y,
+				mesh->GetMesh()->vertices[mesh->GetMesh()->indices[i]].z);
 
-			glVertex3f(mesh->vertices[mesh->indices[i]].x + mesh->normals[mesh->indices[i]].x * normals_size,
-					   mesh->vertices[mesh->indices[i]].y + mesh->normals[mesh->indices[i]].y * normals_size, 
-					   mesh->vertices[mesh->indices[i]].z + mesh->normals[mesh->indices[i]].z * normals_size);
+			glVertex3f(mesh->GetMesh()->vertices[mesh->GetMesh()->indices[i]].x + mesh->GetMesh()->normals[mesh->GetMesh()->indices[i]].x * normals_size,
+				mesh->GetMesh()->vertices[mesh->GetMesh()->indices[i]].y + mesh->GetMesh()->normals[mesh->GetMesh()->indices[i]].y * normals_size,
+				mesh->GetMesh()->vertices[mesh->GetMesh()->indices[i]].z + mesh->GetMesh()->normals[mesh->GetMesh()->indices[i]].z * normals_size);
 		}
 	}
 	glColor3ub(255, 255, 255); //reset default color

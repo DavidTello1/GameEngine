@@ -2,39 +2,13 @@
 #define __MODULE_RESOURCES_H__
 
 #include "Module.h"
-#include "GameObject.h"
-#include "Component.h"
-#include <vector>
+#include "Resource.h"
 #include "Hierarchy.h"
+#include <vector>
 
-#include "glew\include\GL\glew.h"
-
-#include "MathGeoLib/include/MathBuildConfig.h"
-#include "MathGeoLib/include/MathGeoLib.h"
-
-enum shape_type {
-	CYLINDER,
-	CONE,
-	TORUS,
-	SPHERE,
-	BOTTLE,
-	KNOT,
-	HEMISPHERE,
-	PLANE,
-	ICOSAHEDRON,
-	DODECAHEDRON,
-	OCTAHEDRON,
-	TETRAHEDRON,
-	CUBE,
-	ROCK,
-
-	UNKNOWN
-};
-
-struct aiMesh;
-struct aiScene;
-class ComponentMesh;
-class ComponentMaterial;
+class Resource;
+class ResourceMesh;
+class ResourceMaterial;
 
 class ModuleResources : public Module
 {
@@ -46,10 +20,8 @@ public:
 	bool Start(Config* config = nullptr);
 	bool CleanUp();
 
-	Component::Type GetType(const char* path);
-
-	void LogImageInfo();
-	void LoadResource(const char* path, Component::Type type = Component::Type::Unknown, bool use = false, GameObject* parent = nullptr);
+	void ImportResource(const char* path);
+	void LoadResource(const char* path);
 	void UnLoadResource();
 
 	void GenVBO(ComponentMesh * mesh_component);

@@ -1,13 +1,7 @@
-#include "Globals.h"
 #include "Application.h"
 #include "ModuleSceneBase.h"
-#include "ModuleResources.h"
-#include "Hierarchy.h"
-#include "Viewport.h"
-#include "GameObject.h"
 
 #include "glew/include/GL/glew.h"
-#include "par_shapes.h"
 #include "mmgr/mmgr.h"
 
 
@@ -26,8 +20,6 @@ bool ModuleSceneBase::Start(Config* config)
 	return true;
 }
 
-
-
 // Update
 bool ModuleSceneBase::Update(float dt)
 {
@@ -36,14 +28,12 @@ bool ModuleSceneBase::Update(float dt)
 
 bool ModuleSceneBase::PostUpdate(float dt)
 {
-
 	return true;
 }
 
 bool ModuleSceneBase::CleanUp()
 {
 	LOG("Unloading Intro scene");
-
 	return true;
 }
 
@@ -57,8 +47,6 @@ bool ModuleSceneBase::Draw()
 
 	return true;
 }
-
-
 
 void ModuleSceneBase::DrawGridPlane()
 {
@@ -105,7 +93,6 @@ void ModuleSceneBase::DrawAxis()
 	glVertex3f(0.0f, 0.0f, 1.0f);
 
 	glColor3ub(255, 255, 255);
-
 
 	glEnd();
 }

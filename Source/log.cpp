@@ -20,9 +20,9 @@ void log(const char file[], int line, const char* format, ...)
 	vsprintf_s(tmp_string, 4096, format, ap);
 
 	// Filtering
-	strcpy(log_type, format);
-	strcat(log_type, "%c");
-	vsprintf(final_log, log_type, ap);
+	strcpy_s(log_type, format);
+	strcat_s(log_type, "%c");
+	vsprintf_s(final_log, log_type, ap);
 	char char_type = final_log[strlen(final_log)-1];
 
 	va_end(ap);

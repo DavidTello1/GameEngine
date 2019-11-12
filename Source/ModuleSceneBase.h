@@ -1,10 +1,6 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
-#include "GameObject.h"
-
-#include "MathGeoLib/include/MathBuildConfig.h"
-#include "MathGeoLib/include/MathGeoLib.h"
 
 class ModuleSceneBase : public Module
 {

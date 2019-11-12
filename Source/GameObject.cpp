@@ -33,7 +33,7 @@ GameObject::~GameObject()
 	// Delete from parent
 	if (parent)
 	{
-		for (int i = 0; i < parent->childs.size(); i++)
+		for (uint i = 0; i < parent->childs.size(); i++)
 		{
 			if (parent->childs[i] == this)
 			{
@@ -54,6 +54,7 @@ GameObject::~GameObject()
 
 	LogAction("Deleted");
 }
+
 void GameObject::Select()
 {
 	hierarchy_flags |= ImGuiTreeNodeFlags_Selected;
@@ -79,10 +80,6 @@ bool GameObject::ToggleSelection() // Toggles the state of the node, returns cur
 
 	return is_selected;
 }
-void GameObject::LogAction(const char * Action)
-{
-	LOG("%s node '%s', id: %ld ", Action, name, uid, 'd');
-}
 
 Component* GameObject::GetComponent(Component::Type type)
 {
@@ -102,11 +99,6 @@ Component* GameObject::AddComponent(Component::Type type)
 {
 	Component* new_component;
 
-	//if (GetComponent(type) != nullptr)
-	//{
-	//	LOG("GameObject already has component", 'e');
-	//	return nullptr;
-	//}
 	if (type == Component::Type::Unknown)
 	{
 		LOG("Unknown Component", 'e');
@@ -197,7 +189,6 @@ void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_m
 		{
 			GetMinMaxVertex(child, abs_max, abs_min);
 		}
-
 	}
 }
 
@@ -223,8 +214,8 @@ void GameObject::ChildDeleted()
 {
 	if (uid == 0) return;
 
-	if (HasChilds()) {
-
+	if (HasChilds()) 
+	{
 		min_vertex = childs.back()->min_vertex;
 		max_vertex = childs.back()->max_vertex;
 
@@ -236,11 +227,12 @@ void GameObject::ChildDeleted()
 	{
 		GenBoundingBox(true);
 	}
-
 }
+
 void GameObject::GenBoundingBox(bool to_delete)
 {
-	if (to_delete) {
+	if (to_delete) 
+	{
 		if (bb_VBO != 0)
 		{
 			glDeleteFramebuffers(1, &bb_VBO);
@@ -301,9 +293,4 @@ void GameObject::GenBoundingBox(bool to_delete)
 			LOG("{ %f , %f , %f }", bounding_box[i].x, bounding_box[i].y, bounding_box[i].z, 'v');
 		}
 	}
-}
-
-bool GameObject::HasChilds()
-{
-	return !childs.empty();
 }
