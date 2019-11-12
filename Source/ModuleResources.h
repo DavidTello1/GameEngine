@@ -23,31 +23,28 @@ public:
 	void ImportResource(const char* path);
 	void LoadResource(const char* path);
 	void UnLoadResource();
+	Resource::Type GetResource(UID uid);
 
-	void GenVBO(ComponentMesh * mesh_component);
-	void GenIBO(ComponentMesh * mesh_component);
-	void GenTexture(ComponentMesh * mesh_component);
-
-	void ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component);
-	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
-
-	void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, GameObject* parent = nullptr);
-
-public:
-	GLuint checker_texture;
-
-	const char* GetShapeName(shape_type type) { return shape_to_string[type];}
-
-private:
-	const char* shape_to_string[shape_type::UNKNOWN] =
-	{ "Cylinder","Cone", "Torus", "Sphere", "Bottle", "Knot",
-		"Hemisphere", "Plane", "Icosahedron", "Dodecahedron",
-		"Octahedron", "Tetrahedron", "Cube", "Rock" };
-
-	uint tex_height, tex_width;
-
-	void MakeCheckersTexture();
-
+//	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
+//	void LogImageInfo();
+//
+//	void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, GameObject* parent = nullptr);
+//
+//public:
+//	GLuint checker_texture;
+//
+//	const char* GetShapeName(shape_type type) { return shape_to_string[type]; }
+//
+//private:
+//	const char* shape_to_string[shape_type::UNKNOWN] =
+//	{ "Cylinder","Cone", "Torus", "Sphere", "Bottle", "Knot",
+//		"Hemisphere", "Plane", "Icosahedron", "Dodecahedron",
+//		"Octahedron", "Tetrahedron", "Cube", "Rock" };
+//
+//	uint tex_height, tex_width;
+//
+//	void MakeCheckersTexture();
+//
 public:
 	GLuint bbox_indices[24] =
 	{
