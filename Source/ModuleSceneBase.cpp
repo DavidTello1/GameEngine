@@ -66,7 +66,7 @@ void ModuleSceneBase::DrawGridPlane()
 
 	glBegin(GL_LINES);
 	glColor3ub(100, 100, 100);
-	float d = 40;
+	float d = plane_length;
 	for (float i = -d; i <= d; ++i)
 	{
 		glVertex3f(i, 0.f, 0.f);
@@ -92,17 +92,17 @@ void ModuleSceneBase::DrawAxis()
 	// x
 	glColor3ub(255, 0, 0);
 	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(axis_length, 0.0f, 0.0f);
 
 	//y
 	glColor3ub(0, 255, 0);
 	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.0f, axis_length, 0.0f);
 
 	// z
 	glColor3ub(0, 0, 255);
 	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, axis_length);
 
 	glColor3ub(255, 255, 255);
 

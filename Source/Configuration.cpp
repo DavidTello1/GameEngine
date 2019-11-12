@@ -4,7 +4,6 @@
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
 #include "ModuleRenderer3D.h"
-#include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
 #include "ModuleFileSystem.h"
 #include "ModuleScene.h"
@@ -89,6 +88,12 @@ void Configuration::DrawScene()
 		ImGui::ColorEdit3("Bounding box color", (float*)&App->scene->bounding_box_color);
 		ImGui::DragFloat("Bounding box width", &App->scene->bounding_box_width, 0.1f,0.1f,5.0f);
 
+		ImGui::Separator();
+
+		ImGui::DragFloat("Plane length", &App->scene_base->plane_length, 1.0f, 0.0f, 5000.0f);
+		ImGui::DragFloat("Axis length", &App->scene_base->axis_length, 1.0f, 0.0f, 5000.0f);
+		//ImGui::InputFloat("Axis length", &App->scene_base->axis_length, 1.0f, 5.0f, 0);
+		//ImGui::InputFloat("Plane length", &App->scene_base->plane_length, 1.0f, 5.0f, 0);
 	}
 }
 

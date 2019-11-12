@@ -19,9 +19,13 @@ public:
 
 	bool Draw();
 
+	float plane_length = 40.0f;
+	float axis_length = 40.0f;
+
 private:
 
 	void DrawGridPlane();
 	void DrawAxis();
+
 };
 

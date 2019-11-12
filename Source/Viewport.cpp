@@ -46,7 +46,8 @@ bool Viewport::PreUpdate()
 	ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
 	glLoadMatrixf(camera->GetViewMatrix());
 
-	camera->viewport_focus = ImGui::IsWindowFocused();
+	// Makes and assertion
+	//camera->viewport_focus = ImGui::IsWindowFocused();
 
 	App->scene_base->Draw();
 	App->scene->Draw();

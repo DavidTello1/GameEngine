@@ -25,7 +25,7 @@ bool ModuleScene::Start(Config* config)
 
 	// Create game objects after this ----------
 
-	main_camera = CreateGameObject("Camera");
+	main_camera = CreateGameObject("Main Camera");
 	main_camera->AddComponent(Component::Type::Camera);
 		
 	GameObject* bparent = CreateGameObject("BakerHouse");
