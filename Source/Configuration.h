@@ -61,6 +61,8 @@ public:
 
 	void DrawScene();
 
+	void DrawMainCamera();
+
 	bool InitModuleDraw(Module* module);
 	void DrawApplication();
 	void DrawHardware();

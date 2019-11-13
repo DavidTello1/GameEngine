@@ -17,9 +17,18 @@ public:
 	void Look(const vec3 &Position, const vec3 &Reference, bool RotateAroundReference = false);
 	void LookAt(const vec3 &Spot);
 	void Move(const vec3 &Movement);
+
 	float* GetViewMatrix();
 
+	float * GetProjectionMatrix();
+
 	void CalculateViewMatrix();
+
+	void CalculateProjectionMatrix();
+
+	mat4x4 SetFrustum(float l, float r, float b, float t, float n, float f);
+
+	mat4x4 SetFrustum(float fovY, float aspectRatio, float front, float back);
 
 public:
 	vec3 X = { 1.0f, 0.0f, 0.0f };
@@ -33,12 +42,26 @@ public:
 	vec3 Position, Reference;
 	bool viewport_focus;
 
+public:
+
+	float z_near = 1.0f;
+	float z_far = 10.0f;
+
+	float left		= 0.0f;
+	float right		= 0.0f; 
+	float bottom	= 0.0f; 
+	float top		= 0.0f;
+
+	float fov_y = 60.0f;
+	float fov_x;
+
+	float width;
+	float height;
+
 private:
 
-	float z_near;
-	float z_far;
-
 	mat4x4 ViewMatrix;
+	mat4x4 ProjectionMatrix;
 };
 
 

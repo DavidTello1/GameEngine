@@ -483,7 +483,9 @@
     <ClInclude Include="par_shapes.h">
       <Filter>Sources\Containers\par_shapes</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentCamera.h" />
+    <ClInclude Include="ComponentCamera.h">
+      <Filter>Sources\GameObjects\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -696,7 +698,9 @@
     <ClCompile Include="par_shapes.cpp">
       <Filter>Sources\Containers\par_shapes</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentCamera.cpp" />
+    <ClCompile Include="ComponentCamera.cpp">
+      <Filter>Sources\GameObjects\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

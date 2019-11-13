@@ -26,10 +26,16 @@ Viewport::~Viewport()
 // Is not automatically called
 bool Viewport::PreUpdate()
 {
+	ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
+
 	if (width != window_avail_size.x || height != window_avail_size.y)
 	{
 		width = window_avail_size.x;
 		height = window_avail_size.y;
+
+		camera->width = width;
+		camera->height = height;
+		camera->CalculateProjectionMatrix();
 
 		GenerateFBO(ImVec2(width, height));
 		OnResize(width, height);
@@ -40,10 +46,11 @@ bool Viewport::PreUpdate()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
-	glLoadIdentity();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(camera->GetProjectionMatrix());
 
 	glMatrixMode(GL_MODELVIEW);
-	ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
 	glLoadMatrixf(camera->GetViewMatrix());
 
 	// Makes and assertion

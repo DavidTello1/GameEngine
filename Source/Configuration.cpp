@@ -8,6 +8,7 @@
 #include "ModuleFileSystem.h"
 #include "ModuleScene.h"
 #include "ComponentMaterial.h"
+#include "ComponentCamera.h"
 
 #include "gpudetect/DeviceId.h"
 #include "Devil/include/IL/il.h"
@@ -72,6 +73,8 @@ void Configuration::Draw()
 		DrawModuleFileSystem(App->file_system);
 
 	DrawScene();
+
+	DrawMainCamera();
 }
 
 void Configuration::DrawScene()
@@ -92,6 +95,21 @@ void Configuration::DrawScene()
 
 		ImGui::DragFloat("Plane length", &App->scene_base->plane_length, 1.0f, 0.0f, 5000.0f);
 		ImGui::DragFloat("Axis length", &App->scene_base->axis_length, 1.0f, 0.0f, 5000.0f);
+	}
+}
+
+void Configuration::DrawMainCamera()
+{
+	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
+
+		if (ImGui::DragFloat("Fov Y",  &camera->fov_y,	0.25f, 0.0f, 180.0f) ||
+			ImGui::DragFloat("Z Near", &camera->z_near,	0.25f, 1.0f, camera->z_far) ||
+			ImGui::DragFloat("Z Far",  &camera->z_far,	0.25f, 0.0f, 5000.0f))
+		{
+			camera->CalculateProjectionMatrix();
+		}
 	}
 }
 

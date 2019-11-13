@@ -101,12 +101,46 @@ float* ComponentCamera::GetViewMatrix()
 	return &ViewMatrix;
 }
 
+float* ComponentCamera::GetProjectionMatrix()
+{
+	return &ProjectionMatrix;
+}
+
 // -----------------------------------------------------------------
 void ComponentCamera::CalculateViewMatrix()
 {
 	ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
 }
 
+void ComponentCamera::CalculateProjectionMatrix()
+{
+	ProjectionMatrix = SetFrustum(fov_y, width / height, z_near, z_far);
+}
+
+mat4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, float f)
+{
+	mat4x4 matrix;
+	matrix[0] = 2 * n / (r - l);
+	matrix[5] = 2 * n / (t - b);
+	matrix[8] = (r + l) / (r - l);
+	matrix[9] = (t + b) / (t - b);
+	matrix[10] = -(f + n) / (f - n);
+	matrix[11] = -1;
+	matrix[14] = -(2 * f * n) / (f - n);
+	matrix[15] = 0;
+
+	return matrix;
+}
+
+mat4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, float back)
+{
+	float tangent = tanf(fovY / 2 * DEGTORAD);   // tangent of half fovY
+	float height = front * tangent;           // half height of near plane
+	float width = height * aspectRatio;       // half width of near plane
+
+	// params: left, right, bottom, top, near, far
+	return SetFrustum(-width, width, -height, height, front, back);
+}
 
 
 //#include "ComponentCamera.h"
