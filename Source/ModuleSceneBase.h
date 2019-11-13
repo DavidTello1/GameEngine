@@ -2,6 +2,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "GameObject.h"
+#include "ComponentCamera.h"
 
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
@@ -15,6 +16,7 @@ public:
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
 	bool PostUpdate(float dt);
+	void UpdateMainCamera(float dt);
 	bool CleanUp();
 
 	bool Draw();
@@ -31,6 +33,11 @@ public:
 	float bounding_box_width = 1.0f;
 	bool show_all_bounding_box = false;
 
+	// Viewport camera
+	static GameObject* main_camera_object;
+	static ComponentCamera* main_camera;
+
+	float zoom_speed = 75.0f;
 private:
 
 	void DrawGridPlane();

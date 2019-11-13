@@ -21,7 +21,6 @@ public:
 
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
-	void UpdateMainCamera(float dt);
 	bool PostUpdate(float dt);
 	bool CleanUp();
 
@@ -34,7 +33,7 @@ public:
 	void DeleteSelected();
 
 	GameObject* GetSelectedGameObject() { 
-		for (int i=0;i<gameObjects.size();i++)
+		for (uint i=0;i<gameObjects.size();i++)
 			if (gameObjects[i]->is_selected)
 				return gameObjects[i];
 		return nullptr;
@@ -49,6 +48,7 @@ public:
 	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 
 public:
+
 	char scene_name[NAME_LENGTH];
 	void SetSceneName(const char* name)	{strcpy_s(scene_name, name);}
 
@@ -58,14 +58,9 @@ public:
 	std::vector<GameObject*> gameObjects;
 	   
 	static GameObject* root_object;
-	static GameObject* main_camera;
-
-	float zoom_speed = 75.0f;
 
 private:
+
 	GameObject* selected_gameobj = nullptr;
 
-	//Hierarchy --------------------------------
-
-public:
 };

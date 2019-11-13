@@ -26,16 +26,16 @@ Viewport::~Viewport()
 // Is not automatically called
 bool Viewport::PreUpdate()
 {
-	ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
+	//ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
 
 	if (width != window_avail_size.x || height != window_avail_size.y)
 	{
 		width = window_avail_size.x;
 		height = window_avail_size.y;
 
-		camera->width = width;
-		camera->height = height;
-		camera->CalculateProjectionMatrix();
+		ModuleSceneBase::main_camera->width = width;
+		ModuleSceneBase::main_camera->height = height;
+		ModuleSceneBase::main_camera->CalculateProjectionMatrix();
 
 		GenerateFBO(ImVec2(width, height));
 		OnResize(width, height);
@@ -48,10 +48,10 @@ bool Viewport::PreUpdate()
 
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(camera->GetProjectionMatrix());
+	glLoadMatrixf(ModuleSceneBase::main_camera->GetProjectionMatrix());
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(camera->GetViewMatrix());
+	glLoadMatrixf(ModuleSceneBase::main_camera->GetViewMatrix());
 
 	// Makes and assertion
 	//camera->viewport_focus = ImGui::IsWindowFocused();
