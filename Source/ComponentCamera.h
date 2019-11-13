@@ -30,6 +30,8 @@ public:
 
 	mat4x4 SetFrustum(float fovY, float aspectRatio, float front, float back);
 
+	mat4x4 SetOrthoFrustum(float l, float r, float b, float t, float n, float f);
+
 public:
 	vec3 X = { 1.0f, 0.0f, 0.0f };
 	vec3 Y = { 0.0f, 1.0f, 0.0f };
@@ -44,13 +46,10 @@ public:
 
 public:
 
-	float z_near = 1.0f;
-	float z_far = 10.0f;
+	bool perspective = true;
 
-	float left		= 0.0f;
-	float right		= 0.0f; 
-	float bottom	= 0.0f; 
-	float top		= 0.0f;
+	float z_near = 1.0f;
+	float z_far = 100.0f;
 
 	float fov_y = 60.0f;
 	float fov_x;

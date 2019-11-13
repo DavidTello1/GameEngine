@@ -104,7 +104,8 @@ void Configuration::DrawMainCamera()
 	{
 		ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
 
-		if (ImGui::DragFloat("Fov Y",  &camera->fov_y,	0.25f, 0.0f, 180.0f) ||
+		if (ImGui::Checkbox("Perspective (activated) - Orthogonal (deactivated)", &camera->perspective) ||
+			ImGui::DragFloat("Fov Y",  &camera->fov_y,	0.25f, 0.0f, 180.0f) ||
 			ImGui::DragFloat("Z Near", &camera->z_near,	0.25f, 1.0f, camera->z_far) ||
 			ImGui::DragFloat("Z Far",  &camera->z_far,	0.25f, 0.0f, 5000.0f))
 		{

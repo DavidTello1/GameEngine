@@ -139,9 +139,22 @@ mat4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, f
 	float width = height * aspectRatio;       // half width of near plane
 
 	// params: left, right, bottom, top, near, far
-	return SetFrustum(-width, width, -height, height, front, back);
+	if (perspective)
+		return SetFrustum(-width, width, -height, height, front, back);
+	return SetOrthoFrustum(-width, width, -height, height, front, back);
 }
 
+mat4x4 ComponentCamera::SetOrthoFrustum(float l, float r, float b, float t, float n, float f)
+{
+	mat4x4 matrix;
+	matrix[0] = 2 / (r - l);
+	matrix[5] = 2 / (t - b);
+	matrix[10] = -2 / (f - n);
+	matrix[12] = -(r + l) / (r - l);
+	matrix[13] = -(t + b) / (t - b);
+	matrix[14] = -(f + n) / (f - n);
+	return matrix;
+}
 
 //#include "ComponentCamera.h"
 //#include "GameObject.h"
