@@ -52,7 +52,7 @@ bool ResourceMesh::Import(const char* file, const char* path, const char* buffer
 	if (num_vertices <= 0)
 	{
 		LOG("Mesh has no vertices", 'e');
-		return;
+		return false;
 	}
 
 	LOG("Importing vertices %u", mesh->mNumVertices, 'g');

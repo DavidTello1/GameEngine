@@ -332,26 +332,6 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				if (ImGui::MenuItem("Show Axis", NULL, &is_axis))
 					show_axis = !show_axis;
 
-				ImGui::Separator();
-
-				//if (ImGui::MenuItem("Top"))
-				//	//top
-
-				//if (ImGui::MenuItem("Bottom"))
-				//	//bottom
-
-				//if (ImGui::MenuItem("Front"))
-				//	//front
-
-				//if (ImGui::MenuItem("Back"))
-				//	//back
-
-				//if (ImGui::MenuItem("Left"))
-				//	//left
-
-				//if (ImGui::MenuItem("Right"))
-				//	//right
-
 				ImGui::EndMenu();
 			}
 
@@ -384,7 +364,6 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 						ImGui::StyleColorsLight();
 						style = Style::LIGHT;
 					}
-
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();
@@ -424,7 +403,6 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 
 				ImGui::EndMenu();
 			}
-
 			ImGui::EndMainMenuBar();
 		}
 	}

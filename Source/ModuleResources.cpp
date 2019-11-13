@@ -7,7 +7,6 @@
 #include "ResourceMesh.h"
 #include "ResourceMaterial.h"
 #include "Config.h"
-#include <string>
 
 #include "Assimp/include/cimport.h"
 #include "Assimp/include/scene.h"
@@ -60,35 +59,116 @@ bool ModuleResources::CleanUp()
 	return true;
 }
 
-void ModuleResources::ImportResource(const char* path)
+bool ModuleResources::ImportResource(const char* path, UID uid)
 {
-	GameObject* object = nullptr;
+	std::string final_path;
+	App->file_system->SplitFilePath(path, nullptr, &final_path);
+	final_path = ASSETS_FOLDER + final_path;
 
-	// name
-	const char* file_name = strrchr(path, 92) ;
-	if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "GameObject";
-	file_name++;
-
-	//type
-	char extension[32];
-	const char* last_dot = strrchr(path, '.');
-	strcpy_s(extension, last_dot + 1);
-
-	for (uint i = 0; i < strlen(extension); i++)
+	if (App->file_system->CopyFromOutsideFS(path, final_path.c_str()) == true) //copy file to final_path
 	{
-		extension[i] = tolower(extension[i]);
-	}
+		// Get Extension
+		std::string extension;
+		App->file_system->SplitFilePath(path, nullptr, nullptr, &extension);
 
-	if (strcmp("obj", extension) == 0 || strcmp("fbx", extension) == 0) // Model
-	{
-		ResourceModel* model = new ResourceModel();
+		// Get Type
+		Resource::Type type;
+		if (strcmp("obj", extension.c_str()) == 0 || strcmp("fbx", extension.c_str()) == 0)
+		{
+			type = Resource::Type::model;
+			LOG("Importing resource model from %s", path, 'd');
+		}
+		else if (strcmp("dds", extension.c_str()) == 0 || strcmp("png", extension.c_str()) == 0 || strcmp("jpg", extension.c_str()) == 0)
+		{
+			type = Resource::Type::material;
+			LOG("Importing resource material from %s", path, 'd');
+		}
+		else
+		{
+			type = Resource::Type::unknown;
+			LOG("File format not supported from %s", path, 'e');
+			return false;
+		}
+
+		// Check if file has already been loaded
+		std::string file = final_path;
+		App->file_system->NormalizePath(file);
+		for (std::map<UID, Resource*>::const_iterator it = resources.begin(); it != resources.end(); ++it)
+		{
+			if (it->second->file.compare(file) == 0)
+			{
+				uid = it->first;
+				LOG("File is already loaded in memory", 'd');
+				return true;
+			}
+		}
+
+		// Import file
+		bool import_ok = false;
+		std::string written_file;
+
+		switch (type)
+		{
+		case Resource::model:
+			import_ok = ResourceModel::Import(final_path, written_file);
+			break;
+		case Resource::material:
+			import_ok = ResourceMaterial::Import(final_path, written_file);
+			break;
+		}
+
+		// Check if import went ok
+		if (import_ok == true)
+		{
+			// Create new Resource
+			Resource* res = CreateResource(type);
+			res->file = final_path;
+			App->file_system->NormalizePath(res->file);
+			uid = res->uid;
+
+			// Exported file of Resource
+			std::string exported_file;
+			App->file_system->SplitFilePath(written_file.c_str(), nullptr, &exported_file);
+			res->exported_file = exported_file.c_str();
+			//LOG("Imported successful from [%s] to [%s]", res->GetFile(), res->GetExportedFile());
+
+			// Name of Resource
+			std::string name;
+			App->file_system->SplitFilePath(final_path.c_str(), nullptr, &name);
+			App->file_system->SplitFilePath(res->file.c_str(), nullptr, &res->name);
+
+			res->name = name;
+			if (res->name.empty())
+				res->name = res->exported_file;
+
+			size_t pos_dot = res->name.find_last_of(".");
+			if (pos_dot != std::string::npos)
+				res->name.erase(res->name.begin() + pos_dot, res->name.end());
+		}
+		else
+		{
+			LOG("Importing of [%s] FAILED", final_path);
+			return false;
+		}
+		return true;
 	}
-	else if (strcmp("dds", extension) == 0 || strcmp("png", extension) == 0 || strcmp("jpg", extension) == 0) // Texture
-	{
-		ResourceMaterial* material = new ResourceMaterial();
-	}
-	else
-		LOG("File format not supported", 'e');
+	return false;
+
+	//// name
+	//const char* file_name = strrchr(path, 92) ;
+	//if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "GameObject";
+	//file_name++;
+
+	////type
+	//char extension[32];
+	//const char* last_dot = strrchr(path, '.');
+	//strcpy_s(extension, last_dot + 1);
+
+	//for (uint i = 0; i < strlen(extension); i++)
+	//{
+	//	extension[i] = tolower(extension[i]);
+	//}
+
 
 
 	//else if (type == Component::Type::Material) // Texture
@@ -165,10 +245,6 @@ void ModuleResources::ImportResource(const char* path)
 	//	}
 	//	
 	//}
-}
-
-void ModuleResources::UnLoadResource()
-{
 }
 
 //GLuint ModuleResources::ImportTexture(int width, int height,int internal_format, int format, unsigned char* image)

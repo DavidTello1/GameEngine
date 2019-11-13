@@ -6,6 +6,8 @@ class Config;
 
 class Resource
 {
+	friend class ModuleResources;
+
 public:
 	enum Type
 	{
@@ -22,8 +24,8 @@ public:
 	Resource::Type GetType() const { return type; }
 	UID GetID() const { return uid; }
 
-	const char* GetName() const { return name; }
-	void SetName(const char* n) { name = n; }
+	const char* GetName() const { return name.c_str(); }
+	void SetName(std::string n) { name = n; }
 
 	virtual bool Import();
 	virtual bool Load();
@@ -50,10 +52,10 @@ public:
 protected:
 	UID uid = 0;
 	Type type = unknown;
-	const char* name;
+	std::string name;
 
-	//std::string file;
-	//std::string exported_file;
+	std::string file;
+	std::string exported_file;
 
 	//uint loaded = 0;
 };

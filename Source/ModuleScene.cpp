@@ -26,8 +26,8 @@ bool ModuleScene::Start(Config* config)
 		
 	GameObject* bparent = CreateGameObject("BakerHouse");
 
-	App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
-	App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
+	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
+	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
 
 	// ParShapes 
 	/*GameObject* pparent = CreateGameObj("ParShapes");

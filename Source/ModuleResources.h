@@ -4,7 +4,12 @@
 #include "Module.h"
 #include "Resource.h"
 #include "Hierarchy.h"
+
 #include <vector>
+#include <map>
+#include <string>
+
+#include "glew\include\GL\glew.h"
 
 class Resource;
 class ResourceMesh;
@@ -20,10 +25,16 @@ public:
 	bool Start(Config* config = nullptr);
 	bool CleanUp();
 
-	void ImportResource(const char* path);
-	void LoadResource(const char* path);
-	void UnLoadResource();
-	Resource::Type GetResource(UID uid);
+	bool ImportResource(const char* path, UID uid = 0);
+
+	Resource* CreateResource(Resource::Type type, UID uid = 0);
+	void RemoveResource(UID uid);
+
+	const Resource* GetResource(UID uid) const;
+	Resource * GetResource(UID uid);
+
+	UID GenerateUID();
+
 
 //	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
 //	void LogImageInfo();
@@ -52,6 +63,11 @@ public:
 		4,5,6,7,4,7,5,6,
 		0,4,1,5,2,6,3,7
 	};
+
+private:
+	std::map<UID, Resource*> resources;
+	std::vector<Resource*> removed;
+
 };
 
 #endif
