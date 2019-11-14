@@ -28,10 +28,11 @@ public:
 	void SetName(std::string n) { name = n; }
 
 	virtual bool Import();
-	virtual bool Load();
-	virtual bool UnLoad();
+	virtual bool SaveOwnFormat();
 	virtual void Draw();
 
+	virtual void Save(Config& config) const;
+	virtual void Load(const Config& config);
 
 	//const char*         GetFile() const;
 	//const char*         GetExportedFile() const;
@@ -41,13 +42,9 @@ public:
 
 	//uint                CountReferences() const;
 
-	//virtual void        Save(Config& config) const;
-	//virtual void        Load(const Config& config);
-//
-//protected:
-//
-//	virtual bool    LoadInMemory() = 0;
-//	virtual void    ReleaseFromMemory() = 0;
+protected:
+	virtual bool LoadtoScene() = 0;
+	virtual bool UnLoad() = 0;
 
 protected:
 	UID uid = 0;
@@ -57,5 +54,5 @@ protected:
 	std::string file;
 	std::string exported_file;
 
-	//uint loaded = 0;
+	uint loaded = 0;
 };

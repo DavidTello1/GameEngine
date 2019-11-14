@@ -247,6 +247,38 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 	//}
 }
 
+Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
+{
+	Resource* ret = nullptr;
+	UID uid;
+
+	if (force_uid != 0 && GetResource(force_uid) == nullptr)
+		uid = force_uid;
+	else
+		uid = GenerateUID();
+
+	switch (type)
+	{
+	case Resource::model:
+		ret = new ResourceModel(uid);
+		break;
+	case Resource::mesh:
+		ret = (Resource*) new ResourceMesh(uid);
+		break;
+	case Resource::material:
+		ret = (Resource*) new ResourceMaterial(uid);
+		break;
+	}
+
+	if (ret != nullptr)
+	{
+		resources[uid] = ret;
+	}
+
+	return ret;
+}
+
+
 //GLuint ModuleResources::ImportTexture(int width, int height,int internal_format, int format, unsigned char* image)
 //{
 //	//LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image)*sizeof(unsigned char), 'g');
