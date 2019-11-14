@@ -34,13 +34,11 @@ public:
 	virtual void Save(Config& config) const;
 	virtual void Load(const Config& config);
 
-	//const char*         GetFile() const;
-	//const char*         GetExportedFile() const;
-	//bool                IsLoadedToMemory() const;
-	//bool                LoadToMemory();
-	//void                Release();
+	const char* GetFile() const { return file.c_str(); }
+	const char* GetExportedFile() const { return exported_file.c_str(); }
+	bool IsLoadedToMemory() const { return loaded > 0; }
 
-	//uint                CountReferences() const;
+	uint CountReferences() const { return loaded; }
 
 protected:
 	virtual bool LoadtoScene() = 0;

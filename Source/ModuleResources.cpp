@@ -130,7 +130,7 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 			std::string exported_file;
 			App->file_system->SplitFilePath(written_file.c_str(), nullptr, &exported_file);
 			res->exported_file = exported_file.c_str();
-			//LOG("Imported successful from [%s] to [%s]", res->GetFile(), res->GetExportedFile());
+			LOG("Imported successful from [%s] to [%s]", res->GetFile(), res->GetExportedFile());
 
 			// Name of Resource
 			std::string name;
