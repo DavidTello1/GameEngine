@@ -7,16 +7,37 @@
 #include "ModuleScene.h"
 #include "mmgr/mmgr.h"
 
+GLuint ComponentCamera::frustum_indices[24] =
+{
+	0,1,2,3,0,3,1,2,
+	4,5,6,7,4,7,5,6,
+	0,4,1,5,2,6,3,7
+};
+
 ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Type::Camera, gameobj)
 {
 	CalculateViewMatrix();
+	CalculateProjectionMatrix();
+
+	//frustum_vertices = new float3[8];
 
 	Position = vec3(0.0f, 0.0f, 5.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 }
 
 ComponentCamera::~ComponentCamera()
-{}
+{
+	//RELEASE_ARRAY(frustum_vertices);
+	
+	if (VBO != 0)
+	{
+		glDeleteFramebuffers(1, &VBO);
+	}
+	if (IBO != 0)
+	{
+		glDeleteBuffers(1, &IBO);
+	}
+}
 
 
 void ComponentCamera::RotateWithMouse() {
@@ -117,8 +138,31 @@ void ComponentCamera::CalculateProjectionMatrix()
 	ProjectionMatrix = SetFrustum(fov_y, width / height, z_near, z_far);
 }
 
+//void ComponentCamera::DrawFrustrum()
+//{
+//	glEnableClientState(GL_VERTEX_ARRAY);
+//	if (VBO != 0)
+//	{
+//		glColor3ub(255.0f, 0.0f, 0.0f);
+//		glLineWidth(3.0f);
+//
+//		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//		glVertexPointer(3, GL_FLOAT, 0, NULL);
+//
+//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+//		glDrawElements(GL_LINES, sizeof(frustum_indices), GL_UNSIGNED_INT, nullptr);
+//
+//
+//		glBindBuffer(GL_ARRAY_BUFFER, 0);
+//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+//		glColor3ub(255, 255, 255);
+//	}
+//	glDisableClientState(GL_VERTEX_ARRAY);
+//}
+
 mat4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, float f)
 {
+
 	mat4x4 matrix;
 	matrix[0] = 2 * n / (r - l);
 	matrix[5] = 2 * n / (t - b);
@@ -129,7 +173,121 @@ mat4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, 
 	matrix[14] = -(2 * f * n) / (f - n);
 	matrix[15] = 0;
 
+	/*frustum_vertices[0] = {Position.x + r,Position.y + b,Position.z + n};
+	frustum_vertices[1] = {Position.x + r,Position.y + b,Position.z + f};
+	frustum_vertices[2] = {Position.x + l,Position.y + b,Position.z + f};
+	frustum_vertices[3] = {Position.x + l,Position.y + b,Position.z + n};
+	frustum_vertices[4] = {Position.x + r,Position.y + t,Position.z + n};
+	frustum_vertices[5] = {Position.x + r,Position.y + t,Position.z + f};
+	frustum_vertices[6] = {Position.x + l,Position.y + t,Position.z + f};
+	frustum_vertices[7] = {Position.x + l,Position.y + t,Position.z + n};
+
+	if (VBO == 0) glGenBuffers(1, &VBO);
+
+	if (IBO == 0) glGenBuffers(1, &IBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(frustum_vertices), frustum_vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(frustum_indices), frustum_vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
+
+	
+
 	return matrix;
+}
+
+void ComponentCamera::DrawFrustum() {
+
+	float *proj = ProjectionMatrix.M;
+	
+
+	// Get near and far from the Projection matrix.
+	const double n = proj[11] / (proj[10] - 1.0);
+	const double f = proj[11] / (1.0 + proj[10]);
+
+	// Get the sides of the n plane.
+	const double nLeft = n * (proj[2] - 1.0) / proj[0];
+	const double nRight = n * (1.0 + proj[2]) / proj[0];
+	const double nTop = n * (1.0 + proj[6]) / proj[5];
+	const double nBottom = n * (proj[6] - 1.0) / proj[5];
+
+	// Get the sides of the f plane.
+	const double fLeft = f * (proj[2] - 1.0) / proj[0];
+	const double fRight = f * (1.0 + proj[2]) / proj[0];
+	const double fTop = f * (1.0 + proj[6]) / proj[5];
+	const double fBottom = f * (proj[6] - 1.0) / proj[5];
+
+	/*
+	 0	glVertex3f(0.0f, 0.0f, 0.0f);
+	 1	glVertex3f(nLeft, nBottom, -n);
+	 2	glVertex3f(nRight, nBottom, -n);
+	 3	glVertex3f(nRight, nTop, -n);
+	 4	glVertex3f(nLeft, nTop, -n);
+	 5	glVertex3f(fLeft, fBottom, -f);
+	 6	glVertex3f(fRight, fBottom, -f);
+	 7	glVertex3f(fRight, fTop, -f);
+	 8	glVertex3f(fLeft, fTop, -f);
+	 */
+
+	//glMatrixMode(GL_MODELVIEW);
+	//glPushMatrix();
+	//glLoadIdentity ();
+
+		// TODO - Update: You need to invert the mv before multiplying it with the current mv!
+
+	//glMultMatrixf(ViewMatrix.M);
+
+	glLineWidth(2);
+	glColor3ub(255.0f,0.0f,0.0f);
+	glBegin(GL_LINES);
+	
+	//glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(nLeft, nBottom, -n);
+	glVertex3f(fLeft, fBottom, -f);
+
+	glVertex3f(nRight, nBottom, -n);
+	glVertex3f(fRight, fBottom, -f);
+
+	glVertex3f(nRight, nTop, -n);
+	glVertex3f(fRight, fTop, -f);
+
+	glVertex3f(nLeft, nTop, -n);
+	glVertex3f(fLeft, fTop, -f);
+
+	//f
+	glVertex3f(fLeft, fBottom, -f);
+	glVertex3f(fRight, fBottom, -f);
+
+	glVertex3f(fRight, fTop, -f);
+	glVertex3f(fLeft, fTop, -f);
+
+	glVertex3f(fRight, fTop, -f);
+	glVertex3f(fRight, fBottom, -f);
+
+	glVertex3f(fLeft, fTop, -f);
+	glVertex3f(fLeft, fBottom, -f);
+
+	//n
+	glVertex3f(nLeft, nBottom, -n);
+	glVertex3f(nRight, nBottom, -n);
+
+	glVertex3f(nRight, nTop, -n);
+	glVertex3f(nLeft, nTop, -n);
+
+	glVertex3f(nLeft, nTop, -n);
+	glVertex3f(nLeft, nBottom, -n);
+
+	glVertex3f(nRight, nTop, -n);
+	glVertex3f(nRight, nBottom, -n);
+
+	glEnd();
+	glLineWidth(1);
+	glPopMatrix();
+
+	glColor3ub(255.0f, 255.0f, 255.0f);
 }
 
 mat4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, float back)
@@ -146,6 +304,27 @@ mat4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, f
 
 mat4x4 ComponentCamera::SetOrthoFrustum(float l, float r, float b, float t, float n, float f)
 {
+	/*frustum_vertices[0] = { Position.x + r,Position.y + b,Position.z + n };
+	frustum_vertices[1] = { Position.x + r,Position.y + b,Position.z + f };
+	frustum_vertices[2] = { Position.x + l,Position.y + b,Position.z + f };
+	frustum_vertices[3] = { Position.x + l,Position.y + b,Position.z + n };
+	frustum_vertices[4] = { Position.x + r,Position.y + t,Position.z + n };
+	frustum_vertices[5] = { Position.x + r,Position.y + t,Position.z + f };
+	frustum_vertices[6] = { Position.x + l,Position.y + t,Position.z + f };
+	frustum_vertices[7] = { Position.x + l,Position.y + t,Position.z + n };
+
+	if (VBO == 0) glGenBuffers(1, &VBO);
+
+	if (IBO == 0) glGenBuffers(1, &IBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(frustum_vertices), frustum_vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(frustum_indices), frustum_vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
+
 	mat4x4 matrix;
 	matrix[0] = 2 / (r - l);
 	matrix[5] = 2 / (t - b);

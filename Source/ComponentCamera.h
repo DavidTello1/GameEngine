@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Component.h"
+#include "glew\include\GL\glew.h"
 
 #include "Globals.h"
 #include "glmath.h"
+#include "Math.h"
 
 class ComponentCamera : public Component
 {
@@ -27,6 +29,8 @@ public:
 	void CalculateProjectionMatrix();
 
 	mat4x4 SetFrustum(float l, float r, float b, float t, float n, float f);
+
+	void DrawFrustum();
 
 	mat4x4 SetFrustum(float fovY, float aspectRatio, float front, float back);
 
@@ -52,15 +56,21 @@ public:
 	float z_far = 100.0f;
 
 	float fov_y = 60.0f;
-	float fov_x;
 
-	float width;
-	float height;
+	float width = 1280.0f;
+	float height = 720.0f;
 
 private:
 
 	mat4x4 ViewMatrix;
 	mat4x4 ProjectionMatrix;
+
+	float3 frustum_vertices[8];
+
+	GLuint VBO = 0;
+	GLuint IBO = 0;
+
+	static GLuint frustum_indices[24];
 };
 
 

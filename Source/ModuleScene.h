@@ -59,6 +59,8 @@ public:
 	   
 	static GameObject* root_object;
 
+	GameObject* test_camera = nullptr;
+
 private:
 
 	GameObject* selected_gameobj = nullptr;

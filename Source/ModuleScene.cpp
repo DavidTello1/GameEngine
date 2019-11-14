@@ -27,10 +27,13 @@ bool ModuleScene::Start(Config* config)
 	ModuleSceneBase::main_camera_object = CreateGameObject("Main Camera");
 	ModuleSceneBase::main_camera = (ComponentCamera*)ModuleSceneBase::main_camera_object->AddComponent(Component::Type::Camera);
 		
-	GameObject* bparent = CreateGameObject("BakerHouse");
+	test_camera = CreateGameObject("test camera");
+	test_camera->AddComponent(Component::Type::Camera);
 
-	App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
-	App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
+	//GameObject* bparent = CreateGameObject("BakerHouse");
+
+	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
+	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
 
 	// ParShapes 
 	/*GameObject* pparent = CreateGameObj("ParShapes");
@@ -137,6 +140,12 @@ bool ModuleScene::Draw()
 			glColor3ub(255, 255, 255);
 		}
 		glDisableClientState(GL_VERTEX_ARRAY);
+
+		ComponentCamera* camera = (ComponentCamera*)obj->GetComponent(Component::Type::Camera);
+		if (camera != nullptr && camera != App->scene_base->main_camera)
+		{
+			camera->DrawFrustum();
+		}
 
 		glPopMatrix();
 	}
