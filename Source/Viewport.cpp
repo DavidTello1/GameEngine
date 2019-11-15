@@ -46,17 +46,20 @@ bool Viewport::PreUpdate()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
+	glMatrixMode(GL_MODELVIEW);
+	//glLoadMatrixf(ModuleSceneBase::main_camera->frustum.ViewProjMatrix().ptr());
+	//glLoadIdentity();
+	glLoadMatrixf(ModuleSceneBase::main_camera->GetViewMatrix());
+	glPopMatrix();
 
 	glMatrixMode(GL_PROJECTION);
-	//glLoadMatrixf(ModuleSceneBase::main_camera->GetProjectionMatrix());
-	glLoadMatrixf(ModuleSceneBase::main_camera->frustum.ProjectionMatrix().ptr());
+	glLoadIdentity();
+	glLoadMatrixf(ModuleSceneBase::main_camera->GetProjectionMatrix());
+	//glLoadMatrixf(ModuleSceneBase::main_camera->frustum.ProjectionMatrix().ptr());
 	glPopMatrix();
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glMultTransposeMatrixf(ModuleSceneBase::main_camera->frustum.ViewProjMatrix().Transposed().ptr());
 	//glLoadMatrixf(ModuleSceneBase::main_camera->frustum.ViewProjMatrix().Transposed().ptr());
-	glPopMatrix();
+	//glPopMatrix();
 
 	// Makes and assertion
 	//camera->viewport_focus = ImGui::IsWindowFocused();

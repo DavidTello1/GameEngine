@@ -22,7 +22,7 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 	//frustum_vertices = new float3[8];
 	frustum.pos = { 0,0,0 };
 	frustum.up = { 0,1,0 };
-	frustum.front = { 0,0,-1 };
+	frustum.front = { 0,0,1 };
 
 	Position = vec3(0.0f, 0.0f, 5.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
@@ -134,8 +134,11 @@ float* ComponentCamera::GetProjectionMatrix()
 void ComponentCamera::CalculateViewMatrix()
 {
 	//frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, -dot(X, Position), X.y, Y.y, Z.y, -dot(Y, Position), X.z, Y.z, Z.z, -dot(Z, Position)));
-	//ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
+	//frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, Position.x, X.y, Y.y, Z.y, Position.y, X.z, Y.z, Z.z, Position.z));
+	ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
 	frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f));// , -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f));
+	float3 up = { -dot(X, Position), -dot(Y, Position),-dot(Z, Position) };
+	frustum.up = up.Normalized();
 }
 
 void ComponentCamera::CalculateProjectionMatrix()
@@ -143,33 +146,13 @@ void ComponentCamera::CalculateProjectionMatrix()
 	frustum.nearPlaneDistance = z_near;
 	frustum.farPlaneDistance = z_far;
 	frustum.verticalFov = fov_y;
-	frustum.horizontalFov = 2 * Atan(tan(fov_y / 2) * width/height);
+	frustum.horizontalFov = 2 * Atan(tan(fov_y / 2) * width / height);
 	frustum.type = FrustumType::PerspectiveFrustum;
+	float3x4 view = frustum.ViewMatrix();
 	//ProjectionMatrix = frustum.ProjectionMatrix();
 	ProjectionMatrix = SetFrustum(fov_y, width / height, z_near, z_far);
 }
 
-//void ComponentCamera::DrawFrustrum()
-//{
-//	glEnableClientState(GL_VERTEX_ARRAY);
-//	if (VBO != 0)
-//	{
-//		glColor3ub(255.0f, 0.0f, 0.0f);
-//		glLineWidth(3.0f);
-//
-//		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//		glVertexPointer(3, GL_FLOAT, 0, NULL);
-//
-//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-//		glDrawElements(GL_LINES, sizeof(frustum_indices), GL_UNSIGNED_INT, nullptr);
-//
-//
-//		glBindBuffer(GL_ARRAY_BUFFER, 0);
-//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-//		glColor3ub(255, 255, 255);
-//	}
-//	glDisableClientState(GL_VERTEX_ARRAY);
-//}
 
 mat4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, float f)
 {
@@ -184,30 +167,19 @@ mat4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, 
 	matrix[14] = -(2 * f * n) / (f - n);
 	matrix[15] = 0;
 
-	/*frustum_vertices[0] = {Position.x + r,Position.y + b,Position.z + n};
-	frustum_vertices[1] = {Position.x + r,Position.y + b,Position.z + f};
-	frustum_vertices[2] = {Position.x + l,Position.y + b,Position.z + f};
-	frustum_vertices[3] = {Position.x + l,Position.y + b,Position.z + n};
-	frustum_vertices[4] = {Position.x + r,Position.y + t,Position.z + n};
-	frustum_vertices[5] = {Position.x + r,Position.y + t,Position.z + f};
-	frustum_vertices[6] = {Position.x + l,Position.y + t,Position.z + f};
-	frustum_vertices[7] = {Position.x + l,Position.y + t,Position.z + n};
-
-	if (VBO == 0) glGenBuffers(1, &VBO);
-
-	if (IBO == 0) glGenBuffers(1, &IBO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(frustum_vertices), frustum_vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(frustum_indices), frustum_vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
-
-	
-
 	return matrix;
+}
+
+mat4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, float back)
+{
+	float tangent = tanf(fovY / 2 * DEGTORAD);   // tangent of half fovY
+	float height = front * tangent;           // half height of near plane
+	float width = height * aspectRatio;       // half width of near plane
+
+	// params: left, right, bottom, top, near, far
+	if (perspective)
+		return SetFrustum(-width, width, -height, height, front, back);
+	return SetOrthoFrustum(-width, width, -height, height, front, back);
 }
 
 void ComponentCamera::DrawFrustum() {
@@ -301,17 +273,7 @@ void ComponentCamera::DrawFrustum() {
 	glColor3ub(255.0f, 255.0f, 255.0f);
 }
 
-mat4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, float back)
-{
-	float tangent = tanf(fovY / 2 * DEGTORAD);   // tangent of half fovY
-	float height = front * tangent;           // half height of near plane
-	float width = height * aspectRatio;       // half width of near plane
 
-	// params: left, right, bottom, top, near, far
-	if (perspective)
-		return SetFrustum(-width, width, -height, height, front, back);
-	return SetOrthoFrustum(-width, width, -height, height, front, back);
-}
 
 mat4x4 ComponentCamera::SetOrthoFrustum(float l, float r, float b, float t, float n, float f)
 {

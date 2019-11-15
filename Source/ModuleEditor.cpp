@@ -522,7 +522,7 @@ void ModuleEditor::ConfirmExit()
 	static ImVec2 size = ImVec2(0, 0);
 	static float pos = 0.0f;
 
-	if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)
+	if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN || App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 		close = true;
 
 	ImGui::OpenPopup("Quit");
