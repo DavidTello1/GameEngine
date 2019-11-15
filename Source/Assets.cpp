@@ -37,22 +37,23 @@ void Assets::Draw()
 
 		}
 
+		if (ImGui::MenuItem("Update Changes"))
+		{
+			//update changes from /Assets folder
+		}
 		ImGui::EndMenuBar();
 	}
 
 	// Child Hierarchy
-	ImGui::BeginChild("Hierarchy", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.2f, 0), true);
+	ImGui::BeginChild("Hierarchy", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.2f, 0), true, ImGuiWindowFlags_MenuBar);
 	
-	if (ImGui::TreeNode("Show All"))
+	if (ImGui::BeginMenu("Show All")) //Resource types
 	{
-		ImGui::Selectable("Meshes");
-		ImGui::Selectable("Materials");
-		ImGui::Selectable("Models");
-
-		ImGui::TreePop();
+		ImGui::MenuItem("Models");
+		ImGui::MenuItem("Meshes");
+		ImGui::MenuItem("Materials");
+		ImGui::EndMenu();
 	}
-
-	ImGui::Separator();
 
 	if (ImGui::TreeNode("Assets"))
 	{
@@ -71,6 +72,7 @@ void Assets::Draw()
 
 		ImGui::EndMenuBar();
 	}
+	// actual icons
 
 	ImGui::EndChild();
 }

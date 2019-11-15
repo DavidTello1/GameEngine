@@ -27,22 +27,21 @@ public:
 	const char* GetName() const { return name.c_str(); }
 	void SetName(std::string n) { name = n; }
 
-	virtual bool Import();
-	virtual bool SaveOwnFormat();
-	virtual void Draw();
-
 	virtual void Save(Config& config) const;
 	virtual void Load(const Config& config);
-
+	
 	const char* GetFile() const { return file.c_str(); }
 	const char* GetExportedFile() const { return exported_file.c_str(); }
-	bool IsLoadedToMemory() const { return loaded > 0; }
 
+	bool LoadToMemory();
+	void Release();
+	bool IsLoadedToMemory() const { return loaded > 0; }
 	uint CountReferences() const { return loaded; }
 
 protected:
-	virtual bool LoadtoScene() = 0;
-	virtual bool UnLoad() = 0;
+	virtual bool SaveOwnFormat(std::string& output) const;
+	virtual bool LoadtoScene();
+	virtual void UnLoad();
 
 protected:
 	UID uid = 0;
@@ -53,4 +52,6 @@ protected:
 	std::string exported_file;
 
 	uint loaded = 0;
+
+	//bool visible = true;
 };

@@ -14,6 +14,132 @@ ResourceMesh::ResourceMesh(UID uid) : Resource(uid, Resource::Type::mesh)
 
 ResourceMesh::~ResourceMesh()
 {
+}
+
+UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
+{
+	ResourceMesh* mesh = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh)); //create new resource
+
+	mesh->name = ai_mesh->mName.C_Str();
+	LOG("Importing mesh '%s'", (mesh->name.c_str()), 'g');
+
+	bool ret = mesh->LoadMesh(ai_mesh); //load mesh info (vertices, indices...)
+	if (!ret)
+		LOG("Error Importing info from mesh '%s'", (mesh->name.c_str()), 'e');
+
+	std::string output;
+	if (mesh->SaveOwnFormat(output)) //save to own format
+	{
+		mesh->file = source_file; //get file
+		App->file_system->NormalizePath(mesh->file);
+
+		std::string file_name; //get file name
+		App->file_system->SplitFilePath(output.c_str(), nullptr, &file_name);
+		mesh->exported_file = file_name;
+
+		LOG("Imported aiMesh from [%s] to [%s]", mesh->GetFile(), mesh->GetExportedFile());
+	}
+	else
+	{
+		LOG("Importing aiMesh %s FAILED", source_file);
+	}
+
+	mesh->UnLoad();
+
+	return mesh->uid;
+}
+
+bool ResourceMesh::SaveOwnFormat(std::string& output) const
+{
+	// amount of indices / vertices / normals / texture_coords / AABB
+	uint ranges[NUM_RANGES] = { num_vertices, num_indices, num_tex_coords, num_normals };
+	uint size = sizeof(ranges) + sizeof(uint) * num_indices + sizeof(float3) * num_vertices + sizeof(float3) * num_normals + sizeof(float)* num_tex_coords;
+
+	char* data = new char[size]; // Allocate
+	char* cursor = data;
+
+	uint bytes = sizeof(ranges); // First store ranges
+	memcpy(cursor, ranges, bytes);
+
+	// Store vertices
+	cursor += bytes;
+	bytes = sizeof(float3) * num_vertices;
+	memcpy(cursor, vertices, bytes);
+
+	// Store indices
+	cursor += bytes;
+	bytes = sizeof(uint) * num_indices;
+	memcpy(cursor, indices, bytes);
+
+	// Store tex_coords
+	cursor += bytes;
+	bytes = sizeof(uint) * num_tex_coords;
+	memcpy(cursor, tex_coords, bytes);
+
+	// Store normals
+	cursor += bytes;
+	bytes = sizeof(float3) * num_normals;
+	memcpy(cursor, normals, bytes);
+
+	bool ret = App->file_system->SaveUnique(output, &data, size, LIBRARY_MESH_FOLDER, "mesh", "dvs_mesh");
+
+	RELEASE(data);
+	return ret;
+}
+
+bool ResourceMesh::LoadtoScene()
+{
+	if (GetExportedFile() != nullptr)
+	{
+		char* buffer = nullptr;
+		uint size = App->file_system->Load(LIBRARY_MESH_FOLDER, GetExportedFile(), &buffer);
+		char* cursor = buffer;
+
+		// amount of indices / vertices / normals / texture_coords
+		uint ranges[NUM_RANGES];
+		uint bytes = sizeof(ranges);
+		memcpy(ranges, cursor, bytes);
+
+		num_vertices = ranges[0];
+		num_indices = ranges[1];
+		num_tex_coords = ranges[2];
+		num_normals = ranges[3];
+
+		// Load vertices
+		cursor += bytes;
+		bytes = sizeof(float3) * num_vertices;
+		vertices = new float3[num_vertices];
+		memcpy(vertices, cursor, bytes);
+		GenVBO();
+
+		// Load indices
+		cursor += bytes;
+		bytes = sizeof(uint) * num_indices;
+		indices = new uint[num_indices];
+		memcpy(indices, cursor, bytes);
+		GenIBO();
+
+		// Load tex_coords
+		cursor += bytes;
+		bytes = sizeof(float2) * num_tex_coords;
+		tex_coords = new float2[num_tex_coords];
+		memcpy(tex_coords, cursor, bytes);
+		GenTexture();
+		
+		// Load normals
+		cursor += bytes;
+		bytes = sizeof(float3) * num_normals;
+		normals = new float3[num_normals];
+		memcpy(normals, cursor, bytes);
+
+		RELEASE(buffer);
+		return true;
+	}
+	return false;
+}
+
+void ResourceMesh::UnLoad()
+{
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &IBO);
 	glDeleteBuffers(1, &TEX);
@@ -40,11 +166,9 @@ ResourceMesh::~ResourceMesh()
 	}
 }
 
-bool ResourceMesh::Import(const char* file, const char* path, const char* buffer)
-{
-	const aiMesh* mesh;
-	LOG("Importing mesh '%s'", (mesh->mName.C_Str()), 'g');
 
+bool ResourceMesh::LoadMesh(const aiMesh* mesh)
+{
 	// Vertices -----------------------
 	num_vertices = mesh->mNumVertices;
 	vertices = new float3[mesh->mNumVertices];
@@ -68,6 +192,13 @@ bool ResourceMesh::Import(const char* file, const char* path, const char* buffer
 	num_indices = mesh->mNumFaces * 3;
 	indices = new GLuint[num_indices];
 
+	if (num_indices <= 0)
+	{
+		LOG("Mesh has no indices", 'e');
+		return false;
+	}
+
+	LOG("Importing faces %u", mesh->mNumFaces, 'g');
 	for (uint i = 0; i < mesh->mNumFaces; ++i)
 	{
 		assert(mesh->mFaces[i].mNumIndices == 3); // assert if face is not a triangle
@@ -87,6 +218,10 @@ bool ResourceMesh::Import(const char* file, const char* path, const char* buffer
 			tex_coords[i].y = mesh->mTextureCoords[0][i].y;
 		}
 	}
+	else
+	{
+		LOG("Mesh has no texture coords", 'e');
+	}
 	GenTexture();
 
 	// Normals -----------------------
@@ -103,6 +238,11 @@ bool ResourceMesh::Import(const char* file, const char* path, const char* buffer
 			normals[i].z = mesh->mNormals[i].z;
 		}
 	}
+	else
+	{
+		LOG("Mesh has no normals", 'e');
+	}
+	return true;
 }
 
 void ResourceMesh::GenVBO()

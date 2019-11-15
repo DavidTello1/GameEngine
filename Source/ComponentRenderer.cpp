@@ -36,33 +36,28 @@ void ComponentRenderer::Draw()
 void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->VBO);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-	ComponentMaterial* material = (ComponentMaterial*)mesh.GetGameobj()->GetComponent(Component::Type::Material);
-	if (show_wireframe || App->scene->show_all_wireframe)
-	{
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-	else if(material != nullptr && material->IsActive())
-	{
-		if (show_checkers)
-			glBindTexture(GL_TEXTURE_2D, App->resources->checker_texture); // start using texture
-		else
-			glBindTexture(GL_TEXTURE_2D, mesh.GetMesh()->TEX);
-		
-	}
-	else
-	{
-		if (show_checkers)
-			glBindTexture(GL_TEXTURE_2D, App->resources->checker_texture);
-		else
-			glBindTexture(GL_TEXTURE_2D, 0);
-	}
+	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	//glEnable(GL_TEXTURE_2D);
+	//glActiveTexture(GL_TEXTURE0);
+
+	//ComponentMaterial* material = (ComponentMaterial*)mesh.GetGameobj()->GetComponent(Component::Type::Material);
+
+	//if (show_wireframe || App->scene->show_all_wireframe) //wireframe
+	//	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//else if (show_checkers) //checkers
+	//	glBindTexture(GL_TEXTURE_2D, App->resources->checker_texture);
+
+	//else if(material != nullptr && material->IsActive())
+	//	glBindTexture(GL_TEXTURE_2D, mesh.GetMesh()->TEX);
+
+	//else
+	//		glBindTexture(GL_TEXTURE_2D, 0);
+
 	glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->tex_coords_id);
 	glTexCoordPointer(2, GL_FLOAT, 0, NULL);
 
@@ -71,14 +66,11 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
 
-	/*glDisable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0);*/
+	//glBindTexture(GL_TEXTURE_2D, 0);
 
-
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
+	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	//glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void ComponentRenderer::DrawFaceNormals()

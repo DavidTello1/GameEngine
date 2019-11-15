@@ -2,17 +2,12 @@
 #include "Application.h"
 #include "ModuleResources.h"
 #include "ModuleFileSystem.h"
-
 #include "ResourceModel.h"
 #include "ResourceMesh.h"
 #include "ResourceMaterial.h"
 #include "Config.h"
 
 #include "Assimp/include/cimport.h"
-#include "Assimp/include/scene.h"
-#include "Assimp/include/postprocess.h"
-#include "Assimp/include/cfileio.h"
-#pragma comment (lib, "Assimp/libx86/assimp.lib")
 
 #include "Devil/include/IL/il.h"
 #pragma comment (lib, "Devil/lib/x86/DevIL.lib")
@@ -36,11 +31,6 @@ ModuleResources::~ModuleResources()
 
 bool ModuleResources::Init(Config* config)
 {
-	return true;
-}
-
-bool ModuleResources::Start(Config* config)
-{
 	LOG("Loading DevIL", 'd');
 	ilInit();
 
@@ -49,7 +39,11 @@ bool ModuleResources::Start(Config* config)
 	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
 	stream.callback = AssimpLogCallback;
 	aiAttachLogStream(&stream);
+	return true;
+}
 
+bool ModuleResources::Start(Config* config)
+{
 	//MakeCheckersTexture();
 	return true;
 }
@@ -110,10 +104,10 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 		switch (type)
 		{
 		case Resource::model:
-			import_ok = ResourceModel::Import(final_path, written_file);
+			import_ok = ResourceModel::Import(final_path.c_str(), written_file);
 			break;
 		case Resource::material:
-			import_ok = ResourceMaterial::Import(final_path, written_file);
+			import_ok = ResourceMaterial::Import(final_path.c_str(), written_file);
 			break;
 		}
 
@@ -129,8 +123,16 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 			// Exported file of Resource
 			std::string exported_file;
 			App->file_system->SplitFilePath(written_file.c_str(), nullptr, &exported_file);
-			res->exported_file = exported_file.c_str();
-			LOG("Imported successful from [%s] to [%s]", res->GetFile(), res->GetExportedFile());
+			if (res->exported_file.c_str() != NULL)
+			{
+				res->exported_file = exported_file.c_str();
+				LOG("Imported successful from [%s] to [%s]", res->GetFile(), res->GetExportedFile(), 'd');
+			}
+			else
+			{
+				LOG("Unable to export file [%s]", res->GetFile(), 'e');
+				return false;
+			}
 
 			// Name of Resource
 			std::string name;
@@ -259,6 +261,8 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 
 	switch (type)
 	{
+	case Resource::unknown:
+		break;
 	case Resource::model:
 		ret = new ResourceModel(uid);
 		break;
