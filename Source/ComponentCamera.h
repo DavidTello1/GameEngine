@@ -60,10 +60,12 @@ public:
 	float width = 1280.0f;
 	float height = 720.0f;
 
+	Frustum frustum;
 private:
 
 	mat4x4 ViewMatrix;
 	mat4x4 ProjectionMatrix;
+
 
 	float3 frustum_vertices[8];
 

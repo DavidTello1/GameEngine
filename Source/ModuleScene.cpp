@@ -30,9 +30,9 @@ bool ModuleScene::Start(Config* config)
 	test_camera = CreateGameObject("test camera");
 	test_camera->AddComponent(Component::Type::Camera);
 
-	//GameObject* bparent = CreateGameObject("BakerHouse");
+	GameObject* bparent = CreateGameObject("BakerHouse");
 
-	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
+	App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
 	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
 
 	// ParShapes 

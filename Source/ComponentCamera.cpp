@@ -20,6 +20,9 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 	CalculateProjectionMatrix();
 
 	//frustum_vertices = new float3[8];
+	frustum.pos = { 0,0,0 };
+	frustum.up = { 0,1,0 };
+	frustum.front = { 0,0,-1 };
 
 	Position = vec3(0.0f, 0.0f, 5.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
@@ -130,11 +133,19 @@ float* ComponentCamera::GetProjectionMatrix()
 // -----------------------------------------------------------------
 void ComponentCamera::CalculateViewMatrix()
 {
-	ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
+	//frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, -dot(X, Position), X.y, Y.y, Z.y, -dot(Y, Position), X.z, Y.z, Z.z, -dot(Z, Position)));
+	//ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
+	frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f));// , -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f));
 }
 
 void ComponentCamera::CalculateProjectionMatrix()
 {
+	frustum.nearPlaneDistance = z_near;
+	frustum.farPlaneDistance = z_far;
+	frustum.verticalFov = fov_y;
+	frustum.horizontalFov = 2 * Atan(tan(fov_y / 2) * width/height);
+	frustum.type = FrustumType::PerspectiveFrustum;
+	//ProjectionMatrix = frustum.ProjectionMatrix();
 	ProjectionMatrix = SetFrustum(fov_y, width / height, z_near, z_far);
 }
 
