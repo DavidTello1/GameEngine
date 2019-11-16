@@ -486,9 +486,6 @@
     <ClInclude Include="par_shapes.h">
       <Filter>Sources\Containers\par_shapes</Filter>
     </ClInclude>
-    <ClInclude Include="Config.h">
-      <Filter>Sources\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Sources\Resources</Filter>
     </ClInclude>
@@ -500,6 +497,9 @@
     </ClInclude>
     <ClInclude Include="ResourceModel.h">
       <Filter>Sources\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Sources\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -713,9 +713,6 @@
     <ClCompile Include="par_shapes.cpp">
       <Filter>Sources\Containers\par_shapes</Filter>
     </ClCompile>
-    <ClCompile Include="Config.cpp">
-      <Filter>Sources\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="Resource.cpp">
       <Filter>Sources\Resources</Filter>
     </ClCompile>
@@ -727,6 +724,9 @@
     </ClCompile>
     <ClCompile Include="ResourceModel.cpp">
       <Filter>Sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Sources\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

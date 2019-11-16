@@ -8,8 +8,6 @@
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
-#define NUM_RANGES 4
-
 struct aiMesh;
 struct par_shapes_mesh_s;
 
@@ -45,6 +43,9 @@ public:
 	void UnLoad();
 
 	//void Draw();
+	//void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, GameObject* parent = nullptr);
+
+//	const char* GetShapeName(shape_type type) { return shape_to_string[type]; }
 
 private:
 	bool LoadMesh(const aiMesh* mesh);
@@ -68,4 +69,11 @@ public:
 
 	float3* normals = nullptr;		// Array of normal coordinates
 	uint num_normals = 0;			// Number of normal coordinates
+
+private:
+	const char* shape_to_string[shape_type::UNKNOWN] =
+	{ "Cylinder","Cone", "Torus", "Sphere", "Bottle", "Knot",
+		"Hemisphere", "Plane", "Icosahedron", "Dodecahedron",
+		"Octahedron", "Tetrahedron", "Cube", "Rock" };
+
 };

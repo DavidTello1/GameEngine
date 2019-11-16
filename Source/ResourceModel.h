@@ -33,8 +33,6 @@ public:
 	const Node& GetNode(uint index) const { return nodes[index]; }
 
 private:
-	void GenerateMaterials(const aiScene* scene, const char* file, std::vector<UID>& materials);
-	void GenerateMeshes(const aiScene* scene, const char* file, std::vector<UID>& meshes);
 	void CreateGameobjs(const aiScene* model, const aiNode* node, uint parent, const std::vector<UID>& meshes, const std::vector<UID>& materials);
 
 private:

@@ -18,17 +18,19 @@ ResourceMesh::~ResourceMesh()
 
 UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 {
-	ResourceMesh* mesh = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh)); //create new resource
+	ResourceMesh* mesh = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh)); //create new mesh
 
+	// Load Mesh info
 	mesh->name = ai_mesh->mName.C_Str();
 	LOG("Importing mesh '%s'", (mesh->name.c_str()), 'g');
 
-	bool ret = mesh->LoadMesh(ai_mesh); //load mesh info (vertices, indices...)
+	bool ret = mesh->LoadMesh(ai_mesh);
 	if (!ret)
 		LOG("Error Importing info from mesh '%s'", (mesh->name.c_str()), 'e');
 
+	// Saving to own format
 	std::string output;
-	if (mesh->SaveOwnFormat(output)) //save to own format
+	if (mesh->SaveOwnFormat(output))
 	{
 		mesh->file = source_file; //get file
 		App->file_system->NormalizePath(mesh->file);
@@ -44,7 +46,7 @@ UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 		LOG("Importing aiMesh %s FAILED", source_file);
 	}
 
-	mesh->UnLoad();
+	mesh->UnLoad(); //release memory
 
 	return mesh->uid;
 }
@@ -52,8 +54,12 @@ UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 bool ResourceMesh::SaveOwnFormat(std::string& output) const
 {
 	// amount of indices / vertices / normals / texture_coords / AABB
-	uint ranges[NUM_RANGES] = { num_vertices, num_indices, num_tex_coords, num_normals };
-	uint size = sizeof(ranges) + sizeof(uint) * num_indices + sizeof(float3) * num_vertices + sizeof(float3) * num_normals + sizeof(float)* num_tex_coords;
+	uint ranges[4] = { num_vertices, num_indices, num_tex_coords, num_normals };
+	uint size = sizeof(ranges) + 
+		sizeof(uint) * num_indices + 
+		sizeof(float3) * num_vertices + 
+		sizeof(float3) * num_normals + 
+		sizeof(float)* num_tex_coords;
 
 	char* data = new char[size]; // Allocate
 	char* cursor = data;
@@ -96,7 +102,7 @@ bool ResourceMesh::LoadtoScene()
 		char* cursor = buffer;
 
 		// amount of indices / vertices / normals / texture_coords
-		uint ranges[NUM_RANGES];
+		uint ranges[4];
 		uint bytes = sizeof(ranges);
 		memcpy(ranges, cursor, bytes);
 

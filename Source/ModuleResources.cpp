@@ -8,11 +8,7 @@
 #include "Config.h"
 
 #include "Assimp/include/cimport.h"
-
 #include "Devil/include/IL/il.h"
-#pragma comment (lib, "Devil/lib/x86/DevIL.lib")
-#pragma comment (lib, "Devil/lib/x86/ILU.lib")
-#pragma comment (lib, "Devil/lib/x86/ILUT.lib")
 
 #include "mmgr/mmgr.h"
 
@@ -171,34 +167,6 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 	//	extension[i] = tolower(extension[i]);
 	//}
 
-
-
-	//else if (type == Component::Type::Material) // Texture
-	//{
-	//	ComponentMaterial* material_loaded = nullptr;
-	//	GLuint tex;
-
-	//	if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-	//		material_loaded = App->scene->GetMaterial(path);
-	//	else
-	//	{
-	//		// Devil
-	//		uint imageID;
-	//		ilGenImages(1, &imageID);
-	//		ilBindImage(imageID);
-	//		ilEnable(IL_ORIGIN_SET);
-	//		ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-
-	//		bool loaded = ilLoadImage(path);
-	//		if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
-
-	//		LogImageInfo();
-
-	//		tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
-	//		ilDeleteImages(1, &imageID);
-	//		LOG("Texture %s loaded", file_name, 'd');
-	//	}
-
 	//	if (use)
 	//	{
 	//		for (GameObject* object : App->scene->gameObjects)
@@ -281,27 +249,6 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 
 	return ret;
 }
-
-
-//GLuint ModuleResources::ImportTexture(int width, int height,int internal_format, int format, unsigned char* image)
-//{
-//	//LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image)*sizeof(unsigned char), 'g');
-//	GLuint texture;
-//	glGenTextures(1, &texture);
-//	glBindTexture(GL_TEXTURE_2D, texture);
-//
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//
-//	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
-//	glGenerateMipmap(GL_TEXTURE_2D);
-//
-//	tex_height = height;
-//	tex_width = width;
-//	return texture;
-//}
 
 //void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
 //{
@@ -449,7 +396,7 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 //		object->is_valid_dimensions = true;
 //	}
 //}
-//
+
 //void ModuleResources::MakeCheckersTexture()
 //{
 //	const int checkImageWidth = 256;
@@ -483,37 +430,4 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 //	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
 //		checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 //		checkImage);
-//}
-//
-//void ModuleResources::LogImageInfo()
-//{
-//	char* s;
-//	char* c;
-//	switch (ilGetInteger(IL_IMAGE_FORMAT)) {
-//	case IL_COLOR_INDEX: s = "IL_COLOR_INDEX"; break;
-//	case IL_ALPHA: s = "IL_ALPHA"; break;
-//	case IL_RGB: s = "IL_RGB"; break;
-//	case IL_RGBA: s = "IL_RGBA"; break;
-//	case IL_BGR: s = "IL_BGR"; break;
-//	case IL_BGRA: s = "IL_BGRA"; break;
-//	case IL_LUMINANCE: s = "IL_LUMINANCE"; break;
-//	case  IL_LUMINANCE_ALPHA: s = "IL_LUMINANCE_ALPHA"; break;
-//	}
-//	switch (ilGetInteger(IL_IMAGE_TYPE)) {
-//	case IL_BYTE: c = "IL_BYTE"; break;
-//	case IL_UNSIGNED_BYTE: c = "IL_UNSIGNED_BYTE"; break;
-//	case IL_SHORT: c = "IL_SHORT"; break;
-//	case IL_UNSIGNED_SHORT: c = "IL_UNSIGNED_SHORT"; break;
-//	case IL_INT: c = "IL_INT"; break;
-//	case IL_UNSIGNED_INT: c = "IL_UNSIGNED_INT"; break;
-//	case IL_FLOAT: c = "IL_FLOAT"; break;
-//	case IL_DOUBLE: c = "IL_DOUBLE"; break;
-//	case IL_HALF: c = "IL_HALF"; break;
-//	}
-//
-//	LOG("Width: %d, Height %d, Bytes per Pixel %d",
-//		ilGetInteger(IL_IMAGE_WIDTH),
-//		ilGetInteger(IL_IMAGE_HEIGHT),
-//		ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL), 'g');
-//	LOG("Original image format: %s, data type: %s", s, c, 'g');
 //}

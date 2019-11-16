@@ -14,5 +14,17 @@ public:
 	bool LoadtoScene();
 	void UnLoad();
 
+private:
+	bool LoadMaterial(const char* path);
+
+	//GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
+	void LogImageInfo();
+
+public:
+	GLuint checker_texture;
+
+private:
+	uint tex_height, tex_width;
+
 };
 
