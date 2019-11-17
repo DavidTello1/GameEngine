@@ -8,7 +8,7 @@
 class ComponentMesh : public Component
 {
 public:
-	ComponentMesh(GameObject* obj, ResourceMesh* mesh);
+	ComponentMesh(GameObject* obj/*, ResourceMesh* mesh*/);
 	virtual ~ComponentMesh();
 
 	ResourceMesh* GetMesh() const { return mesh; }

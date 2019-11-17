@@ -5,6 +5,8 @@
 #include "Globals.h"
 #include <vector>
 
+#include "PhysFS/include/physfs.h"
+
 struct SDL_RWops;
 int close_sdl_rwops(SDL_RWops *rw);
 

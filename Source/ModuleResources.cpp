@@ -102,8 +102,8 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 		case Resource::model:
 			import_ok = ResourceModel::Import(final_path.c_str(), written_file);
 			break;
-		case Resource::material:
-			import_ok = ResourceMaterial::Import(final_path.c_str(), written_file);
+		//case Resource::material:
+		//	import_ok = ResourceMaterial::Import(final_path.c_str(), written_file);
 			break;
 		}
 
@@ -249,6 +249,89 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 
 	return ret;
 }
+
+void ModuleResources::RemoveResource(UID uid)
+{
+	std::map<UID, Resource*>::iterator it = resources.find(uid);
+	if (it != resources.end())
+	{
+		App->file_system->Remove(it->second->GetExportedFile());
+
+		char tmp[256];
+		sprintf_s(tmp, 255, "%s%s", GetDirectory(it->second->GetType()), it->second->GetExportedFile());
+		App->file_system->Remove(tmp);
+
+		removed.push_back(it->second);
+
+		resources.erase(it);
+	}
+}
+
+const Resource * ModuleResources::GetResource(UID uid) const
+{
+	if (resources.find(uid) != resources.end())
+		return resources.at(uid);
+	return nullptr;
+}
+
+Resource * ModuleResources::GetResource(UID uid)
+{
+	std::map<UID, Resource*>::iterator it = resources.find(uid);
+	if (it != resources.end())
+		return it->second;
+	return nullptr;
+}
+
+UID ModuleResources::GenerateUID()
+{
+	++last_uid;
+	SaveUID();
+	return last_uid;
+}
+
+void ModuleResources::LoadUID()
+{
+	std::string file(SETTINGS_FOLDER);
+	file += "Last UID";
+
+	char *buf = nullptr;
+	uint size = App->file_system->Load(file.c_str(), &buf);
+
+	if (size == sizeof(last_uid))
+	{
+		last_uid = *((UID*)buf);
+		RELEASE_ARRAY(buf);
+	}
+	else
+	{
+		LOG("WARNING! Cannot read resource UID from file [%s] - Generating a new one", file.c_str());
+		SaveUID();
+	}
+}
+
+void ModuleResources::SaveUID() const
+{
+	std::string file(SETTINGS_FOLDER);
+	file += "Last UID";
+
+	uint size = App->file_system->Save(file.c_str(), (const char*)&last_uid, sizeof(last_uid));
+
+	if (size != sizeof(last_uid))
+		LOG("WARNING! Cannot write resource UID into file [%s]", file.c_str());
+}
+
+const char* ModuleResources::GetDirectory(Resource::Type type) const
+{
+	static_assert(Resource::Type::unknown == 0, "String list needs update");
+
+	static const char* dirs_by_type[] = {
+		LIBRARY_MODEL_FOLDER, LIBRARY_MATERIAL_FOLDER,
+		LIBRARY_MESH_FOLDER, LIBRARY_SCENE_FOLDER
+	};
+
+	return dirs_by_type[type];
+}
+
 
 //void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
 //{

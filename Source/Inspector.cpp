@@ -178,22 +178,22 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Mesh"))
 		{
-			ImGui::Text("Triangles: ");
-			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_indices / 3));
+			//ImGui::Text("Triangles: ");
+			//ImGui::SameLine();
+			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_indices / 3));
 
-			ImGui::Text("Vertices: ");
-			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_vertices));
+			//ImGui::Text("Vertices: ");
+			//ImGui::SameLine();
+			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_vertices));
 
-			ImGui::Text("Vertex Normals: ");
-			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_normals));
+			//ImGui::Text("Vertex Normals: ");
+			//ImGui::SameLine();
+			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_normals));
 
-			ImGui::Text("Tex Coords: ");
-			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_tex_coords));
-			ImGui::NewLine();
+			//ImGui::Text("Tex Coords: ");
+			//ImGui::SameLine();
+			//ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_tex_coords));
+			//ImGui::NewLine();
 
 			if (has_renderer)
 			{

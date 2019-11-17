@@ -82,37 +82,41 @@ void ResourceMaterial::UnLoad()
 
 bool ResourceMaterial::LoadMaterial(const char* path)
 {
-		// Devil
-		uint imageID;
-		ilGenImages(1, &imageID);
-		ilBindImage(imageID);
-		ilEnable(IL_ORIGIN_SET);
-		ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	// Devil
+	uint imageID;
+	ilGenImages(1, &imageID);
+	ilBindImage(imageID);
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 
-		bool loaded = ilLoadImage(path);
-		if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
+	bool loaded = ilLoadImage(path);
+	if (!loaded)
+	{
+		LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
+		return false;
+	}
 
-		LogImageInfo();
-		
-		GLuint texture;
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
+	LogImageInfo();
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_FORMAT), 
-			ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 0, 
-			ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		glGenerateMipmap(GL_TEXTURE_2D);
+	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_FORMAT),
+		ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 0,
+		ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
 
-		tex_height = ilGetInteger(IL_IMAGE_HEIGHT);
-		tex_width = ilGetInteger(IL_IMAGE_WIDTH);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
-		ilDeleteImages(1, &imageID);
+	tex_height = ilGetInteger(IL_IMAGE_HEIGHT);
+	tex_width = ilGetInteger(IL_IMAGE_WIDTH);
+
+	ilDeleteImages(1, &imageID);
 	return true;
 }
 

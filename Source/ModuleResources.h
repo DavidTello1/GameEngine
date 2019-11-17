@@ -10,6 +10,8 @@
 
 #include "glew\include\GL\glew.h"
 
+#define RESERVED_RESOURCES 1 // checker texture
+
 class Resource;
 class ResourceMesh;
 class ResourceMaterial;
@@ -24,18 +26,21 @@ public:
 	bool Start(Config* config = nullptr);
 	bool CleanUp();
 
+	UID GenerateUID();
 	bool ImportResource(const char* path, UID uid = 0);
 
 	Resource* CreateResource(Resource::Type type, UID uid = 0);
 	void RemoveResource(UID uid);
-
 	const Resource* GetResource(UID uid) const;
 	Resource * GetResource(UID uid);
 
-	UID GenerateUID();
+	const char* GetDirectory(Resource::Type type) const;
 
 private:
-	void MakeCheckersTexture();
+	void LoadUID();
+	void SaveUID() const;
+
+	//void MakeCheckersTexture();
 
 public:
 	GLuint bbox_indices[24] =
@@ -49,6 +54,7 @@ private:
 	std::map<UID, Resource*> resources;
 	std::vector<Resource*> removed;
 
+	UID last_uid = RESERVED_RESOURCES;
 };
 
 #endif

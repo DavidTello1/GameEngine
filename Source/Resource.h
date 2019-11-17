@@ -27,8 +27,8 @@ public:
 	const char* GetName() const { return name.c_str(); }
 	void SetName(std::string n) { name = n; }
 
-	virtual void Save(Config& config) const;
-	virtual void Load(const Config& config);
+	//virtual void Save(Config& config) const;
+	//virtual void Load(const Config& config);
 	
 	const char* GetFile() const { return file.c_str(); }
 	const char* GetExportedFile() const { return exported_file.c_str(); }
@@ -39,9 +39,9 @@ public:
 	uint CountReferences() const { return times_loaded; }
 
 protected:
-	virtual bool SaveOwnFormat(std::string& output) const {};
-	virtual bool LoadtoScene() {};
-	virtual void UnLoad() {};
+	virtual bool SaveOwnFormat(std::string& output) const = 0;
+	virtual bool LoadtoScene() = 0;
+	virtual void UnLoad() = 0;
 
 protected:
 	UID uid = 0;

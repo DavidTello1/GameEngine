@@ -16,17 +16,11 @@ Application::Application()
 	modules.push_back(file_system = new ModuleFileSystem(ASSETS_FOLDER));
 	modules.push_back(window = new ModuleWindow());
 	modules.push_back(resources = new ModuleResources());
-	//modules.push_back(tex = new ModuleTextures());
 	modules.push_back(camera = new ModuleCamera3D());
 	modules.push_back(scene_base = new ModuleSceneBase());
 	modules.push_back(scene = new ModuleScene());
 	modules.push_back(editor = new ModuleEditor());
 	modules.push_back(input = new ModuleInput());
-	//modules.push_back(audio = new ModuleAudio(true));
-	//modules.push_back(ai = new ModuleAI());
-	//modules.push_back(level = new ModuleLevelManager());
-	//modules.push_back(programs = new ModulePrograms(true));
-	//modules.push_back(renderer = new ModuleRenderer());
 	modules.push_back(renderer3D = new ModuleRenderer3D());
 }
 

@@ -21,15 +21,15 @@ ResourceModel::~ResourceModel()
 {
 }
 
-void ResourceModel::Save(Config& config) const
-{
-	Resource::Save(config);
-}
-
-void ResourceModel::Load(const Config& config)
-{
-	Resource::Load(config);
-}
+//void ResourceModel::Save(Config& config) const
+//{
+//	Resource::Save(config);
+//}
+//
+//void ResourceModel::Load(const Config& config)
+//{
+//	Resource::Load(config);
+//}
 
 bool ResourceModel::Import(const char* full_path, std::string& output)
 {
