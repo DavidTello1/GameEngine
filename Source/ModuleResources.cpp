@@ -46,6 +46,18 @@ bool ModuleResources::Start(Config* config)
 
 bool ModuleResources::CleanUp()
 {
+	LOG("Unloading Resource Manager");
+
+	//SaveResources();
+
+	for (std::map<UID, Resource*>::iterator it = resources.begin(); it != resources.end(); ++it)
+		RELEASE(it->second);
+
+	for (std::vector<Resource*>::iterator it = removed.begin(); it != removed.end(); ++it)
+		RELEASE(*it);
+
+	resources.clear();
+
 	return true;
 }
 

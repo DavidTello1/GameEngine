@@ -1,6 +1,5 @@
 #pragma once
 #include "Resource.h"
-#include "Math.h"
 
 struct aiScene;
 struct aiNode;
@@ -11,7 +10,6 @@ public:
 	struct Node
 	{
 		std::string name;
-		float4x4 transform = float4x4::identity;
 		uint parent = 0;
 		UID mesh = 0;
 		UID material = 0;
@@ -33,9 +31,9 @@ public:
 	const Node& GetNode(uint index) const { return nodes[index]; }
 
 private:
-	void CreateGameobjs(const aiScene* model, const aiNode* node, uint parent, const std::vector<UID>& meshes, const std::vector<UID>& materials);
+	void CreateNodes(const aiScene* model, const aiNode* node, uint parent, const std::vector<UID>& meshes, const std::vector<UID>& materials);
+	void CreateGameObjects(const std::vector<UID>& meshes, const std::vector<UID>& materials);
 
 private:
 	std::vector<Node> nodes;
-
 };

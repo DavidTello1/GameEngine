@@ -87,10 +87,9 @@ bool ResourceMesh::SaveOwnFormat(std::string& output) const
 	bytes = sizeof(float3) * num_normals;
 	memcpy(cursor, normals, bytes);
 
-	bool ret = App->file_system->SaveUnique(output, &data, size, LIBRARY_MESH_FOLDER, "mesh", "dvs_mesh");
+	delete[] data;
 
-	RELEASE(data);
-	return ret;
+	return App->file_system->SaveUnique(output, &data, size, LIBRARY_MESH_FOLDER, "mesh", "dvs_mesh");
 }
 
 bool ResourceMesh::LoadtoScene()
@@ -138,7 +137,7 @@ bool ResourceMesh::LoadtoScene()
 		normals = new float3[num_normals];
 		memcpy(normals, cursor, bytes);
 
-		RELEASE(buffer);
+		delete[] buffer;
 		return true;
 	}
 	return false;

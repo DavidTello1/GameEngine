@@ -34,6 +34,8 @@ class Resource;
 class ResourceMesh : public Resource
 {
 public:
+	ALIGN_CLASS_TO_16
+
 	ResourceMesh(UID id);
 	virtual ~ResourceMesh();
 
@@ -45,7 +47,7 @@ public:
 	//void Draw();
 	//void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, GameObject* parent = nullptr);
 
-//	const char* GetShapeName(shape_type type) { return shape_to_string[type]; }
+	//const char* GetShapeName(shape_type type) { return shape_to_string[type]; }
 
 private:
 	bool LoadMesh(const aiMesh* mesh);

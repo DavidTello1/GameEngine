@@ -11,7 +11,10 @@ public:
 	ComponentMesh(GameObject* obj/*, ResourceMesh* mesh*/);
 	virtual ~ComponentMesh();
 
+	void SetMesh(ResourceMesh* Mesh) { mesh = Mesh; }
 	ResourceMesh* GetMesh() const { return mesh; }
+
+	void SetBoundingBox();
 
 private:
 	ResourceMesh* mesh = nullptr;

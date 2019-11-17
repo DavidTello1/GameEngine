@@ -5,6 +5,9 @@
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"
 
+#include "ComponentMesh.h"
+#include "ComponentMaterial.h"
+
 #include "Assimp/include/scene.h"
 #include "Assimp/include/cimport.h"
 #include "Assimp/include/postprocess.h"
@@ -74,7 +77,8 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		}
 
 		// Generate GameObjects
-		model.CreateGameobjs(scene, scene->mRootNode, 0, meshes, materials);
+		model.CreateNodes(scene, scene->mRootNode, 0, meshes, materials);
+		model.CreateGameObjects(meshes, materials);
 
 		aiReleaseImport(scene);
 
@@ -85,7 +89,7 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 
 bool ResourceModel::SaveOwnFormat(std::string& output) const
 {
-	uint size = (sizeof(std::string) + sizeof(float4x4) + sizeof(uint) + sizeof(UID) + sizeof(UID)) * nodes.size();
+	uint size = (sizeof(std::string) + sizeof(uint) + sizeof(UID) + sizeof(UID)) * nodes.size();
 	char* data = new char[size]; // Allocate
 	char* cursor = data;
 
@@ -94,11 +98,6 @@ bool ResourceModel::SaveOwnFormat(std::string& output) const
 		// Store name
 		uint bytes = sizeof(std::string);
 		memcpy(cursor, &nodes[i].name, bytes);
-
-		// Store transform
-		cursor += bytes;
-		bytes = sizeof(float4x4);
-		memcpy(cursor, &nodes[i].transform, bytes);
 
 		// Store parent
 		cursor += bytes;
@@ -115,9 +114,10 @@ bool ResourceModel::SaveOwnFormat(std::string& output) const
 		bytes = sizeof(UID);
 		memcpy(cursor, &nodes[i].material, bytes);
 	}
+	delete[] data;
+
 	bool ret = App->file_system->SaveUnique(output, &data, size, LIBRARY_MODEL_FOLDER, "model", "dvs_model");
 
-	RELEASE(data);
 	return ret;
 }
 
@@ -129,34 +129,38 @@ bool ResourceModel::LoadtoScene()
 		uint size = App->file_system->Load(LIBRARY_MODEL_FOLDER, GetExportedFile(), &buffer);
 		char* cursor = buffer;
 
-		uint node_size = sizeof(std::string) + sizeof(float4x4) + sizeof(uint) + sizeof(UID) + sizeof(UID);
+		uint node_size = sizeof(std::string) + sizeof(uint) + sizeof(UID) + sizeof(UID);
 		for (uint i = 0; i < node_size; ++i)
 		{
 			Node node;
 
+			std::string* name_ptr;
+			uint* parent_ptr;
+			UID* mesh_ptr, material_ptr;
+
 			// Load name
 			uint bytes = sizeof(std::string);
-			memcpy(cursor, &node.name, bytes);
+			name_ptr = new std::string;
+			memcpy(cursor, name_ptr, bytes);
+			node.name.data = name_ptr->data;
 
-			// Load transform
-			cursor += bytes;
-			bytes = sizeof(float4x4);
-			memcpy(cursor, &node.transform, bytes);
+			//// Load parent
+			//cursor += bytes;
+			//bytes = sizeof(uint);
+			//node.parent = new uint;
+			//memcpy(cursor, &node.parent, bytes);
 
-			// Load parent
-			cursor += bytes;
-			bytes = sizeof(uint);
-			memcpy(cursor, &node.parent, bytes);
+			//// Load mesh
+			//cursor += bytes;
+			//bytes = sizeof(UID);
+			//node.mesh = new UID;
+			//memcpy(cursor, &node.mesh, bytes);
 
-			// Load mesh
-			cursor += bytes;
-			bytes = sizeof(UID);
-			memcpy(cursor, &node.mesh, bytes);
-
-			// Load material
-			cursor += bytes;
-			bytes = sizeof(UID);
-			memcpy(cursor, &node.material, bytes);
+			//// Load material
+			//cursor += bytes;
+			//bytes = sizeof(UID);
+			//node.material = new UID;
+			//memcpy(cursor, &node.material, bytes);
 
 			nodes.push_back(node); //add node to list
 		}
@@ -170,6 +174,7 @@ bool ResourceModel::LoadtoScene()
 			if (nodes[i].material != 0)
 				App->resources->GetResource(nodes[i].material)->LoadToMemory();
 		}
+
 		RELEASE(buffer);
 		return true;
 	}
@@ -190,24 +195,23 @@ void ResourceModel::UnLoad()
 	nodes.clear();
 }
 
-void ResourceModel::CreateGameobjs(const aiScene* model, const aiNode* node, uint parent, const std::vector<UID>& meshes, const std::vector<UID>& materials)
+void ResourceModel::CreateNodes(const aiScene* model, const aiNode* node, uint parent, const std::vector<UID>& meshes, const std::vector<UID>& materials)
 {
-	uint index = nodes.size();
+	uint index = nodes.size(); //get position in vector
 
+	// create node and init
 	Node dst;
-
-	dst.transform = reinterpret_cast<const float4x4&>(node->mTransformation);
 	dst.name = node->mName.C_Str();
 	dst.parent = parent;
 
-	nodes.push_back(dst);
+	nodes.push_back(dst); //add node to vector
 
-	for (unsigned i = 0; i < node->mNumChildren; ++i)
+	for (unsigned i = 0; i < node->mNumChildren; ++i) //check for children and create respective nodes with actual node as parent
 	{
-		CreateGameobjs(model, node->mChildren[i], index, meshes, materials);
+		CreateNodes(model, node->mChildren[i], index, meshes, materials);
 	}
 
-	if (node->mNumMeshes == 1)
+	if (node->mNumMeshes == 1) //check for meshes and materials and init if exist
 	{
 		uint mesh_index = node->mMeshes[0];
 
@@ -218,28 +222,55 @@ void ResourceModel::CreateGameobjs(const aiScene* model, const aiNode* node, uin
 	{
 		for (uint i = 0; i < node->mNumMeshes; ++i)
 		{
-			Node mesh;
-
 			uint mesh_index = node->mMeshes[i];
 
+			Node mesh;
 			mesh.parent = index;
 			mesh.mesh = meshes[mesh_index];
 			mesh.material = materials[model->mMeshes[mesh_index]->mMaterialIndex];
 
 			char buff[100];
-
 			if (model->mMeshes[mesh_index]->mName.length == 0)
-			{
 				snprintf(buff, sizeof(buff), "mesh_%d", i);
-			}
 			else
-			{
 				snprintf(buff, sizeof(buff), "mesh_%s", model->mMeshes[mesh_index]->mName.C_Str());
-			}
 
 			mesh.name = buff;
 
 			nodes.push_back(mesh);
 		}
 	}
+}
+
+void ResourceModel::CreateGameObjects(const std::vector<UID>& meshes, const std::vector<UID>& materials)
+{
+	std::vector<GameObject*> objects;
+	GameObject* obj;
+
+	for (uint i = 0; i < nodes.size(); ++i)
+	{
+		if (i == 0)
+			obj = App->scene->CreateGameObject(nodes[0].name.c_str()); //create root gameobject
+		else
+			obj = App->scene->CreateGameObject(nodes[i].name.c_str(), objects[nodes[i].parent]);
+
+		objects.push_back(obj);
+
+		if (nodes[i].mesh != 0)
+		{
+			ComponentMesh* mesh = (ComponentMesh*)obj->AddComponent(Component::Type::Mesh);
+			ResourceMesh* r_mesh = (ResourceMesh*)App->resources->GetResource(meshes[i - 1]);
+			mesh->SetMesh(r_mesh);
+			//mesh->SetBoundingBox();
+		}
+
+		if (nodes[i].material != 0)
+		{
+			obj->AddComponent(Component::Type::Material);
+		}
+
+	}
+
+	objects.clear();
+	LoadToMemory();
 }

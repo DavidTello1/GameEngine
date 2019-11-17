@@ -70,7 +70,7 @@ void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
 	//glBindTexture(GL_TEXTURE_2D, 0);
 
 	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	//glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void ComponentRenderer::DrawFaceNormals()
