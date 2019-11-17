@@ -134,15 +134,10 @@ bool ResourceModel::LoadtoScene()
 		{
 			Node node;
 
-			std::string* name_ptr;
-			uint* parent_ptr;
-			UID* mesh_ptr, material_ptr;
-
-			// Load name
-			uint bytes = sizeof(std::string);
-			name_ptr = new std::string;
-			memcpy(cursor, name_ptr, bytes);
-			node.name.data = name_ptr->data;
+			//// Load name
+			//uint bytes = sizeof(std::string);
+			//node.name = new std::string;
+			//memcpy(cursor, node.name, bytes);
 
 			//// Load parent
 			//cursor += bytes;
