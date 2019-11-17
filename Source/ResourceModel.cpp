@@ -182,10 +182,10 @@ void ResourceModel::UnLoad()
 	for (uint i = 0; i < nodes.size(); ++i)
 	{
 		if (nodes[i].mesh != 0)
-			App->resources->GetResource(nodes[i].mesh)->Release();
+			App->resources->GetResource(nodes[i].mesh)->ReleaseFromMemory();
 
 		if (nodes[i].material != 0)
-			App->resources->GetResource(nodes[i].material)->Release();
+			App->resources->GetResource(nodes[i].material)->ReleaseFromMemory();
 	}
 	nodes.clear();
 }

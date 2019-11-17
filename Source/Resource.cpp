@@ -13,16 +13,16 @@ Resource::~Resource()
 
 bool Resource::LoadToMemory()
 {
-	if (loaded > 0)
-		loaded++;
+	if (times_loaded > 0)
+		times_loaded++;
 	else
-		loaded = LoadtoScene() ? 1 : 0;
+		times_loaded = LoadtoScene() ? 1 : 0;
 
-	return loaded > 0;
+	return times_loaded > 0;
 }
 
-void Resource::Release()
+void Resource::ReleaseFromMemory()
 {
-	if (--loaded == 0)
+	if (--times_loaded == 0)
 		UnLoad();
 }

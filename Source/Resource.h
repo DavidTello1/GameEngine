@@ -34,14 +34,14 @@ public:
 	const char* GetExportedFile() const { return exported_file.c_str(); }
 
 	bool LoadToMemory();
-	void Release();
-	bool IsLoadedToMemory() const { return loaded > 0; }
-	uint CountReferences() const { return loaded; }
+	void ReleaseFromMemory();
+	bool IsLoadedToMemory() const { return times_loaded > 0; }
+	uint CountReferences() const { return times_loaded; }
 
 protected:
-	virtual bool SaveOwnFormat(std::string& output) const;
-	virtual bool LoadtoScene();
-	virtual void UnLoad();
+	virtual bool SaveOwnFormat(std::string& output) const {};
+	virtual bool LoadtoScene() {};
+	virtual void UnLoad() {};
 
 protected:
 	UID uid = 0;
@@ -51,7 +51,7 @@ protected:
 	std::string file;
 	std::string exported_file;
 
-	uint loaded = 0;
+	uint times_loaded = 0;
 
 	//bool visible = true;
 };

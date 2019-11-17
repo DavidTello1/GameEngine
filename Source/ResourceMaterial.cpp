@@ -20,9 +20,7 @@ UID ResourceMaterial::Import(const aiMaterial* ai_material, const char* source_f
 {
 	ResourceMaterial* material = static_cast<ResourceMaterial*>(App->resources->CreateResource(Resource::material)); //create new material
 
-	bool ret = material->LoadMaterial(source_file); //load material
-	if (!ret)
-		LOG("Error Importing info from material '%s'", (material->name.c_str()), 'e');
+	material->LoadMaterial(source_file); //load material
 
 	// Saving to own format
 	std::string output;
