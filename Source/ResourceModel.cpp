@@ -8,6 +8,8 @@
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
 
+#include "SimpleBinStream.h"
+
 #include "Assimp/include/scene.h"
 #include "Assimp/include/cimport.h"
 #include "Assimp/include/postprocess.h"
@@ -78,47 +80,51 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 
 		// Generate GameObjects
 		model.CreateNodes(scene, scene->mRootNode, 0, meshes, materials);
-		model.CreateGameObjects(meshes, materials);
 
 		aiReleaseImport(scene);
 
-		return model.SaveOwnFormat(output);
+		bool ret = model.SaveOwnFormat(output);
+
+		if (ret)
+		{
+			model.file = full_path; //get file
+			App->file_system->NormalizePath(model.file);
+
+			std::string file_name; //get exported file
+			App->file_system->SplitFilePath(output.c_str(), nullptr, &file_name);
+			model.exported_file = file_name;
+
+			LOG("Imported aiScene from [%s] to [%s]", model.GetFile(), model.GetExportedFile());
+		}
+		else
+		{
+			LOG("Importing aiScene %s FAILED", full_path);
+		}
+
+		model.CreateGameObjects(meshes, materials);
+
+		return ret;
 	}
 	return false;
 }
 
 bool ResourceModel::SaveOwnFormat(std::string& output) const
 {
-	uint size = (sizeof(std::string) + sizeof(uint) + sizeof(UID) + sizeof(UID)) * nodes.size();
-	char* data = new char[size]; // Allocate
-	char* cursor = data;
+	simple::mem_ostream<std::true_type> write_stream; //create output stream
 
-	for (uint i = 0; i < nodes.size(); ++i)
+	write_stream << uint(nodes.size()); // save nodes size
+
+	for (uint i = 0; i < nodes.size(); ++i) // save data
 	{
-		// Store name
-		uint bytes = sizeof(std::string);
-		memcpy(cursor, &nodes[i].name, bytes);
-
-		// Store parent
-		cursor += bytes;
-		bytes = sizeof(uint);
-		memcpy(cursor, &nodes[i].parent, bytes);
-
-		// Store mesh
-		cursor += bytes;
-		bytes = sizeof(UID);
-		memcpy(cursor, &nodes[i].mesh, bytes);
-
-		// Store material
-		cursor += bytes;
-		bytes = sizeof(UID);
-		memcpy(cursor, &nodes[i].material, bytes);
+		write_stream << nodes[i].name;
+		write_stream << nodes[i].parent;
+		write_stream << nodes[i].mesh;
+		write_stream << nodes[i].material;
 	}
-	delete[] data;
 
-	bool ret = App->file_system->SaveUnique(output, &data, size, LIBRARY_MODEL_FOLDER, "model", "dvs_model");
+	const std::vector<char>& data = write_stream.get_internal_vec(); //get stream vector
 
-	return ret;
+	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MODEL_FOLDER, "model", "dvs_model"); //save file
 }
 
 bool ResourceModel::LoadtoScene()
@@ -126,42 +132,27 @@ bool ResourceModel::LoadtoScene()
 	if (GetExportedFile() != nullptr)
 	{
 		char* buffer = nullptr;
-		uint size = App->file_system->Load(LIBRARY_MODEL_FOLDER, GetExportedFile(), &buffer);
-		char* cursor = buffer;
+		uint size = App->file_system->Load(LIBRARY_MODEL_FOLDER, GetExportedFile(), &buffer); //get total size
 
-		uint node_size = sizeof(std::string) + sizeof(uint) + sizeof(UID) + sizeof(UID);
-		for (uint i = 0; i < node_size; ++i)
+		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
+
+		uint node_size = 0;
+		read_stream >> node_size; //get node size
+		nodes.reserve(node_size); //reserve memory in vector for size
+
+		for (uint i = 0; i < node_size; ++i) // load data
 		{
 			Node node;
 
-			//// Load name
-			//uint bytes = sizeof(std::string);
-			//node.name = new std::string;
-			//memcpy(cursor, node.name, bytes);
+			read_stream >> node.name;
+			read_stream >> node.parent;
+			read_stream >> node.mesh;
+			read_stream >> node.material;
 
-			//// Load parent
-			//cursor += bytes;
-			//bytes = sizeof(uint);
-			//node.parent = new uint;
-			//memcpy(cursor, &node.parent, bytes);
-
-			//// Load mesh
-			//cursor += bytes;
-			//bytes = sizeof(UID);
-			//node.mesh = new UID;
-			//memcpy(cursor, &node.mesh, bytes);
-
-			//// Load material
-			//cursor += bytes;
-			//bytes = sizeof(UID);
-			//node.material = new UID;
-			//memcpy(cursor, &node.material, bytes);
-
-			nodes.push_back(node); //add node to list
+			nodes.push_back(node); //add node to vector nodes
 		}
 
-		// Load meshes and materials to Memory
-		for (uint i = 0; i < nodes.size(); ++i)
+		for (uint i = 0; i < nodes.size(); ++i) //load meshes and materials
 		{
 			if (nodes[i].mesh != 0)
 				App->resources->GetResource(nodes[i].mesh)->LoadToMemory();
@@ -169,8 +160,6 @@ bool ResourceModel::LoadtoScene()
 			if (nodes[i].material != 0)
 				App->resources->GetResource(nodes[i].material)->LoadToMemory();
 		}
-
-		RELEASE(buffer);
 		return true;
 	}
 	return false;
@@ -198,7 +187,6 @@ void ResourceModel::CreateNodes(const aiScene* model, const aiNode* node, uint p
 	Node dst;
 	dst.name = node->mName.C_Str();
 	dst.parent = parent;
-
 	nodes.push_back(dst); //add node to vector
 
 	for (unsigned i = 0; i < node->mNumChildren; ++i) //check for children and create respective nodes with actual node as parent
@@ -206,7 +194,8 @@ void ResourceModel::CreateNodes(const aiScene* model, const aiNode* node, uint p
 		CreateNodes(model, node->mChildren[i], index, meshes, materials);
 	}
 
-	if (node->mNumMeshes == 1) //check for meshes and materials and init if exist
+	// Check for meshes and materials and init if exist
+	if (node->mNumMeshes == 1) //if there is only one
 	{
 		uint mesh_index = node->mMeshes[0];
 
@@ -215,7 +204,7 @@ void ResourceModel::CreateNodes(const aiScene* model, const aiNode* node, uint p
 	}
 	else
 	{
-		for (uint i = 0; i < node->mNumMeshes; ++i)
+		for (uint i = 0; i < node->mNumMeshes; ++i) //if there are more than one iterate
 		{
 			uint mesh_index = node->mMeshes[i];
 
@@ -244,17 +233,18 @@ void ResourceModel::CreateGameObjects(const std::vector<UID>& meshes, const std:
 
 	for (uint i = 0; i < nodes.size(); ++i)
 	{
-		if (i == 0)
-			obj = App->scene->CreateGameObject(nodes[0].name.c_str()); //create root gameobject
-		else
-			obj = App->scene->CreateGameObject(nodes[i].name.c_str(), objects[nodes[i].parent]);
+		GameObject* parent = nullptr;
 
+		if (i > 0)
+			parent = objects[nodes[i].parent];
+
+		obj = App->scene->CreateGameObject(nodes[i].name.c_str(), parent);
 		objects.push_back(obj);
 
 		if (nodes[i].mesh != 0)
 		{
 			ComponentMesh* mesh = (ComponentMesh*)obj->AddComponent(Component::Type::Mesh);
-			ResourceMesh* r_mesh = (ResourceMesh*)App->resources->GetResource(meshes[i - 1]);
+			ResourceMesh* r_mesh = (ResourceMesh*)App->resources->GetResource(nodes[i].mesh);
 			mesh->SetMesh(r_mesh);
 			//mesh->SetBoundingBox();
 		}

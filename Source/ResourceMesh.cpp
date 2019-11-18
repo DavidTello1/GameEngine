@@ -36,7 +36,7 @@ UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 		mesh->file = source_file; //get file
 		App->file_system->NormalizePath(mesh->file);
 
-		std::string file_name; //get file name
+		std::string file_name; //get exported file
 		App->file_system->SplitFilePath(output.c_str(), nullptr, &file_name);
 		mesh->exported_file = file_name;
 
