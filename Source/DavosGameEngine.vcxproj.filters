@@ -501,6 +501,9 @@
     <ClInclude Include="Config.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleBinStream.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleCamera3D.cpp">

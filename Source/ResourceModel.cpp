@@ -259,10 +259,10 @@ void ResourceModel::CreateGameObjects(const std::vector<UID>& meshes, const std:
 			//mesh->SetBoundingBox();
 		}
 
-		if (nodes[i].material != 0)
-		{
-			obj->AddComponent(Component::Type::Material);
-		}
+		//if (nodes[i].material != 0)
+		//{
+		//	obj->AddComponent(Component::Type::Material);
+		//}
 
 	}
 

@@ -5,6 +5,7 @@
 
 #include "Assimp/include/mesh.h"
 #include "par_shapes.h"
+#include "SimpleBinStream.h"
 
 #include "mmgr/mmgr.h"
 
@@ -53,43 +54,41 @@ UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 
 bool ResourceMesh::SaveOwnFormat(std::string& output) const
 {
-	// amount of indices / vertices / normals / texture_coords / AABB
-	uint ranges[4] = { num_vertices, num_indices, num_tex_coords, num_normals };
-	uint size = sizeof(ranges) + 
-		sizeof(uint) * num_indices + 
-		sizeof(float3) * num_vertices + 
-		sizeof(float3) * num_normals + 
-		sizeof(float)* num_tex_coords;
+	simple::mem_ostream<std::true_type> write_stream; //create output stream
 
-	char* data = new char[size]; // Allocate
-	char* cursor = data;
-
-	uint bytes = sizeof(ranges); // First store ranges
-	memcpy(cursor, ranges, bytes);
+	// Store num of vertices, indices, tex_coords, normals
+	write_stream << num_vertices;
+	write_stream << num_indices;
+	write_stream << num_tex_coords;
+	write_stream << num_normals;
 
 	// Store vertices
-	cursor += bytes;
-	bytes = sizeof(float3) * num_vertices;
-	memcpy(cursor, vertices, bytes);
+	for (uint i = 0; i < num_vertices; ++i)
+	{
+		write_stream << vertices[i].x << vertices[i].y << vertices[i].z;
+	}
 
 	// Store indices
-	cursor += bytes;
-	bytes = sizeof(uint) * num_indices;
-	memcpy(cursor, indices, bytes);
+	for (uint i = 0; i < num_indices; ++i)
+	{
+		write_stream << indices[i];
+	}
 
 	// Store tex_coords
-	cursor += bytes;
-	bytes = sizeof(uint) * num_tex_coords;
-	memcpy(cursor, tex_coords, bytes);
+	for (uint i = 0; i < num_tex_coords; ++i)
+	{
+		write_stream << tex_coords[i];
+	}
 
 	// Store normals
-	cursor += bytes;
-	bytes = sizeof(float3) * num_normals;
-	memcpy(cursor, normals, bytes);
+	for (uint i = 0; i < num_normals; ++i)
+	{
+		write_stream << normals[i];
+	}
 
-	delete[] data;
+	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
 
-	return App->file_system->SaveUnique(output, &data, size, LIBRARY_MESH_FOLDER, "mesh", "dvs_mesh");
+	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MESH_FOLDER, "mesh", "dvs_mesh"); //save
 }
 
 bool ResourceMesh::LoadtoScene()
@@ -98,44 +97,45 @@ bool ResourceMesh::LoadtoScene()
 	{
 		char* buffer = nullptr;
 		uint size = App->file_system->Load(LIBRARY_MESH_FOLDER, GetExportedFile(), &buffer);
-		char* cursor = buffer;
 
-		// amount of indices / vertices / normals / texture_coords
-		uint ranges[4];
-		uint bytes = sizeof(ranges);
-		memcpy(ranges, cursor, bytes);
+		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 
-		num_vertices = ranges[0];
-		num_indices = ranges[1];
-		num_tex_coords = ranges[2];
-		num_normals = ranges[3];
+		// Load num of vertices, indices, tex_coords, normals
+		read_stream >> num_vertices;
+		read_stream >> num_indices;
+		read_stream >> num_tex_coords;
+		read_stream >> num_normals;
 
 		// Load vertices
-		cursor += bytes;
-		bytes = sizeof(float3) * num_vertices;
 		vertices = new float3[num_vertices];
-		memcpy(vertices, cursor, bytes);
+		for (uint i = 0; i < num_vertices; ++i)
+		{
+			read_stream >> vertices[i].x >> vertices[i].y >> vertices[i].z;
+		}
 		GenVBO();
 
 		// Load indices
-		cursor += bytes;
-		bytes = sizeof(uint) * num_indices;
 		indices = new uint[num_indices];
-		memcpy(indices, cursor, bytes);
+		for (uint i = 0; i < num_indices; ++i)
+		{
+			read_stream >> indices[i];
+		}
 		GenIBO();
 
 		// Load tex_coords
-		cursor += bytes;
-		bytes = sizeof(float2) * num_tex_coords;
 		tex_coords = new float2[num_tex_coords];
-		memcpy(tex_coords, cursor, bytes);
+		for (uint i = 0; i < num_tex_coords; ++i)
+		{
+			read_stream >> tex_coords[i].x >> tex_coords[i].y;
+		}
 		GenTexture();
 		
 		// Load normals
-		cursor += bytes;
-		bytes = sizeof(float3) * num_normals;
 		normals = new float3[num_normals];
-		memcpy(normals, cursor, bytes);
+		for (uint i = 0; i < num_normals; ++i)
+		{
+			read_stream >> normals[i].x >> normals[i].y >> normals[i].z;
+		}
 
 		delete[] buffer;
 		return true;

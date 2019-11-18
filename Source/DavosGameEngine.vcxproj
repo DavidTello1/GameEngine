@@ -212,6 +212,7 @@
     <ClInclude Include="ResourceMaterial.h" />
     <ClInclude Include="ResourceMesh.h" />
     <ClInclude Include="ResourceModel.h" />
+    <ClInclude Include="SimpleBinStream.h" />
     <ClInclude Include="src\glew\include\GL\eglew.h" />
     <ClInclude Include="src\glew\include\GL\glew.h" />
     <ClInclude Include="src\glew\include\GL\glxew.h" />
