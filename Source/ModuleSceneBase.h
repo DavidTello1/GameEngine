@@ -17,6 +17,8 @@ public:
 	bool Update(float dt);
 	bool PostUpdate(float dt);
 	void UpdateMainCamera(float dt);
+	void CameraFreeMove(float dt);
+	void CameraZoom(float dt);
 	bool CleanUp();
 
 	bool Draw();
@@ -37,9 +39,9 @@ public:
 	static GameObject* main_camera_object;
 	static ComponentCamera* main_camera;
 
-	void Look(const float3 &Position, const float3 &Reference, bool RotateAroundReference = false);
-	void LookAt(const float3 &Spot);
-	void Move(const float3 &Movement);
+	//void Look(const float3 &Position, const float3 &Reference, bool RotateAroundReference = false);
+	//void LookAt(const float3 &Spot);
+	//void Move(const float3 &Movement);
 
 	void RotateWithMouse();
 

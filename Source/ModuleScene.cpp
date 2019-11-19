@@ -22,13 +22,10 @@ bool ModuleScene::Start(Config* config)
 	root_object = new GameObject("Root", nullptr);
 	root_object->uid = 0;
 
-	// Create game objects after this ----------
+	// Create game objects after this ^^^^^^^^^^^^	
 
-	ModuleSceneBase::main_camera_object = CreateGameObject("Main Camera");
-	ModuleSceneBase::main_camera = (ComponentCamera*)ModuleSceneBase::main_camera_object->AddComponent(Component::Type::Camera);
-		
-	test_camera = CreateGameObject("test camera");
-	test_camera->AddComponent(Component::Type::Camera);
+	//test_camera = CreateGameObject("test camera");
+	//test_camera->AddComponent(Component::Type::Camera);
 
 	GameObject* bparent = CreateGameObject("BakerHouse");
 

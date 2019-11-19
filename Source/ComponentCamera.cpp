@@ -119,42 +119,27 @@ void ComponentCamera::SetAspectRatio(float ratio)
 	update_projection = true;
 }
 
-// To delete -----------------------------------------------
-
-void ComponentCamera::CalculateViewMatrix()
+void ComponentCamera::SetPosition(const float3& position)
 {
-	ViewMatrix = float4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -Dot(X, Position), -Dot(Y, Position), -Dot(Z, Position), 1.0f);
+	frustum.pos = position;
+	update_projection = true;
+}
+// Actions ---------------------------------------------------
+
+void ComponentCamera::Look(const float3 & position)
+{
+	float3 vector = position - frustum.pos;
+
+	float3x3 matrix = float3x3::LookAt(frustum.front, vector.Normalized(), frustum.up, float3::unitY);
+
+	frustum.front = matrix.MulDir(frustum.front).Normalized();
+	frustum.up = matrix.MulDir(frustum.up).Normalized();
 }
 
-void ComponentCamera::CalculateProjectionMatrix()
+void ComponentCamera::Move(const float3 & distance)
 {
-	ProjectionMatrix = SetFrustum(frustum.verticalFov, frustum.AspectRatio(), frustum.nearPlaneDistance, frustum.farPlaneDistance);
-}
-
-float4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, float f)
-{
-
-	float4x4 matrix = float4x4::identity;
-	matrix.ptr()[0] = 2 * n / (r - l);
-	matrix.ptr()[5] = 2 * n / (t - b);
-	matrix.ptr()[8] = (r + l) / (r - l);
-	matrix.ptr()[9] = (t + b) / (t - b);
-	matrix.ptr()[10] = -(f + n) / (f - n);
-	matrix.ptr()[11] = -1;
-	matrix.ptr()[14] = -(2 * f * n) / (f - n);
-	matrix.ptr()[15] = 0;
-
-	return matrix;
-}
-
-float4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, float back)
-{
-	float tangent = tanf(fovY / 2);   // tangent of half fovY
-	float height = front * tangent;           // half height of near plane
-	float width = height * aspectRatio;       // half width of near plane
-
-
-	return SetFrustum(-width, width, -height, height, front, back);
+	frustum.Translate(distance);
+	update_projection = true;
 }
 
 void ComponentCamera::DrawFrustum() {
@@ -225,6 +210,46 @@ void ComponentCamera::DrawFrustum() {
 
 	glColor3ub(255.0f, 255.0f, 255.0f);
 }
+
+// To delete -----------------------------------------------
+
+void ComponentCamera::CalculateViewMatrix()
+{
+	ViewMatrix = float4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -Dot(X, Position), -Dot(Y, Position), -Dot(Z, Position), 1.0f);
+}
+
+void ComponentCamera::CalculateProjectionMatrix()
+{
+	ProjectionMatrix = SetFrustum(frustum.verticalFov, frustum.AspectRatio(), frustum.nearPlaneDistance, frustum.farPlaneDistance);
+}
+
+float4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, float f)
+{
+
+	float4x4 matrix = float4x4::identity;
+	matrix.ptr()[0] = 2 * n / (r - l);
+	matrix.ptr()[5] = 2 * n / (t - b);
+	matrix.ptr()[8] = (r + l) / (r - l);
+	matrix.ptr()[9] = (t + b) / (t - b);
+	matrix.ptr()[10] = -(f + n) / (f - n);
+	matrix.ptr()[11] = -1;
+	matrix.ptr()[14] = -(2 * f * n) / (f - n);
+	matrix.ptr()[15] = 0;
+
+	return matrix;
+}
+
+float4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, float back)
+{
+	float tangent = tanf(fovY / 2);   // tangent of half fovY
+	float height = front * tangent;           // half height of near plane
+	float width = height * aspectRatio;       // half width of near plane
+
+
+	return SetFrustum(-width, width, -height, height, front, back);
+}
+
+
 
 
 

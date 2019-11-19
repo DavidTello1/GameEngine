@@ -22,8 +22,10 @@ ModuleSceneBase::~ModuleSceneBase()
 // Load assets
 bool ModuleSceneBase::Start(Config* config)
 {
-	//main_camera->Move(vec3(0, 7.5f, 7.5f));
-	//main_camera->LookAt(vec3(0, 0, 0));
+	main_camera_object = App->scene->CreateGameObject("Main Camera");
+	main_camera = (ComponentCamera*)ModuleSceneBase::main_camera_object->AddComponent(Component::Type::Camera);
+
+	main_camera->Move({ 0, 5.0f, -10.5f });
 
 	return true;
 }
@@ -49,21 +51,8 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 
 	if (main_camera == nullptr || main_camera->viewport_focus == false) return;
 
-	// TODO Change library glmath to math
-
 	// Camera ZOOM with MOUSE WHEEL
-	ImGuiIO io = ImGui::GetIO();
-	float3 newPos(0, 0, 0);
-	float speed = io.MouseWheel * zoom_speed * dt; // TODO Not hardcoded speed
-	if (speed != 0)
-	{
-		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT || App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
-			speed *= 2.0f;
-
-		newPos -= main_camera->Z * speed;
-		main_camera->Position += newPos;
-		main_camera->update_projection = true;
-	}
+	CameraZoom(dt);
 
 	// Center main_camera to selected gameobject with F
 	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
@@ -121,38 +110,13 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 			LOG("To [%f,%f,%f]", main_camera->Position.x, main_camera->Position.y, main_camera->Position.z, 'v');
 			LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'v');
 
-			LookAt(new_p);
+			main_camera->Look(new_p);
 
 			main_camera->update_projection = true;
 		}
 	}
 	//Free move 
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
-	{
-		//Camera motion with WASD, Shift to go faster
-		float3 newPos(0, 0, 0);
-		float speed = 10.0f * dt;
-
-		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT ||
-			App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
-			speed *= 2.0f;
-
-		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos -= main_camera->Z * speed;
-		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos += main_camera->Z * speed;
-
-
-		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= main_camera->X * speed;
-		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += main_camera->X * speed;
-
-		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= main_camera->Y * speed;
-		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += main_camera->Y * speed;
-
-		main_camera->Position += newPos;
-		main_camera->Reference += newPos;
-
-		RotateWithMouse();
-		main_camera->update_projection = true;
-	}
+	CameraFreeMove(dt);
 
 	// Orbit move
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))
@@ -162,7 +126,7 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 		GameObject* object = App->scene->GetSelectedGameObject();
 		if (object != nullptr)
 		{
-			LookAt({ object->center.x, object->center.y,object->center.z });
+			main_camera->Look({ object->center.x, object->center.y,object->center.z });
 			main_camera->update_projection = true;
 		}
 
@@ -175,46 +139,98 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 
 }
 
-// -----------------------------------------------------------------
-void ModuleSceneBase::Look(const float3 &Position, const float3 &Reference, bool RotateAroundReference)
+void ModuleSceneBase::CameraFreeMove(float dt)
 {
-	main_camera->Position = Position;
-	main_camera->Reference = Reference;
-
-	/*main_camera->Z = normalize(Position - Reference);
-	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
-	main_camera->Y = cross(main_camera->Z, main_camera->X);*/
-	
-	if (!RotateAroundReference)
+	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 	{
-		main_camera->Reference = main_camera->Position;
-		main_camera->Position += main_camera->Z * 0.05f;
+		//Camera motion with WASD, Shift to go faster
+		float3 newPos = float3::zero;
+		float speed = 10.0f * dt;
+
+		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT ||
+			App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
+			speed *= 2.0f;
+
+		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos += main_camera->frustum.front * speed;
+		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos -= main_camera->frustum.front * speed;
+
+
+		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= main_camera->frustum.WorldRight() * speed;
+		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += main_camera->frustum.WorldRight() * speed;
+
+		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= main_camera->frustum.up * speed;
+		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += main_camera->frustum.up * speed;
+
+		main_camera->Move(newPos);
+
+		LOG("Distance [%f,%f,%f]", newPos.x, newPos.y, newPos.z, 'd');
+
+		//main_camera->Position += newPos;
+		//main_camera->Reference += newPos;
+
+		//RotateWithMouse();
+		//main_camera->update_projection = true;
 	}
+}
 
-	main_camera->CalculateViewMatrix();
+void ModuleSceneBase::CameraZoom(float dt)
+{
+	//float3 distance = float3::zero;
+
+	float speed = ImGui::GetIO().MouseWheel * zoom_speed * dt;
+
+	if (speed != 0)
+	{
+		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT || App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
+			speed *= 2.0f;
+
+		main_camera->Move(main_camera->frustum.front * speed);
+
+		//distance -= main_camera->frustum.front * speed;
+		//LOG("Distance [%f,%f,%f]", distance.x,distance.y,distance.z, 'd');
+	}
 }
 
 // -----------------------------------------------------------------
-void ModuleSceneBase::LookAt(const float3 &Spot)
-{
-	main_camera->Reference = Spot;
+//void ModuleSceneBase::Look(const float3 &Position, const float3 &Reference, bool RotateAroundReference)
+//{
+//	main_camera->Position = Position;
+//	main_camera->Reference = Reference;
+//
+//	/*main_camera->Z = normalize(Position - Reference);
+//	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
+//	main_camera->Y = cross(main_camera->Z, main_camera->X);*/
+//	
+//	if (!RotateAroundReference)
+//	{
+//		main_camera->Reference = main_camera->Position;
+//		main_camera->Position += main_camera->Z * 0.05f;
+//	}
+//
+//	main_camera->CalculateViewMatrix();
+//}
 
-	/*main_camera->Z = normalize(main_camera->Position - main_camera->Reference);
-	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
-	main_camera->Y = cross(main_camera->Z, main_camera->X);*/
-
-	main_camera->CalculateViewMatrix();
-}
+// -----------------------------------------------------------------
+//void ModuleSceneBase::LookAt(const float3 &Spot)
+//{
+//	main_camera->Reference = Spot;
+//
+//	/*main_camera->Z = normalize(main_camera->Position - main_camera->Reference);
+//	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
+//	main_camera->Y = cross(main_camera->Z, main_camera->X);*/
+//
+//	main_camera->CalculateViewMatrix();
+//}
 
 
 // -----------------------------------------------------------------
-void ModuleSceneBase::Move(const float3 &Movement)
-{
-	main_camera->Position += Movement;
-	main_camera->Reference += Movement;
-
-	main_camera->CalculateViewMatrix();
-}
+//void ModuleSceneBase::Move(const float3 &Movement)
+//{
+//	main_camera->Position += Movement;
+//	main_camera->Reference += Movement;
+//
+//	main_camera->CalculateViewMatrix();
+//}
 
 void ModuleSceneBase::RotateWithMouse() {
 	// Camera rotation with mouse

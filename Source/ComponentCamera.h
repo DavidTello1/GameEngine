@@ -29,6 +29,12 @@ public:
 	void SetFov(float fov, bool in_degree = true);
 	void SetAspectRatio(float ratio);
 
+	void SetPosition(const float3 & position);
+
+	void Look(const float3 & position);
+
+	void Move(const float3 & distance);
+
 	// to delete
 	void CalculateViewMatrix();
 	void CalculateProjectionMatrix();
