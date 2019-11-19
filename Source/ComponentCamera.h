@@ -16,8 +16,16 @@ public:
 	ComponentCamera(GameObject* gameObject);
 	~ComponentCamera();
 
+	float GetNearPlane() const;
+	float GetFarPlane() const;
+	float GetFOV() const;
+	float GetAspectRatio() const;
+
 	float* GetViewMatrix();
 	float* GetProjectionMatrix();
+
+
+
 
 	void CalculateViewMatrix();
 	void CalculateProjectionMatrix();

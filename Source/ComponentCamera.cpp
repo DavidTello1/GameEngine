@@ -15,10 +15,16 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 
 
 	frustum.pos = float3(0.0f, 0.0f, -5.0f);
+	frustum.front = float3::unitZ;
+	frustum.up = float3::unitY;
+
 	frustum.nearPlaneDistance = 1.0f;
 	frustum.farPlaneDistance = 100.0f;
 	frustum.verticalFov = DEGTORAD * 60.0f;
+
 	SetAspectRatio(1.4f);
+
+	update_projection = true;
 
 	Position = float3(0.0f, 0.0f, 5.0f);
 	Reference = Position;
@@ -27,15 +33,45 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 ComponentCamera::~ComponentCamera()
 {}
 
-// -----------------------------------------------------------------
+// Getters -----------------------------------------------------------------
+float ComponentCamera::GetNearPlane() const
+{
+	return frustum.nearPlaneDistance;
+}
+
+float ComponentCamera::GetFarPlane() const
+{
+	return frustum.farPlaneDistance;
+}
+
+float ComponentCamera::GetFOV() const
+{
+	return frustum.verticalFov * RADTODEG;
+}
+
+float ComponentCamera::GetAspectRatio() const
+{
+	return frustum.AspectRatio();
+}
+
 float* ComponentCamera::GetViewMatrix()
 {
-	return ViewMatrix.ptr();
+	if (perspective) {
 
+		math::float4x4 matrix = frustum.ViewMatrix();
+		return matrix.Transposed().ptr();
+	}
+
+	return ViewMatrix.ptr();
 }
 
 float* ComponentCamera::GetProjectionMatrix()
 {
+	if (perspective) {
+
+		math::float4x4 matrix = frustum.ProjectionMatrix();
+		return matrix.Transposed().ptr();
+	}
 	return ProjectionMatrix.ptr();
 }
 
@@ -89,10 +125,8 @@ float4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front,
 	float height = front * tangent;           // half height of near plane
 	float width = height * aspectRatio;       // half width of near plane
 
-	// params: left, right, bottom, top, near, far
-	if (perspective)
-		return SetFrustum(-width, width, -height, height, front, back);
-	return SetOrthoFrustum(-width, width, -height, height, front, back);
+
+	return SetFrustum(-width, width, -height, height, front, back);
 }
 
 void ComponentCamera::DrawFrustum() {

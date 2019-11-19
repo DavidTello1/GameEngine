@@ -158,7 +158,7 @@ void Viewport::OnResize(int width, int height)
 
 	glViewport(0, 0, width, height);
 
-	if (height != 0)
+	if (height > 0)
 		ModuleSceneBase::main_camera->SetAspectRatio(width/height);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -166,7 +166,7 @@ void Viewport::OnResize(int width, int height)
 	//glLoadIdentity();
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	//glLoadIdentity();
 	ModuleSceneBase::main_camera->CalculateProjectionMatrix();
 	glLoadMatrixf(ModuleSceneBase::main_camera->GetProjectionMatrix());
 
