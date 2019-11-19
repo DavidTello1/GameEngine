@@ -55,70 +55,22 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 	CameraZoom(dt);
 
 	// Center main_camera to selected gameobject with F
-	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
-	{
-		LOG("Centering viewport camera from [%f,%f,%f]", main_camera->Position.x, main_camera->Position.y, main_camera->Position.z, 'v');
-		// To change to the Reference we want to orbit at
-		GameObject* object = App->scene->GetSelectedGameObject();
-		if (object != nullptr)
-		{
-			float3 c = { main_camera->Position.x,main_camera->Position.y,main_camera->Position.z };
-			float3 p = object->bounding_box[9] - c;
-
-			float l = length(vec3(p.x, p.y, p.z));
-			float min = l;
-			int face = 9;
-
-			for (int i = 10; i < 13; i++)
-			{
-				p = object->bounding_box[i] - c;
-				l = length(vec3(p.x, p.y, p.z));
-				if (l < min) {
-					min = l;
-					face = i;
-				}
-			}
-
-			float3 new_p = { object->bounding_box[face].x,object->bounding_box[face].y,object->bounding_box[face].z };
-			float size = object->size.MaxElement();
-			float offset = Sqrt((size*size) - (size*size / 4));
-			float parent = (object->HasChilds()) ? 1.0f : -1.0f;
-
-			switch (face)
-			{
-			case 9:
-				main_camera->Position = new_p + (main_camera->c_Z * offset * parent);
-				break;
-			case 10:
-				main_camera->Position = new_p + (main_camera->c_X * offset* parent);
-				break;
-			case 11:
-				main_camera->Position = new_p - (main_camera->c_X * offset* parent);
-				break;
-			case 12:
-				main_camera->Position = new_p - (main_camera->c_Z * offset* parent);
-				break;
-			default:
-				LOG("Could not detect closest face", 'e');
-				break;
-			}
-			//mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
-			//App->resources->bbox_indices[25] = face;
-			//App->resources->GenBoundingBox(mesh);
-
-			LOG("FACE %i", face, 'v');
-			LOG("To [%f,%f,%f]", main_camera->Position.x, main_camera->Position.y, main_camera->Position.z, 'v');
-			LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'v');
-
-			main_camera->Look(new_p);
-
-			main_camera->update_projection = true;
-		}
-	}
+	CameraFocusTo();
 	//Free move 
 	CameraFreeMove(dt);
 
 	// Orbit move
+	CameraOrbit();
+
+	// Recalculate matrix -------------
+	main_camera->CalculateViewMatrix();
+
+	
+
+}
+
+void ModuleSceneBase::CameraOrbit()
+{
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))
 	{
 		RotateWithMouse();
@@ -126,17 +78,78 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 		GameObject* object = App->scene->GetSelectedGameObject();
 		if (object != nullptr)
 		{
-			main_camera->Look({ object->center.x, object->center.y,object->center.z });
-			main_camera->update_projection = true;
+			main_camera->Look(object->center);
 		}
 
 	}
+}
 
-	// Recalculate matrix -------------
-	main_camera->CalculateViewMatrix();
+void ModuleSceneBase::CameraFocusTo()
+{
+	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
+	{
+		//LOG("Centering viewport camera from [%f,%f,%f]", main_camera->Position.x, main_camera->Position.y, main_camera->Position.z, 'v');
+		// To change to the Reference we want to orbit at
+		GameObject* object = App->scene->GetSelectedGameObject();
 
-	
+		if (object != nullptr)
+		{
+			//float3 c = main_camera->frustum.pos; // { main_camera->Position.x, main_camera->Position.y, main_camera->Position.z };
 
+			float3 v_distance = object->bounding_box[9] - main_camera->frustum.pos;
+
+			//float l = v_distance.Length();
+			float min = v_distance.Length();
+			int face = 9;
+
+			for (int i = 10; i < 13; i++)
+			{
+				v_distance = object->bounding_box[i] - main_camera->frustum.pos;
+				
+				if (v_distance.Length() < min) {
+					min = v_distance.Length();
+					face = i;
+				}
+			}
+
+			//float3 new_p = { object->bounding_box[face].x,object->bounding_box[face].y,object->bounding_box[face].z };
+			float size = object->size.MaxElement();
+			float offset = Sqrt((size*size) - (size*size / 4));
+			float parent = (object->HasChilds()) ? 1.0f : -1.0f;
+
+			switch (face)
+			{
+			case 9:
+				main_camera->SetPosition(object->bounding_box[face] + (main_camera->c_Z * offset * parent));
+				break;
+			case 10:
+				main_camera->SetPosition(object->bounding_box[face] + (main_camera->c_X * offset* parent));
+				break;
+			case 11:
+				main_camera->SetPosition(object->bounding_box[face] - (main_camera->c_X * offset* parent));
+				break;
+			case 12:
+				main_camera->SetPosition(object->bounding_box[face] - (main_camera->c_Z * offset* parent));
+				break;
+			default:
+				LOG("Could not detect closest face", 'e');
+				break;
+			}
+
+			main_camera->Look(object->bounding_box[face]);
+
+			//mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
+			//App->resources->bbox_indices[25] = face;
+			//App->resources->GenBoundingBox(mesh);
+
+			//LOG("FACE %i", face, 'v');
+			//LOG("To [%f,%f,%f]", main_camera->Position.x, main_camera->Position.y, main_camera->Position.z, 'v');
+			//LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'v');
+
+
+			//main_camera->update_projection = true;
+		}
+	}
 }
 
 void ModuleSceneBase::CameraFreeMove(float dt)

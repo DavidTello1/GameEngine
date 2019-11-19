@@ -134,6 +134,9 @@ void ComponentCamera::Look(const float3 & position)
 
 	frustum.front = matrix.MulDir(frustum.front).Normalized();
 	frustum.up = matrix.MulDir(frustum.up).Normalized();
+
+	update_projection = true;
+
 }
 
 void ComponentCamera::Move(const float3 & distance)
