@@ -128,6 +128,7 @@ void Inspector::Draw()
 			ImGui::SetTooltip("Rename");
 	}
 
+	ImGui::Text("ID: %ld", obj->GetUID());
 	ImGui::Separator();
 
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))

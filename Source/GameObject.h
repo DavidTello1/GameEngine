@@ -23,6 +23,7 @@ enum GameObjectFlags
 class GameObject
 {
 	friend class ModuleScene;
+	ALIGN_CLASS_TO_16
 
 private:
 	GameObject(const char* name, GameObject* Parent);
