@@ -15,6 +15,7 @@ ResourceMesh::ResourceMesh(UID uid) : Resource(uid, Resource::Type::mesh)
 
 ResourceMesh::~ResourceMesh()
 {
+	UnLoad();
 }
 
 UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)

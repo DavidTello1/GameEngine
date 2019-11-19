@@ -24,7 +24,6 @@ ResourceModel::ResourceModel(UID id) : Resource(id, Resource::Type::model)
 
 ResourceModel::~ResourceModel()
 {
-	UnLoad();
 }
 
 //void ResourceModel::Save(Config& config) const
@@ -39,6 +38,8 @@ ResourceModel::~ResourceModel()
 
 bool ResourceModel::Import(const char* full_path, std::string& output)
 {
+	Timer timer;
+	timer.Start();
 	unsigned flags = aiProcess_CalcTangentSpace | \
 		aiProcess_GenSmoothNormals | \
 		aiProcess_JoinIdenticalVertices | \
@@ -101,6 +102,8 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		{
 			LOG("Importing aiScene %s FAILED", full_path);
 		}
+		LOG("[%s] imported in %d ms", model.GetFile(), timer.Read(), 'd');
+		timer.Stop();
 		model.LoadToMemory(); //should be called when loading after importing (just for testing)
 		return ret;
 	}
@@ -130,6 +133,8 @@ bool ResourceModel::LoadtoScene()
 {
 	if (GetExportedFile() != nullptr)
 	{
+		Timer timer;
+		timer.Start();
 		char* buffer = nullptr;
 		uint size = App->file_system->LoadFromPath(LIBRARY_MODEL_FOLDER, GetExportedFile(), &buffer); //get total size
 
@@ -152,6 +157,8 @@ bool ResourceModel::LoadtoScene()
 		}
 
 		CreateGameObjects(App->file_system->GetFileName(file.c_str()).c_str());
+		LOG("[%s] loaded in %d ms", GetExportedFile(), timer.Read(), 'd');
+		timer.Stop();
 		return true;
 	}
 	return false;
@@ -159,7 +166,7 @@ bool ResourceModel::LoadtoScene()
 
 void ResourceModel::UnLoad()
 {
-	LOG("UnLoading Model %s with uid %d", name, uid, 'd');
+	LOG("UnLoading Model %s with uid %d", name.c_str(), uid, 'd');
 	for (uint i = 0; i < nodes.size(); ++i)
 	{
 		if (nodes[i].mesh != 0)
