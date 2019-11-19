@@ -110,6 +110,7 @@ void Configuration::DrawMainCamera()
 			ImGui::DragFloat("Z Far",  &App->scene_base->main_camera->z_far,	0.25f, 0.0f, 5000.0f))
 		{
 			App->scene_base->main_camera->CalculateProjectionMatrix();
+			App->scene_base->main_camera->update_projection = true;
 		}
 	}
 }

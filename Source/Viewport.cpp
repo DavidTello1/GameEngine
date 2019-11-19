@@ -46,17 +46,23 @@ bool Viewport::PreUpdate()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
-	glMatrixMode(GL_MODELVIEW);
+	if (ModuleSceneBase::main_camera->update_projection)
+	{
+		OnResize(width, height);
+		ModuleSceneBase::main_camera->update_projection = false;
+	}
+
+	//glMatrixMode(GL_MODELVIEW);
 	//glLoadMatrixf(ModuleSceneBase::main_camera->frustum.ViewProjMatrix().ptr());
 	//glLoadIdentity();
-	glLoadMatrixf(ModuleSceneBase::main_camera->GetViewMatrix());
-	glPopMatrix();
+	//glLoadMatrixf(ModuleSceneBase::main_camera->GetViewMatrix());
+	//glPopMatrix();
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glLoadMatrixf(ModuleSceneBase::main_camera->GetProjectionMatrix());
+	//glMatrixMode(GL_PROJECTION);
+	//glLoadIdentity();
+	//glLoadMatrixf(ModuleSceneBase::main_camera->GetProjectionMatrix());
 	//glLoadMatrixf(ModuleSceneBase::main_camera->frustum.ProjectionMatrix().ptr());
-	glPopMatrix();
+	//glPopMatrix();
 
 	//glLoadMatrixf(ModuleSceneBase::main_camera->frustum.ViewProjMatrix().Transposed().ptr());
 	//glPopMatrix();
@@ -148,13 +154,17 @@ void Viewport::RemoveBuffer(FrameBuffer& buffer)
 
 void Viewport::OnResize(int width, int height)
 {
+	//projection_matrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
+
 	glViewport(0, 0, width, height);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(ModuleSceneBase::main_camera->GetViewMatrix());
+	//glLoadIdentity();
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	projection_matrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
-	glLoadMatrixf(&projection_matrix);
+	ModuleSceneBase::main_camera->CalculateProjectionMatrix();
+	glLoadMatrixf(ModuleSceneBase::main_camera->GetProjectionMatrix());
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 }

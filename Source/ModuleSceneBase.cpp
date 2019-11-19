@@ -62,6 +62,7 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 
 		newPos -= main_camera->Z * speed;
 		main_camera->Position += newPos;
+		main_camera->update_projection = true;
 	}
 
 	// Center main_camera to selected gameobject with F
@@ -122,7 +123,7 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 
 			LookAt(new_p);
 
-
+			main_camera->update_projection = true;
 		}
 	}
 	//Free move 
@@ -150,6 +151,7 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 		main_camera->Reference += newPos;
 
 		RotateWithMouse();
+		main_camera->update_projection = true;
 	}
 
 	// Orbit move
@@ -161,11 +163,15 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 		if (object != nullptr)
 		{
 			LookAt({ object->center.x, object->center.y,object->center.z });
+			main_camera->update_projection = true;
 		}
+
 	}
 
 	// Recalculate matrix -------------
 	main_camera->CalculateViewMatrix();
+
+	
 
 }
 

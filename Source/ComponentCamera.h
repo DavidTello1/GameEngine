@@ -15,22 +15,19 @@ public:
 	~ComponentCamera();
 
 	float* GetViewMatrix();
-
-	float * GetProjectionMatrix();
+	float* GetProjectionMatrix();
 
 	void CalculateViewMatrix();
-
 	void CalculateProjectionMatrix();
 
+	mat4x4 SetFrustum(float fovY, float aspectRatio, float front, float back);
 	mat4x4 SetFrustum(float l, float r, float b, float t, float n, float f);
+	mat4x4 SetOrthoFrustum(float l, float r, float b, float t, float n, float f);
 
 	void DrawFrustum();
 
-	mat4x4 SetFrustum(float fovY, float aspectRatio, float front, float back);
-
-	mat4x4 SetOrthoFrustum(float l, float r, float b, float t, float n, float f);
-
 public:
+
 	vec3 X = { 1.0f, 0.0f, 0.0f };
 	vec3 Y = { 0.0f, 1.0f, 0.0f };
 	vec3 Z = { 0.0f, 0.0f, 1.0f };
@@ -45,6 +42,7 @@ public:
 public:
 
 	bool perspective = true;
+	bool update_projection = false;
 
 	float z_near = 1.0f;
 	float z_far = 100.0f;
@@ -54,19 +52,16 @@ public:
 	float width = 1280.0f;
 	float height = 720.0f;
 
-	Frustum frustum;
 private:
 
 	mat4x4 ViewMatrix;
 	mat4x4 ProjectionMatrix;
 
+	//GLuint VBO = 0;
+	//GLuint IBO = 0;
 
-	float3 frustum_vertices[8];
-
-	GLuint VBO = 0;
-	GLuint IBO = 0;
-
-	static GLuint frustum_indices[24];
+	//float3 frustum_vertices[8];
+	//static GLuint frustum_indices[24];
 };
 
 

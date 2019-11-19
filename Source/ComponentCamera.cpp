@@ -7,22 +7,17 @@
 #include "ModuleScene.h"
 #include "mmgr/mmgr.h"
 
-GLuint ComponentCamera::frustum_indices[24] =
-{
-	0,1,2,3,0,3,1,2,
-	4,5,6,7,4,7,5,6,
-	0,4,1,5,2,6,3,7
-};
+//GLuint ComponentCamera::frustum_indices[24] =
+//{
+//	0,1,2,3,0,3,1,2,
+//	4,5,6,7,4,7,5,6,
+//	0,4,1,5,2,6,3,7
+//};
 
 ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Type::Camera, gameobj)
 {
 	CalculateViewMatrix();
 	CalculateProjectionMatrix();
-
-	//frustum_vertices = new float3[8];
-	frustum.pos = { 0,0,0 };
-	frustum.up = { 0,1,0 };
-	frustum.front = { 0,0,1 };
 
 	Position = vec3(0.0f, 0.0f, 5.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
@@ -32,14 +27,14 @@ ComponentCamera::~ComponentCamera()
 {
 	//RELEASE_ARRAY(frustum_vertices);
 	
-	if (VBO != 0)
+	/*if (VBO != 0)
 	{
 		glDeleteFramebuffers(1, &VBO);
 	}
 	if (IBO != 0)
 	{
 		glDeleteBuffers(1, &IBO);
-	}
+	}*/
 }
 
 
@@ -61,21 +56,23 @@ void ComponentCamera::CalculateViewMatrix()
 {
 	//frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, -dot(X, Position), X.y, Y.y, Z.y, -dot(Y, Position), X.z, Y.z, Z.z, -dot(Z, Position)));
 	//frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, Position.x, X.y, Y.y, Z.y, Position.y, X.z, Y.z, Z.z, Position.z));
+	//frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f));// , -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f));
+	//float3 up = { -dot(X, Position), -dot(Y, Position),-dot(Z, Position) };
+	//frustum.up = up.Normalized();
+
 	ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
-	frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f));// , -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f));
-	float3 up = { -dot(X, Position), -dot(Y, Position),-dot(Z, Position) };
-	frustum.up = up.Normalized();
 }
 
 void ComponentCamera::CalculateProjectionMatrix()
 {
-	frustum.nearPlaneDistance = z_near;
-	frustum.farPlaneDistance = z_far;
-	frustum.verticalFov = fov_y;
-	frustum.horizontalFov = 2 * Atan(tan(fov_y / 2) * width / height);
-	frustum.type = FrustumType::PerspectiveFrustum;
-	float3x4 view = frustum.ViewMatrix();
+	//frustum.nearPlaneDistance = z_near;
+	//frustum.farPlaneDistance = z_far;
+	//frustum.verticalFov = fov_y;
+	//frustum.horizontalFov = 2 * Atan(tan(fov_y / 2) * width / height);
+	//frustum.type = FrustumType::PerspectiveFrustum;
+	//float3x4 view = frustum.ViewMatrix();
 	//ProjectionMatrix = frustum.ProjectionMatrix();
+
 	ProjectionMatrix = SetFrustum(fov_y, width / height, z_near, z_far);
 }
 
