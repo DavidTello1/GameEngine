@@ -1,4 +1,5 @@
 #include "Console.h"
+#include "mmgr/mmgr.h"
 
 char						Console::InputBuf[256];
 ImVector<char*>				Console::Items;

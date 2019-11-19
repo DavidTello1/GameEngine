@@ -8,6 +8,8 @@
 #pragma comment (lib, "Devil/lib/x86/ILU.lib")
 #pragma comment (lib, "Devil/lib/x86/ILUT.lib")
 
+#include "mmgr/mmgr.h"
+
 ResourceMaterial::ResourceMaterial(UID id) : Resource(id, Resource::Type::material)
 {
 }

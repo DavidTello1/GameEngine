@@ -4,6 +4,8 @@
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
 
+#include "mmgr/mmgr.h"
+
 GameObject* ModuleScene::root_object;
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
@@ -11,7 +13,9 @@ ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 
 
 ModuleScene::~ModuleScene()
-{}
+{
+	delete root_object;
+}
 
 // Load assets
 bool ModuleScene::Start(Config* config)
@@ -24,18 +28,6 @@ bool ModuleScene::Start(Config* config)
 	App->camera->Move(vec3(0, 7.5f, 7.5f));
 	App->camera->LookAt(vec3(0, 0, 0));
 		
-	GameObject* bparent = CreateGameObject("BakerHouse");
-
-	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
-	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
-
-	// ParShapes 
-	/*GameObject* pparent = CreateGameObj("ParShapes");
-	for (int i = 0; i < shape_type::UNKNOWN; i++)
-	{
-		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10, 0.5f, pparent->GetUID());
-	}*/
-
 	UnSelectAll();
 
 	return true;
