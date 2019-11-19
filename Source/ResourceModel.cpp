@@ -84,6 +84,7 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		aiReleaseImport(scene);
 
 		bool ret = model.SaveOwnFormat(output);
+		model.nodes.clear(); //clear nodes data
 
 		if (ret)
 		{
@@ -99,7 +100,6 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		{
 			LOG("Importing aiScene %s FAILED", full_path);
 		}
-
 		model.LoadToMemory(); //should be called when loading after importing (just for testing)
 		return ret;
 	}
@@ -242,6 +242,7 @@ void ResourceModel::CreateGameObjects(const char* name)
 			ResourceMesh* r_mesh = (ResourceMesh*)App->resources->GetResource(nodes[i].mesh);
 			r_mesh->LoadToMemory(); //load mesh data
 			mesh->SetMesh(r_mesh);
+			mesh->SetBoundingBox();
 
 			obj->AddComponent(Component::Type::Renderer);
 		}

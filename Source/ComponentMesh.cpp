@@ -8,6 +8,14 @@ ComponentMesh::ComponentMesh(GameObject* gameobj) : Component(Component::Type::M
 {
 	object = gameobj;
 
+}
+
+ComponentMesh::~ComponentMesh()
+{
+}
+
+void ComponentMesh::SetBoundingBox()
+{
 	if (mesh == nullptr)
 	{
 		LOG("Error setting bounding box, mesh is nullptr", 'e');
@@ -40,18 +48,9 @@ ComponentMesh::ComponentMesh(GameObject* gameobj) : Component(Component::Type::M
 			if (z > object->max_vertex.z) object->max_vertex.z = z;
 		}
 	}
-	else 
+	else
 	{
 		LOG("Mesh has no vertices - Cannot create bounding box", 'e');
 		return;
 	}
-}
-
-ComponentMesh::~ComponentMesh()
-{
-}
-
-void ComponentMesh::SetBoundingBox()
-{
-
 }
