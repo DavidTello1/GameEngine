@@ -100,8 +100,7 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 			LOG("Importing aiScene %s FAILED", full_path);
 		}
 
-		model.CreateGameObjects(meshes, materials, App->file_system->GetFileName(model.file.c_str()).c_str());
-
+		model.LoadToMemory(); //should be called when loading after importing (just for testing)
 		return ret;
 	}
 	return false;
@@ -151,14 +150,7 @@ bool ResourceModel::LoadtoScene()
 			nodes.push_back(node); //add node to vector nodes
 		}
 
-		for (uint i = 0; i < nodes.size(); ++i) //load meshes and materials
-		{
-			if (nodes[i].mesh != 0)
-				App->resources->GetResource(nodes[i].mesh)->LoadToMemory();
-
-			if (nodes[i].material != 0)
-				App->resources->GetResource(nodes[i].material)->LoadToMemory();
-		}
+		CreateGameObjects(App->file_system->GetFileName(file.c_str()).c_str());
 		return true;
 	}
 	return false;
@@ -225,7 +217,7 @@ void ResourceModel::CreateNodes(const aiScene* model, const aiNode* node, uint p
 	}
 }
 
-void ResourceModel::CreateGameObjects(std::vector<UID>& meshes, const std::vector<UID>& materials, const char* name)
+void ResourceModel::CreateGameObjects(const char* name)
 {
 	std::vector<GameObject*> objects;
 	GameObject* obj;
@@ -248,8 +240,10 @@ void ResourceModel::CreateGameObjects(std::vector<UID>& meshes, const std::vecto
 		{
 			ComponentMesh* mesh = (ComponentMesh*)obj->AddComponent(Component::Type::Mesh);
 			ResourceMesh* r_mesh = (ResourceMesh*)App->resources->GetResource(nodes[i].mesh);
+			r_mesh->LoadToMemory(); //load mesh data
 			mesh->SetMesh(r_mesh);
-			//mesh->SetBoundingBox();
+
+			obj->AddComponent(Component::Type::Renderer);
 		}
 
 		//if (nodes[i].material != 0)
@@ -260,5 +254,4 @@ void ResourceModel::CreateGameObjects(std::vector<UID>& meshes, const std::vecto
 	}
 
 	objects.clear();
-	LoadToMemory();
 }

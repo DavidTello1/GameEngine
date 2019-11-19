@@ -29,6 +29,7 @@ void Inspector::Draw()
 	static bool has_mesh = false;
 	static bool has_material = false;
 	static bool has_renderer = false;
+	static bool rename = false;
 
 	obj = App->scene->GetSelectedGameObject();
 	if (obj == nullptr)
@@ -104,7 +105,29 @@ void Inspector::Draw()
 		ImGui::EndMenuBar();
 	}
 
-	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), obj->GetName());
+	if (rename)
+	{
+		char buffer[NAME_LENGTH];
+		sprintf_s(buffer, NAME_LENGTH, "%s", obj->GetName());
+
+		if (ImGui::InputText("##GameObject", buffer, NAME_LENGTH, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+		{
+			obj->SetName(buffer);
+			rename = false;
+		}
+	}
+	else
+	{
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), obj->GetName());
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30);
+		if (ImGui::Button("##rename", ImVec2(15, 15)))
+			rename = true;
+
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Rename");
+	}
+
 	ImGui::Separator();
 
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
@@ -160,11 +183,6 @@ void Inspector::Draw()
 		ImGui::SetNextItemWidth(60);
 		if (ImGui::DragFloat("z##3", &scale.z, 0.2f))
 			SetScale(obj, scale);
-
-		ImGui::Separator();
-
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
-		ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
 
 		ImGui::Separator();
 	}
@@ -260,6 +278,9 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Renderer"))
 		{
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
+			ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
+
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 			ImGui::Checkbox("Wireframe", &renderer->show_wireframe);
 			ImGui::Separator();

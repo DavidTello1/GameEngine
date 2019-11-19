@@ -32,7 +32,7 @@ public:
 
 private:
 	void CreateNodes(const aiScene* model, const aiNode* node, uint parent, const std::vector<UID>& meshes, const std::vector<UID>& materials);
-	void CreateGameObjects(std::vector<UID>& meshes, const std::vector<UID>& materials, const char* name = nullptr);
+	void CreateGameObjects(const char* name = nullptr);
 
 private:
 	std::vector<Node> nodes;
