@@ -37,9 +37,9 @@ public:
 	static GameObject* main_camera_object;
 	static ComponentCamera* main_camera;
 
-	void Look(const vec3 &Position, const vec3 &Reference, bool RotateAroundReference = false);
-	void LookAt(const vec3 &Spot);
-	void Move(const vec3 &Movement);
+	void Look(const float3 &Position, const float3 &Reference, bool RotateAroundReference = false);
+	void LookAt(const float3 &Spot);
+	void Move(const float3 &Movement);
 
 	void RotateWithMouse();
 

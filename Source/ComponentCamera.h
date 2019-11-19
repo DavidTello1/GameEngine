@@ -30,15 +30,15 @@ public:
 
 public:
 
-	vec3 X = { 1.0f, 0.0f, 0.0f };
-	vec3 Y = { 0.0f, 1.0f, 0.0f };
-	vec3 Z = { 0.0f, 0.0f, 1.0f };
+	float3 X = float3::unitX;
+	float3 Y = float3::unitY;
+	float3 Z = float3::unitZ;
 
-	const vec3 c_X = { 1.0f, 0.0f, 0.0f };
-	const vec3 c_Y = { 0.0f, 1.0f, 0.0f };
-	const vec3 c_Z = { 0.0f, 0.0f, 1.0f };
+	const float3 c_X = float3::unitX;
+	const float3 c_Y = float3::unitY;
+	const float3 c_Z = float3::unitZ;
 
-	vec3 Position, Reference;
+	float3 Position, Reference;
 	bool viewport_focus;
 
 public:
@@ -54,7 +54,7 @@ public:
 	float width = 1280.0f;
 	float height = 720.0f;
 
-private:
+public:
 
 	float4x4 ViewMatrix;
 	float4x4 ProjectionMatrix;

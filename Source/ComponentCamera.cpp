@@ -13,8 +13,8 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 	CalculateViewMatrix();
 	CalculateProjectionMatrix();
 
-	Position = vec3(0.0f, 0.0f, 5.0f);
-	Reference = vec3(0.0f, 0.0f, 0.0f);
+	Position = float3(0.0f, 0.0f, 5.0f);
+	Reference = Position;
 }
 
 ComponentCamera::~ComponentCamera()
@@ -24,6 +24,7 @@ ComponentCamera::~ComponentCamera()
 float* ComponentCamera::GetViewMatrix()
 {
 	return ViewMatrix.ptr();
+
 }
 
 float* ComponentCamera::GetProjectionMatrix()
@@ -34,7 +35,7 @@ float* ComponentCamera::GetProjectionMatrix()
 // -----------------------------------------------------------------
 void ComponentCamera::CalculateViewMatrix()
 {
-	ViewMatrix = float4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
+	ViewMatrix = float4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -Dot(X, Position), -Dot(Y, Position), -Dot(Z, Position), 1.0f);
 }
 
 void ComponentCamera::CalculateProjectionMatrix()

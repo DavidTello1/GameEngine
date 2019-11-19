@@ -53,7 +53,7 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 
 	// Camera ZOOM with MOUSE WHEEL
 	ImGuiIO io = ImGui::GetIO();
-	vec3 newPos(0, 0, 0);
+	float3 newPos(0, 0, 0);
 	float speed = io.MouseWheel * zoom_speed * dt; // TODO Not hardcoded speed
 	if (speed != 0)
 	{
@@ -90,7 +90,7 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 				}
 			}
 
-			vec3 new_p = { object->bounding_box[face].x,object->bounding_box[face].y,object->bounding_box[face].z };
+			float3 new_p = { object->bounding_box[face].x,object->bounding_box[face].y,object->bounding_box[face].z };
 			float size = object->size.MaxElement();
 			float offset = Sqrt((size*size) - (size*size / 4));
 			float parent = (object->HasChilds()) ? 1.0f : -1.0f;
@@ -130,7 +130,7 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 	{
 		//Camera motion with WASD, Shift to go faster
-		vec3 newPos(0, 0, 0);
+		float3 newPos(0, 0, 0);
 		float speed = 10.0f * dt;
 
 		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT ||
@@ -176,14 +176,14 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 }
 
 // -----------------------------------------------------------------
-void ModuleSceneBase::Look(const vec3 &Position, const vec3 &Reference, bool RotateAroundReference)
+void ModuleSceneBase::Look(const float3 &Position, const float3 &Reference, bool RotateAroundReference)
 {
 	main_camera->Position = Position;
 	main_camera->Reference = Reference;
 
-	main_camera->Z = normalize(Position - Reference);
+	/*main_camera->Z = normalize(Position - Reference);
 	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
-	main_camera->Y = cross(main_camera->Z, main_camera->X);
+	main_camera->Y = cross(main_camera->Z, main_camera->X);*/
 	
 	if (!RotateAroundReference)
 	{
@@ -195,20 +195,20 @@ void ModuleSceneBase::Look(const vec3 &Position, const vec3 &Reference, bool Rot
 }
 
 // -----------------------------------------------------------------
-void ModuleSceneBase::LookAt(const vec3 &Spot)
+void ModuleSceneBase::LookAt(const float3 &Spot)
 {
 	main_camera->Reference = Spot;
 
-	main_camera->Z = normalize(main_camera->Position - main_camera->Reference);
+	/*main_camera->Z = normalize(main_camera->Position - main_camera->Reference);
 	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
-	main_camera->Y = cross(main_camera->Z, main_camera->X);
+	main_camera->Y = cross(main_camera->Z, main_camera->X);*/
 
 	main_camera->CalculateViewMatrix();
 }
 
 
 // -----------------------------------------------------------------
-void ModuleSceneBase::Move(const vec3 &Movement)
+void ModuleSceneBase::Move(const float3 &Movement)
 {
 	main_camera->Position += Movement;
 	main_camera->Reference += Movement;
@@ -231,12 +231,16 @@ void ModuleSceneBase::RotateWithMouse() {
 	{
 		float DeltaX = (float)dx * Sensitivity;
 
-		main_camera->X = rotate(main_camera->X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-		main_camera->Y = rotate(main_camera->Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-		main_camera->Z = rotate(main_camera->Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+		main_camera->ViewMatrix = main_camera->ViewMatrix.RotateX(DeltaX);
+		main_camera->ViewMatrix = main_camera->ViewMatrix.RotateY(DeltaX);
+		main_camera->ViewMatrix = main_camera->ViewMatrix.RotateZ(DeltaX);
+
+		//main_camera->X = rotate(main_camera->X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+		//main_camera->Y = rotate(main_camera->Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+		//main_camera->Z = rotate(main_camera->Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
 	}
 
-	if (dy != 0)
+	/*if (dy != 0)
 	{
 		float DeltaY = (float)dy * Sensitivity;
 
@@ -245,11 +249,11 @@ void ModuleSceneBase::RotateWithMouse() {
 
 		if (main_camera->Y.y < 0.0f)
 		{
-			main_camera->Z = vec3(0.0f, main_camera->Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
+			main_camera->Z = float3(0.0f, main_camera->Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
 			main_camera->Y = cross(main_camera->Z, main_camera->X);
 		}
 	}
-	main_camera->Position = main_camera->Reference + main_camera->Z * length(main_camera->Position);
+	main_camera->Position = main_camera->Reference + main_camera->Z * length(main_camera->Position);*/
 }
 
 bool ModuleSceneBase::CleanUp()
