@@ -120,7 +120,7 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 			LOG("To [%f,%f,%f]", main_camera->Position.x, main_camera->Position.y, main_camera->Position.z, 'v');
 			LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'v');
 
-			main_camera->LookAt(new_p);
+			LookAt(new_p);
 
 
 		}
@@ -160,7 +160,7 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 		GameObject* object = App->scene->GetSelectedGameObject();
 		if (object != nullptr)
 		{
-			main_camera->LookAt({ object->center.x, object->center.y,object->center.z });
+			LookAt({ object->center.x, object->center.y,object->center.z });
 		}
 	}
 
@@ -169,12 +169,54 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 
 }
 
+// -----------------------------------------------------------------
+void ModuleSceneBase::Look(const vec3 &Position, const vec3 &Reference, bool RotateAroundReference)
+{
+	main_camera->Position = Position;
+	main_camera->Reference = Reference;
+
+	main_camera->Z = normalize(Position - Reference);
+	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
+	main_camera->Y = cross(main_camera->Z, main_camera->X);
+	
+	if (!RotateAroundReference)
+	{
+		main_camera->Reference = main_camera->Position;
+		main_camera->Position += main_camera->Z * 0.05f;
+	}
+
+	main_camera->CalculateViewMatrix();
+}
+
+// -----------------------------------------------------------------
+void ModuleSceneBase::LookAt(const vec3 &Spot)
+{
+	main_camera->Reference = Spot;
+
+	main_camera->Z = normalize(main_camera->Position - main_camera->Reference);
+	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
+	main_camera->Y = cross(main_camera->Z, main_camera->X);
+
+	main_camera->CalculateViewMatrix();
+}
+
+
+// -----------------------------------------------------------------
+void ModuleSceneBase::Move(const vec3 &Movement)
+{
+	main_camera->Position += Movement;
+	main_camera->Reference += Movement;
+
+	main_camera->CalculateViewMatrix();
+}
+
 bool ModuleSceneBase::CleanUp()
 {
 	LOG("Unloading Intro scene");
 
 	return true;
 }
+
 
 bool ModuleSceneBase::Draw()
 {
