@@ -43,41 +43,7 @@ ComponentCamera::~ComponentCamera()
 }
 
 
-void ComponentCamera::RotateWithMouse() {
-	// Camera rotation with mouse
-	int dx, dy;
-	App->input->GetMouseMotion(dx, dy);
-	dx = -dx;
-	dy = -dy;
 
-	float Sensitivity = 0.25f;
-
-	Position -= Reference;
-
-	if (dx != 0)
-	{
-		float DeltaX = (float)dx * Sensitivity;
-
-		X = rotate(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-		Y = rotate(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-		Z = rotate(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-	}
-
-	if (dy != 0)
-	{
-		float DeltaY = (float)dy * Sensitivity;
-
-		Y = rotate(Y, DeltaY, X);
-		Z = rotate(Z, DeltaY, X);
-
-		if (Y.y < 0.0f)
-		{
-			Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
-			Y = cross(Z, X);
-		}
-	}
-	Position = Reference + Z * length(Position);
-}
 
 // -----------------------------------------------------------------
 float* ComponentCamera::GetViewMatrix()

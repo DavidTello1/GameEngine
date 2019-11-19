@@ -149,13 +149,13 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 		main_camera->Position += newPos;
 		main_camera->Reference += newPos;
 
-		main_camera->RotateWithMouse();
+		RotateWithMouse();
 	}
 
 	// Orbit move
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))
 	{
-		main_camera->RotateWithMouse();
+		RotateWithMouse();
 		// To change to the Reference we want to orbit at
 		GameObject* object = App->scene->GetSelectedGameObject();
 		if (object != nullptr)
@@ -208,6 +208,42 @@ void ModuleSceneBase::Move(const vec3 &Movement)
 	main_camera->Reference += Movement;
 
 	main_camera->CalculateViewMatrix();
+}
+
+void ModuleSceneBase::RotateWithMouse() {
+	// Camera rotation with mouse
+	int dx, dy;
+	App->input->GetMouseMotion(dx, dy);
+	dx = -dx;
+	dy = -dy;
+
+	float Sensitivity = 0.25f;
+
+	main_camera->Position -= main_camera->Reference;
+
+	if (dx != 0)
+	{
+		float DeltaX = (float)dx * Sensitivity;
+
+		main_camera->X = rotate(main_camera->X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+		main_camera->Y = rotate(main_camera->Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+		main_camera->Z = rotate(main_camera->Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	if (dy != 0)
+	{
+		float DeltaY = (float)dy * Sensitivity;
+
+		main_camera->Y = rotate(main_camera->Y, DeltaY, main_camera->X);
+		main_camera->Z = rotate(main_camera->Z, DeltaY, main_camera->X);
+
+		if (main_camera->Y.y < 0.0f)
+		{
+			main_camera->Z = vec3(0.0f, main_camera->Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
+			main_camera->Y = cross(main_camera->Z, main_camera->X);
+		}
+	}
+	main_camera->Position = main_camera->Reference + main_camera->Z * length(main_camera->Position);
 }
 
 bool ModuleSceneBase::CleanUp()

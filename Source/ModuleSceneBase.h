@@ -41,6 +41,8 @@ public:
 	void LookAt(const vec3 &Spot);
 	void Move(const vec3 &Movement);
 
+	void RotateWithMouse();
+
 	float zoom_speed = 75.0f;
 private:
 

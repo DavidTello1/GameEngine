@@ -14,8 +14,6 @@ public:
 	ComponentCamera(GameObject* gameObject);
 	~ComponentCamera();
 
-	void RotateWithMouse();
-
 	float* GetViewMatrix();
 
 	float * GetProjectionMatrix();
