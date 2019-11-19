@@ -24,12 +24,12 @@ bool ModuleScene::Start(Config* config)
 
 	// Create game objects after this ^^^^^^^^^^^^	
 
-	//test_camera = CreateGameObject("test camera");
-	//test_camera->AddComponent(Component::Type::Camera);
+	test_camera = CreateGameObject("test camera");
+	test_camera->AddComponent(Component::Type::Camera);
 
-	GameObject* bparent = CreateGameObject("BakerHouse");
+	//GameObject* bparent = CreateGameObject("BakerHouse");
 
-	App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
+	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
 	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
 
 	// ParShapes 
@@ -107,7 +107,7 @@ bool ModuleScene::Draw()
 			if (renderer->show_wireframe || App->scene_base->show_all_wireframe) //wireframe
 			{
 
-				glColor3ub(App->scene_base->wireframe_color[0]*255.0f, App->scene_base->wireframe_color[1] * 255.0f, App->scene_base->wireframe_color[2] * 255.0f);
+				glColor3ub(App->scene_base->wireframe_color.r*255.0f, App->scene_base->wireframe_color.g * 255.0f, App->scene_base->wireframe_color.b * 255.0f);
 				glLineWidth(App->scene_base->wireframe_width);
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			}
@@ -122,7 +122,7 @@ bool ModuleScene::Draw()
 		glEnableClientState(GL_VERTEX_ARRAY);
 		if ((obj->show_bounding_box || App->scene_base->show_all_bounding_box) && obj->bb_VBO != 0)
 		{
-			glColor3ub(App->scene_base->bounding_box_color[0] * 255.0f, App->scene_base->bounding_box_color[1] * 255.0f, App->scene_base->bounding_box_color[2] * 255.0f);
+			glColor3ub(App->scene_base->bounding_box_color.r * 255.0f, App->scene_base->bounding_box_color.g * 255.0f, App->scene_base->bounding_box_color.b * 255.0f);
 			glLineWidth(App->scene_base->bounding_box_width);
 
 			glBindBuffer(GL_ARRAY_BUFFER, obj->bb_VBO);
@@ -137,12 +137,6 @@ bool ModuleScene::Draw()
 			glColor3ub(255, 255, 255);
 		}
 		glDisableClientState(GL_VERTEX_ARRAY);
-
-		ComponentCamera* camera = (ComponentCamera*)obj->GetComponent(Component::Type::Camera);
-		if (camera != nullptr && camera != App->scene_base->main_camera)
-		{
-			camera->DrawFrustum();
-		}
 
 		glPopMatrix();
 	}

@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "glmath.h"
 #include "Math.h"
+#include "Color.h"
 
 class ComponentCamera : public Component
 {
@@ -37,18 +38,13 @@ public:
 
 	void Look(const float3 & position);
 
-
 	void DrawFrustum();
 
-public:
-
-	bool viewport_focus;
-
-public:
-
+	bool viewport_focus = true;
 	bool perspective = true;
 	bool update_projection = false;
 
 	Frustum frustum;
 
+	Color background = DarkGrey;
 };

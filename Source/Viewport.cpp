@@ -36,14 +36,14 @@ bool Viewport::PreUpdate()
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClearColor(viewport_camera->background.r,viewport_camera->background.g,viewport_camera->background.b,viewport_camera->background.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
-	if (ModuleSceneBase::main_camera->update_projection)
+	if (viewport_camera->update_projection)
 	{
 		OnCameraUpdate();
-		ModuleSceneBase::main_camera->update_projection = false;
+		viewport_camera->update_projection = false;
 	}
 
 	App->scene_base->Draw();
@@ -63,7 +63,7 @@ void Viewport::Draw()
 // Is not automatically called
 bool Viewport::PostUpdate()
 {
-
+	// Background color of the editor (ImGui)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -133,14 +133,14 @@ void Viewport::OnResize(int width, int height)
 {
 	glViewport(0, 0, width, height);
 
-	ModuleSceneBase::main_camera->SetAspectRatio(width/height);
+	viewport_camera->SetAspectRatio(width/height);
 }
 
 void Viewport::OnCameraUpdate()
 {
 	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(ModuleSceneBase::main_camera->GetViewMatrix());
+	glLoadMatrixf(viewport_camera->GetViewMatrix());
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(ModuleSceneBase::main_camera->GetProjectionMatrix());
+	glLoadMatrixf(viewport_camera->GetProjectionMatrix());
 }

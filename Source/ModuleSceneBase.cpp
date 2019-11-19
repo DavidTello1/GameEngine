@@ -10,8 +10,7 @@
 #include "par_shapes.h"
 #include "mmgr/mmgr.h"
 
-GameObject* ModuleSceneBase::main_camera_object;
-ComponentCamera* ModuleSceneBase::main_camera;
+ComponentCamera* viewport_camera;
 
 ModuleSceneBase::ModuleSceneBase(bool start_enabled) : Module("SceneBase", start_enabled)
 {}
@@ -21,10 +20,10 @@ ModuleSceneBase::~ModuleSceneBase()
 
 bool ModuleSceneBase::Start(Config* config)
 {
-	main_camera_object = App->scene->CreateGameObject("Main Camera");
-	main_camera = (ComponentCamera*)main_camera_object->AddComponent(Component::Type::Camera);
+	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
+	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
 
-	main_camera->Move({ 0, 5.0f, -10.5f });
+	viewport_camera->Move({ 0, 5.0f, -10.5f });
 
 	return true;
 }
@@ -51,7 +50,7 @@ bool ModuleSceneBase::CleanUp()
 
 void ModuleSceneBase::UpdateMainCamera(float dt)
 {
-	if (main_camera == nullptr || main_camera->viewport_focus == false) return;
+	if (viewport_camera == nullptr || viewport_camera->viewport_focus == false) return;
 
 	CameraZoom(dt);
 
@@ -71,7 +70,7 @@ void ModuleSceneBase::CameraOrbit(float dt)
 		GameObject* object = App->scene->GetSelectedGameObject();
 		if (object != nullptr)
 		{
-			main_camera->Look(object->center);
+			viewport_camera->Look(object->center);
 		}
 	}
 }
@@ -84,7 +83,7 @@ void ModuleSceneBase::CameraFocusTo()
 
 		if (object != nullptr)
 		{
-			float3 v_distance = object->bounding_box[9] - main_camera->frustum.pos;
+			float3 v_distance = object->bounding_box[9] - viewport_camera->frustum.pos;
 
 			float min = v_distance.Length();
 			int face = 9;
@@ -92,7 +91,7 @@ void ModuleSceneBase::CameraFocusTo()
 			// Check which face of the object is the closest one
 			for (int i = 10; i < 13; i++)
 			{
-				v_distance = object->bounding_box[i] - main_camera->frustum.pos;
+				v_distance = object->bounding_box[i] - viewport_camera->frustum.pos;
 				
 				if (v_distance.Length() < min) {
 					min = v_distance.Length();
@@ -107,23 +106,23 @@ void ModuleSceneBase::CameraFocusTo()
 			switch (face)
 			{
 			case 9:
-				main_camera->SetPosition(object->bounding_box[face] + (float3::unitZ * offset * parent));
+				viewport_camera->SetPosition(object->bounding_box[face] + (float3::unitZ * offset * parent));
 				break;
 			case 10:
-				main_camera->SetPosition(object->bounding_box[face] + (float3::unitX * offset* parent));
+				viewport_camera->SetPosition(object->bounding_box[face] + (float3::unitX * offset* parent));
 				break;
 			case 11:
-				main_camera->SetPosition(object->bounding_box[face] - (float3::unitX * offset* parent));
+				viewport_camera->SetPosition(object->bounding_box[face] - (float3::unitX * offset* parent));
 				break;
 			case 12:
-				main_camera->SetPosition(object->bounding_box[face] - (float3::unitZ * offset* parent));
+				viewport_camera->SetPosition(object->bounding_box[face] - (float3::unitZ * offset* parent));
 				break;
 			default:
 				LOG("Could not detect closest face", 'w');
 				break;
 			}
 
-			main_camera->Look(object->bounding_box[face]);
+			viewport_camera->Look(object->bounding_box[face]);
 		}
 	}
 }
@@ -139,17 +138,17 @@ void ModuleSceneBase::CameraFreeMove(float dt)
 			App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
 			speed *= 2.0f;
 
-		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos += main_camera->frustum.front * speed;
-		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos -= main_camera->frustum.front * speed;
+		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos += viewport_camera->frustum.front * speed;
+		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos -= viewport_camera->frustum.front * speed;
 
 
-		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= main_camera->frustum.WorldRight() * speed;
-		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += main_camera->frustum.WorldRight() * speed;
+		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= viewport_camera->frustum.WorldRight() * speed;
+		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += viewport_camera->frustum.WorldRight() * speed;
 
-		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= main_camera->frustum.up * speed;
-		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += main_camera->frustum.up * speed;
+		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= viewport_camera->frustum.up * speed;
+		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += viewport_camera->frustum.up * speed;
 
-		main_camera->Move(newPos);
+		viewport_camera->Move(newPos);
 
 		CameraRotateWithMouse(dt);
 	}
@@ -164,7 +163,7 @@ void ModuleSceneBase::CameraZoom(float dt)
 		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT || App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
 			speed *= 2.0f;
 
-		main_camera->Move(main_camera->frustum.front * speed);
+		viewport_camera->Move(viewport_camera->frustum.front * speed);
 	}
 }
 
@@ -180,19 +179,19 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 	if (dx != 0)
 	{
 		Quat quat = Quat::RotateY(dx*dt*Sensitivity);
-		main_camera->frustum.up = quat.Mul(main_camera->frustum.up).Normalized();
-		main_camera->frustum.front = quat.Mul(main_camera->frustum.front).Normalized();
+		viewport_camera->frustum.up = quat.Mul(viewport_camera->frustum.up).Normalized();
+		viewport_camera->frustum.front = quat.Mul(viewport_camera->frustum.front).Normalized();
 	}
 
 	if (dy != 0)
 	{
-		Quat quat = Quat::RotateAxisAngle(main_camera->frustum.WorldRight(), dy* dt *Sensitivity);
-		float3 up = quat.Mul(main_camera->frustum.up).Normalized();
+		Quat quat = Quat::RotateAxisAngle(viewport_camera->frustum.WorldRight(), dy* dt *Sensitivity);
+		float3 up = quat.Mul(viewport_camera->frustum.up).Normalized();
 
 		if (up.y > 0.0f)
 		{
-			main_camera->frustum.up = up;
-			main_camera->frustum.front = quat.Mul(main_camera->frustum.front).Normalized();
+			viewport_camera->frustum.up = up;
+			viewport_camera->frustum.front = quat.Mul(viewport_camera->frustum.front).Normalized();
 		}
 	}
 

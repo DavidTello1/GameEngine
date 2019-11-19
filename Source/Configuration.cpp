@@ -9,6 +9,7 @@
 #include "ModuleScene.h"
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
+#include "ModuleSceneBase.h"
 
 #include "gpudetect/DeviceId.h"
 #include "Devil/include/IL/il.h"
@@ -102,31 +103,36 @@ void Configuration::DrawMainCamera()
 {
 	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		// Dummy floats
-		float _fov = App->scene_base->main_camera->frustum.verticalFov * RADTODEG;
-		float _near = App->scene_base->main_camera->frustum.nearPlaneDistance;
-		float _far = App->scene_base->main_camera->frustum.farPlaneDistance;
+		
+		ImGui::ColorEdit3("Background color", (float*)&viewport_camera->background);
 
-		if (ImGui::Checkbox("Perspective / Orthogonal", &ModuleSceneBase::main_camera->perspective))
+		// Dummy floats
+		float _fov  = viewport_camera->frustum.verticalFov * RADTODEG;
+		float _near = viewport_camera->frustum.nearPlaneDistance;
+		float _far  = viewport_camera->frustum.farPlaneDistance;
+
+		if (ImGui::Checkbox("Perspective / Orthogonal", &viewport_camera->perspective))
 		{
-			if (ModuleSceneBase::main_camera->perspective)
-				ModuleSceneBase::main_camera->frustum.type = FrustumType::PerspectiveFrustum;
+			if (viewport_camera->perspective)
+				viewport_camera->frustum.type = FrustumType::PerspectiveFrustum;
 			else
-				ModuleSceneBase::main_camera->frustum.type = FrustumType::OrthographicFrustum;
+				viewport_camera->frustum.type = FrustumType::OrthographicFrustum;
+
+			viewport_camera->update_projection = true;
 		}
 
 		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
 		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 180.0f,"%.1f"))
 		{
-			ModuleSceneBase::main_camera->SetFov(_fov, true);
+			viewport_camera->SetFov(_fov, true);
 		}
 		if (ImGui::DragFloat("Z Near", &_near, 0.25f, 0.1f, _far))
 		{
-			ModuleSceneBase::main_camera->SetNearPlane(_near);
+			viewport_camera->SetNearPlane(_near);
 		}
 		if (ImGui::DragFloat("Z Far",  &_far,	0.25f, _near, 5000.0f))
 		{
-			ModuleSceneBase::main_camera->SetFarPlane(_far);
+			viewport_camera->SetFarPlane(_far);
 		}
 	}
 }

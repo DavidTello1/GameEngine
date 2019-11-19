@@ -33,25 +33,16 @@ public:
 	float axis_length = 40.0f;
 
 	// Misc
-	float wireframe_color[3] = { 1.0f, 1.0f, 1.0f };
-	//Color wireframe_color = White;
+	Color wireframe_color = White;
 	float wireframe_width = 1.0f;
 	bool show_all_wireframe = false;
-
-	float bounding_box_color[3] = { 1.0f, 0.0f, 0.0f };
+	
+	Color bounding_box_color = Red;
 	float bounding_box_width = 1.0f;
 	bool show_all_bounding_box = false;
 
-	// Viewport camera
-	static GameObject* main_camera_object;
-	static ComponentCamera* main_camera;
-
-	//void Look(const float3 &Position, const float3 &Reference, bool RotateAroundReference = false);
-	//void LookAt(const float3 &Spot);
-	//void Move(const float3 &Movement);
-
-
 	float zoom_speed = 75.0f;
+
 private:
 
 	void DrawGridPlane();
@@ -59,3 +50,5 @@ private:
 
 };
 
+// Viewport camera
+extern ComponentCamera* viewport_camera;
