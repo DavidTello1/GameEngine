@@ -22,6 +22,8 @@ public:
 	void CalculateViewMatrix();
 	void CalculateProjectionMatrix();
 
+	void SetAspectRatio(float ratio);
+
 	float4x4 SetFrustum(float fovY, float aspectRatio, float front, float back);
 	float4x4 SetFrustum(float l, float r, float b, float t, float n, float f);
 	float4x4 SetOrthoFrustum(float l, float r, float b, float t, float n, float f);
@@ -46,13 +48,7 @@ public:
 	bool perspective = true;
 	bool update_projection = false;
 
-	float z_near = 1.0f;
-	float z_far = 100.0f;
-
-	float fov_y = 60.0f;
-
-	float width = 1280.0f;
-	float height = 720.0f;
+	Frustum frustum;
 
 public:
 

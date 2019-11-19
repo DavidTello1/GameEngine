@@ -13,6 +13,13 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 	CalculateViewMatrix();
 	CalculateProjectionMatrix();
 
+
+	frustum.pos = float3(0.0f, 0.0f, -5.0f);
+	frustum.nearPlaneDistance = 1.0f;
+	frustum.farPlaneDistance = 100.0f;
+	frustum.verticalFov = DEGTORAD * 60.0f;
+	SetAspectRatio(1.4f);
+
 	Position = float3(0.0f, 0.0f, 5.0f);
 	Reference = Position;
 }
@@ -40,9 +47,14 @@ void ComponentCamera::CalculateViewMatrix()
 
 void ComponentCamera::CalculateProjectionMatrix()
 {
-	ProjectionMatrix = SetFrustum(fov_y, width / height, z_near, z_far);
+	ProjectionMatrix = SetFrustum(frustum.verticalFov, frustum.AspectRatio(), frustum.nearPlaneDistance, frustum.farPlaneDistance);
 }
 
+void ComponentCamera::SetAspectRatio(float ratio)
+{
+	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * ratio);
+	update_projection = true;
+}
 
 float4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, float f)
 {
@@ -73,7 +85,7 @@ float4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n
 
 float4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, float back)
 {
-	float tangent = tanf(fovY / 2 * DEGTORAD);   // tangent of half fovY
+	float tangent = tanf(fovY / 2);   // tangent of half fovY
 	float height = front * tangent;           // half height of near plane
 	float width = height * aspectRatio;       // half width of near plane
 

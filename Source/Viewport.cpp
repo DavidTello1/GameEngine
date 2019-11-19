@@ -33,8 +33,8 @@ bool Viewport::PreUpdate()
 		width = window_avail_size.x;
 		height = window_avail_size.y;
 
-		ModuleSceneBase::main_camera->width = width;
-		ModuleSceneBase::main_camera->height = height;
+		//ModuleSceneBase::main_camera->width = width;
+		//ModuleSceneBase::main_camera->height = height;
 		ModuleSceneBase::main_camera->CalculateProjectionMatrix();
 
 		GenerateFBO(ImVec2(width, height));
@@ -157,6 +157,9 @@ void Viewport::OnResize(int width, int height)
 	//projection_matrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
 
 	glViewport(0, 0, width, height);
+
+	if (height != 0)
+		ModuleSceneBase::main_camera->SetAspectRatio(width/height);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(ModuleSceneBase::main_camera->GetViewMatrix());
