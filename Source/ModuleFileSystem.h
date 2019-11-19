@@ -30,14 +30,16 @@ public:
 	void DiscoverFiles(const char* directory, std::vector<std::string>& file_list, std::vector<std::string>& dir_list) const;
 	bool CopyFromOutsideFS(const char* full_path, const char* destination);
 	bool Copy(const char* source, const char* destination);
-	void SplitFilePath(const char* full_path, std::string* path, std::string* file = nullptr, std::string* extension = nullptr) const;
-	void NormalizePath(char* full_path) const;
-	void NormalizePath(std::string& full_path) const;
+
+	std::string GetFileName(const char* full_path) const; //returns file name (baker_house.fbx)
+	std::string GetExtension(const char* full_path) const; //returns extension (fbx)
+	void NormalizePath(char* full_path, bool to_lower) const;
+	void NormalizePath(std::string& full_path, bool to_lower) const;
 
 	// Open for Read/Write
-	unsigned int Load(const char* path, const char* file, char** buffer) const;
+	unsigned int LoadFromPath(const char* path, const char* file, char** buffer) const;
 	unsigned int Load(const char* file, char** buffer) const;
-	SDL_RWops* Load(const char* file) const;
+	//SDL_RWops* LoadFile(const char* file) const;
 
 	unsigned int Save(const char* file, const void* buffer, unsigned int size, bool append = false) const;
 	bool SaveUnique(std::string& output, const void* buffer, uint size, const char* path, const char* prefix, const char* extension);

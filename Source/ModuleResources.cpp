@@ -63,53 +63,22 @@ bool ModuleResources::CleanUp()
 
 bool ModuleResources::ImportResource(const char* path, UID uid)
 {
-	std::string final_path;
-	App->file_system->SplitFilePath(path, nullptr, &final_path);
+	std::string final_path = App->file_system->GetFileName(path); //get file name
 	final_path = ASSETS_FOLDER + final_path;
 
 	if (App->file_system->CopyFromOutsideFS(path, final_path.c_str()) == true) //copy file to final_path
 	{
-		// Get Extension
-		std::string extension;
-		App->file_system->SplitFilePath(path, nullptr, nullptr, &extension);
-
-		// Get Type
-		Resource::Type type;
-		if (strcmp("obj", extension.c_str()) == 0 || strcmp("fbx", extension.c_str()) == 0)
+		if (CheckLoaded(path, uid)) // Check if file has already been loaded and if so, init uid
 		{
-			type = Resource::Type::model;
-			LOG("Importing resource model from %s", path, 'd');
-		}
-		else if (strcmp("dds", extension.c_str()) == 0 || strcmp("png", extension.c_str()) == 0 || strcmp("jpg", extension.c_str()) == 0)
-		{
-			type = Resource::Type::material;
-			LOG("Importing resource material from %s", path, 'd');
-		}
-		else
-		{
-			type = Resource::Type::unknown;
-			LOG("File format not supported from %s", path, 'e');
-			return false;
+			LOG("File is already loaded in memory", 'd');
+			return true;
 		}
 
-		// Check if file has already been loaded
-		std::string file = final_path;
-		App->file_system->NormalizePath(file);
-		for (std::map<UID, Resource*>::const_iterator it = resources.begin(); it != resources.end(); ++it)
-		{
-			if (it->second->file.compare(file) == 0)
-			{
-				uid = it->first;
-				LOG("File is already loaded in memory", 'd');
-				return true;
-			}
-		}
-
-		// Import file
 		bool import_ok = false;
 		std::string written_file;
+		Resource::Type type = GetResourceType(path); //get resource type
 
-		switch (type)
+		switch (type) //import depending on type
 		{
 		case Resource::model:
 			import_ok = ResourceModel::Import(final_path.c_str(), written_file);
@@ -119,41 +88,9 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 			break;
 		}
 
-		// Check if import went ok
 		if (import_ok == true)
 		{
-			// Create new Resource
-			Resource* res = CreateResource(type);
-			res->file = final_path;
-			App->file_system->NormalizePath(res->file);
-			uid = res->uid;
-
-			// Exported file of Resource
-			std::string exported_file;
-			App->file_system->SplitFilePath(written_file.c_str(), nullptr, &exported_file);
-			if (res->exported_file.c_str() != NULL)
-			{
-				res->exported_file = exported_file.c_str();
-				LOG("Imported successful from [%s] to [%s]", res->GetFile(), res->GetExportedFile(), 'd');
-			}
-			else
-			{
-				LOG("Unable to export file [%s]", res->GetFile(), 'e');
-				return false;
-			}
-
-			// Name of Resource
-			std::string name;
-			App->file_system->SplitFilePath(final_path.c_str(), nullptr, &name);
-			App->file_system->SplitFilePath(res->file.c_str(), nullptr, &res->name);
-
-			res->name = name;
-			if (res->name.empty())
-				res->name = res->exported_file;
-
-			size_t pos_dot = res->name.find_last_of(".");
-			if (pos_dot != std::string::npos)
-				res->name.erase(res->name.begin() + pos_dot, res->name.end());
+			Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
 		}
 		else
 		{
@@ -163,70 +100,6 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 		return true;
 	}
 	return false;
-
-	//// name
-	//const char* file_name = strrchr(path, 92) ;
-	//if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "GameObject";
-	//file_name++;
-
-	////type
-	//char extension[32];
-	//const char* last_dot = strrchr(path, '.');
-	//strcpy_s(extension, last_dot + 1);
-
-	//for (uint i = 0; i < strlen(extension); i++)
-	//{
-	//	extension[i] = tolower(extension[i]);
-	//}
-
-	//	if (use)
-	//	{
-	//		for (GameObject* object : App->scene->gameObjects)
-	//		{
-	//			if (!object->is_selected) continue;
-
-	//			if (object->HasComponent(Component::Type::Mesh))
-	//			{
-	//				ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
-	//				if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-	//				{
-	//					material_loaded = App->scene->GetMaterial(path);
-	//					mesh->TEX = material_loaded->tex_id;
-	//				}
-	//				else
-	//					mesh->TEX = tex;
-	//			}
-
-	//			//if (object->HasChilds()) //if object is parent
-	//			//{
-	//				if (!object->HasComponent(Component::Type::Material)) //if object has not got material add one
-	//					object->AddComponent(Component::Type::Material);
-
-	//				ComponentMaterial* material = (ComponentMaterial*)object->GetComponent(Component::Type::Material);
-	//				if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-	//				{
-	//					material_loaded = App->scene->GetMaterial(path);
-	//					strcpy_s(material->path, 256, material_loaded->path);
-	//					material->tex_id = material_loaded->tex_id;
-	//					material->width = material_loaded->width;
-	//					material->height = material_loaded->height;
-	//				}
-	//				else
-	//				{
-	//					strcpy_s(material->path, 256, path);
-	//					material->tex_id = tex;
-	//					material->width = tex_width;
-	//					material->height = tex_height;
-
-	//					App->scene->materials.push_back(material);
-
-	//					LOG("Texture %s applied to object %s %u", file_name, object->GetName(), object->GetUID(), 'd');
-	//				}
-	//			//}
-	//		}
-	//	}
-	//	
-	//}
 }
 
 Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
@@ -260,6 +133,39 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 	}
 
 	return ret;
+}
+
+Resource* ModuleResources::CreateInitResource(Resource::Type type, UID uid, std::string& final_path, std::string& written_file)
+{
+	Resource* res = CreateResource(type); //create new resource
+	uid = res->uid; //fill uid
+
+	res->file = final_path; //get file
+	App->file_system->NormalizePath(res->file, true);
+
+	std::string exported_file = App->file_system->GetFileName(written_file.c_str()); //get exported file
+
+	if (exported_file.c_str() != NULL) //check for errors
+	{
+		res->exported_file = exported_file.c_str();
+		LOG("Imported successful from [%s] to [%s]", res->GetFile(), res->GetExportedFile(), 'd');
+	}
+	else
+	{
+		LOG("Unable to export file [%s]", res->GetFile(), 'e');
+		return false;
+	}
+
+	res->name = App->file_system->GetFileName(res->file.c_str()); //fill resource name
+
+	if (res->name.empty()) //if empty, name = exported file
+		res->name = res->exported_file;
+
+	size_t pos_dot = res->name.find_last_of("."); //get last dot position
+	if (pos_dot != std::string::npos)
+		res->name.erase(res->name.begin() + pos_dot, res->name.end()); //erase extension from name
+
+	return res;
 }
 
 void ModuleResources::RemoveResource(UID uid)
@@ -344,6 +250,45 @@ const char* ModuleResources::GetDirectory(Resource::Type type) const
 	return dirs_by_type[type];
 }
 
+Resource::Type ModuleResources::GetResourceType(const char* path) const
+{
+	Resource::Type type;
+	std::string extension = App->file_system->GetExtension(path);
+
+	if (strcmp("obj", extension.c_str()) == 0 || strcmp("fbx", extension.c_str()) == 0)
+	{
+		type = Resource::Type::model;
+		LOG("Importing resource model from %s", path, 'd');
+	}
+	else if (strcmp("dds", extension.c_str()) == 0 || strcmp("png", extension.c_str()) == 0 || strcmp("jpg", extension.c_str()) == 0)
+	{
+		type = Resource::Type::material;
+		LOG("Importing resource material from %s", path, 'd');
+	}
+	else
+	{
+		type = Resource::Type::unknown;
+		LOG("File format not supported from %s", path, 'e');
+	}
+
+	return type;
+}
+
+bool ModuleResources::CheckLoaded(std::string path, UID uid)
+{
+	std::string file = path;
+	App->file_system->NormalizePath(file, true);
+
+	for (std::map<UID, Resource*>::const_iterator it = resources.begin(); it != resources.end(); ++it)
+	{
+		if (it->second->file.compare(file) == 0)
+		{
+			uid = it->first;
+			LOG("File is already loaded in memory", 'd');
+			return true;
+		}
+	}
+}
 
 //void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
 //{

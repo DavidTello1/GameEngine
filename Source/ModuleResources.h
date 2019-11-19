@@ -30,9 +30,12 @@ public:
 	bool ImportResource(const char* path, UID uid = 0);
 
 	Resource* CreateResource(Resource::Type type, UID uid = 0);
+	Resource* CreateInitResource(Resource::Type type, UID uid, std::string& path, std::string& written_file);
 	void RemoveResource(UID uid);
 	const Resource* GetResource(UID uid) const;
 	Resource * GetResource(UID uid);
+	Resource::Type GetResourceType(const char* path) const;
+	bool CheckLoaded(std::string path, UID uid);
 
 	const char* GetDirectory(Resource::Type type) const;
 

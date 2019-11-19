@@ -27,10 +27,9 @@ UID ResourceMaterial::Import(const aiMaterial* ai_material, const char* source_f
 	if (material->SaveOwnFormat(output))
 	{
 		material->file = source_file; //get file
-		App->file_system->NormalizePath(material->file);
+		App->file_system->NormalizePath(material->file, true);
 
-		std::string file_name; //get file name
-		App->file_system->SplitFilePath(output.c_str(), nullptr, &file_name);
+		std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
 		material->exported_file = file_name;
 
 		LOG("Imported aiMaterial from [%s] to [%s]", material->GetFile(), material->GetExportedFile());

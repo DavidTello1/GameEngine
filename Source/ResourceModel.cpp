@@ -88,10 +88,9 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		if (ret)
 		{
 			model.file = full_path; //get file
-			App->file_system->NormalizePath(model.file);
+			App->file_system->NormalizePath(model.file, true);
 
-			std::string file_name; //get exported file
-			App->file_system->SplitFilePath(output.c_str(), nullptr, &file_name);
+			std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
 			model.exported_file = file_name;
 
 			LOG("Imported aiScene from [%s] to [%s]", model.GetFile(), model.GetExportedFile());
@@ -132,7 +131,7 @@ bool ResourceModel::LoadtoScene()
 	if (GetExportedFile() != nullptr)
 	{
 		char* buffer = nullptr;
-		uint size = App->file_system->Load(LIBRARY_MODEL_FOLDER, GetExportedFile(), &buffer); //get total size
+		uint size = App->file_system->LoadFromPath(LIBRARY_MODEL_FOLDER, GetExportedFile(), &buffer); //get total size
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 

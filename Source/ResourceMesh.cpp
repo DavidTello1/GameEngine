@@ -34,10 +34,9 @@ UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 	if (mesh->SaveOwnFormat(output))
 	{
 		mesh->file = source_file; //get file
-		App->file_system->NormalizePath(mesh->file);
+		App->file_system->NormalizePath(mesh->file, true);
 
-		std::string file_name; //get exported file
-		App->file_system->SplitFilePath(output.c_str(), nullptr, &file_name);
+		std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
 		mesh->exported_file = file_name;
 
 		LOG("Imported aiMesh from [%s] to [%s]", mesh->GetFile(), mesh->GetExportedFile());
@@ -96,7 +95,7 @@ bool ResourceMesh::LoadtoScene()
 	if (GetExportedFile() != nullptr)
 	{
 		char* buffer = nullptr;
-		uint size = App->file_system->Load(LIBRARY_MESH_FOLDER, GetExportedFile(), &buffer);
+		uint size = App->file_system->LoadFromPath(LIBRARY_MESH_FOLDER, GetExportedFile(), &buffer);
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 
