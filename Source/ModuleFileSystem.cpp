@@ -30,12 +30,12 @@ ModuleFileSystem::ModuleFileSystem(const char* game_path) : Module("FileSystem",
 		AddPath(game_path);
 
 	// Dump list of paths
-	LOG("FileSystem Operations base is [%s] plus:", GetBasePath());
+	LOG("FileSystem Operations base is [%s] plus:", GetBasePath(), 'd');
 	LOG(GetReadPaths());
 
 	// enable us to write in the game's dir area
 	if (PHYSFS_setWriteDir(".") == 0)
-		LOG("File System error while creating write dir: %s\n", PHYSFS_getLastError());
+		LOG("File System error while creating write dir: %s\n", PHYSFS_getLastError(), 'e');
 
 	// Make sure standard paths exist
 	const char* dirs[] = {
@@ -93,7 +93,7 @@ bool ModuleFileSystem::AddPath(const char* path_or_zip)
 
 	if (PHYSFS_mount(path_or_zip, nullptr, 1) == 0)
 	{
-		LOG("File System error while adding a path or zip: %s\n", PHYSFS_getLastError());
+		LOG("File System error while adding a path or zip: %s\n", PHYSFS_getLastError(), 'e');
 	}
 	else
 		ret = true;
@@ -140,10 +140,10 @@ bool ModuleFileSystem::CopyFromOutsideFS(const char * full_path, const char * de
 		PHYSFS_close(dest); //close destination file
 		ret = true;
 
-		LOG("File System copied file [%s] to [%s]", full_path, destination);
+		LOG("File System copied file [%s] to [%s]", full_path, destination, 'd');
 	}
 	else
-		LOG("File System error while copy from [%s] to [%s]", full_path, destination);
+		LOG("File System error while copy from [%s] to [%s]", full_path, destination, 'e');
 
 	return ret;
 }
@@ -167,10 +167,10 @@ bool ModuleFileSystem::Copy(const char * source, const char * destination)
 		PHYSFS_close(dst); //close destination file
 		ret = true;
 
-		LOG("File System copied file [%s] to [%s]", source, destination);
+		LOG("File System copied file [%s] to [%s]", source, destination, 'd');
 	}
 	else
-		LOG("File System error while copy from [%s] to [%s]", source, destination);
+		LOG("File System error while copy from [%s] to [%s]", source, destination, 'e');
 
 	return ret;
 }
@@ -178,7 +178,7 @@ bool ModuleFileSystem::Copy(const char * source, const char * destination)
 std::string ModuleFileSystem::GetFileName(const char* path) const
 {
 	const char* file_name = strrchr(path, 92);
-	if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "GameObject";
+	if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "empty";
 	file_name++;
 	return file_name;
 }
@@ -240,7 +240,7 @@ uint ModuleFileSystem::Load(const char* file, char** buffer) const
 			uint readed = (uint)PHYSFS_read(fs_file, *buffer, 1, size); //read file to buffer and get size
 			if (readed != size) //check for error
 			{
-				LOG("File System error while reading from file %s: %s\n", file, PHYSFS_getLastError());
+				LOG("File System error while reading from file %s: %s\n", file, PHYSFS_getLastError(), 'e');
 				RELEASE(buffer);
 			}
 			else
@@ -248,10 +248,10 @@ uint ModuleFileSystem::Load(const char* file, char** buffer) const
 		}
 
 		if (PHYSFS_close(fs_file) == 0) //close file
-			LOG("File System error while closing file %s: %s\n", file, PHYSFS_getLastError());
+			LOG("File System error while closing file %s: %s\n", file, PHYSFS_getLastError(), 'e');
 	}
 	else
-		LOG("File System error while opening file %s: %s\n", file, PHYSFS_getLastError());
+		LOG("File System error while opening file %s: %s\n", file, PHYSFS_getLastError(), 'e');
 
 	return ret; //return size of file
 }
@@ -287,25 +287,25 @@ uint ModuleFileSystem::Save(const char* file, const void* buffer, unsigned int s
 		uint written = (uint)PHYSFS_write(fs_file, (const void*)buffer, 1, size); //write file to buffer and get size
 		if (written != size) //check for error
 		{
-			LOG("File System error while writing to file %s: %s", file, PHYSFS_getLastError());
+			LOG("File System error while writing to file %s: %s", file, PHYSFS_getLastError(), 'e');
 		}
 		else
 		{
 			if (append == true) //if append
 			{
-				LOG("Added %u data to [%s%s]", size, PHYSFS_getWriteDir(), file);
+				LOG("Added %u data to [%s%s]", size, PHYSFS_getWriteDir(), file, 'd');
 			}
 			else if (overwrite == false) //if is new file
-				LOG("New file created [%s%s] of %u bytes", PHYSFS_getWriteDir(), file, size);
+				LOG("New file created [%s%s] of %u bytes", PHYSFS_getWriteDir(), file, size, 'd');
 
 			ret = written;
 		}
 
 		if (PHYSFS_close(fs_file) == 0) //close file
-			LOG("File System error while closing file %s: %s", file, PHYSFS_getLastError());
+			LOG("File System error while closing file %s: %s", file, PHYSFS_getLastError(), 'e');
 	}
 	else
-		LOG("File System error while opening file %s: %s", file, PHYSFS_getLastError());
+		LOG("File System error while opening file %s: %s", file, PHYSFS_getLastError(), 'e');
 
 	return ret;
 }
@@ -332,11 +332,11 @@ bool ModuleFileSystem::Remove(const char * file)
 	{
 		if (PHYSFS_delete(file) == 0) //delete file
 		{
-			LOG("File deleted: [%s]", file);
+			LOG("File deleted: [%s]", file, 'd');
 			ret = true;
 		}
 		else
-			LOG("File System error while trying to delete [%s]: ", file, PHYSFS_getLastError());
+			LOG("File System error while trying to delete [%s]: ", file, PHYSFS_getLastError(), 'e');
 	}
 
 	return ret;

@@ -100,7 +100,7 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 			LOG("Importing aiScene %s FAILED", full_path);
 		}
 
-		model.CreateGameObjects(meshes, materials);
+		model.CreateGameObjects(meshes, materials, App->file_system->GetFileName(model.file.c_str()).c_str());
 
 		return ret;
 	}
@@ -225,7 +225,7 @@ void ResourceModel::CreateNodes(const aiScene* model, const aiNode* node, uint p
 	}
 }
 
-void ResourceModel::CreateGameObjects(const std::vector<UID>& meshes, const std::vector<UID>& materials)
+void ResourceModel::CreateGameObjects(std::vector<UID>& meshes, const std::vector<UID>& materials, const char* name)
 {
 	std::vector<GameObject*> objects;
 	GameObject* obj;
@@ -237,7 +237,11 @@ void ResourceModel::CreateGameObjects(const std::vector<UID>& meshes, const std:
 		if (i > 0)
 			parent = objects[nodes[i].parent];
 
-		obj = App->scene->CreateGameObject(nodes[i].name.c_str(), parent);
+		if (strcmp("RootNode", nodes[i].name.c_str()) == 0 && name != nullptr) //if RootNode init name as file name
+			obj = App->scene->CreateGameObject(name, parent);
+		else
+			obj = App->scene->CreateGameObject(nodes[i].name.c_str(), parent);
+
 		objects.push_back(obj);
 
 		if (nodes[i].mesh != 0)
