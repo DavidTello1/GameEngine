@@ -51,30 +51,25 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 
 	if (main_camera == nullptr || main_camera->viewport_focus == false) return;
 
-	// Camera ZOOM with MOUSE WHEEL
+
 	CameraZoom(dt);
 
-	// Center main_camera to selected gameobject with F
 	CameraFocusTo();
-	//Free move 
+
 	CameraFreeMove(dt);
 
-	// Orbit move
-	CameraOrbit();
+	CameraOrbit(dt);
 
 	// Recalculate matrix -------------
 	main_camera->CalculateViewMatrix();
-
-	
-
 }
 
-void ModuleSceneBase::CameraOrbit()
+void ModuleSceneBase::CameraOrbit(float dt)
 {
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))
 	{
-		RotateWithMouse();
-		// To change to the Reference we want to orbit at
+		CameraRotateWithMouse(dt);
+
 		GameObject* object = App->scene->GetSelectedGameObject();
 		if (object != nullptr)
 		{
@@ -88,17 +83,12 @@ void ModuleSceneBase::CameraFocusTo()
 {
 	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
 	{
-		//LOG("Centering viewport camera from [%f,%f,%f]", main_camera->Position.x, main_camera->Position.y, main_camera->Position.z, 'v');
-		// To change to the Reference we want to orbit at
 		GameObject* object = App->scene->GetSelectedGameObject();
 
 		if (object != nullptr)
 		{
-			//float3 c = main_camera->frustum.pos; // { main_camera->Position.x, main_camera->Position.y, main_camera->Position.z };
-
 			float3 v_distance = object->bounding_box[9] - main_camera->frustum.pos;
 
-			//float l = v_distance.Length();
 			float min = v_distance.Length();
 			int face = 9;
 
@@ -112,9 +102,8 @@ void ModuleSceneBase::CameraFocusTo()
 				}
 			}
 
-			//float3 new_p = { object->bounding_box[face].x,object->bounding_box[face].y,object->bounding_box[face].z };
 			float size = object->size.MaxElement();
-			float offset = Sqrt((size*size) - (size*size / 4));
+			float offset = Sqrt((size*size) - (size*size / 4)); // superformula to define the offset to the object
 			float parent = (object->HasChilds()) ? 1.0f : -1.0f;
 
 			switch (face)
@@ -132,22 +121,12 @@ void ModuleSceneBase::CameraFocusTo()
 				main_camera->SetPosition(object->bounding_box[face] - (main_camera->c_Z * offset* parent));
 				break;
 			default:
-				LOG("Could not detect closest face", 'e');
+				LOG("Could not detect closest face", 'w');
 				break;
 			}
 
 			main_camera->Look(object->bounding_box[face]);
 
-			//mesh->bounding_box[13] = { Position.x, Position.y, Position.z };
-			//App->resources->bbox_indices[25] = face;
-			//App->resources->GenBoundingBox(mesh);
-
-			//LOG("FACE %i", face, 'v');
-			//LOG("To [%f,%f,%f]", main_camera->Position.x, main_camera->Position.y, main_camera->Position.z, 'v');
-			//LOG("Looking at [%f,%f,%f]", new_p.x, new_p.y, new_p.z, 'v');
-
-
-			//main_camera->update_projection = true;
 		}
 	}
 }
@@ -156,7 +135,6 @@ void ModuleSceneBase::CameraFreeMove(float dt)
 {
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 	{
-		//Camera motion with WASD, Shift to go faster
 		float3 newPos = float3::zero;
 		float speed = 10.0f * dt;
 
@@ -176,20 +154,12 @@ void ModuleSceneBase::CameraFreeMove(float dt)
 
 		main_camera->Move(newPos);
 
-		LOG("Distance [%f,%f,%f]", newPos.x, newPos.y, newPos.z, 'd');
-
-		//main_camera->Position += newPos;
-		//main_camera->Reference += newPos;
-
-		//RotateWithMouse();
-		//main_camera->update_projection = true;
+		CameraRotateWithMouse(dt);
 	}
 }
 
 void ModuleSceneBase::CameraZoom(float dt)
 {
-	//float3 distance = float3::zero;
-
 	float speed = ImGui::GetIO().MouseWheel * zoom_speed * dt;
 
 	if (speed != 0)
@@ -198,92 +168,37 @@ void ModuleSceneBase::CameraZoom(float dt)
 			speed *= 2.0f;
 
 		main_camera->Move(main_camera->frustum.front * speed);
-
-		//distance -= main_camera->frustum.front * speed;
-		//LOG("Distance [%f,%f,%f]", distance.x,distance.y,distance.z, 'd');
 	}
 }
 
-// -----------------------------------------------------------------
-//void ModuleSceneBase::Look(const float3 &Position, const float3 &Reference, bool RotateAroundReference)
-//{
-//	main_camera->Position = Position;
-//	main_camera->Reference = Reference;
-//
-//	/*main_camera->Z = normalize(Position - Reference);
-//	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
-//	main_camera->Y = cross(main_camera->Z, main_camera->X);*/
-//	
-//	if (!RotateAroundReference)
-//	{
-//		main_camera->Reference = main_camera->Position;
-//		main_camera->Position += main_camera->Z * 0.05f;
-//	}
-//
-//	main_camera->CalculateViewMatrix();
-//}
-
-// -----------------------------------------------------------------
-//void ModuleSceneBase::LookAt(const float3 &Spot)
-//{
-//	main_camera->Reference = Spot;
-//
-//	/*main_camera->Z = normalize(main_camera->Position - main_camera->Reference);
-//	main_camera->X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), main_camera->Z));
-//	main_camera->Y = cross(main_camera->Z, main_camera->X);*/
-//
-//	main_camera->CalculateViewMatrix();
-//}
-
-
-// -----------------------------------------------------------------
-//void ModuleSceneBase::Move(const float3 &Movement)
-//{
-//	main_camera->Position += Movement;
-//	main_camera->Reference += Movement;
-//
-//	main_camera->CalculateViewMatrix();
-//}
-
-void ModuleSceneBase::RotateWithMouse() {
-	// Camera rotation with mouse
+void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 	int dx, dy;
 	App->input->GetMouseMotion(dx, dy);
 	dx = -dx;
 	dy = -dy;
-
 	float Sensitivity = 0.25f;
-
-	main_camera->Position -= main_camera->Reference;
 
 	if (dx != 0)
 	{
-		float DeltaX = (float)dx * Sensitivity;
-
-		main_camera->ViewMatrix = main_camera->ViewMatrix.RotateX(DeltaX);
-		main_camera->ViewMatrix = main_camera->ViewMatrix.RotateY(DeltaX);
-		main_camera->ViewMatrix = main_camera->ViewMatrix.RotateZ(DeltaX);
-
-		//main_camera->X = rotate(main_camera->X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-		//main_camera->Y = rotate(main_camera->Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-		//main_camera->Z = rotate(main_camera->Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
+		Quat quat = Quat::RotateY(dx*dt*Sensitivity);
+		main_camera->frustum.up = quat.Mul(main_camera->frustum.up).Normalized();
+		main_camera->frustum.front = quat.Mul(main_camera->frustum.front).Normalized();
 	}
 
-	/*if (dy != 0)
+	if (dy != 0)
 	{
-		float DeltaY = (float)dy * Sensitivity;
+		Quat quat = Quat::RotateAxisAngle(main_camera->frustum.WorldRight(), dy* dt *Sensitivity);
+		float3 up = quat.Mul(main_camera->frustum.up).Normalized();
 
-		main_camera->Y = rotate(main_camera->Y, DeltaY, main_camera->X);
-		main_camera->Z = rotate(main_camera->Z, DeltaY, main_camera->X);
-
-		if (main_camera->Y.y < 0.0f)
+		if (up.y > 0.0f)
 		{
-			main_camera->Z = float3(0.0f, main_camera->Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
-			main_camera->Y = cross(main_camera->Z, main_camera->X);
+			main_camera->frustum.up = up;
+			main_camera->frustum.front = quat.Mul(main_camera->frustum.front).Normalized();
 		}
 	}
-	main_camera->Position = main_camera->Reference + main_camera->Z * length(main_camera->Position);*/
+
 }
+
 
 bool ModuleSceneBase::CleanUp()
 {

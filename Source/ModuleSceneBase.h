@@ -17,10 +17,11 @@ public:
 	bool Update(float dt);
 	bool PostUpdate(float dt);
 	void UpdateMainCamera(float dt);
-	void CameraOrbit();
-	void CameraFocusTo();
-	void CameraFreeMove(float dt);
 	void CameraZoom(float dt);
+	void CameraFreeMove(float dt);
+	void CameraFocusTo();
+	void CameraOrbit(float dt);
+	void CameraRotateWithMouse(float dt);
 	bool CleanUp();
 
 	bool Draw();
@@ -45,7 +46,6 @@ public:
 	//void LookAt(const float3 &Spot);
 	//void Move(const float3 &Movement);
 
-	void RotateWithMouse();
 
 	float zoom_speed = 75.0f;
 private:
