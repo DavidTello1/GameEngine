@@ -66,9 +66,11 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 	std::string final_path = App->file_system->GetFileName(path); //get file name
 	final_path = ASSETS_FOLDER + final_path;
 
+	App->file_system->NormalizePath(final_path, true);
+
 	if (App->file_system->CopyFromOutsideFS(path, final_path.c_str()) == true) //copy file to final_path
 	{
-		if (CheckLoaded(path, uid)) // Check if file has already been loaded and if so, init uid
+		if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded and if so, init uid
 		{
 			LOG("File is already loaded in memory", 'd');
 			return true;
@@ -76,7 +78,7 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 
 		bool import_ok = false;
 		std::string written_file;
-		Resource::Type type = GetResourceType(path); //get resource type
+		Resource::Type type = GetResourceType(final_path.c_str()); //get resource type
 
 		switch (type) //import depending on type
 		{
@@ -141,8 +143,6 @@ Resource* ModuleResources::CreateInitResource(Resource::Type type, UID uid, std:
 	uid = res->uid; //fill uid
 
 	res->file = final_path; //get file
-	App->file_system->NormalizePath(res->file, true);
-
 	std::string exported_file = App->file_system->GetFileName(written_file.c_str()); //get exported file
 
 	if (exported_file.c_str() != NULL) //check for errors
@@ -276,18 +276,15 @@ Resource::Type ModuleResources::GetResourceType(const char* path) const
 
 bool ModuleResources::CheckLoaded(std::string path, UID uid)
 {
-	std::string file = path;
-	App->file_system->NormalizePath(file, true);
-
 	for (std::map<UID, Resource*>::const_iterator it = resources.begin(); it != resources.end(); ++it)
 	{
-		if (it->second->file.compare(file) == 0)
+		if (it->second->file.compare(path) == 0)
 		{
 			uid = it->first;
-			LOG("File is already loaded in memory", 'd');
 			return true;
 		}
 	}
+	return false;
 }
 
 //void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
