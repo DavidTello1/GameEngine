@@ -102,17 +102,42 @@ void Configuration::DrawMainCamera()
 {
 	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		//ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
+		// Dummy floats
+		bool to_update = false; // to delete
+		float _fov = App->scene_base->main_camera->frustum.verticalFov * RADTODEG;
+		float _near = App->scene_base->main_camera->frustum.nearPlaneDistance;
+		float _far = App->scene_base->main_camera->frustum.farPlaneDistance;
 
-		if (ImGui::Checkbox("Perspective (activated) - Orthogonal (deactivated)", &App->scene_base->main_camera->perspective) ||
-			ImGui::DragFloat("Fov Y",  &App->scene_base->main_camera->frustum.verticalFov,	0.001f, 0.01f, PI) ||
-			ImGui::DragFloat("Z Near", &App->scene_base->main_camera->frustum.nearPlaneDistance,	0.25f, 1.0f, App->scene_base->main_camera->frustum.farPlaneDistance) ||
-			ImGui::DragFloat("Z Far",  &App->scene_base->main_camera->frustum.farPlaneDistance,	0.25f, 0.0f, 5000.0f))
+		if (ImGui::Checkbox("Math::Frustum - Internet::Frustum", &App->scene_base->main_camera->perspective))
 		{
-			App->scene_base->main_camera->CalculateProjectionMatrix();
-			App->scene_base->main_camera->update_projection = true;
+			to_update = true;
 		}
+
+		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
+		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 180.0f,"%.1f"))
+		{
+			ModuleSceneBase::main_camera->SetFov(_fov, true);
+			to_update = true;
+		}
+		if (ImGui::DragFloat("Z Near", &_near, 0.25f, 0.1f, _far))
+		{
+			ModuleSceneBase::main_camera->SetNearPlane(_near);
+			to_update = true;
+		}
+		if (ImGui::DragFloat("Z Far",  &_far,	0.25f, _near, 5000.0f))
+		{
+			ModuleSceneBase::main_camera->SetFarPlane(_far);
+			to_update = true;
+		}
+
+		App->scene_base->main_camera->CalculateProjectionMatrix(); // to delete
+		App->scene_base->main_camera->update_projection = to_update; // to delete
 	}
+	// Old options menu
+	/*if (ImGui::Checkbox("Perspective (activated) - Orthogonal (deactivated)", &App->scene_base->main_camera->perspective) ||
+		ImGui::DragFloat("Fov Y", &App->scene_base->main_camera->frustum.verticalFov, 0.001f, 0.01f, PI) ||
+		ImGui::DragFloat("Z Near", &App->scene_base->main_camera->frustum.nearPlaneDistance, 0.25f, 1.0f, App->scene_base->main_camera->frustum.farPlaneDistance) ||
+		ImGui::DragFloat("Z Far", &App->scene_base->main_camera->frustum.farPlaneDistance, 0.25f, 0.0f, 5000.0f))*/
 }
 
 bool Configuration::InitModuleDraw(Module* module)

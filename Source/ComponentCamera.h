@@ -18,24 +18,26 @@ public:
 
 	float GetNearPlane() const;
 	float GetFarPlane() const;
-	float GetFOV() const;
+	float GetFOV(bool in_degree = true) const;
 	float GetAspectRatio() const;
 
 	float* GetViewMatrix();
 	float* GetProjectionMatrix();
 
+	void SetNearPlane(float distance);
+	void SetFarPlane(float distance);
+	void SetFov(float fov, bool in_degree = true);
+	void SetAspectRatio(float ratio);
 
-
-
+	// to delete
 	void CalculateViewMatrix();
 	void CalculateProjectionMatrix();
-
-	void SetAspectRatio(float ratio);
 
 	float4x4 SetFrustum(float fovY, float aspectRatio, float front, float back);
 	float4x4 SetFrustum(float l, float r, float b, float t, float n, float f);
 	float4x4 SetOrthoFrustum(float l, float r, float b, float t, float n, float f);
 
+	// to delete ^
 	void DrawFrustum();
 
 public:

@@ -13,20 +13,21 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 	CalculateViewMatrix();
 	CalculateProjectionMatrix();
 
+	frustum.type = FrustumType::PerspectiveFrustum;
 
-	frustum.pos = float3(0.0f, 0.0f, -5.0f);
+	frustum.pos = float3(0.0f, 0.0f, -10.0f);
 	frustum.front = float3::unitZ;
 	frustum.up = float3::unitY;
 
 	frustum.nearPlaneDistance = 1.0f;
 	frustum.farPlaneDistance = 100.0f;
-	frustum.verticalFov = DEGTORAD * 60.0f;
+	SetFov( 60.0f);
 
 	SetAspectRatio(1.4f);
 
 	update_projection = true;
 
-	Position = float3(0.0f, 0.0f, 5.0f);
+	Position = float3(0.0f, 0.0f, 10.0f);
 	Reference = Position;
 }
 
@@ -34,6 +35,7 @@ ComponentCamera::~ComponentCamera()
 {}
 
 // Getters -----------------------------------------------------------------
+
 float ComponentCamera::GetNearPlane() const
 {
 	return frustum.nearPlaneDistance;
@@ -44,9 +46,12 @@ float ComponentCamera::GetFarPlane() const
 	return frustum.farPlaneDistance;
 }
 
-float ComponentCamera::GetFOV() const
+float ComponentCamera::GetFOV(bool in_degree) const
 {
-	return frustum.verticalFov * RADTODEG;
+	if (in_degree)
+		return frustum.verticalFov * RADTODEG;
+
+	return frustum.verticalFov;
 }
 
 float ComponentCamera::GetAspectRatio() const
@@ -75,7 +80,47 @@ float* ComponentCamera::GetProjectionMatrix()
 	return ProjectionMatrix.ptr();
 }
 
-// -----------------------------------------------------------------
+// Setters -----------------------------------------------------------------
+
+void ComponentCamera::SetNearPlane(float distance)
+{
+	if (distance > 0 && distance < frustum.farPlaneDistance)
+	{
+		frustum.nearPlaneDistance = distance;
+		update_projection = true;
+	}
+
+}
+
+void ComponentCamera::SetFarPlane(float distance)
+{
+	if (distance > 0 && distance > frustum.nearPlaneDistance)
+	{
+		frustum.farPlaneDistance = distance;
+		update_projection = true;
+	}
+}
+
+void ComponentCamera::SetFov(float fov, bool in_degree)
+{
+	float aspect_ratio = frustum.AspectRatio();
+
+	if (in_degree)
+		frustum.verticalFov = DEGTORAD * fov;
+	else
+		frustum.verticalFov =  fov;
+
+	SetAspectRatio(aspect_ratio);
+}
+
+void ComponentCamera::SetAspectRatio(float ratio)
+{
+	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov / 2) * ratio);
+	update_projection = true;
+}
+
+// To delete -----------------------------------------------
+
 void ComponentCamera::CalculateViewMatrix()
 {
 	ViewMatrix = float4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -Dot(X, Position), -Dot(Y, Position), -Dot(Z, Position), 1.0f);
@@ -84,12 +129,6 @@ void ComponentCamera::CalculateViewMatrix()
 void ComponentCamera::CalculateProjectionMatrix()
 {
 	ProjectionMatrix = SetFrustum(frustum.verticalFov, frustum.AspectRatio(), frustum.nearPlaneDistance, frustum.farPlaneDistance);
-}
-
-void ComponentCamera::SetAspectRatio(float ratio)
-{
-	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * ratio);
-	update_projection = true;
 }
 
 float4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, float f)
@@ -104,17 +143,6 @@ float4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n
 	matrix.ptr()[11] = -1;
 	matrix.ptr()[14] = -(2 * f * n) / (f - n);
 	matrix.ptr()[15] = 0;
-
-	// The same
-	//float4x4 matrix = float4x4::identity;
-	//matrix.At(0, 0) = 2 * n / (r - l); //0
-	//matrix.At(1, 1) = 2 * n / (t - b); //5
-	//matrix.At(2, 0) = (r + l) / (r - l); //8
-	//matrix.At(2, 1) = (t + b) / (t - b); //9
-	//matrix.At(2, 2) = -(f + n) / (f - n); //10
-	//matrix.At(2, 3) = -1; //11
-	//matrix.At(3, 2) = -(2 * f * n) / (f - n); //14
-	//matrix.At(3, 3) = 0; //15
 
 	return matrix;
 }
@@ -131,7 +159,7 @@ float4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front,
 
 void ComponentCamera::DrawFrustum() {
 
-	float *proj = ProjectionMatrix.ptr();
+	float *proj = frustum.ProjectionMatrix().ptr();
 	
 	// Get near and far from the Projection matrix.
 	const double n = proj[11] / (proj[10] - 1.0);
@@ -211,6 +239,8 @@ float4x4 ComponentCamera::SetOrthoFrustum(float l, float r, float b, float t, fl
 	matrix.ptr()[14] = -(f + n) / (f - n);
 	return matrix;
 }
+
+// To delete ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //#include "ComponentCamera.h"
 //#include "GameObject.h"

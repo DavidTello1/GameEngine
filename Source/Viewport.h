@@ -29,6 +29,8 @@ public:
 
 	void OnResize(int width, int height);
 
+	void OnCameraUpdate();
+
 	bool PreUpdate();
 
 	bool PostUpdate();
@@ -41,7 +43,7 @@ public:
 
 	mat4x4 model_matrix, view_matrix, projection_matrix;
 
-	ImVec2 window_avail_size;
+	ImVec2 window_avail_size = { default_width, default_height };
 
 };
 
