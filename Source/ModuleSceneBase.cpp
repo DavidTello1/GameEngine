@@ -13,26 +13,22 @@
 GameObject* ModuleSceneBase::main_camera_object;
 ComponentCamera* ModuleSceneBase::main_camera;
 
-ModuleSceneBase::ModuleSceneBase(bool start_enabled) : Module("SceneIntro", start_enabled)
+ModuleSceneBase::ModuleSceneBase(bool start_enabled) : Module("SceneBase", start_enabled)
 {}
 
 ModuleSceneBase::~ModuleSceneBase()
 {}
 
-// Load assets
 bool ModuleSceneBase::Start(Config* config)
 {
 	main_camera_object = App->scene->CreateGameObject("Main Camera");
-	main_camera = (ComponentCamera*)ModuleSceneBase::main_camera_object->AddComponent(Component::Type::Camera);
+	main_camera = (ComponentCamera*)main_camera_object->AddComponent(Component::Type::Camera);
 
 	main_camera->Move({ 0, 5.0f, -10.5f });
 
 	return true;
 }
 
-
-
-// Update
 bool ModuleSceneBase::Update(float dt)
 {
 	UpdateMainCamera(dt);
@@ -42,15 +38,20 @@ bool ModuleSceneBase::Update(float dt)
 
 bool ModuleSceneBase::PostUpdate(float dt)
 {
+	return true;
+}
+
+bool ModuleSceneBase::CleanUp()
+{
+	LOG("Unloading SceneBase");
 
 	return true;
 }
 
+
 void ModuleSceneBase::UpdateMainCamera(float dt)
 {
-
 	if (main_camera == nullptr || main_camera->viewport_focus == false) return;
-
 
 	CameraZoom(dt);
 
@@ -59,9 +60,6 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 	CameraFreeMove(dt);
 
 	CameraOrbit(dt);
-
-	// Recalculate matrix -------------
-	main_camera->CalculateViewMatrix();
 }
 
 void ModuleSceneBase::CameraOrbit(float dt)
@@ -75,7 +73,6 @@ void ModuleSceneBase::CameraOrbit(float dt)
 		{
 			main_camera->Look(object->center);
 		}
-
 	}
 }
 
@@ -92,6 +89,7 @@ void ModuleSceneBase::CameraFocusTo()
 			float min = v_distance.Length();
 			int face = 9;
 
+			// Check which face of the object is the closest one
 			for (int i = 10; i < 13; i++)
 			{
 				v_distance = object->bounding_box[i] - main_camera->frustum.pos;
@@ -109,16 +107,16 @@ void ModuleSceneBase::CameraFocusTo()
 			switch (face)
 			{
 			case 9:
-				main_camera->SetPosition(object->bounding_box[face] + (main_camera->c_Z * offset * parent));
+				main_camera->SetPosition(object->bounding_box[face] + (float3::unitZ * offset * parent));
 				break;
 			case 10:
-				main_camera->SetPosition(object->bounding_box[face] + (main_camera->c_X * offset* parent));
+				main_camera->SetPosition(object->bounding_box[face] + (float3::unitX * offset* parent));
 				break;
 			case 11:
-				main_camera->SetPosition(object->bounding_box[face] - (main_camera->c_X * offset* parent));
+				main_camera->SetPosition(object->bounding_box[face] - (float3::unitX * offset* parent));
 				break;
 			case 12:
-				main_camera->SetPosition(object->bounding_box[face] - (main_camera->c_Z * offset* parent));
+				main_camera->SetPosition(object->bounding_box[face] - (float3::unitZ * offset* parent));
 				break;
 			default:
 				LOG("Could not detect closest face", 'w');
@@ -126,7 +124,6 @@ void ModuleSceneBase::CameraFocusTo()
 			}
 
 			main_camera->Look(object->bounding_box[face]);
-
 		}
 	}
 }
@@ -172,10 +169,12 @@ void ModuleSceneBase::CameraZoom(float dt)
 }
 
 void ModuleSceneBase::CameraRotateWithMouse(float dt) {
+
 	int dx, dy;
 	App->input->GetMouseMotion(dx, dy);
 	dx = -dx;
 	dy = -dy;
+
 	float Sensitivity = 0.25f;
 
 	if (dx != 0)
@@ -199,15 +198,6 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 
 }
 
-
-bool ModuleSceneBase::CleanUp()
-{
-	LOG("Unloading Intro scene");
-
-	return true;
-}
-
-
 bool ModuleSceneBase::Draw()
 {
 	if (App->editor->show_plane) // plane
@@ -218,7 +208,6 @@ bool ModuleSceneBase::Draw()
 
 	return true;
 }
-
 
 
 void ModuleSceneBase::DrawGridPlane()

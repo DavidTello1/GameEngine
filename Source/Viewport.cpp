@@ -26,16 +26,10 @@ Viewport::~Viewport()
 // Is not automatically called
 bool Viewport::PreUpdate()
 {
-	//ComponentCamera* camera = (ComponentCamera*)App->scene->main_camera->GetComponent(Component::Type::Camera);
-
 	if (width != window_avail_size.x || height != window_avail_size.y)
 	{
 		width = window_avail_size.x;
 		height = window_avail_size.y;
-
-		//ModuleSceneBase::main_camera->width = width;
-		//ModuleSceneBase::main_camera->height = height;
-		ModuleSceneBase::main_camera->CalculateProjectionMatrix();
 
 		GenerateFBO(ImVec2(width, height));
 		OnResize(width, height);
@@ -51,7 +45,6 @@ bool Viewport::PreUpdate()
 		OnCameraUpdate();
 		ModuleSceneBase::main_camera->update_projection = false;
 	}
-
 
 	App->scene_base->Draw();
 	App->scene->Draw();
@@ -88,6 +81,7 @@ bool Viewport::CleanUp()
 bool Viewport::GenerateFBO(ImVec2 size)
 {
 	RemoveBuffer(frame_buffer);
+
 	//Generate the FBO and bind it, continue if FBO is complete
 	glGenFramebuffers(1, &frame_buffer.id);
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
@@ -149,6 +143,4 @@ void Viewport::OnCameraUpdate()
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(ModuleSceneBase::main_camera->GetProjectionMatrix());
-
-	ModuleSceneBase::main_camera->CalculateProjectionMatrix(); // To delete
 }

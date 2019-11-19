@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "GameObject.h"
 #include "ComponentCamera.h"
+#include "Color.h"
 
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
@@ -16,13 +17,15 @@ public:
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
 	bool PostUpdate(float dt);
+	bool CleanUp();
+
 	void UpdateMainCamera(float dt);
+
 	void CameraZoom(float dt);
 	void CameraFreeMove(float dt);
 	void CameraFocusTo();
 	void CameraOrbit(float dt);
 	void CameraRotateWithMouse(float dt);
-	bool CleanUp();
 
 	bool Draw();
 
@@ -31,6 +34,7 @@ public:
 
 	// Misc
 	float wireframe_color[3] = { 1.0f, 1.0f, 1.0f };
+	//Color wireframe_color = White;
 	float wireframe_width = 1.0f;
 	bool show_all_wireframe = false;
 

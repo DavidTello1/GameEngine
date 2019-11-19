@@ -107,9 +107,12 @@ void Configuration::DrawMainCamera()
 		float _near = App->scene_base->main_camera->frustum.nearPlaneDistance;
 		float _far = App->scene_base->main_camera->frustum.farPlaneDistance;
 
-		if (ImGui::Checkbox("Math::Frustum - Internet::Frustum", &App->scene_base->main_camera->perspective))
+		if (ImGui::Checkbox("Perspective / Orthogonal", &ModuleSceneBase::main_camera->perspective))
 		{
-
+			if (ModuleSceneBase::main_camera->perspective)
+				ModuleSceneBase::main_camera->frustum.type = FrustumType::PerspectiveFrustum;
+			else
+				ModuleSceneBase::main_camera->frustum.type = FrustumType::OrthographicFrustum;
 		}
 
 		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
@@ -125,14 +128,7 @@ void Configuration::DrawMainCamera()
 		{
 			ModuleSceneBase::main_camera->SetFarPlane(_far);
 		}
-
-		App->scene_base->main_camera->CalculateProjectionMatrix(); // to delete
 	}
-	// Old options menu
-	/*if (ImGui::Checkbox("Perspective (activated) - Orthogonal (deactivated)", &App->scene_base->main_camera->perspective) ||
-		ImGui::DragFloat("Fov Y", &App->scene_base->main_camera->frustum.verticalFov, 0.001f, 0.01f, PI) ||
-		ImGui::DragFloat("Z Near", &App->scene_base->main_camera->frustum.nearPlaneDistance, 0.25f, 1.0f, App->scene_base->main_camera->frustum.farPlaneDistance) ||
-		ImGui::DragFloat("Z Far", &App->scene_base->main_camera->frustum.farPlaneDistance, 0.25f, 0.0f, 5000.0f))*/
 }
 
 bool Configuration::InitModuleDraw(Module* module)
