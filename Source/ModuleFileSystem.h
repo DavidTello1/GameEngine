@@ -33,8 +33,10 @@ public:
 
 	std::string GetFileName(const char* full_path) const; //returns file name (baker_house.fbx)
 	std::string GetExtension(const char* full_path) const; //returns extension (fbx)
-	void NormalizePath(char* full_path, bool to_lower) const;
-	void NormalizePath(std::string& full_path, bool to_lower) const;
+	void NormalizePath(char* full_path) const;
+	void NormalizePath(std::string& full_path) const;
+	void ToLower(char* full_path) const;
+	void ToLower(std::string& full_path) const;
 
 	// Open for Read/Write
 	unsigned int LoadFromPath(const char* path, const char* file, char** buffer) const;

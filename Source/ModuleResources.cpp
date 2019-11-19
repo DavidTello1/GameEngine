@@ -66,7 +66,7 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 	std::string final_path = App->file_system->GetFileName(path); //get file name
 	final_path = ASSETS_FOLDER + final_path;
 
-	App->file_system->NormalizePath(final_path, true);
+	App->file_system->NormalizePath(final_path);
 
 	if (App->file_system->CopyFromOutsideFS(path, final_path.c_str()) == true) //copy file to final_path
 	{
@@ -254,6 +254,7 @@ Resource::Type ModuleResources::GetResourceType(const char* path) const
 {
 	Resource::Type type;
 	std::string extension = App->file_system->GetExtension(path);
+	App->file_system->ToLower(extension);
 
 	if (strcmp("obj", extension.c_str()) == 0 || strcmp("fbx", extension.c_str()) == 0)
 	{

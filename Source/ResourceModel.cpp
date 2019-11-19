@@ -91,7 +91,7 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		if (ret)
 		{
 			model.file = full_path; //get file
-			App->file_system->NormalizePath(model.file, true);
+			App->file_system->NormalizePath(model.file);
 
 			std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
 			model.exported_file = file_name;
@@ -156,7 +156,8 @@ bool ResourceModel::LoadtoScene()
 			nodes.push_back(node); //add node to vector nodes
 		}
 
-		CreateGameObjects(App->file_system->GetFileName(file.c_str()).c_str());
+		CreateGameObjects(App->file_system->GetFileName(file.c_str()).c_str()); //create gameobjects from model
+
 		LOG("[%s] loaded in %d ms", GetExportedFile(), timer.Read(), 'd');
 		timer.Stop();
 		return true;

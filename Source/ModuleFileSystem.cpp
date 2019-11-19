@@ -193,28 +193,42 @@ std::string ModuleFileSystem::GetExtension(const char* path) const
 	return extension;
 }
 
-void ModuleFileSystem::NormalizePath(char * full_path, bool to_lower) const
+void ModuleFileSystem::NormalizePath(char* full_path) const
 {
 	int len = strlen(full_path);
 	for (int i = 0; i < len; ++i)
 	{
 		if (full_path[i] == '\\')
 			full_path[i] = '/';
-		else if (to_lower)
-			full_path[i] = tolower(full_path[i]);
 	}
 }
 
-void ModuleFileSystem::NormalizePath(std::string & full_path, bool to_lower) const
+void ModuleFileSystem::NormalizePath(std::string & full_path) const
 {
 	for (string::iterator it = full_path.begin(); it != full_path.end(); ++it)
 	{
 		if (*it == '\\')
 			*it = '/';
-		else if (to_lower)
-			*it = tolower(*it);
 	}
 }
+
+void ModuleFileSystem::ToLower(char* full_path) const
+{
+	int len = strlen(full_path);
+	for (int i = 0; i < len; ++i)
+	{
+		full_path[i] = tolower(full_path[i]);
+	}
+}
+
+void ModuleFileSystem::ToLower(std::string & full_path) const
+{
+	for (string::iterator it = full_path.begin(); it != full_path.end(); ++it)
+	{
+		*it = tolower(*it);
+	}
+}
+
 
 unsigned int ModuleFileSystem::LoadFromPath(const char * path, const char * file, char ** buffer) const
 {
@@ -315,7 +329,7 @@ bool ModuleFileSystem::SaveUnique(string& name, const void * buffer, uint size, 
 	char result[250];
 
 	sprintf_s(result, 250, "%s%s_%llu.%s", path, prefix, App->resources->GenerateUID(), extension); //put file data into new path
-	NormalizePath(result, true); //normalize new path
+	NormalizePath(result); //normalize new path
 	if (Save(result, buffer, size) > 0) //save to new path
 	{
 		name = result; //change source name to new name
