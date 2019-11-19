@@ -11,6 +11,8 @@ class ComponentCamera : public Component
 {
 public:
 
+	ALIGN_CLASS_TO_16
+
 	ComponentCamera(GameObject* gameObject);
 	~ComponentCamera();
 
@@ -20,9 +22,9 @@ public:
 	void CalculateViewMatrix();
 	void CalculateProjectionMatrix();
 
-	mat4x4 SetFrustum(float fovY, float aspectRatio, float front, float back);
-	mat4x4 SetFrustum(float l, float r, float b, float t, float n, float f);
-	mat4x4 SetOrthoFrustum(float l, float r, float b, float t, float n, float f);
+	float4x4 SetFrustum(float fovY, float aspectRatio, float front, float back);
+	float4x4 SetFrustum(float l, float r, float b, float t, float n, float f);
+	float4x4 SetOrthoFrustum(float l, float r, float b, float t, float n, float f);
 
 	void DrawFrustum();
 
@@ -54,14 +56,9 @@ public:
 
 private:
 
-	mat4x4 ViewMatrix;
-	mat4x4 ProjectionMatrix;
+	float4x4 ViewMatrix;
+	float4x4 ProjectionMatrix;
 
-	//GLuint VBO = 0;
-	//GLuint IBO = 0;
-
-	//float3 frustum_vertices[8];
-	//static GLuint frustum_indices[24];
 };
 
 

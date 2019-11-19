@@ -7,12 +7,6 @@
 #include "ModuleScene.h"
 #include "mmgr/mmgr.h"
 
-//GLuint ComponentCamera::frustum_indices[24] =
-//{
-//	0,1,2,3,0,3,1,2,
-//	4,5,6,7,4,7,5,6,
-//	0,4,1,5,2,6,3,7
-//};
 
 ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Type::Camera, gameobj)
 {
@@ -24,76 +18,59 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 }
 
 ComponentCamera::~ComponentCamera()
-{
-	//RELEASE_ARRAY(frustum_vertices);
-	
-	/*if (VBO != 0)
-	{
-		glDeleteFramebuffers(1, &VBO);
-	}
-	if (IBO != 0)
-	{
-		glDeleteBuffers(1, &IBO);
-	}*/
-}
-
-
-
+{}
 
 // -----------------------------------------------------------------
 float* ComponentCamera::GetViewMatrix()
 {
-	return &ViewMatrix;
+	return ViewMatrix.ptr();
 }
 
 float* ComponentCamera::GetProjectionMatrix()
 {
-	return &ProjectionMatrix;
+	return ProjectionMatrix.ptr();
 }
 
 // -----------------------------------------------------------------
 void ComponentCamera::CalculateViewMatrix()
 {
-	//frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, -dot(X, Position), X.y, Y.y, Z.y, -dot(Y, Position), X.z, Y.z, Z.z, -dot(Z, Position)));
-	//frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, Position.x, X.y, Y.y, Z.y, Position.y, X.z, Y.z, Z.z, Position.z));
-	//frustum.SetWorldMatrix(float3x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f));// , -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f));
-	//float3 up = { -dot(X, Position), -dot(Y, Position),-dot(Z, Position) };
-	//frustum.up = up.Normalized();
-
-	ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
+	ViewMatrix = float4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
 }
 
 void ComponentCamera::CalculateProjectionMatrix()
 {
-	//frustum.nearPlaneDistance = z_near;
-	//frustum.farPlaneDistance = z_far;
-	//frustum.verticalFov = fov_y;
-	//frustum.horizontalFov = 2 * Atan(tan(fov_y / 2) * width / height);
-	//frustum.type = FrustumType::PerspectiveFrustum;
-	//float3x4 view = frustum.ViewMatrix();
-	//ProjectionMatrix = frustum.ProjectionMatrix();
-
 	ProjectionMatrix = SetFrustum(fov_y, width / height, z_near, z_far);
 }
 
 
-mat4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, float f)
+float4x4 ComponentCamera::SetFrustum(float l, float r, float b, float t, float n, float f)
 {
 
-	mat4x4 matrix;
-	matrix[0] = 2 * n / (r - l);
-	matrix[5] = 2 * n / (t - b);
-	matrix[8] = (r + l) / (r - l);
-	matrix[9] = (t + b) / (t - b);
-	matrix[10] = -(f + n) / (f - n);
-	matrix[11] = -1;
-	matrix[14] = -(2 * f * n) / (f - n);
-	matrix[15] = 0;
+	float4x4 matrix = float4x4::identity;
+	matrix.ptr()[0] = 2 * n / (r - l);
+	matrix.ptr()[5] = 2 * n / (t - b);
+	matrix.ptr()[8] = (r + l) / (r - l);
+	matrix.ptr()[9] = (t + b) / (t - b);
+	matrix.ptr()[10] = -(f + n) / (f - n);
+	matrix.ptr()[11] = -1;
+	matrix.ptr()[14] = -(2 * f * n) / (f - n);
+	matrix.ptr()[15] = 0;
+
+	// The same
+	//float4x4 matrix = float4x4::identity;
+	//matrix.At(0, 0) = 2 * n / (r - l); //0
+	//matrix.At(1, 1) = 2 * n / (t - b); //5
+	//matrix.At(2, 0) = (r + l) / (r - l); //8
+	//matrix.At(2, 1) = (t + b) / (t - b); //9
+	//matrix.At(2, 2) = -(f + n) / (f - n); //10
+	//matrix.At(2, 3) = -1; //11
+	//matrix.At(3, 2) = -(2 * f * n) / (f - n); //14
+	//matrix.At(3, 3) = 0; //15
 
 	return matrix;
 }
 
-mat4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, float back)
+float4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, float back)
 {
 	float tangent = tanf(fovY / 2 * DEGTORAD);   // tangent of half fovY
 	float height = front * tangent;           // half height of near plane
@@ -107,9 +84,8 @@ mat4x4 ComponentCamera::SetFrustum(float fovY, float aspectRatio, float front, f
 
 void ComponentCamera::DrawFrustum() {
 
-	float *proj = ProjectionMatrix.M;
+	float *proj = ProjectionMatrix.ptr();
 	
-
 	// Get near and far from the Projection matrix.
 	const double n = proj[11] / (proj[10] - 1.0);
 	const double f = proj[11] / (1.0 + proj[10]);
@@ -126,31 +102,10 @@ void ComponentCamera::DrawFrustum() {
 	const double fTop = f * (1.0 + proj[6]) / proj[5];
 	const double fBottom = f * (proj[6] - 1.0) / proj[5];
 
-	/*
-	 0	glVertex3f(0.0f, 0.0f, 0.0f);
-	 1	glVertex3f(nLeft, nBottom, -n);
-	 2	glVertex3f(nRight, nBottom, -n);
-	 3	glVertex3f(nRight, nTop, -n);
-	 4	glVertex3f(nLeft, nTop, -n);
-	 5	glVertex3f(fLeft, fBottom, -f);
-	 6	glVertex3f(fRight, fBottom, -f);
-	 7	glVertex3f(fRight, fTop, -f);
-	 8	glVertex3f(fLeft, fTop, -f);
-	 */
-
-	//glMatrixMode(GL_MODELVIEW);
-	//glPushMatrix();
-	//glLoadIdentity ();
-
-		// TODO - Update: You need to invert the mv before multiplying it with the current mv!
-
-	//glMultMatrixf(ViewMatrix.M);
-
 	glLineWidth(2);
 	glColor3ub(255.0f,0.0f,0.0f);
 	glBegin(GL_LINES);
 	
-	//glVertex3f(0.0f, 0.0f, 0.0f);
 	glVertex3f(nLeft, nBottom, -n);
 	glVertex3f(fLeft, fBottom, -f);
 
@@ -198,36 +153,15 @@ void ComponentCamera::DrawFrustum() {
 
 
 
-mat4x4 ComponentCamera::SetOrthoFrustum(float l, float r, float b, float t, float n, float f)
+float4x4 ComponentCamera::SetOrthoFrustum(float l, float r, float b, float t, float n, float f)
 {
-	/*frustum_vertices[0] = { Position.x + r,Position.y + b,Position.z + n };
-	frustum_vertices[1] = { Position.x + r,Position.y + b,Position.z + f };
-	frustum_vertices[2] = { Position.x + l,Position.y + b,Position.z + f };
-	frustum_vertices[3] = { Position.x + l,Position.y + b,Position.z + n };
-	frustum_vertices[4] = { Position.x + r,Position.y + t,Position.z + n };
-	frustum_vertices[5] = { Position.x + r,Position.y + t,Position.z + f };
-	frustum_vertices[6] = { Position.x + l,Position.y + t,Position.z + f };
-	frustum_vertices[7] = { Position.x + l,Position.y + t,Position.z + n };
-
-	if (VBO == 0) glGenBuffers(1, &VBO);
-
-	if (IBO == 0) glGenBuffers(1, &IBO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(frustum_vertices), frustum_vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(frustum_indices), frustum_vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
-
-	mat4x4 matrix;
-	matrix[0] = 2 / (r - l);
-	matrix[5] = 2 / (t - b);
-	matrix[10] = -2 / (f - n);
-	matrix[12] = -(r + l) / (r - l);
-	matrix[13] = -(t + b) / (t - b);
-	matrix[14] = -(f + n) / (f - n);
+	float4x4 matrix;
+	matrix.ptr()[0] = 2 / (r - l);
+	matrix.ptr()[5] = 2 / (t - b);
+	matrix.ptr()[10] = -2 / (f - n);
+	matrix.ptr()[12] = -(r + l) / (r - l);
+	matrix.ptr()[13] = -(t + b) / (t - b);
+	matrix.ptr()[14] = -(f + n) / (f - n);
 	return matrix;
 }
 
