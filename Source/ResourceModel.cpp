@@ -24,6 +24,7 @@ ResourceModel::ResourceModel(UID id) : Resource(id, Resource::Type::model)
 
 ResourceModel::~ResourceModel()
 {
+	UnLoad();
 }
 
 //void ResourceModel::Save(Config& config) const
