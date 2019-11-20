@@ -29,6 +29,8 @@ GameObject::GameObject(const char* name, GameObject* Parent)
 		parent->flags |= ProcessNewChild;
 		parent->LogAction("To parent");
 	}
+
+	b_box.SetNegativeInfinity();
 }
 
 GameObject::~GameObject()
@@ -216,8 +218,7 @@ void GameObject::ChildAdded()
 
 	GetMinMaxVertex(this, &b_box.minPoint, &b_box.maxPoint);
 
-	GenBoundingBox();
-
+	GenerateBoundingBox();
 }
 
 void GameObject::ChildDeleted()
@@ -231,33 +232,41 @@ void GameObject::ChildDeleted()
 
 		GetMinMaxVertex(this, &b_box.minPoint, &b_box.maxPoint);
 
-		GenBoundingBox();
+		GenerateBoundingBox();
 	}
 	else 
 	{
-		GenBoundingBox(true);
+		DeleteBoundingBox();
 	}
 }
 
-void GameObject::GenBoundingBox(bool to_delete)
+void GameObject::GenerateBoundingBox()
 {
-	if (to_delete) 
-	{
-		if (bb_VBO != 0)
-		{
-			glDeleteFramebuffers(1, &bb_VBO);
-			bb_VBO = 0;
-		}
-	}
-	else
-	{
-		if (bb_VBO == 0) glGenBuffers(1, &bb_VBO);
+	const ComponentMesh* mesh = (ComponentMesh*)GetComponent(Component::Type::Mesh);
 
-		float3 corners[8];
-		b_box.GetCornerPoints(corners);
-
-		glBindBuffer(GL_ARRAY_BUFFER, bb_VBO);
-		glBufferData(GL_ARRAY_BUFFER, b_box.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	if (mesh != nullptr)
+	{
+		b_box.SetNegativeInfinity();
+		b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
 	}
+
+	if (bb_VBO == 0) glGenBuffers(1, &bb_VBO);
+
+	float3 corners[8];
+	b_box.GetCornerPoints(corners);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bb_VBO);
+	glBufferData(GL_ARRAY_BUFFER, b_box.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+}
+
+void GameObject::DeleteBoundingBox()
+{
+	if (bb_VBO != 0)
+	{
+		glDeleteFramebuffers(1, &bb_VBO);
+		bb_VBO = 0;
+	}
+	b_box.SetNegativeInfinity();
 }

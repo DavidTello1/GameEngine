@@ -4,6 +4,7 @@
 #include "Component.h"
 #include "glew\include\GL\glew.h"
 #include "Hierarchy.h"
+#include "ResourceMesh.h"
 
 #include "Math.h"
 #include <vector>
@@ -56,8 +57,10 @@ public:
 	void ChildAdded();
 	void ChildDeleted();
 
+
+	void GenerateBoundingBox();
+	void DeleteBoundingBox();
 	void GetMinMaxVertex(GameObject * obj, float3 * abs_max, float3 * abs_min);
-	void GenBoundingBox(bool to_delete = false);
 
 	void SetLocalPosition(const float3& position) { translation = position; }
 	void SetLocalScale(const float3& Scale) { scale = Scale; }

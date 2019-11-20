@@ -251,11 +251,8 @@ void ResourceModel::CreateGameObjects(const char* name)
 			ResourceMesh* r_mesh = (ResourceMesh*)App->resources->GetResource(nodes[i].mesh);
 			r_mesh->LoadToMemory(); //load mesh data
 			mesh->SetMesh(r_mesh);
-			//mesh->SetBoundingBox();
 
-			obj->b_box.SetNegativeInfinity();
-			obj->b_box.Enclose(r_mesh->vertices, r_mesh->num_vertices);
-			obj->GenBoundingBox();
+			obj->GenerateBoundingBox();
 
 			obj->AddComponent(Component::Type::Renderer);
 		}

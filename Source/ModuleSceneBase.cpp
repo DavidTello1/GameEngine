@@ -105,9 +105,11 @@ void ModuleSceneBase::CameraFocusTo()
 			}
 
 			float size = object->b_box.Size().MaxElement();
-			float offset = Sqrt((size*size) - (size*size / 4)); // superformula to define the offset to the object
+			// superformula to define the offset to the object
+			float offset = Sqrt((size*size) - (size*size / 4)); 
+
 			//XOR with if is parent and the position (parity) of the face inside the b_box.FaceCenterPoint
-			// code reference at commit "Cleaned Focus Camera" +- 230 commit number
+			// code reference at commit "Cleaned Focus Camera" +- 280 commit number
 			float xor = (object->HasChilds() ^ face % 2 == 0) ? -1.0f : 1.0f;
 
 			if (face < 2)
