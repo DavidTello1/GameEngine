@@ -127,7 +127,7 @@ Component* GameObject::AddComponent(Component::Type type)
 	{
 		new_component = new ComponentCamera(this);
 		components.push_back(new_component);
-		App->resources->LoadResource("Assets/camera_mesh.fbx", Component::Type::Mesh, true, this);
+		//App->resources->LoadResource("Assets/camera_mesh.fbx", Component::Type::Mesh, true, this);
 		return new_component;
 	}
 	return nullptr;
