@@ -136,17 +136,17 @@ void Inspector::Draw()
 		// Position
 		ImGui::Text("Position");
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("x##1", &position.x, 0.5f))
+		if (ImGui::DragFloat("x##1", &position.x, precision))
 			SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("y##1", &position.y, 0.5f))
+		if (ImGui::DragFloat("y##1", &position.y, precision))
 			SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("z##1", &position.z, 0.5f))
+		if (ImGui::DragFloat("z##1", &position.z, precision))
 			SetPosition(obj, position);
 
 		ImGui::Separator();
@@ -154,17 +154,17 @@ void Inspector::Draw()
 		// Rotation
 		ImGui::Text("Rotation");
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("x##2", &rotation.x, 0.5f, 0.0f, 360.0f))
+		if (ImGui::DragFloat("x##2", &rotation.x, precision, 0.0f, 360.0f))
 			SetRotation(obj, rotation);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("y##2", &rotation.y, 0.5f, 0.0f, 360.0f))
+		if (ImGui::DragFloat("y##2", &rotation.y, precision, 0.0f, 360.0f))
 			SetRotation(obj, rotation);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("z##2", &rotation.z, 0.5f, 0.0f, 360.0f))
+		if (ImGui::DragFloat("z##2", &rotation.z, precision, 0.0f, 360.0f))
 			SetRotation(obj, rotation);
 
 		ImGui::Separator();
@@ -172,17 +172,17 @@ void Inspector::Draw()
 		// Scale
 		ImGui::Text("Scale");
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("x##3", &scale.x, 0.2f))
+		if (ImGui::DragFloat("x##3", &scale.x, precision))
 			SetScale(obj, scale);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("y##3", &scale.y, 0.2f))
+		if (ImGui::DragFloat("y##3", &scale.y, precision))
 			SetScale(obj, scale);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("z##3", &scale.z, 0.2f))
+		if (ImGui::DragFloat("z##3", &scale.z, precision))
 			SetScale(obj, scale);
 
 		ImGui::Separator();

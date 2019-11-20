@@ -14,11 +14,11 @@ class ComponentMaterial;
 //Dealt at scene post update
 enum GameObjectFlags
 {
-	NoFlags				= 0,
-	ProcessNewChild		= 1 << 0,
-	ProcessDeletedChild	= 1 << 1,
-	UnusedFlagNumber2	= 1 << 2,
-	UnusedFlagNumber3	= 1 << 3
+	NoFlags					= 0,
+	ProcessNewChild			= 1 << 0,
+	ProcessDeletedChild		= 1 << 1,
+	ProcessTransformUpdate	= 1 << 2,
+	UnusedFlagNumber3		= 1 << 3
 };
 
 class GameObject
@@ -46,8 +46,12 @@ public:
 	float3 GetRotation() const { return rotation; }
 	Quat GetRotationQ() const { return rotation_quat; }
 	float3 GetScale() const { return scale; }
-	float4x4 GetLocalTransform() {return local_transform; }
+	float4x4 GetLocalTransform() { return local_transform; }
+	float4x4 GetGlobalTransform() { return global_transform; }
 	//float3 GetVelocity() const { return velocity; }
+
+
+	void UpdateTransform();
 
 	void SetRotation(const float3& XYZ_euler_rotation);
 	void SetRotation(const Quat& rotation);
@@ -60,9 +64,10 @@ public:
 
 	void GenerateBoundingBox();
 	void DeleteBoundingBox();
+	void UpdateBoundingBox();
 	void GetMinMaxVertex(GameObject * obj, float3 * abs_max, float3 * abs_min);
 
-	void SetLocalPosition(const float3& position) { translation = position; }
+	void SetLocalPosition(const float3& position);
 	void SetLocalScale(const float3& Scale) { scale = Scale; }
 
 	void Move(const float3& velocity) { translation += velocity; }
@@ -78,6 +83,7 @@ private:
 	float3 rotation = float3::zero;
 	float3 scale = float3::one;
 	float4x4 local_transform = math::float4x4::identity;
+	float4x4 global_transform = math::float4x4::identity;
 	//float3 velocity = float3::zero;
 
 public:
@@ -90,7 +96,7 @@ public:
 
 	// Bounding box
 	AABB b_box;
-
+	OBB obb;
 	GLuint bb_VBO = 0;
 
 	static GLuint bounding_box_IBO;

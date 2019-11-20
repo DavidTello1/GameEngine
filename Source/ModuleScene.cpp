@@ -80,6 +80,12 @@ bool ModuleScene::PostUpdate(float dt)
 			obj->ChildDeleted();
 			obj->flags &= ~ProcessDeletedChild;
 		}
+		if (obj->flags & ProcessTransformUpdate)
+		{
+			obj->UpdateTransform();
+			obj->GenerateBoundingBox();
+			obj->flags &= ~ProcessTransformUpdate;
+		}
 	}
 
 	return true;
@@ -107,11 +113,13 @@ bool ModuleScene::CleanUp()
 
 bool ModuleScene::Draw()
 {
+	//glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
 	// Draw GameObjects
 	for (uint i = 0; i < gameObjects.size(); ++i)
 	{
 		glPushMatrix();
-		glMultMatrixf(gameObjects[i]->GetLocalTransform().ptr());
+		glMultMatrixf(gameObjects[i]->GetGlobalTransform().Transposed().ptr());
 
 		ComponentRenderer* renderer = (ComponentRenderer*)gameObjects[i]->GetComponent(Component::Type::Renderer);
 		if (renderer != nullptr && renderer->IsActive())

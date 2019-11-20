@@ -160,6 +160,26 @@ void GameObject::DeleteComponent(Component::Type type)
 	}
 }
 
+void GameObject::UpdateTransform()
+{
+	if (flags & ProcessTransformUpdate)
+		local_transform = float4x4::FromTRS(translation, rotation_quat, scale);
+
+	if (parent && parent->GetUID() != 0)
+	{
+		global_transform = local_transform + parent->GetGlobalTransform();
+	}
+	else
+	{
+		global_transform = local_transform;
+	}
+
+	for (GameObject* child : childs)
+	{
+		child->UpdateTransform();
+	}
+
+}
 
 // ---------------------
 void GameObject::SetRotation(const float3& XYZ_euler_rotation)
@@ -204,6 +224,12 @@ void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_m
 	}
 }
 
+void GameObject::SetLocalPosition(const float3 & position)
+{
+	translation = position; 
+	flags |= ProcessTransformUpdate;
+}
+
 void GameObject::ChildAdded()
 {
 	// Checking if new child node is not an empty node and parent not root node
@@ -244,10 +270,21 @@ void GameObject::GenerateBoundingBox()
 {
 	const ComponentMesh* mesh = (ComponentMesh*)GetComponent(Component::Type::Mesh);
 
-	if (mesh != nullptr)
+	if (mesh)
 	{
-		b_box.SetNegativeInfinity();
-		b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
+		if (b_box.IsFinite())
+		{
+			obb = b_box;
+			obb.Transform(GetGlobalTransform());
+
+			b_box.SetNegativeInfinity();
+			b_box.Enclose(obb);
+		}
+		else
+		{
+			//b_box.SetNegativeInfinity();
+			b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
+		}
 	}
 
 	if (bb_VBO == 0) glGenBuffers(1, &bb_VBO);
@@ -269,4 +306,18 @@ void GameObject::DeleteBoundingBox()
 		bb_VBO = 0;
 	}
 	b_box.SetNegativeInfinity();
+}
+
+void GameObject::UpdateBoundingBox()
+{
+	/*const ComponentMesh* mesh = (ComponentMesh*)GetComponent(Component::Type::Mesh);
+
+	if (mesh != nullptr)
+	{
+		obb = mesh->GetBoundingBox();
+		obb.Transform(this->GetComponentTransform()->GetGlobalTransform());
+
+		aabb.SetNegativeInfinity();
+		aabb.Enclose(obb);
+	}*/
 }
