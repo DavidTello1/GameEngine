@@ -75,7 +75,7 @@ void ModuleSceneBase::CameraOrbit(float dt)
 		GameObject* object = App->scene->GetSelectedGameObject();
 		if (object != nullptr)
 		{
-			viewport_camera->Look(object->center);
+			viewport_camera->Look(object->b_box.CenterPoint());
 		}
 	}
 }
@@ -88,15 +88,15 @@ void ModuleSceneBase::CameraFocusTo()
 
 		if (object != nullptr)
 		{
-			float3 v_distance = object->bounding_box[9] - viewport_camera->frustum.pos;
+			float3 v_distance = object->b_box.FaceCenterPoint(0) - viewport_camera->frustum.pos;
 
 			float min = v_distance.Length();
-			int face = 9;
+			int face = 0;
 
 			// Check which face of the object is the closest one
-			for (int i = 10; i < 13; i++)
+			for (int i = 1; i < 6; i++)
 			{
-				v_distance = object->bounding_box[i] - viewport_camera->frustum.pos;
+				v_distance = object->b_box.FaceCenterPoint(i) - viewport_camera->frustum.pos;
 				
 				if (v_distance.Length() < min) {
 					min = v_distance.Length();
@@ -104,30 +104,49 @@ void ModuleSceneBase::CameraFocusTo()
 				}
 			}
 
-			float size = object->size.MaxElement();
+			float size = object->b_box.Size().MaxElement();
 			float offset = Sqrt((size*size) - (size*size / 4)); // superformula to define the offset to the object
-			float parent = (object->HasChilds()) ? 1.0f : -1.0f;
+			//XOR with if is parent and the position (parity) of the face inside the b_box.FaceCenterPoint
+			float xor = (object->HasChilds() ^ face % 2 == 0) ? -1.0f : 1.0f;
 
-			switch (face)
+			if (face < 2)
 			{
-			case 9:
-				viewport_camera->SetPosition(object->bounding_box[face] + (float3::unitZ * offset * parent));
+				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitX * offset * xor));
+			}
+			else if (face < 4)
+			{
+				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitY * offset * xor));
+			}
+			else if (face < 6)
+			{
+				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitZ * offset * xor));
+			}
+			/*switch (face)
+			{
+			case 0:
+				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitX * offset * parent));
 				break;
-			case 10:
-				viewport_camera->SetPosition(object->bounding_box[face] + (float3::unitX * offset* parent));
+			case 1:
+				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) - (float3::unitX * offset* parent));
 				break;
-			case 11:
-				viewport_camera->SetPosition(object->bounding_box[face] - (float3::unitX * offset* parent));
+			case 2:
+				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitY * offset* parent));
 				break;
-			case 12:
-				viewport_camera->SetPosition(object->bounding_box[face] - (float3::unitZ * offset* parent));
+			case 3:
+				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) - (float3::unitY * offset* parent));
+				break;
+			case 4:
+				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitZ * offset* parent));
+				break;
+			case 5:
+				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) - (float3::unitZ * offset* parent));
 				break;
 			default:
 				LOG("Could not detect closest face", 'w');
 				break;
-			}
+			}*/
 
-			viewport_camera->Look(object->bounding_box[face]);
+			viewport_camera->Look(object->b_box.FaceCenterPoint(face));
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
+#include "ResourceModel.h"
 
 #include "mmgr/mmgr.h"
 
@@ -31,7 +32,14 @@ bool ModuleScene::Start(Config* config)
 	test_camera = CreateGameObject("test camera");
 	test_camera->AddComponent(Component::Type::Camera);
 
-	//GameObject* bparent = CreateGameObject("BakerHouse");
+	//ResourceModel* tcmodel = new ResourceModel(root_object->GetUID());
+	//std::string tmdp = "MyCamera.dvs";
+	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
+
+
+	ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
+	std::string tmp = "MyBakerHouse.dvs";
+	bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
 
 	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
 	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
@@ -132,8 +140,8 @@ bool ModuleScene::Draw()
 			glBindBuffer(GL_ARRAY_BUFFER, obj->bb_VBO);
 			glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->bb_IBO);
-			glDrawElements(GL_LINES, sizeof(App->resources->bbox_indices), GL_UNSIGNED_INT, nullptr);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GameObject::bounding_box_IBO);
+			glDrawElements(GL_LINES, sizeof(App->scene_base->bounding_box_indices), GL_UNSIGNED_INT, nullptr);
 
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);

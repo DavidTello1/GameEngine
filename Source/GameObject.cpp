@@ -185,7 +185,7 @@ void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_m
 {
 	if (!obj->HasChilds())
 	{
-		if (!obj->is_valid_dimensions) return;
+		if (!obj->b_box.IsFinite()) return;
 		if (obj->b_box.minPoint.x < abs_min->x) abs_min->x = obj->b_box.minPoint.x;
 		if (obj->b_box.minPoint.y < abs_min->y) abs_min->y = obj->b_box.minPoint.y;
 		if (obj->b_box.minPoint.z < abs_min->z) abs_min->z = obj->b_box.minPoint.z;
@@ -209,7 +209,7 @@ void GameObject::ChildAdded()
 		LOG("Child is root node", 'e');
 		return;
 	}
-	if (uid == 0 || !childs.back()->is_valid_dimensions) return;
+	if (uid == 0 || !childs.back()->b_box.IsFinite()) return;
 
 	b_box.minPoint = childs.back()->b_box.minPoint;
 	b_box.maxPoint = childs.back()->b_box.maxPoint;

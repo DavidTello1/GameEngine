@@ -87,11 +87,7 @@ public:
 
 	// Bounding box
 	AABB b_box;
-	bool is_valid_dimensions = false;
-	float3 center		= { 0,0,0 };
-	float3 size			= { 0,0,0 };
 
-	float3 bounding_box[13]; //0-7 Box vertex//8 Box center//9-12 Faces center
 	GLuint bb_VBO = 0;
 
 	static GLuint bounding_box_IBO;
