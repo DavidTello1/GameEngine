@@ -83,7 +83,7 @@ bool ModuleScene::PostUpdate(float dt)
 		if (obj->flags & ProcessTransformUpdate)
 		{
 			obj->UpdateTransform();
-			obj->GenerateBoundingBox();
+			obj->UpdateBoundingBox();
 			obj->flags &= ~ProcessTransformUpdate;
 		}
 	}

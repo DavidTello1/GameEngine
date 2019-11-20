@@ -44,6 +44,7 @@ public:
 	bool LoadtoScene();
 	void UnLoad();
 
+	const AABB& GetAABB() { return aabb; }
 	//void Draw();
 	//void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, GameObject* parent = nullptr);
 
@@ -73,6 +74,9 @@ public:
 	uint num_normals = 0;			// Number of normal coordinates
 
 private:
+
+	AABB aabb;
+
 	const char* shape_to_string[shape_type::UNKNOWN] =
 	{ "Cylinder","Cone", "Torus", "Sphere", "Bottle", "Knot",
 		"Hemisphere", "Plane", "Icosahedron", "Dodecahedron",

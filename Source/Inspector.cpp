@@ -38,7 +38,7 @@ void Inspector::Draw()
 		return;
 	}
 	position = obj->GetPosition();
-	rotation = obj->GetRotation();
+	rotation = obj->GetRotation() * RADTODEG;
 	scale = obj->GetScale();
 
 	if (has_mesh = obj->HasComponent(Component::Type::Mesh))
@@ -154,18 +154,18 @@ void Inspector::Draw()
 		// Rotation
 		ImGui::Text("Rotation");
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("x##2", &rotation.x, precision, 0.0f, 360.0f))
-			SetRotation(obj, rotation);
+		if (ImGui::DragFloat("x##2", &rotation.x, precision))
+			SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("y##2", &rotation.y, precision, 0.0f, 360.0f))
-			SetRotation(obj, rotation);
+		if (ImGui::DragFloat("y##2", &rotation.y, precision))
+			SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("z##2", &rotation.z, precision, 0.0f, 360.0f))
-			SetRotation(obj, rotation);
+		if (ImGui::DragFloat("z##2", &rotation.z, precision))
+			SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::Separator();
 

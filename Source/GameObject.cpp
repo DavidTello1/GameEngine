@@ -184,16 +184,20 @@ void GameObject::UpdateTransform()
 // ---------------------
 void GameObject::SetRotation(const float3& XYZ_euler_rotation)
 {
-	float3 diff = XYZ_euler_rotation - rotation;
+	/*float3 diff = XYZ_euler_rotation - rotation;
 	Quat mod = Quat::FromEulerXYZ(diff.x, diff.y, diff.z);
 	rotation_quat = rotation_quat * mod;
-	rotation = XYZ_euler_rotation;
+	rotation = XYZ_euler_rotation;*/
+
+	rotation_quat = rotation_quat *Quat::FromEulerXYZ(XYZ_euler_rotation.x, XYZ_euler_rotation.y, XYZ_euler_rotation.z);
+	flags |= ProcessTransformUpdate;
 }
 
 void GameObject::SetRotation(const Quat& rotation_quat)
 {
 	this->rotation_quat = rotation_quat;
 	rotation = rotation_quat.ToEulerXYZ().Abs();
+	flags |= ProcessTransformUpdate;
 }
 
 
@@ -201,6 +205,7 @@ void GameObject::SetTransform(const float4x4 & transform)
 {
 	transform.Decompose(translation, rotation_quat, scale);
 	rotation = rotation_quat.ToEulerXYZ().Abs();
+	flags |= ProcessTransformUpdate;
 }
 
 void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_min)
@@ -227,6 +232,24 @@ void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_m
 void GameObject::SetLocalPosition(const float3 & position)
 {
 	translation = position; 
+	flags |= ProcessTransformUpdate;
+}
+
+void GameObject::SetLocalScale(const float3 & Scale)
+{
+	scale = Scale;
+	flags |= ProcessTransformUpdate;
+}
+
+void GameObject::Move(const float3 & velocity)
+{
+	translation += velocity;
+	flags |= ProcessTransformUpdate;
+}
+
+void GameObject::Rotate(float angular_velocity)
+{
+	rotation_quat = rotation_quat * Quat::RotateY(angular_velocity);
 	flags |= ProcessTransformUpdate;
 }
 
@@ -270,26 +293,78 @@ void GameObject::GenerateBoundingBox()
 {
 	const ComponentMesh* mesh = (ComponentMesh*)GetComponent(Component::Type::Mesh);
 
+
 	if (mesh)
 	{
-		if (b_box.IsFinite())
+		obb = mesh->GetMesh()->GetAABB();
+		obb.Transform(GetGlobalTransform());
+
+		b_box.SetNegativeInfinity();
+		b_box.Enclose(obb);
+		//b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
+	}
+
+
+	//if (b_box.IsFinite())
+	//{
+	//	// Already generated bbox -> needs update
+	//	if (mesh)
+	//	{
+	//		obb.SetFrom(mesh->GetMesh()->GetAABB());
+	//		obb.Transform(GetGlobalTransform());
+
+	//		b_box.SetNegativeInfinity();
+	//		b_box.Enclose(obb);
+	//	}
+	//	else
+	//	{
+	//		if (HasChilds())
+	//		{
+	//			b_box.minPoint = childs.back()->b_box.minPoint;
+	//			b_box.maxPoint = childs.back()->b_box.maxPoint;
+
+	//			GetMinMaxVertex(this, &b_box.minPoint, &b_box.maxPoint);
+
+	//			b_box.Enclose(AABB(b_box.minPoint, b_box.maxPoint));
+	//		}
+	//	}
+	//}
+	//else
+	//{
+	//	if (mesh)
+	//	{
+	//		b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
+	//	}
+	//}
+
+
+	/*if (b_box.IsFinite())
+	{
+		if (mesh)
 		{
-			obb = b_box;
+			b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
+		}
+		else
+		{
+			obb.SetFrom(b_box);
 			obb.Transform(GetGlobalTransform());
 
 			b_box.SetNegativeInfinity();
 			b_box.Enclose(obb);
-		}
-		else
-		{
-			//b_box.SetNegativeInfinity();
-			b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
+			
 		}
 	}
+	else
+	{
+		if (mesh)
+		{
+			b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
+		}
+
+	}*/
 
 	if (bb_VBO == 0) glGenBuffers(1, &bb_VBO);
 
-	float3 corners[8];
 	b_box.GetCornerPoints(corners);
 
 	glBindBuffer(GL_ARRAY_BUFFER, bb_VBO);
@@ -310,14 +385,5 @@ void GameObject::DeleteBoundingBox()
 
 void GameObject::UpdateBoundingBox()
 {
-	/*const ComponentMesh* mesh = (ComponentMesh*)GetComponent(Component::Type::Mesh);
-
-	if (mesh != nullptr)
-	{
-		obb = mesh->GetBoundingBox();
-		obb.Transform(this->GetComponentTransform()->GetGlobalTransform());
-
-		aabb.SetNegativeInfinity();
-		aabb.Enclose(obb);
-	}*/
+	GenerateBoundingBox();
 }

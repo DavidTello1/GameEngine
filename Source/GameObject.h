@@ -68,10 +68,10 @@ public:
 	void GetMinMaxVertex(GameObject * obj, float3 * abs_max, float3 * abs_min);
 
 	void SetLocalPosition(const float3& position);
-	void SetLocalScale(const float3& Scale) { scale = Scale; }
+	void SetLocalScale(const float3& Scale);
 
-	void Move(const float3& velocity) { translation += velocity; }
-	void Rotate(float angular_velocity) { rotation_quat = rotation_quat * Quat::RotateY(angular_velocity); }
+	void Move(const float3& velocity);
+	void Rotate(float angular_velocity);
 
 private:
 	uint uid = 0;
@@ -98,6 +98,7 @@ public:
 	AABB b_box;
 	OBB obb;
 	GLuint bb_VBO = 0;
+	float3 corners[8];
 
 	static GLuint bounding_box_IBO;
 
