@@ -107,6 +107,7 @@ void ModuleSceneBase::CameraFocusTo()
 			float size = object->b_box.Size().MaxElement();
 			float offset = Sqrt((size*size) - (size*size / 4)); // superformula to define the offset to the object
 			//XOR with if is parent and the position (parity) of the face inside the b_box.FaceCenterPoint
+			// code reference at commit "Cleaned Focus Camera" +- 230 commit number
 			float xor = (object->HasChilds() ^ face % 2 == 0) ? -1.0f : 1.0f;
 
 			if (face < 2)
@@ -121,30 +122,6 @@ void ModuleSceneBase::CameraFocusTo()
 			{
 				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitZ * offset * xor));
 			}
-			/*switch (face)
-			{
-			case 0:
-				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitX * offset * parent));
-				break;
-			case 1:
-				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) - (float3::unitX * offset* parent));
-				break;
-			case 2:
-				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitY * offset* parent));
-				break;
-			case 3:
-				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) - (float3::unitY * offset* parent));
-				break;
-			case 4:
-				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitZ * offset* parent));
-				break;
-			case 5:
-				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) - (float3::unitZ * offset* parent));
-				break;
-			default:
-				LOG("Could not detect closest face", 'w');
-				break;
-			}*/
 
 			viewport_camera->Look(object->b_box.FaceCenterPoint(face));
 		}
