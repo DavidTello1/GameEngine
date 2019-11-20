@@ -5,6 +5,8 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 
+#include "mmgr/mmgr.h"
+
 GameObject* ModuleScene::root_object;
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
@@ -12,7 +14,9 @@ ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 
 
 ModuleScene::~ModuleScene()
-{}
+{
+	delete root_object;
+}
 
 // Load assets
 bool ModuleScene::Start(Config* config)
@@ -54,7 +58,7 @@ bool ModuleScene::Update(float dt)
 bool ModuleScene::PostUpdate(float dt)
 {
 	// Do all remaining actions activated by flags
-	for (int i = 0; i < gameObjects.size(); i++)
+	for (uint i = 0; i < gameObjects.size(); i++)
 	{
 		GameObject* obj = gameObjects[i];
 
@@ -145,7 +149,7 @@ bool ModuleScene::Draw()
 
 GameObject* ModuleScene::FindById(uint id)
 {
-	for (int i = 0; i < gameObjects.size(); i++)
+	for (uint i = 0; i < gameObjects.size(); i++)
 		if (gameObjects[i]->GetUID() == id) return gameObjects[i];
 
 	return nullptr;

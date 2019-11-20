@@ -1,16 +1,10 @@
-#include "Globals.h"
 #include "Application.h"
 #include "ModuleSceneBase.h"
-#include "ModuleResources.h"
-#include "Hierarchy.h"
-#include "Viewport.h"
-#include "GameObject.h"
 
 #include "glew/include/GL/glew.h"
-#include "par_shapes.h"
 #include "mmgr/mmgr.h"
 
-ComponentCamera* viewport_camera;
+ComponentCamera* viewport_camera = nullptr;
 
 ModuleSceneBase::ModuleSceneBase(bool start_enabled) : Module("SceneBase", start_enabled)
 {}
@@ -208,7 +202,6 @@ bool ModuleSceneBase::Draw()
 	return true;
 }
 
-
 void ModuleSceneBase::DrawGridPlane()
 {
 	glLineWidth(0.25f);
@@ -254,7 +247,6 @@ void ModuleSceneBase::DrawAxis()
 	glVertex3f(0.0f, 0.0f, axis_length);
 
 	glColor3ub(255, 255, 255);
-
 
 	glEnd();
 }

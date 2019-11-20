@@ -18,24 +18,22 @@ enum GameObjectFlags
 	ProcessDeletedChild	= 1 << 1,
 	UnusedFlagNumber2	= 1 << 2,
 	UnusedFlagNumber3	= 1 << 3
-
 };
 
 class GameObject
 {
 	friend class ModuleScene;
+	ALIGN_CLASS_TO_16
 
 private:
-
 	GameObject(const char* name, GameObject* Parent);
 	virtual ~GameObject();
 
 public:
-
 	void SetName(const char* Name) { strcpy_s(this->name, NAME_LENGTH, Name); }
+	const char* GetName() const { return name; }
 
 	uint GetUID() const { return uid; }
-	const char* GetName() const { return name; }
 	bool IsActive() { return active; }
 
 	Component* GetComponent(Component::Type type);
@@ -54,12 +52,15 @@ public:
 	void SetRotation(const Quat& rotation);
 	void SetTransform(const float4x4& transform);
 
-	void GetMinMaxVertex(GameObject * obj, float3 * abs_max, float3 * abs_min);
-
+	bool HasChilds() { return !childs.empty(); }
 	void ChildAdded();
+	void ChildDeleted();
+
+	void GetMinMaxVertex(GameObject * obj, float3 * abs_max, float3 * abs_min);
+	void GenBoundingBox(bool to_delete = false);
 
 	void SetLocalPosition(const float3& position) { translation = position; }
-	void SetLocalScale(const float3& scale) { this->scale = scale; }
+	void SetLocalScale(const float3& Scale) { scale = Scale; }
 
 	void Move(const float3& velocity) { translation += velocity; }
 	void Rotate(float angular_velocity) { rotation_quat = rotation_quat * Quat::RotateY(angular_velocity); }
@@ -70,39 +71,28 @@ private:
 	bool active = true;
 
 	float3 translation = float3::zero;
-
 	Quat rotation_quat = Quat::identity;
 	float3 rotation = float3::zero;
-	
 	float3 scale = float3::one;
-	
 	float4x4 local_transform = math::float4x4::identity;
-	
 	//float3 velocity = float3::zero;
 
 public:
 
 	// Objects
+	int flags = NoFlags;
 	GameObject* parent;
 	std::vector<GameObject*> childs;
-	int flags = NoFlags;
-
 	std::vector<Component*> components;
 
-	void ChildDeleted();
-
-	void GenBoundingBox(bool to_delete = false);
-
-	bool HasChilds();
-
-	// Dimensions
+	// Bounding box
 	bool is_valid_dimensions = false;
 	float3 min_vertex	= { 0,0,0 };
 	float3 max_vertex	= { 0,0,0 };
 	float3 center		= { 0,0,0 };
 	float3 size			= { 0,0,0 };
 
-	float3 bounding_box[13];//0-7 Box vertex//8 Box center//9-12 Faces center
+	float3 bounding_box[13]; //0-7 Box vertex//8 Box center//9-12 Faces center
 	GLuint bb_VBO = 0;
 	GLuint bb_IBO = 0;
 
@@ -115,14 +105,12 @@ public:
 	bool ToggleSelection();
 
 	// Debug
-	void LogAction(const char* Action);
+	void LogAction(const char* Action) { LOG("%s node '%s', id: %ld ", Action, name, uid, 'd'); }
 
 public:
-
 	ImGuiTreeNodeFlags hierarchy_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 	uint hierarchy_pos = 0;
 	bool is_rename = false;
 	bool is_selected = false;
-
 };

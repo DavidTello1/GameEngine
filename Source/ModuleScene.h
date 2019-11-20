@@ -1,18 +1,16 @@
 #pragma once
-
 #include "Module.h"
-#include <vector>
 #include "Globals.h"
 #include "GameObject.h"
 #include "Hierarchy.h"
 #include "ModuleResources.h"
+#include <vector>
 
 class ComponentRenderer;
 class ComponentMesh;
 
 class ModuleScene :	public Module
 {
-
 public:
 
 	ModuleScene(bool start_enabled = true);

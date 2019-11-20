@@ -29,6 +29,7 @@ void Inspector::Draw()
 	static bool has_mesh = false;
 	static bool has_material = false;
 	static bool has_renderer = false;
+	static bool rename = false;
 
 	obj = App->scene->GetSelectedGameObject();
 	if (obj == nullptr)
@@ -104,7 +105,30 @@ void Inspector::Draw()
 		ImGui::EndMenuBar();
 	}
 
-	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), obj->GetName());
+	if (rename)
+	{
+		char buffer[NAME_LENGTH];
+		sprintf_s(buffer, NAME_LENGTH, "%s", obj->GetName());
+
+		if (ImGui::InputText("##GameObject", buffer, NAME_LENGTH, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+		{
+			obj->SetName(buffer);
+			rename = false;
+		}
+	}
+	else
+	{
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), obj->GetName());
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30);
+		if (ImGui::Button("##rename", ImVec2(15, 15)))
+			rename = true;
+
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Rename");
+	}
+
+	ImGui::Text("ID: %ld", obj->GetUID());
 	ImGui::Separator();
 
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
@@ -162,15 +186,12 @@ void Inspector::Draw()
 			SetScale(obj, scale);
 
 		ImGui::Separator();
-
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
-		ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
-
-		ImGui::Separator();
 	}
 
 	if (has_mesh)
 	{
+		const ResourceMesh* r_mesh = mesh->GetMesh(); //get mesh resource
+
 		bool active = mesh->IsActive();
 		if (ImGui::Checkbox("##check", &active))
 			mesh->SwitchActive();
@@ -180,19 +201,19 @@ void Inspector::Draw()
 		{
 			ImGui::Text("Triangles: ");
 			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_indices / 3));
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(r_mesh->num_indices / 3));
 
 			ImGui::Text("Vertices: ");
 			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_vertices));
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(r_mesh->num_vertices));
 
 			ImGui::Text("Vertex Normals: ");
 			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_normals));
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(r_mesh->num_normals));
 
 			ImGui::Text("Tex Coords: ");
 			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(mesh->num_tex_coords));
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", (int)(r_mesh->num_tex_coords));
 			ImGui::NewLine();
 
 			if (has_renderer)
@@ -258,6 +279,9 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Renderer"))
 		{
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
+			ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
+
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 			ImGui::Checkbox("Wireframe", &renderer->show_wireframe);
 			ImGui::Separator();

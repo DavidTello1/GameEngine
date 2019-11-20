@@ -6,33 +6,51 @@
 
 ComponentMesh::ComponentMesh(GameObject* gameobj) : Component(Component::Type::Mesh, gameobj)
 {
+	object = gameobj;
+
 }
 
 ComponentMesh::~ComponentMesh()
 {
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &IBO);
-	glDeleteBuffers(1, &TEX);
-
-	if (vertices)
-	{
-		RELEASE_ARRAY(vertices);
-		vertices = nullptr;
-	}
-	if (indices)
-	{
-		RELEASE_ARRAY(indices);
-		indices = nullptr;
-	}
-	if (tex_coords)
-	{
-		RELEASE_ARRAY(tex_coords);
-		tex_coords = nullptr;
-	}
-	if (normals)
-	{
-		RELEASE_ARRAY(normals);
-		normals = nullptr;
-	}
 }
 
+void ComponentMesh::SetBoundingBox()
+{
+	if (mesh == nullptr)
+	{
+		LOG("Error setting bounding box, mesh is nullptr", 'e');
+		return;
+	}
+
+	// Bounding box setting up
+	if (mesh->num_vertices > 0 && mesh->vertices != nullptr)
+	{
+		object->min_vertex.x = mesh->vertices[0].x;
+		object->min_vertex.y = mesh->vertices[0].y;
+		object->min_vertex.z = mesh->vertices[0].z;
+
+		object->max_vertex.x = mesh->vertices[0].x;
+		object->max_vertex.y = mesh->vertices[0].y;
+		object->max_vertex.z = mesh->vertices[0].z;
+
+		for (uint i = 0; i < mesh->num_vertices; ++i)
+		{
+			float x = mesh->vertices[i].x;
+			float y = mesh->vertices[i].y;
+			float z = mesh->vertices[i].z;
+
+			if (x < object->min_vertex.x) object->min_vertex.x = x;
+			if (y < object->min_vertex.y) object->min_vertex.y = y;
+			if (z < object->min_vertex.z) object->min_vertex.z = z;
+
+			if (x > object->max_vertex.x) object->max_vertex.x = x;
+			if (y > object->max_vertex.y) object->max_vertex.y = y;
+			if (z > object->max_vertex.z) object->max_vertex.z = z;
+		}
+	}
+	else
+	{
+		LOG("Mesh has no vertices - Cannot create bounding box", 'e');
+		return;
+	}
+}

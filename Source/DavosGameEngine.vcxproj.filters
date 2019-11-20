@@ -64,6 +64,9 @@
     <Filter Include="Sources\Containers\par_shapes">
       <UniqueIdentifier>{2f146a49-8480-490a-8b72-7614fc1a1952}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Resources">
+      <UniqueIdentifier>{a84cad31-bd31-4edd-b76a-23e4fb3de339}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -263,9 +266,6 @@
     </ClInclude>
     <ClInclude Include="assimp\include\version.h">
       <Filter>Sources\Containers\assimp</Filter>
-    </ClInclude>
-    <ClInclude Include="Config.h">
-      <Filter>Sources\Tools</Filter>
     </ClInclude>
     <ClInclude Include="parson\parson.h">
       <Filter>Sources\Containers\parson</Filter>
@@ -483,6 +483,24 @@
     <ClInclude Include="par_shapes.h">
       <Filter>Sources\Containers\par_shapes</Filter>
     </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Sources\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceMaterial.h">
+      <Filter>Sources\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceMesh.h">
+      <Filter>Sources\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceModel.h">
+      <Filter>Sources\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleBinStream.h">
+      <Filter>Sources\Tools</Filter>
+    </ClInclude>
     <ClInclude Include="ComponentCamera.h">
       <Filter>Sources\GameObjects\Components</Filter>
     </ClInclude>
@@ -563,13 +581,13 @@
     <ClCompile Include="ModuleFileSystem.cpp">
       <Filter>Sources\Modules</Filter>
     </ClCompile>
-    <ClCompile Include="Config.cpp">
-      <Filter>Sources\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="parson\parson.c">
       <Filter>Sources\Containers\parson</Filter>
     </ClCompile>
     <ClCompile Include="Assets.cpp">
+      <Filter>Sources\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewport.cpp">
       <Filter>Sources\Panels</Filter>
     </ClCompile>
     <ClCompile Include="ModuleResources.cpp">
@@ -695,8 +713,20 @@
     <ClCompile Include="par_shapes.cpp">
       <Filter>Sources\Containers\par_shapes</Filter>
     </ClCompile>
-    <ClCompile Include="par_shapes.cpp">
-      <Filter>Sources\Containers\par_shapes</Filter>
+    <ClCompile Include="Resource.cpp">
+      <Filter>Sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceMaterial.cpp">
+      <Filter>Sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceMesh.cpp">
+      <Filter>Sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceModel.cpp">
+      <Filter>Sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Sources\Tools</Filter>
     </ClCompile>
     <ClCompile Include="ComponentCamera.cpp">
       <Filter>Sources\GameObjects\Components</Filter>
@@ -724,9 +754,6 @@
     <None Include="assimp\include\vector3.inl">
       <Filter>Sources\Containers\assimp</Filter>
     </None>
-    <ClCompile Include="Viewport.cpp">
-      <Filter>Sources\Panels</Filter>
-    </ClCompile>
     <None Include="MathGeoLib\include\Math\Matrix.inl">
       <Filter>Sources\Containers\MathGeoLib\Math</Filter>
     </None>

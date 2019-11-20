@@ -42,13 +42,13 @@ void Hierarchy::DrawNodes(std::vector<GameObject*>& v)
 
 	for (GameObject* obj : v)
 	{
-		sprintf_s(buffer, NAME_LENGTH, "%s ID: %ld", obj->GetName(), obj->GetUID());
+		//sprintf_s(buffer, NAME_LENGTH, "%s ID: %ld", obj->GetName(), obj->GetUID());
 
 		if (obj->is_rename == false)
 		{
-			bool is_open = ImGui::TreeNodeEx(buffer, obj->hierarchy_flags);
+			bool is_open = ImGui::TreeNodeEx(obj->GetName(), obj->hierarchy_flags);
 
-			if (ImGui::BeginPopupContextItem(buffer)) // Options menu poped up when right clicking a node
+			if (ImGui::BeginPopupContextItem(obj->GetName())) // Options menu poped up when right clicking a node
 			{
 				in_menu = true;
 				if (ImGui::MenuItem("Rename"))
@@ -107,8 +107,8 @@ void Hierarchy::DrawNodes(std::vector<GameObject*>& v)
 			{
 				obj->is_rename = false;
 			}
-			sprintf_s(buffer, NAME_LENGTH, "%s", obj->GetName());
 
+			sprintf_s(buffer, NAME_LENGTH, "%s", obj->GetName());
 			if (ImGui::InputText("##GameObject", buffer, NAME_LENGTH, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
 			{
 				obj->SetName(buffer);
