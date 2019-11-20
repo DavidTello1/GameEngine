@@ -93,7 +93,8 @@ public:
 
 	float3 bounding_box[13]; //0-7 Box vertex//8 Box center//9-12 Faces center
 	GLuint bb_VBO = 0;
-	GLuint bb_IBO = 0;
+
+	static GLuint bounding_box_IBO;
 
 	bool show_bounding_box = false;
 
