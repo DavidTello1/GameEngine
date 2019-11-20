@@ -3,10 +3,15 @@
 #include "ModuleFileSystem.h"
 #include "ResourceMaterial.h"
 
+#include "Assimp/include/types.h"
+#include "Assimp/include/material.h"
+
 #include "Devil/include/IL/il.h"
 #pragma comment (lib, "Devil/lib/x86/DevIL.lib")
 #pragma comment (lib, "Devil/lib/x86/ILU.lib")
 #pragma comment (lib, "Devil/lib/x86/ILUT.lib")
+
+#include "SimpleBinStream.h"
 
 #include "mmgr/mmgr.h"
 
@@ -18,18 +23,35 @@ ResourceMaterial::~ResourceMaterial()
 {
 }
 
-UID ResourceMaterial::Import(const aiMaterial* ai_material, const char* source_file)
+UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_material)
 {
 	ResourceMaterial* material = static_cast<ResourceMaterial*>(App->resources->CreateResource(Resource::material)); //create new material
 
-	material->LoadMaterial(source_file); //load material
+	ai_material->Get(AI_MATKEY_COLOR_DIFFUSE, material->diffuse_color);
+	ai_material->Get(AI_MATKEY_COLOR_SPECULAR, material->specular_color);
+	ai_material->Get(AI_MATKEY_COLOR_EMISSIVE, material->emissive_color);
+	ai_material->Get(AI_MATKEY_SHININESS, material->shininess);
+
+	aiString file;
+	aiTextureMapping mapping;
+	unsigned uvindex = 0;
+	if (ai_material->GetTexture(aiTextureType_DIFFUSE, 0, &file, &mapping, &uvindex) == AI_SUCCESS)
+	{
+		assert(mapping == aiTextureMapping_UV);
+		assert(uvindex == 0);
+
+		std::string full_path(source_file);
+		full_path.append(file.data);
+
+		material->textures[TextureDiffuse] = ImportTexture(full_path);
+	}
 
 	// Saving to own format
 	std::string output;
 	if (material->SaveOwnFormat(output))
 	{
-		material->file = source_file; //get file
-		App->file_system->NormalizePath(material->file);
+		material->original_file = source_file; //get file
+		App->file_system->NormalizePath(material->original_file);
 
 		std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
 		material->exported_file = file_name;
@@ -41,12 +63,10 @@ UID ResourceMaterial::Import(const aiMaterial* ai_material, const char* source_f
 		LOG("Importing aiMaterial %s FAILED", source_file);
 	}
 
-	material->UnLoad(); //release memory
-
 	return material->uid;
 }
 
-bool ResourceMaterial::SaveOwnFormat(std::string& output) const
+UID ResourceMaterial::ImportTexture(std::string& output)
 {
 	bool ret = false;
 	ILuint size;
@@ -70,18 +90,71 @@ bool ResourceMaterial::SaveOwnFormat(std::string& output) const
 	return false;
 }
 
+bool ResourceMaterial::SaveOwnFormat(std::string& output) const
+{
+	simple::mem_ostream<std::true_type> write_stream; //create output stream
+
+	// Store Colors
+	write_stream << diffuse_color.x << diffuse_color.y << diffuse_color.z << diffuse_color.w;
+	write_stream << specular_color.x << specular_color.y << specular_color.z;
+	write_stream << emissive_color.x << emissive_color.y << emissive_color.z;
+
+	// Store Textures
+	for (uint i = 0; i < TextureCount; ++i)
+	{
+		write_stream << textures[i];
+	}
+
+	// Store rest
+	write_stream << k_ambient << k_diffuse << k_specular;
+	write_stream << shininess;
+
+	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
+
+	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MATERIAL_FOLDER, "material", "dvs_material"); //save
+}
+
 bool ResourceMaterial::LoadtoScene()
 {
-	return true;
+	if (GetExportedFile() != nullptr)
+	{
+		char* buffer = nullptr;
+		uint size = App->file_system->LoadFromPath(LIBRARY_MATERIAL_FOLDER, GetExportedFile(), &buffer);
+
+		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
+
+		read_stream >> diffuse_color.x >> diffuse_color.y >> diffuse_color.z >> diffuse_color.w;
+		read_stream >> specular_color.x >> specular_color.y >> specular_color.z;
+		read_stream >> emissive_color.x >> emissive_color.y >> emissive_color.z;
+
+		for (uint i = 0; i < TextureCount; ++i)
+		{
+			read_stream >> textures[i];
+		}
+
+		read_stream >> k_ambient >> k_diffuse >> k_specular;
+		read_stream >> shininess;
+
+		delete[] buffer;
+		return true;
+	}
+	return false;
 }
 
 void ResourceMaterial::UnLoad()
 {
-
+	for (uint i = 0; i < TextureCount; ++i)
+	{
+		if (textures[i] != 0)
+		{
+			App->resources->GetResource(textures[i])->ReleaseFromMemory();
+			textures[i] = 0;
+		}
+	}
 }
 
 
-bool ResourceMaterial::LoadMaterial(const char* path)
+bool ResourceMaterial::LoadMaterial(const aiMaterial* material, const char* path)
 {
 	// Devil
 	uint imageID;
@@ -113,9 +186,6 @@ bool ResourceMaterial::LoadMaterial(const char* path)
 		ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
 
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	tex_height = ilGetInteger(IL_IMAGE_HEIGHT);
-	tex_width = ilGetInteger(IL_IMAGE_WIDTH);
 
 	ilDeleteImages(1, &imageID);
 	return true;

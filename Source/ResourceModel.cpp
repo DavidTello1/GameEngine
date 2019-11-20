@@ -66,7 +66,7 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		materials.reserve(scene->mNumMaterials); //reserve capacity for num of materials
 		for (unsigned i = 0; i < scene->mNumMaterials; ++i)
 		{
-			materials.push_back(ResourceMaterial::Import(scene->mMaterials[i], full_path)); //import material
+			materials.push_back(ResourceMaterial::Import(full_path, scene->mMaterials[i])); //import material
 
 			assert(materials.back() != 0); //asssert if vector materials is empty
 		}
@@ -90,8 +90,8 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 
 		if (ret)
 		{
-			model.file = full_path; //get file
-			App->file_system->NormalizePath(model.file);
+			model.original_file = full_path; //get file
+			App->file_system->NormalizePath(model.original_file);
 
 			std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
 			model.exported_file = file_name;
@@ -156,7 +156,7 @@ bool ResourceModel::LoadtoScene()
 			nodes.push_back(node); //add node to vector nodes
 		}
 
-		CreateGameObjects(App->file_system->GetFileName(file.c_str()).c_str()); //create gameobjects from model
+		CreateGameObjects(App->file_system->GetFileName(original_file.c_str()).c_str()); //create gameobjects from model
 
 		LOG("[%s] loaded in %d ms", GetExportedFile(), timer.Read(), 'd');
 		timer.Stop();
@@ -256,10 +256,12 @@ void ResourceModel::CreateGameObjects(const char* name)
 			obj->AddComponent(Component::Type::Renderer);
 		}
 
-		//if (nodes[i].material != 0)
-		//{
-		//	obj->AddComponent(Component::Type::Material);
-		//}
+		if (nodes[i].material != 0)
+		{
+			ComponentMaterial* material = (ComponentMaterial*)obj->AddComponent(Component::Type::Material);
+			ResourceMaterial* r_material = (ResourceMaterial*)App->resources->GetResource(nodes[i].material);
+			r_material->LoadToMemory(); //load material data
+		}
 
 	}
 

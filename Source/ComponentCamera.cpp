@@ -137,7 +137,7 @@ void ComponentCamera::DrawFrustum()
 	glLineWidth(2.0f);
 	glColor4f(Red.r, Red.g, Red.b, Red.a);
 
-	for (uint i = 0; i < frustum.NumEdges(); i++)
+	for (int i = 0; i < frustum.NumEdges(); i++)
 	{
 		glVertex3f(frustum.Edge(i).a.x, frustum.Edge(i).a.y, frustum.Edge(i).a.z);
 		glVertex3f(frustum.Edge(i).b.x, frustum.Edge(i).b.y, frustum.Edge(i).b.z);

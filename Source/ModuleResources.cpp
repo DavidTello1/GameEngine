@@ -61,7 +61,7 @@ bool ModuleResources::CleanUp()
 	return true;
 }
 
-bool ModuleResources::ImportResource(const char* path, UID uid)
+bool ModuleResources::ImportFromOutside(const char* path, UID uid)
 {
 	std::string final_path = App->file_system->GetFileName(path); //get file name
 	final_path = ASSETS_FOLDER + final_path;
@@ -70,38 +70,44 @@ bool ModuleResources::ImportResource(const char* path, UID uid)
 
 	if (App->file_system->CopyFromOutsideFS(path, final_path.c_str()) == true) //copy file to final_path
 	{
-		if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded and if so, init uid
-		{
-			LOG("File is already loaded in memory", 'd');
-			return true;
-		}
-
-		bool import_ok = false;
-		std::string written_file;
-		Resource::Type type = GetResourceType(final_path.c_str()); //get resource type
-
-		switch (type) //import depending on type
-		{
-		case Resource::model:
-			import_ok = ResourceModel::Import(final_path.c_str(), written_file);
-			break;
-		//case Resource::material:
-		//	import_ok = ResourceMaterial::Import(final_path.c_str(), written_file);
-			break;
-		}
-
-		if (import_ok == true)
-		{
-			Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
-		}
-		else
-		{
-			LOG("Importing of [%s] FAILED", final_path);
-			return false;
-		}
-		return true;
+		return ImportResource(final_path.c_str(), uid);
 	}
 	return false;
+}
+
+bool ModuleResources::ImportResource(const char* final_path, UID uid)
+{
+	if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded and if so, init uid
+	{
+		LOG("File is already loaded in memory", 'd');
+		return true;
+	}
+
+	bool import_ok = false;
+	std::string written_file;
+	Resource::Type type = GetResourceType(final_path); //get resource type
+
+	switch (type) //import depending on type
+	{
+	case Resource::model:
+		import_ok = ResourceModel::Import(final_path, written_file);
+		break;
+	case Resource::material:
+		import_ok = ResourceMaterial::Import(final_path);
+		break;
+	}
+
+	if (import_ok == true)
+	{
+		Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
+	}
+	else
+	{
+		LOG("Importing of [%s] FAILED", final_path);
+		return false;
+	}
+	return true;
+
 }
 
 Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
@@ -137,12 +143,12 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 	return ret;
 }
 
-Resource* ModuleResources::CreateInitResource(Resource::Type type, UID uid, std::string& final_path, std::string& written_file)
+Resource* ModuleResources::CreateInitResource(Resource::Type type, UID uid, const char* final_path, std::string& written_file)
 {
 	Resource* res = CreateResource(type); //create new resource
 	uid = res->uid; //fill uid
 
-	res->file = final_path; //get file
+	res->original_file = final_path; //get file
 	std::string exported_file = App->file_system->GetFileName(written_file.c_str()); //get exported file
 
 	if (exported_file.c_str() != NULL) //check for errors
@@ -156,7 +162,7 @@ Resource* ModuleResources::CreateInitResource(Resource::Type type, UID uid, std:
 		return false;
 	}
 
-	res->name = App->file_system->GetFileName(res->file.c_str()); //fill resource name
+	res->name = App->file_system->GetFileName(res->original_file.c_str()); //fill resource name
 
 	if (res->name.empty()) //if empty, name = exported file
 		res->name = res->exported_file;
@@ -279,7 +285,7 @@ bool ModuleResources::CheckLoaded(std::string path, UID uid)
 {
 	for (std::map<UID, Resource*>::const_iterator it = resources.begin(); it != resources.end(); ++it)
 	{
-		if (it->second->file.compare(path) == 0)
+		if (it->second->original_file.compare(path) == 0)
 		{
 			uid = it->first;
 			return true;

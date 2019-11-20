@@ -30,7 +30,7 @@ public:
 	//virtual void Save(Config& config) const;
 	//virtual void Load(const Config& config);
 	
-	const char* GetFile() const { return file.c_str(); }
+	const char* GetFile() const { return original_file.c_str(); }
 	const char* GetExportedFile() const { return exported_file.c_str(); }
 
 	bool LoadToMemory();
@@ -48,7 +48,7 @@ protected:
 	Type type = unknown;
 	std::string name;
 
-	std::string file;
+	std::string original_file;
 	std::string exported_file;
 
 	uint times_loaded = 0;
