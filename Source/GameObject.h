@@ -86,9 +86,8 @@ public:
 	std::vector<Component*> components;
 
 	// Bounding box
+	AABB b_box;
 	bool is_valid_dimensions = false;
-	float3 min_vertex	= { 0,0,0 };
-	float3 max_vertex	= { 0,0,0 };
 	float3 center		= { 0,0,0 };
 	float3 size			= { 0,0,0 };
 

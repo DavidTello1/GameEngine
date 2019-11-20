@@ -184,13 +184,13 @@ void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_m
 	if (!obj->HasChilds())
 	{
 		if (!obj->is_valid_dimensions) return;
-		if (obj->min_vertex.x < abs_min->x) abs_min->x = obj->min_vertex.x;
-		if (obj->min_vertex.y < abs_min->y) abs_min->y = obj->min_vertex.y;
-		if (obj->min_vertex.z < abs_min->z) abs_min->z = obj->min_vertex.z;
+		if (obj->b_box.minPoint.x < abs_min->x) abs_min->x = obj->b_box.minPoint.x;
+		if (obj->b_box.minPoint.y < abs_min->y) abs_min->y = obj->b_box.minPoint.y;
+		if (obj->b_box.minPoint.z < abs_min->z) abs_min->z = obj->b_box.minPoint.z;
 
-		if (obj->max_vertex.x > abs_max->x) abs_max->x = obj->max_vertex.x;
-		if (obj->max_vertex.y > abs_max->y) abs_max->y = obj->max_vertex.y;
-		if (obj->max_vertex.z > abs_max->z) abs_max->z = obj->max_vertex.z;
+		if (obj->b_box.maxPoint.x > abs_max->x) abs_max->x = obj->b_box.maxPoint.x;
+		if (obj->b_box.maxPoint.y > abs_max->y) abs_max->y = obj->b_box.maxPoint.y;
+		if (obj->b_box.maxPoint.z > abs_max->z) abs_max->z = obj->b_box.maxPoint.z;
 	}
 	else {
 		for (GameObject* child : obj->childs)
@@ -209,10 +209,10 @@ void GameObject::ChildAdded()
 	}
 	if (uid == 0 || !childs.back()->is_valid_dimensions) return;
 
-	min_vertex = childs.back()->min_vertex;
-	max_vertex = childs.back()->max_vertex;
+	b_box.minPoint = childs.back()->b_box.minPoint;
+	b_box.maxPoint = childs.back()->b_box.maxPoint;
 
-	GetMinMaxVertex(this, &min_vertex, &max_vertex);
+	GetMinMaxVertex(this, &b_box.minPoint, &b_box.maxPoint);
 
 	GenBoundingBox();
 
@@ -224,10 +224,10 @@ void GameObject::ChildDeleted()
 
 	if (HasChilds()) 
 	{
-		min_vertex = childs.back()->min_vertex;
-		max_vertex = childs.back()->max_vertex;
+		b_box.minPoint = childs.back()->b_box.minPoint;
+		b_box.maxPoint = childs.back()->b_box.maxPoint;
 
-		GetMinMaxVertex(this, &min_vertex, &max_vertex);
+		GetMinMaxVertex(this, &b_box.minPoint, &b_box.maxPoint);
 
 		GenBoundingBox();
 	}
@@ -254,40 +254,43 @@ void GameObject::GenBoundingBox(bool to_delete)
 	}
 	else
 	{
-		//Bounding box
-		float3 min = min_vertex;
-		float3 max = max_vertex;
+		////Bounding box
+		//float3 min = b_box.minPoint;
+		//float3 max = b_box.maxPoint;
 
-		bounding_box[0] = { min.x,min.y,min.z };
-		bounding_box[1] = { min.x,min.y,max.z };
-		bounding_box[2] = { max.x,min.y,max.z };
-		bounding_box[3] = { max.x,min.y,min.z };
+		//bounding_box[0] = { min.x,min.y,min.z };
+		//bounding_box[1] = { min.x,min.y,max.z };
+		//bounding_box[2] = { max.x,min.y,max.z };
+		//bounding_box[3] = { max.x,min.y,min.z };
 
-		bounding_box[4] = { min.x,max.y,min.z };
-		bounding_box[5] = { min.x,max.y,max.z };
-		bounding_box[6] = { max.x,max.y,max.z };
-		bounding_box[7] = { max.x,max.y,min.z };
+		//bounding_box[4] = { min.x,max.y,min.z };
+		//bounding_box[5] = { min.x,max.y,max.z };
+		//bounding_box[6] = { max.x,max.y,max.z };
+		//bounding_box[7] = { max.x,max.y,min.z };
 
-		float3 c = (min_vertex + max_vertex) / 2;
-		center = c; // gameobject variable
-		bounding_box[8] = center;
+		//float3 c = (b_box.minPoint + b_box.maxPoint) / 2;
+		//center = c; // gameobject variable
+		//bounding_box[8] = center;
 
-		bounding_box[9] = { c.x,c.y,min.z };  //Face 0437 center
-		bounding_box[10] = { min.x,c.y,c.z };  //Face 0415 center
-		bounding_box[11] = { max.x,c.y,c.z }; //Face 3726 center
-		bounding_box[12] = { c.x,c.y,max.z }; //Face 1256 center
-		//mesh_component->bounding_box[13] = { 0,0,0 }; // camera
-		//mesh_component->bounding_box[11] = { c.x,max.y,c.z }; //Face 4567 center (top face)
-		//mesh_component->bounding_box[14] = { c.x,min.y,c.z }; //Face 0123 center (bot face)
+		//bounding_box[9] = { c.x,c.y,min.z };  //Face 0437 center
+		//bounding_box[10] = { min.x,c.y,c.z };  //Face 0415 center
+		//bounding_box[11] = { max.x,c.y,c.z }; //Face 3726 center
+		//bounding_box[12] = { c.x,c.y,max.z }; //Face 1256 center
+		////mesh_component->bounding_box[13] = { 0,0,0 }; // camera
+		////mesh_component->bounding_box[11] = { c.x,max.y,c.z }; //Face 4567 center (top face)
+		////mesh_component->bounding_box[14] = { c.x,min.y,c.z }; //Face 0123 center (bot face)
 
-		size = max_vertex - min_vertex;
+		//size = b_box.minPoint - b_box.maxPoint;
 
 		if (bb_VBO == 0) glGenBuffers(1, &bb_VBO);
 
 		if (bb_IBO == 0) glGenBuffers(1, &bb_IBO);
 
+		float3 corners[8];
+		b_box.GetCornerPoints(corners);
+
 		glBindBuffer(GL_ARRAY_BUFFER, bb_VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(bounding_box), bounding_box, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, b_box.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bb_IBO);
