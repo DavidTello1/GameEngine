@@ -134,6 +134,12 @@ void Inspector::Draw()
 
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		if (ImGui::BeginPopupContextItem("Transform"))
+		{
+			if (ImGui::MenuItem("Reset"))
+				obj->ResetTransform();
+			ImGui::EndPopup();
+		}
 		// Position
 		ImGui::Text("Position");
 		ImGui::SetNextItemWidth(60);

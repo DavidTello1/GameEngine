@@ -141,11 +141,11 @@ bool ModuleScene::Draw()
 		
 		GameObject* obj = gameObjects[i];
 		glEnableClientState(GL_VERTEX_ARRAY);
-
+		Color c = (!obj->HasChilds())?App->scene_base->aabb_color : Cyan;
 		if ((obj->show_aabb || App->scene_base->show_all_aabb) && obj->aabb_VBO != 0)
 		{
 			// AABB
-			glColor3ub(App->scene_base->aabb_color.r * 255.0f, App->scene_base->aabb_color.g * 255.0f, App->scene_base->aabb_color.b * 255.0f);
+			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->aabb_width);
 
 			glBindBuffer(GL_ARRAY_BUFFER, obj->aabb_VBO);

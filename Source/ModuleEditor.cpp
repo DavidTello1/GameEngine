@@ -25,6 +25,22 @@
 
 using namespace std;
 
+static void ShowExampleAppDockSpace(bool* p_open);
+bool ModuleEditor::is_draw_menu = true;
+bool ModuleEditor::is_show_main_dockspace = true;
+bool ModuleEditor::is_show_demo = false;
+bool ModuleEditor::is_auto_select = true;
+bool ModuleEditor::is_about = false;
+bool ModuleEditor::is_new = false;
+bool ModuleEditor::is_open = false;
+bool ModuleEditor::is_save = false;
+bool ModuleEditor::is_import = false;
+bool ModuleEditor::is_plane = true;
+bool ModuleEditor::is_axis = true;
+bool ModuleEditor::is_wireframe = false;
+bool ModuleEditor::is_show_plane = true;
+bool ModuleEditor::is_show_axis = true;
+
 ModuleEditor::ModuleEditor(bool start_enabled) : Module("ModuleEditor", start_enabled)
 {
 }
@@ -34,7 +50,7 @@ ModuleEditor::~ModuleEditor()
 {
 }
 
-static void ShowExampleAppDockSpace(bool* p_open);
+
 void ShowExampleAppDockSpace(bool* p_open)
 {
 	static bool opt_fullscreen_persistant = true;
@@ -197,26 +213,12 @@ void ModuleEditor::Draw()
 	ImGui_ImplSDL2_NewFrame(App->window->GetWindow());
 	ImGui::NewFrame();
 
-	// Bools
-	static bool is_draw_menu = true;
-	static bool is_show_main_dockspace = true;
-	static bool is_show_demo = false;
-	static bool is_auto_select = true;
-	static bool is_about = false;
-	static bool is_new = false;
-	static bool is_open = false;
-	static bool is_save = false;
-	static bool is_import = false;
-	static bool is_plane = true;
-	static bool is_axis = true;
-	static bool is_wireframe = false;
-
 	// Draw functions
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
-	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import, is_auto_select, is_plane, is_axis, is_wireframe);
-	DrawDemo(is_show_demo);
-	DrawAbout(is_about);
-	DrawPanels(is_auto_select);
+	DrawMenu();
+	DrawDemo();
+	DrawAbout();
+	DrawPanels();
 
 	// Menu Functionalities
 	if (is_new)
@@ -242,7 +244,7 @@ void ModuleEditor::Draw()
 	}
 
 	// Shortcuts
-	Shortcuts(is_new, is_open, is_save);
+	Shortcuts();
 
 	// Are you sure you want to Quit
 	if (App->input->quit == true)
@@ -258,7 +260,7 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_auto_select, bool &is_plane, bool &is_axis, bool &is_wireframe)
+void ModuleEditor::DrawMenu()
 {
 	bool ret = true;
 
@@ -328,10 +330,10 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 			if (ImGui::BeginMenu("View")) //view
 			{
 				if (ImGui::MenuItem("Show Plane", NULL, &is_plane))
-					show_plane = !show_plane;
+					is_show_plane = !is_show_plane;
 
 				if (ImGui::MenuItem("Show Axis", NULL, &is_axis))
-					show_axis = !show_axis;
+					is_show_axis = !is_show_axis;
 
 				ImGui::EndMenu();
 			}
@@ -409,7 +411,7 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 	}
 }
 
-void ModuleEditor::DrawDemo(bool &is_show_demo)
+void ModuleEditor::DrawDemo()
 {
 	if (is_show_demo) //show demo
 	{
@@ -418,7 +420,7 @@ void ModuleEditor::DrawDemo(bool &is_show_demo)
 	}
 }
 
-void ModuleEditor::DrawAbout(bool &is_about)
+void ModuleEditor::DrawAbout()
 {
 	if (is_about) //about
 	{
@@ -463,7 +465,7 @@ void ModuleEditor::DrawAbout(bool &is_about)
 	}
 }
 
-void ModuleEditor::DrawPanels(bool &is_auto_select)
+void ModuleEditor::DrawPanels()
 {
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
@@ -545,7 +547,7 @@ void ModuleEditor::ConfirmExit()
 	}
 }
 
-void ModuleEditor::Shortcuts(bool &is_new, bool &is_open, bool &is_save)
+void ModuleEditor::Shortcuts()
 {
 	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
 		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))

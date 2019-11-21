@@ -66,6 +66,7 @@ public:
 	void GenerateBoundingBox();
 	void DeleteBoundingBox();
 	void UpdateBoundingBox();
+	void ResetTransform();
 	void GetMinMaxVertex(GameObject * obj, float3 * abs_max, float3 * abs_min);
 
 	void SetLocalPosition(const float3& position);

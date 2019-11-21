@@ -177,19 +177,19 @@ void GameObject::UpdateTransform()
 		global_transform = local_transform;
 	}
 
-	UpdateBoundingBox();
-
 	for (GameObject* child : childs)
 	{
 		child->UpdateTransform();
 	}
+
+	UpdateBoundingBox();
 }
 
 void GameObject::UpdateParentBoundingBox()
 {
 	if (GetUID() == 0) return;
 
-	GenerateBoundingBox();
+	UpdateBoundingBox();
 	if (parent)
 		parent->UpdateParentBoundingBox();
 }
@@ -219,6 +219,11 @@ void GameObject::SetTransform(const float4x4 & transform)
 	transform.Decompose(translation, rotation_quat, scale);
 	rotation = rotation_quat.ToEulerXYZ().Abs();
 	flags |= ProcessTransformUpdate;
+}
+
+void GameObject::ResetTransform()
+{
+	SetTransform(float4x4::identity);
 }
 
 void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_min)

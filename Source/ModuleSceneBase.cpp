@@ -203,10 +203,10 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 
 bool ModuleSceneBase::Draw()
 {
-	if (App->editor->show_plane) // plane
+	if (App->editor->is_show_plane) // plane
 		DrawGridPlane();
 
-	if (App->editor->show_axis) // axis
+	if (App->editor->is_show_axis) // axis
 		DrawAxis();
 
 	return true;
