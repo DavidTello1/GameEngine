@@ -30,7 +30,7 @@ GameObject::GameObject(const char* name, GameObject* Parent)
 		parent->LogAction("To parent");
 	}
 
-	b_box.SetNegativeInfinity();
+	aabb.SetNegativeInfinity();
 }
 
 GameObject::~GameObject()
@@ -213,14 +213,14 @@ void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_m
 {
 	if (!obj->HasChilds())
 	{
-		if (!obj->b_box.IsFinite()) return;
-		if (obj->b_box.minPoint.x < abs_min->x) abs_min->x = obj->b_box.minPoint.x;
-		if (obj->b_box.minPoint.y < abs_min->y) abs_min->y = obj->b_box.minPoint.y;
-		if (obj->b_box.minPoint.z < abs_min->z) abs_min->z = obj->b_box.minPoint.z;
+		if (!obj->aabb.IsFinite()) return;
+		if (obj->aabb.minPoint.x < abs_min->x) abs_min->x = obj->aabb.minPoint.x;
+		if (obj->aabb.minPoint.y < abs_min->y) abs_min->y = obj->aabb.minPoint.y;
+		if (obj->aabb.minPoint.z < abs_min->z) abs_min->z = obj->aabb.minPoint.z;
 
-		if (obj->b_box.maxPoint.x > abs_max->x) abs_max->x = obj->b_box.maxPoint.x;
-		if (obj->b_box.maxPoint.y > abs_max->y) abs_max->y = obj->b_box.maxPoint.y;
-		if (obj->b_box.maxPoint.z > abs_max->z) abs_max->z = obj->b_box.maxPoint.z;
+		if (obj->aabb.maxPoint.x > abs_max->x) abs_max->x = obj->aabb.maxPoint.x;
+		if (obj->aabb.maxPoint.y > abs_max->y) abs_max->y = obj->aabb.maxPoint.y;
+		if (obj->aabb.maxPoint.z > abs_max->z) abs_max->z = obj->aabb.maxPoint.z;
 	}
 	else {
 		for (GameObject* child : obj->childs)
@@ -261,12 +261,12 @@ void GameObject::ChildAdded()
 		LOG("Child is root node", 'e');
 		return;
 	}
-	if (uid == 0 || !childs.back()->b_box.IsFinite()) return;
+	if (uid == 0 || !childs.back()->aabb.IsFinite()) return;
 
-	b_box.minPoint = childs.back()->b_box.minPoint;
-	b_box.maxPoint = childs.back()->b_box.maxPoint;
+	aabb.minPoint = childs.back()->aabb.minPoint;
+	aabb.maxPoint = childs.back()->aabb.maxPoint;
 
-	GetMinMaxVertex(this, &b_box.minPoint, &b_box.maxPoint);
+	GetMinMaxVertex(this, &aabb.minPoint, &aabb.maxPoint);
 
 	GenerateBoundingBox();
 }
@@ -277,10 +277,10 @@ void GameObject::ChildDeleted()
 
 	if (HasChilds()) 
 	{
-		b_box.minPoint = childs.back()->b_box.minPoint;
-		b_box.maxPoint = childs.back()->b_box.maxPoint;
+		aabb.minPoint = childs.back()->aabb.minPoint;
+		aabb.maxPoint = childs.back()->aabb.maxPoint;
 
-		GetMinMaxVertex(this, &b_box.minPoint, &b_box.maxPoint);
+		GetMinMaxVertex(this, &aabb.minPoint, &aabb.maxPoint);
 
 		GenerateBoundingBox();
 	}
@@ -300,9 +300,9 @@ void GameObject::GenerateBoundingBox()
 		obb.SetFrom(mesh->GetMesh()->GetAABB());
 		obb.Transform(GetGlobalTransform());
 
-		//b_box.SetNegativeInfinity();
-		b_box.SetFrom(obb);
-		//b_box.Enclose(obb);
+		aabb.SetNegativeInfinity();
+		//b_box.SetFrom(obb);
+		aabb.Enclose(obb);
 		//b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
 	}
 
@@ -367,10 +367,10 @@ void GameObject::GenerateBoundingBox()
 
 	if (bb_VBO == 0) glGenBuffers(1, &bb_VBO);
 
-	b_box.GetCornerPoints(corners);
+	aabb.GetCornerPoints(corners);
 
 	glBindBuffer(GL_ARRAY_BUFFER, bb_VBO);
-	glBufferData(GL_ARRAY_BUFFER, b_box.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, aabb.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 }
@@ -382,7 +382,7 @@ void GameObject::DeleteBoundingBox()
 		glDeleteFramebuffers(1, &bb_VBO);
 		bb_VBO = 0;
 	}
-	b_box.SetNegativeInfinity();
+	aabb.SetNegativeInfinity();
 }
 
 void GameObject::UpdateBoundingBox()

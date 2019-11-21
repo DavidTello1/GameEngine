@@ -95,7 +95,7 @@ public:
 	std::vector<Component*> components;
 
 	// Bounding box
-	AABB b_box;
+	AABB aabb;
 	OBB obb;
 	GLuint bb_VBO = 0;
 	float3 corners[8];

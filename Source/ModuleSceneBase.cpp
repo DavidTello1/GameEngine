@@ -75,7 +75,7 @@ void ModuleSceneBase::CameraOrbit(float dt)
 		GameObject* object = App->scene->GetSelectedGameObject();
 		if (object != nullptr)
 		{
-			viewport_camera->Look(object->b_box.CenterPoint());
+			viewport_camera->Look(object->aabb.CenterPoint());
 		}
 	}
 }
@@ -88,7 +88,7 @@ void ModuleSceneBase::CameraFocusTo()
 
 		if (object != nullptr)
 		{
-			float3 v_distance = object->b_box.FaceCenterPoint(0) - viewport_camera->frustum.pos;
+			float3 v_distance = object->aabb.FaceCenterPoint(0) - viewport_camera->frustum.pos;
 
 			float min = v_distance.Length();
 			int face = 0;
@@ -96,7 +96,7 @@ void ModuleSceneBase::CameraFocusTo()
 			// Check which face of the object is the closest one
 			for (int i = 1; i < 6; i++)
 			{
-				v_distance = object->b_box.FaceCenterPoint(i) - viewport_camera->frustum.pos;
+				v_distance = object->aabb.FaceCenterPoint(i) - viewport_camera->frustum.pos;
 				
 				if (v_distance.Length() < min) {
 					min = v_distance.Length();
@@ -104,7 +104,7 @@ void ModuleSceneBase::CameraFocusTo()
 				}
 			}
 
-			float size = object->b_box.Size().MaxElement();
+			float size = object->aabb.Size().MaxElement();
 			// superformula to define the offset to the object
 			float offset = Sqrt((size*size) - (size*size / 4)); 
 
@@ -114,18 +114,18 @@ void ModuleSceneBase::CameraFocusTo()
 
 			if (face < 2)
 			{
-				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitX * offset * xor));
+				viewport_camera->SetPosition(object->aabb.FaceCenterPoint(face) + (float3::unitX * offset * xor));
 			}
 			else if (face < 4)
 			{
-				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitY * offset * xor));
+				viewport_camera->SetPosition(object->aabb.FaceCenterPoint(face) + (float3::unitY * offset * xor));
 			}
 			else if (face < 6)
 			{
-				viewport_camera->SetPosition(object->b_box.FaceCenterPoint(face) + (float3::unitZ * offset * xor));
+				viewport_camera->SetPosition(object->aabb.FaceCenterPoint(face) + (float3::unitZ * offset * xor));
 			}
 
-			viewport_camera->Look(object->b_box.FaceCenterPoint(face));
+			viewport_camera->Look(object->aabb.FaceCenterPoint(face));
 		}
 	}
 }
