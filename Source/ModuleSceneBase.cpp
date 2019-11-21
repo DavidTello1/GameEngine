@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "ModuleSceneBase.h"
+#include "ModuleScene.h"
 
 #include "glew/include/GL/glew.h"
 #include "mmgr/mmgr.h"

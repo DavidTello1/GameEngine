@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
+#include "ModuleScene.h"
 #include "ResourceModel.h"
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"

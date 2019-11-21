@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Viewport.h"
+#include "ModuleScene.h"
 #include "ComponentCamera.h"
 #include "mmgr/mmgr.h"
 

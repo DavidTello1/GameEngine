@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleEditor.h"
 #include "GameObject.h"
+#include "ModuleScene.h"
 #include "Component.h"
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"

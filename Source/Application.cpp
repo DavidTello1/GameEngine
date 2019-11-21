@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include "ModuleScene.h"
+
 #include "mmgr/mmgr.h"
 
 using namespace std;

@@ -2,6 +2,7 @@
 #include "Hierarchy.h"
 #include "Globals.h"
 
+#include "ModuleScene.h"
 #include "ImGui/imgui.h"
 #include "mmgr/mmgr.h"
 

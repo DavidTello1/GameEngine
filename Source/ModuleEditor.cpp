@@ -5,6 +5,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleInput.h"
 #include "ModuleEditor.h"
+#include "ModuleScene.h"
 #include "Console.h"
 #include "Hierarchy.h"
 #include "Inspector.h"
