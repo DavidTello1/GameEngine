@@ -10,6 +10,7 @@
 #include <vector>
 
 class ComponentMaterial;
+class ComponentCamera;
 
 //Dealt at scene post update
 enum GameObjectFlags
@@ -36,6 +37,9 @@ public:
 
 	uint GetUID() const { return uid; }
 	bool IsActive() { return active; }
+
+	template<typename ComponentType> 
+	ComponentType* GetComponent() { return (ComponentType*)GetComponent(ComponentType::GetType()); }
 
 	Component* GetComponent(Component::Type type);
 	Component* AddComponent(Component::Type type);

@@ -62,6 +62,7 @@ GameObject::~GameObject()
 	LogAction("Deleted");
 }
 
+
 void GameObject::Select()
 {
 	hierarchy_flags |= ImGuiTreeNodeFlags_Selected;
@@ -94,7 +95,7 @@ Component* GameObject::GetComponent(Component::Type type)
 	{
 		for (uint i = 0; i < components.size(); i++)
 		{
-			if (components[i]->GetType() == type)
+			if (components[i]->type == type)
 				return components[i];
 		}
 	}
@@ -143,7 +144,7 @@ bool GameObject::HasComponent(Component::Type type)
 {
 	for (uint i = 0; i < components.size(); i++)
 	{
-		if (components[i]->GetType() == type)
+		if (components[i]->type == type)
 			return true;
 	}
 	return false;
@@ -153,7 +154,7 @@ void GameObject::DeleteComponent(Component::Type type)
 {
 	for (uint i = 0; i < components.size(); i++)
 	{
-		if (components[i]->GetType() == type)
+		if (components[i]->type == type)
 		{
 			RELEASE(components[i]);
 			components.erase(components.begin() + i);
@@ -285,7 +286,7 @@ void GameObject::ChildAdded()
 
 	GetMinMaxVertex(this, &aabb.minPoint, &aabb.maxPoint);
 
-	GenerateBoundingBox();
+	UpdateBoundingBox();
 }
 
 void GameObject::ChildDeleted()
@@ -299,7 +300,7 @@ void GameObject::ChildDeleted()
 
 		GetMinMaxVertex(this, &aabb.minPoint, &aabb.maxPoint);
 
-		GenerateBoundingBox();
+		UpdateBoundingBox();
 	}
 	else 
 	{

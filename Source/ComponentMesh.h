@@ -11,12 +11,13 @@ public:
 	ComponentMesh(GameObject* obj/*, ResourceMesh* mesh*/);
 	virtual ~ComponentMesh();
 
+	static inline Component::Type GetType() { return Component::Type::Mesh; }
+
 	void SetMesh(ResourceMesh* Mesh) { mesh = Mesh; }
 	ResourceMesh* GetMesh() const { return mesh; }
 
-	void SetBoundingBox();
-
 private:
+
 	ResourceMesh* mesh = nullptr;
 };
 

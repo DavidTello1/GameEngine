@@ -28,18 +28,21 @@ bool ModuleScene::Start(Config* config)
 	root_object->uid = 0;
 
 	// Create game objects after this ^^^^^^^^^^^^	
+	GameObject* go = CreateGameObject("test camera");
+	go->AddComponent(Component::Type::Camera);
 
-	test_camera = CreateGameObject("test camera");
-	test_camera->AddComponent(Component::Type::Camera);
+	test_camera = go->GetComponent<ComponentCamera>();
+	
+	//go->AddComponent(Component::Type::Camera);
 
 	//ResourceModel* tcmodel = new ResourceModel(root_object->GetUID());
 	//std::string tmdp = "MyCamera.dvs";
 	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
 
 
-	ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
-	std::string tmp = "MyBakerHouse.dvs";
-	bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
+	//ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
+	//std::string tmp = "MyBakerHouse.dvs";
+	//bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
 
 	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
 	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
@@ -58,6 +61,8 @@ bool ModuleScene::Start(Config* config)
 
 bool ModuleScene::Update(float dt)
 {
+	test_camera->DrawFrustum();
+
 	return true;
 }
 

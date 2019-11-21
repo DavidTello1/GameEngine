@@ -8,6 +8,7 @@
 
 class ComponentRenderer;
 class ComponentMesh;
+class ComponentCamera;
 
 class ModuleScene :	public Module
 {
@@ -57,7 +58,7 @@ public:
 	   
 	static GameObject* root_object;
 
-	GameObject* test_camera = nullptr;
+	ComponentCamera* test_camera = nullptr;
 
 private:
 

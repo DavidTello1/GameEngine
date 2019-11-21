@@ -9,6 +9,8 @@ public:
 	ComponentRenderer(GameObject* obj);
 	virtual ~ComponentRenderer();
 
+	static inline Component::Type GetType() { return Component::Type::Renderer; }
+
 	void Draw();
 
 private:

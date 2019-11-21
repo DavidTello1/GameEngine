@@ -26,20 +26,21 @@
 using namespace std;
 
 static void ShowExampleAppDockSpace(bool* p_open);
-bool ModuleEditor::is_draw_menu = true;
-bool ModuleEditor::is_show_main_dockspace = true;
-bool ModuleEditor::is_show_demo = false;
-bool ModuleEditor::is_auto_select = true;
-bool ModuleEditor::is_about = false;
-bool ModuleEditor::is_new = false;
-bool ModuleEditor::is_open = false;
-bool ModuleEditor::is_save = false;
-bool ModuleEditor::is_import = false;
-bool ModuleEditor::is_plane = true;
-bool ModuleEditor::is_axis = true;
-bool ModuleEditor::is_wireframe = false;
-bool ModuleEditor::is_show_plane = true;
-bool ModuleEditor::is_show_axis = true;
+// Editor booleans
+bool ModuleEditor::is_draw_menu				= true;
+bool ModuleEditor::is_show_main_dockspace	= true;
+bool ModuleEditor::is_show_demo				= false;
+bool ModuleEditor::is_auto_select			= false;
+bool ModuleEditor::is_about					= false;
+bool ModuleEditor::is_new					= false;
+bool ModuleEditor::is_open					= false;
+bool ModuleEditor::is_save					= false;
+bool ModuleEditor::is_import				= false;
+bool ModuleEditor::is_plane					= true;
+bool ModuleEditor::is_axis					= true;
+bool ModuleEditor::is_wireframe				= false;
+bool ModuleEditor::is_show_plane			= true;
+bool ModuleEditor::is_show_axis				= true;
 
 ModuleEditor::ModuleEditor(bool start_enabled) : Module("ModuleEditor", start_enabled)
 {

@@ -8,6 +8,10 @@
 #include "Math.h"
 #include "Color.h"
 
+#define AABB_OUT 0
+#define AABB_IN	1
+#define INTERSECT 2
+
 class ComponentCamera : public Component
 {
 public:
@@ -16,6 +20,8 @@ public:
 
 	ComponentCamera(GameObject* gameObject);
 	~ComponentCamera();
+
+	static inline Component::Type GetType() { return Component::Type::Camera; }
 
 	//  -------------------------------------- Getters
 	float GetNearPlane() const;
@@ -38,6 +44,8 @@ public:
 	void Move(const float3 & distance);
 
 	void Look(const float3 & position);
+
+	//int ContainsAABB(const AABB & refBox) const;
 
 	void DrawFrustum();
 

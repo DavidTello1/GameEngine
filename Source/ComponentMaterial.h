@@ -11,6 +11,8 @@ public:
 	ComponentMaterial(GameObject* obj);
 	virtual ~ComponentMaterial();
 
+	static inline Component::Type GetType() { return Component::Type::Material; }
+
 public:
 	uint  tex_id = 0;
 	char path[256];
