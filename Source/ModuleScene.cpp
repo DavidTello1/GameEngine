@@ -33,16 +33,14 @@ bool ModuleScene::Start(Config* config)
 
 	test_camera = go->GetComponent<ComponentCamera>();
 	
-	//go->AddComponent(Component::Type::Camera);
-
 	//ResourceModel* tcmodel = new ResourceModel(root_object->GetUID());
 	//std::string tmdp = "MyCamera.dvs";
 	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
 
 
-	//ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
-	//std::string tmp = "MyBakerHouse.dvs";
-	//bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
+	ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
+	std::string tmp = "MyBakerHouse.dvs";
+	bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
 
 	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
 	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
@@ -61,7 +59,8 @@ bool ModuleScene::Start(Config* config)
 
 bool ModuleScene::Update(float dt)
 {
-	test_camera->DrawFrustum();
+	if (test_camera)
+		test_camera->DrawFrustum();
 
 	return true;
 }
@@ -118,38 +117,48 @@ bool ModuleScene::CleanUp()
 
 bool ModuleScene::Draw()
 {
-	//glLoadIdentity();
-	glMatrixMode(GL_MODELVIEW);
+
 	// Draw GameObjects
-	for (uint i = 0; i < gameObjects.size(); ++i)
+	for (GameObject* obj : gameObjects)
 	{
-		glPushMatrix();
-		glMultMatrixf(gameObjects[i]->GetGlobalTransform().Transposed().ptr());
+		// Just boxes colors things
+		Color c = (!obj->HasChilds())?App->scene_base->aabb_color : Cyan;
+		bool is_drawn = true;
 
-		ComponentRenderer* renderer = (ComponentRenderer*)gameObjects[i]->GetComponent(Component::Type::Renderer);
-		if (renderer != nullptr && renderer->IsActive())
+		if (App->scene_base->camera_culling)
 		{
-			if (renderer->show_wireframe || App->scene_base->show_all_wireframe) //wireframe
+			if (test_camera->frustum.Contains(obj->aabb))
 			{
+				glPushMatrix();
+				glMultMatrixf(obj->GetGlobalTransform().Transposed().ptr());
 
-				glColor3ub(App->scene_base->wireframe_color.r*255.0f, App->scene_base->wireframe_color.g * 255.0f, App->scene_base->wireframe_color.b * 255.0f);
-				glLineWidth(App->scene_base->wireframe_width);
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				ComponentRenderer* renderer = obj->GetComponent<ComponentRenderer>();
+				if (renderer != nullptr && renderer->IsActive())
+				{
+					if (renderer->show_wireframe || App->scene_base->show_all_wireframe) //wireframe
+					{
+						glColor3ub(App->scene_base->wireframe_color.r*255.0f, App->scene_base->wireframe_color.g * 255.0f, App->scene_base->wireframe_color.b * 255.0f);
+						glLineWidth(App->scene_base->wireframe_width);
+						glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					}
+					else
+						glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+					renderer->Draw();
+				}
+				glPopMatrix();
 			}
 			else
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-			renderer->Draw();
+			{
+				c = LightGrey;
+				is_drawn = false;
+			}
 		}
-
-		glPopMatrix();
-		
-		GameObject* obj = gameObjects[i];
 		glEnableClientState(GL_VERTEX_ARRAY);
-		Color c = (!obj->HasChilds())?App->scene_base->aabb_color : Cyan;
+
+		// AABB
 		if ((obj->show_aabb || App->scene_base->show_all_aabb) && obj->aabb_VBO != 0)
 		{
-			// AABB
 			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->aabb_width);
 
@@ -163,11 +172,12 @@ bool ModuleScene::Draw()
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glColor3ub(255, 255, 255);
 		}
-
+		// OBB
 		if ((obj->show_obb || App->scene_base->show_all_obb) && obj->obb_VBO != 0)
 		{
-			// OBB
-			glColor3ub(App->scene_base->obb_color.r * 255.0f, App->scene_base->obb_color.g * 255.0f, App->scene_base->obb_color.b * 255.0f);
+			c = (is_drawn) ? App->scene_base->obb_color : Grey;
+
+			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->obb_width);
 
 			glBindBuffer(GL_ARRAY_BUFFER, obj->obb_VBO);

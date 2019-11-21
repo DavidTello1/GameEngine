@@ -8,4 +8,5 @@ Color Cyan = Color(0.0f, 1.0f, 1.0f);
 Color Black = Color(0.0f, 0.0f, 0.0f);
 Color White = Color(1.0f, 1.0f, 1.0f); 
 Color DarkGrey = Color(0.2f, 0.2f, 0.2f);
+Color Grey = Color(0.5f, 0.5f, 0.5f);
 Color LightGrey = Color(0.8f, 0.8f, 0.8f);

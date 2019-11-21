@@ -19,8 +19,8 @@ void ComponentRenderer::Draw()
 	ComponentMesh* mesh = nullptr;
 	for (uint i = 0; i < object->components.size(); i++)
 	{
-		mesh = (ComponentMesh*)object->components[i];
-		if (mesh->GetType() == Component::Type::Mesh && mesh->IsActive())
+		mesh = (object->components[i]->type == Component::Type::Mesh) ? (ComponentMesh*)object->components[i] : nullptr;
+		if (mesh && mesh->IsActive())
 		{
 			DrawMesh(*mesh);
 

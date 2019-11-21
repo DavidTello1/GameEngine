@@ -32,4 +32,5 @@ extern Color Cyan;
 extern Color Black;
 extern Color White; 
 extern Color DarkGrey;
+extern Color Grey;
 extern Color LightGrey; 

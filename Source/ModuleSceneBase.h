@@ -46,6 +46,8 @@ public:
 	bool show_all_aabb = true;
 	bool show_all_obb = true;
 
+	bool camera_culling = true;
+
 	GLuint bounding_box_indices[24] =
 	{
 		0,1,2,3,0,2,1,3,
