@@ -87,11 +87,15 @@ bool ModuleResources::ImportResource(const char* final_path, UID uid)
 	std::string written_file;
 	Resource::Type type = GetResourceType(final_path); //get resource type
 
+	char* buffer;
+	uint size = App->file_system->Load(final_path, &buffer);
+
 	switch (type) //import depending on type
 	{
 	case Resource::model:
-		import_ok = ResourceModel::Import(final_path, written_file);
+		import_ok = ResourceModel::Import(final_path, written_file, buffer, size);
 		break;
+
 	case Resource::material:
 		import_ok = ResourceMaterial::Import(final_path);
 		break;

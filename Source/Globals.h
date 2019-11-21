@@ -73,13 +73,13 @@ typedef unsigned long long UID;
 
 // Configuration -----------
 #define VERSION "0.1-alpha"
-#define ASSETS_FOLDER "/Assets/"
-#define SETTINGS_FOLDER "/Settings/"
-#define LIBRARY_FOLDER "/Library/"
+#define ASSETS_FOLDER "Assets/"
+#define SETTINGS_FOLDER "Settings/"
+#define LIBRARY_FOLDER "Library/"
 
-#define LIBRARY_SCENE_FOLDER "/Library/Scenes/"
-#define LIBRARY_MODEL_FOLDER "/Library/Models/"
-#define LIBRARY_MATERIAL_FOLDER "/Library/Materials/"
-#define LIBRARY_MESH_FOLDER "/Library/Meshes/"
+#define LIBRARY_SCENE_FOLDER "Library/Scenes/"
+#define LIBRARY_MODEL_FOLDER "Library/Models/"
+#define LIBRARY_MATERIAL_FOLDER "Library/Materials/"
+#define LIBRARY_MESH_FOLDER "Library/Meshes/"
 
 #define NAME_LENGTH 128

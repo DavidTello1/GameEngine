@@ -31,7 +31,7 @@ void Inspector::Draw()
 	static bool has_renderer = false;
 	static bool rename = false;
 
-	obj = App->scene->GetSelectedGameObject();
+	obj = App->scene->GetSelectedGameObjects();
 	if (obj == nullptr)
 	{
 		position = rotation = scale = float3::zero;
@@ -237,7 +237,7 @@ void Inspector::Draw()
 		ImGui::SameLine();
 		if (ImGui::CollapsingHeader("Material"))
 		{
-			if (material->tex_id == NULL)
+			if (material->GetMaterial()->tex_id == NULL)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
 				ImGui::TextWrapped("Material not loaded");
@@ -247,19 +247,19 @@ void Inspector::Draw()
 			{
 				ImGui::Text("Path: ");
 				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", material->path);
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", material->GetMaterial()->GetFile());
 
 				ImGui::Text("Size: ");
 				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->width);
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->GetMaterial()->tex_width);
 				ImGui::SameLine();
 				ImGui::Text("x");
 				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->height);
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", material->GetMaterial()->tex_width);
 
 				if (ImGui::TreeNode("Image"))
 				{
-					ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+					ImGui::Image((ImTextureID)material->GetMaterial()->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 					ImGui::TreePop();
 				}
 			}

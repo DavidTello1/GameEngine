@@ -30,7 +30,7 @@ public:
 	void DeleteGameObject(GameObject* obj);
 	void DeleteSelected();
 
-	GameObject* GetSelectedGameObject() { 
+	GameObject* GetSelectedGameObjects() { 
 		for (uint i=0;i<gameObjects.size();i++)
 			if (gameObjects[i]->is_selected)
 				return gameObjects[i];
@@ -38,10 +38,6 @@ public:
 	}
 
 	void UnSelectAll(GameObject * keep_selected = nullptr);
-
-	bool IsMaterialLoaded(const char* path);
-	ComponentMaterial* GetMaterial(const char* path) const;
-	bool DeleteMaterial(ComponentMaterial* material);
 
 	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 
@@ -52,7 +48,6 @@ public:
 
 	bool create_gameobj = false;
 
-	std::vector<ComponentMaterial*> materials;
 	std::vector<GameObject*> gameObjects;
 	   
 	static GameObject* root_object;

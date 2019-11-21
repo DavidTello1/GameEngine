@@ -610,7 +610,7 @@ void ModuleEditor::DrawCreateMenu()
 	if (ImGui::MenuItem("Empty"))
 		App->scene->CreateGameObject();
 
-	GameObject* parent = App->scene->GetSelectedGameObject();
+	GameObject* parent = App->scene->GetSelectedGameObjects();
 
 	ImGui::Separator();
 	if (ImGui::BeginMenu("Basic shapes"))

@@ -147,7 +147,6 @@ void ResourceMesh::UnLoad()
 {
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &IBO);
-	glDeleteBuffers(1, &TEX);
 
 	if (vertices)
 	{

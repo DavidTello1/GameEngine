@@ -67,7 +67,6 @@ public:
 	float2* tex_coords = nullptr;	// Array of texture coordinates (tex_coords_id)
 	uint num_tex_coords = 0;		// Number of texture coordinates (tex_coords_id)
 	uint tex_coords_id = 0;			// Texture coordinates ID (tex_coords_id)
-	uint TEX = 0;					// Texture Buffer ID (TEX)
 
 	float3* normals = nullptr;		// Array of normal coordinates
 	uint num_normals = 0;			// Number of normal coordinates

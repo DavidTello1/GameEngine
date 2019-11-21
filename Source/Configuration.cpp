@@ -68,7 +68,7 @@ void Configuration::Draw()
 	if (InitModuleDraw(App->input))
 		DrawModuleInput(App->input);
 
-	DrawTextures();
+	//DrawTextures();
 	
 	if (InitModuleDraw(App->file_system))
 		DrawModuleFileSystem(App->file_system);
@@ -399,44 +399,44 @@ void Configuration::DrawModuleInput(ModuleInput* module)
 	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", wheel);
 }
 
-void Configuration::DrawTextures()
-{
-	if (ImGui::CollapsingHeader("Textures"))
-	{
-		if (App->scene->materials.empty())
-		{
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
-			ImGui::TextWrapped("No textures loaded");
-			ImGui::PopStyleColor();
-			ImGui::NewLine();
-			return;
-		}
-		char buffer[120];
-		for (uint i = 0; i < App->scene->materials.size(); i++)
-		{
-			sprintf_s(buffer, 120, "Texture %d", i);
-
-			if (ImGui::TreeNode(buffer))
-			{
-				ImGui::Text("Size: ");
-				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i, %i", App->scene->materials[i]->width, App->scene->materials[i]->height);
-
-				ImGui::Text("Path: ");
-				ImGui::SameLine();
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-				ImGui::TextWrapped("%s", App->scene->materials[i]->path);
-				ImGui::PopStyleColor();
-
-
-				ImGui::Text("Image:");
-				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
-				ImGui::TreePop();
-			}
-			ImGui::Separator();
-		}
-	}
-}
+//void Configuration::DrawTextures()
+//{
+//	if (ImGui::CollapsingHeader("Textures"))
+//	{
+//		if (App->scene->materials.empty())
+//		{
+//			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
+//			ImGui::TextWrapped("No textures loaded");
+//			ImGui::PopStyleColor();
+//			ImGui::NewLine();
+//			return;
+//		}
+//		char buffer[120];
+//		for (uint i = 0; i < App->scene->materials.size(); i++)
+//		{
+//			sprintf_s(buffer, 120, "Texture %d", i);
+//
+//			if (ImGui::TreeNode(buffer))
+//			{
+//				ImGui::Text("Size: ");
+//				ImGui::SameLine();
+//				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i, %i", App->scene->materials[i]->width, App->scene->materials[i]->height);
+//
+//				ImGui::Text("Path: ");
+//				ImGui::SameLine();
+//				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+//				ImGui::TextWrapped("%s", App->scene->materials[i]->path);
+//				ImGui::PopStyleColor();
+//
+//
+//				ImGui::Text("Image:");
+//				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+//				ImGui::TreePop();
+//			}
+//			ImGui::Separator();
+//		}
+//	}
+//}
 
 void Configuration::DrawModuleFileSystem(ModuleFileSystem* module)
 {

@@ -22,7 +22,7 @@ void ComponentRenderer::Draw()
 		mesh = (ComponentMesh*)object->components[i];
 		if (mesh->GetType() == Component::Type::Mesh && mesh->IsActive())
 		{
-			DrawMesh(*mesh);
+			Draw(*mesh, (ComponentMaterial*)mesh->GetGameobj()->GetComponent(Component::Type::Material));
 
 			if (show_face_normals)
 				DrawFaceNormals();
@@ -33,59 +33,45 @@ void ComponentRenderer::Draw()
 	}
 }
 
-void ComponentRenderer::DrawMesh(ComponentMesh& mesh) const
+void ComponentRenderer::Draw(ComponentMesh& mesh, ComponentMaterial* material) const
 {
-	glBindVertexArray(mesh.GetMesh()->VBO);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
+
+
+	if (show_wireframe || App->scene_base->show_all_wireframe) //wireframe
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+	//else if (show_checkers) //checkers
+		//glBindTexture(GL_TEXTURE_2D, App->resources->checker_texture);
+
+	else if (material != nullptr && material->IsActive())
+		glBindTexture(GL_TEXTURE_2D, material->GetMaterial()->tex_id);
+
+	else
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->VBO);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.GetMesh()->IBO);
 	glDrawElements(GL_TRIANGLES, mesh.GetMesh()->num_indices, GL_UNSIGNED_INT, nullptr);
 
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->tex_coords_id);
+	glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	glDisable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	////---------
-	//glEnableClientState(GL_VERTEX_ARRAY);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->VBO);
-	//glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	//glEnable(GL_TEXTURE_2D);
-	//glActiveTexture(GL_TEXTURE0);
-
-	//ComponentMaterial* material = (ComponentMaterial*)mesh.GetGameobj()->GetComponent(Component::Type::Material);
-
-	//if (show_wireframe || App->scene_base->show_all_wireframe) //wireframe
-	//	glBindTexture(GL_TEXTURE_2D, 0);
-
-	////else if (show_checkers) //checkers
-	//	//glBindTexture(GL_TEXTURE_2D, App->resources->checker_texture);
-
-	//else if(material != nullptr && material->IsActive())
-	//	glBindTexture(GL_TEXTURE_2D, mesh.GetMesh()->TEX);
-
-	//else
-	//		glBindTexture(GL_TEXTURE_2D, 0);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->tex_coords_id);
-	//glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.GetMesh()->IBO);
-	//glDrawElements(GL_TRIANGLES, mesh.GetMesh()->num_indices, GL_UNSIGNED_INT, nullptr);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	//glBindTexture(GL_TEXTURE_2D, 0);
-
-	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	//glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void ComponentRenderer::DrawFaceNormals()

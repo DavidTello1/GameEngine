@@ -27,24 +27,9 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 {
 	ResourceMaterial* material = static_cast<ResourceMaterial*>(App->resources->CreateResource(Resource::material)); //create new material
 
-	ai_material->Get(AI_MATKEY_COLOR_DIFFUSE, material->diffuse_color);
-	ai_material->Get(AI_MATKEY_COLOR_SPECULAR, material->specular_color);
-	ai_material->Get(AI_MATKEY_COLOR_EMISSIVE, material->emissive_color);
-	ai_material->Get(AI_MATKEY_SHININESS, material->shininess);
-
-	aiString file;
-	aiTextureMapping mapping;
-	unsigned uvindex = 0;
-	if (ai_material->GetTexture(aiTextureType_DIFFUSE, 0, &file, &mapping, &uvindex) == AI_SUCCESS)
-	{
-		assert(mapping == aiTextureMapping_UV);
-		assert(uvindex == 0);
-
-		std::string full_path(source_file);
-		full_path.append(file.data);
-
-		material->textures[TextureDiffuse] = ImportTexture(full_path);
-	}
+	bool ret = material->LoadMaterial(source_file);
+	if (!ret)
+		LOG("Error Importing material from '%s'", source_file, 'e');
 
 	// Saving to own format
 	std::string output;
@@ -63,10 +48,12 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 		LOG("Importing aiMaterial %s FAILED", source_file);
 	}
 
+	//material->UnLoad();
+
 	return material->uid;
 }
 
-UID ResourceMaterial::ImportTexture(std::string& output)
+UID ResourceMaterial::ImportTexture(const char* path)
 {
 	bool ret = false;
 	ILuint size;
@@ -74,15 +61,11 @@ UID ResourceMaterial::ImportTexture(std::string& output)
 
 	ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
 	size = ilSaveL(IL_DDS, NULL, 0); // Get the size of the data buffer
-
 	if (size > 0)
 	{
 		data = new ILubyte[size]; // allocate data buffer   
-
 		if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveIL function       
-		{
-			ret = App->file_system->SaveUnique(output, data, size, LIBRARY_MATERIAL_FOLDER, "material", "dvs_material");
-		}
+			App->file_system->Save(path, data, size);
 
 		RELEASE_ARRAY(data);
 		return ret;
@@ -94,20 +77,9 @@ bool ResourceMaterial::SaveOwnFormat(std::string& output) const
 {
 	simple::mem_ostream<std::true_type> write_stream; //create output stream
 
-	// Store Colors
-	write_stream << diffuse_color.x << diffuse_color.y << diffuse_color.z << diffuse_color.w;
-	write_stream << specular_color.x << specular_color.y << specular_color.z;
-	write_stream << emissive_color.x << emissive_color.y << emissive_color.z;
-
-	// Store Textures
-	for (uint i = 0; i < TextureCount; ++i)
-	{
-		write_stream << textures[i];
-	}
-
-	// Store rest
-	write_stream << k_ambient << k_diffuse << k_specular;
-	write_stream << shininess;
+	write_stream << tex_id;
+	write_stream << tex_height;
+	write_stream << tex_width;
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
 
@@ -123,17 +95,9 @@ bool ResourceMaterial::LoadtoScene()
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 
-		read_stream >> diffuse_color.x >> diffuse_color.y >> diffuse_color.z >> diffuse_color.w;
-		read_stream >> specular_color.x >> specular_color.y >> specular_color.z;
-		read_stream >> emissive_color.x >> emissive_color.y >> emissive_color.z;
-
-		for (uint i = 0; i < TextureCount; ++i)
-		{
-			read_stream >> textures[i];
-		}
-
-		read_stream >> k_ambient >> k_diffuse >> k_specular;
-		read_stream >> shininess;
+		read_stream >> tex_id;
+		read_stream >> tex_height;
+		read_stream >> tex_width;
 
 		delete[] buffer;
 		return true;
@@ -143,20 +107,14 @@ bool ResourceMaterial::LoadtoScene()
 
 void ResourceMaterial::UnLoad()
 {
-	for (uint i = 0; i < TextureCount; ++i)
-	{
-		if (textures[i] != 0)
-		{
-			App->resources->GetResource(textures[i])->ReleaseFromMemory();
-			textures[i] = 0;
-		}
-	}
+	tex_id = NULL;
+	tex_height = NULL;
+	tex_width = NULL;
 }
 
 
-bool ResourceMaterial::LoadMaterial(const aiMaterial* material, const char* path)
+bool ResourceMaterial::LoadMaterial(const char* path)
 {
-	// Devil
 	uint imageID;
 	ilGenImages(1, &imageID);
 	ilBindImage(imageID);
@@ -169,8 +127,9 @@ bool ResourceMaterial::LoadMaterial(const aiMaterial* material, const char* path
 		LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
 		return false;
 	}
-
 	LogImageInfo();
+
+	ImportTexture(path);
 
 	GLuint texture;
 	glGenTextures(1, &texture);
@@ -186,6 +145,10 @@ bool ResourceMaterial::LoadMaterial(const aiMaterial* material, const char* path
 		ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
 
 	glGenerateMipmap(GL_TEXTURE_2D);
+
+	tex_width = IL_IMAGE_WIDTH;
+	tex_height = IL_IMAGE_HEIGHT;
+	tex_id = texture;
 
 	ilDeleteImages(1, &imageID);
 	return true;

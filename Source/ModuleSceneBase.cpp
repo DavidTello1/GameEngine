@@ -61,7 +61,7 @@ void ModuleSceneBase::CameraOrbit(float dt)
 	{
 		CameraRotateWithMouse(dt);
 
-		GameObject* object = App->scene->GetSelectedGameObject();
+		GameObject* object = App->scene->GetSelectedGameObjects();
 		if (object != nullptr)
 		{
 			viewport_camera->Look(object->center);
@@ -73,7 +73,7 @@ void ModuleSceneBase::CameraFocusTo()
 {
 	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
 	{
-		GameObject* object = App->scene->GetSelectedGameObject();
+		GameObject* object = App->scene->GetSelectedGameObjects();
 
 		if (object != nullptr)
 		{

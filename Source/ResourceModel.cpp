@@ -36,27 +36,12 @@ ResourceModel::~ResourceModel()
 //	Resource::Load(config);
 //}
 
-bool ResourceModel::Import(const char* full_path, std::string& output)
+bool ResourceModel::Import(const char* full_path, std::string& output, char* buffer, uint size)
 {
 	Timer timer;
 	timer.Start();
-	unsigned flags = aiProcess_CalcTangentSpace | \
-		aiProcess_GenSmoothNormals | \
-		aiProcess_JoinIdenticalVertices | \
-		aiProcess_ImproveCacheLocality | \
-		aiProcess_LimitBoneWeights | \
-		aiProcess_SplitLargeMeshes | \
-		aiProcess_Triangulate | \
-		aiProcess_GenUVCoords | \
-		aiProcess_SortByPType | \
-		aiProcess_FindDegenerates | \
-		aiProcess_FindInvalidData |
-		0;
 
-	aiString assimp_path(".");
-	assimp_path.Append(full_path);
-
-	const aiScene* scene = aiImportFile(assimp_path.data, flags);
+	const aiScene* scene = aiImportFileFromMemory(buffer, size, aiProcessPreset_TargetRealtime_MaxQuality, nullptr);
 	if (scene)
 	{
 		ResourceModel model(0);
@@ -261,6 +246,7 @@ void ResourceModel::CreateGameObjects(const char* name)
 			ComponentMaterial* material = (ComponentMaterial*)obj->AddComponent(Component::Type::Material);
 			ResourceMaterial* r_material = (ResourceMaterial*)App->resources->GetResource(nodes[i].material);
 			r_material->LoadToMemory(); //load material data
+			material->SetMaterial(r_material);
 		}
 
 	}

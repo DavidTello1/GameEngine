@@ -2,6 +2,7 @@
 #include "Component.h"
 
 class ComponentMesh;
+class ComponentMaterial;
 class ComponentRenderer : public Component
 {
 public:
@@ -12,7 +13,7 @@ public:
 	void Draw();
 
 private:
-	void DrawMesh(ComponentMesh& mesh) const;
+	void Draw(ComponentMesh& mesh, ComponentMaterial* material) const;
 	void DrawFaceNormals();
 	void DrawVertexNormals();
 
