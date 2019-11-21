@@ -35,6 +35,8 @@ GameObject::GameObject(const char* name, GameObject* Parent)
 
 GameObject::~GameObject()
 {
+	DeleteBoundingBox();
+
 	// Delete from parent
 	if (parent)
 	{
@@ -168,7 +170,7 @@ void GameObject::UpdateTransform()
 	if (parent && parent->GetUID() != 0)
 	{
 		// If things goes strange change order of multiplication
-		global_transform = local_transform * parent->GetGlobalTransform();
+		global_transform = parent->GetGlobalTransform() * local_transform;
 	}
 	else
 	{
@@ -300,9 +302,11 @@ void GameObject::GenerateBoundingBox()
 		obb.SetFrom(mesh->GetMesh()->GetAABB());
 		obb.Transform(GetGlobalTransform());
 
-		aabb.SetNegativeInfinity();
+		aabb.SetFrom(obb);
+
+		//aabb.SetNegativeInfinity();
 		//b_box.SetFrom(obb);
-		aabb.Enclose(obb);
+		//aabb.Enclose(obb);
 		//b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
 	}
 
@@ -365,24 +369,41 @@ void GameObject::GenerateBoundingBox()
 
 	}*/
 
-	if (bb_VBO == 0) glGenBuffers(1, &bb_VBO);
+	//AABB
+	if (aabb_VBO == 0) glGenBuffers(1, &aabb_VBO);
 
 	aabb.GetCornerPoints(corners);
 
-	glBindBuffer(GL_ARRAY_BUFFER, bb_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, aabb_VBO);
 	glBufferData(GL_ARRAY_BUFFER, aabb.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
+
+	//OBB
+	if (obb_VBO == 0) glGenBuffers(1, &obb_VBO);
+
+	obb.GetCornerPoints(corners);
+
+	glBindBuffer(GL_ARRAY_BUFFER, obb_VBO);
+	glBufferData(GL_ARRAY_BUFFER, obb.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 }
 
 void GameObject::DeleteBoundingBox()
 {
-	if (bb_VBO != 0)
+	if (aabb_VBO != 0)
 	{
-		glDeleteFramebuffers(1, &bb_VBO);
-		bb_VBO = 0;
+		glDeleteFramebuffers(1, &aabb_VBO);
+		aabb_VBO = 0;
 	}
 	aabb.SetNegativeInfinity();
+
+	if (obb_VBO != 0)
+	{
+		glDeleteFramebuffers(1, &obb_VBO);
+		obb_VBO = 0;
+	}
+	obb.SetNegativeInfinity();
 }
 
 void GameObject::UpdateBoundingBox()

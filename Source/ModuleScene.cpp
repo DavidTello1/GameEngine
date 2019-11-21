@@ -137,15 +137,52 @@ bool ModuleScene::Draw()
 			renderer->Draw();
 		}
 
-		// Bounding boxes
+		glPopMatrix();
+		
 		GameObject* obj = gameObjects[i];
 		glEnableClientState(GL_VERTEX_ARRAY);
-		if ((obj->show_bounding_box || App->scene_base->show_all_bounding_box) && obj->bb_VBO != 0)
-		{
-			glColor3ub(App->scene_base->bounding_box_color.r * 255.0f, App->scene_base->bounding_box_color.g * 255.0f, App->scene_base->bounding_box_color.b * 255.0f);
-			glLineWidth(App->scene_base->bounding_box_width);
 
-			glBindBuffer(GL_ARRAY_BUFFER, obj->bb_VBO);
+		if ((obj->show_aabb || App->scene_base->show_all_aabb) && obj->aabb_VBO != 0)
+		{
+			// AABB
+			glColor3ub(App->scene_base->aabb_color.r * 255.0f, App->scene_base->aabb_color.g * 255.0f, App->scene_base->aabb_color.b * 255.0f);
+			glLineWidth(App->scene_base->aabb_width);
+
+			glBindBuffer(GL_ARRAY_BUFFER, obj->aabb_VBO);
+			glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GameObject::bounding_box_IBO);
+			glDrawElements(GL_LINES, sizeof(App->scene_base->bounding_box_indices), GL_UNSIGNED_INT, nullptr);
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glColor3ub(255, 255, 255);
+		}
+
+		if ((obj->show_obb || App->scene_base->show_all_obb) && obj->obb_VBO != 0)
+		{
+			// OBB
+			glColor3ub(App->scene_base->obb_color.r * 255.0f, App->scene_base->obb_color.g * 255.0f, App->scene_base->obb_color.b * 255.0f);
+			glLineWidth(App->scene_base->obb_width);
+
+			glBindBuffer(GL_ARRAY_BUFFER, obj->obb_VBO);
+			glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GameObject::bounding_box_IBO);
+			glDrawElements(GL_LINES, sizeof(App->scene_base->bounding_box_indices), GL_UNSIGNED_INT, nullptr);
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glColor3ub(255, 255, 255);
+		}
+
+		
+		/*if ((obj->show_bounding_box || App->scene_base->show_all_bounding_box) && obj->obb_VBO != 0)
+		{
+			glColor3ub(App->scene_base->obb_color.r * 255.0f, App->scene_base->obb_color.g * 255.0f, App->scene_base->obb_color.b * 255.0f);
+			glLineWidth(App->scene_base->obb_width);
+
+			glBindBuffer(GL_ARRAY_BUFFER, obj->obb_VBO);
 			glVertexPointer(3, GL_FLOAT, 0, NULL);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GameObject::bounding_box_IBO);
@@ -155,10 +192,10 @@ bool ModuleScene::Draw()
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glColor3ub(255, 255, 255);
-		}
+		}*/
 		glDisableClientState(GL_VERTEX_ARRAY);
 
-		glPopMatrix();
+		
 	}
 	return true;
 }

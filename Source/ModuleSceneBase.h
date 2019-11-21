@@ -37,9 +37,14 @@ public:
 	float wireframe_width = 1.0f;
 	bool show_all_wireframe = false;
 	
-	Color bounding_box_color = Red;
-	float bounding_box_width = 1.0f;
-	bool show_all_bounding_box = true;
+	Color aabb_color = Red;
+	float aabb_width = 1.0f;
+
+	Color obb_color = Green;
+	float obb_width = 1.0f;
+
+	bool show_all_aabb = true;
+	bool show_all_obb = true;
 
 	GLuint bounding_box_indices[24] =
 	{

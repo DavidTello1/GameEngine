@@ -88,9 +88,15 @@ void Configuration::DrawScene()
 
 		ImGui::Separator();
 
-		ImGui::Checkbox("Show all bounding boxes", &App->scene_base->show_all_bounding_box);
-		ImGui::ColorEdit3("Bounding box color", (float*)&App->scene_base->bounding_box_color);
-		ImGui::DragFloat("Bounding box width", &App->scene_base->bounding_box_width, 0.1f,0.1f,5.0f);
+		ImGui::Checkbox("Show all AABB", &App->scene_base->show_all_aabb);
+		ImGui::ColorEdit3("AABB box color", (float*)&App->scene_base->aabb_color);
+		ImGui::DragFloat("AABB box width", &App->scene_base->aabb_width, 0.1f,0.1f,5.0f);
+
+		ImGui::Separator();
+
+		ImGui::Checkbox("Show all OBB", &App->scene_base->show_all_obb);
+		ImGui::ColorEdit3("OBB box color", (float*)&App->scene_base->obb_color);
+		ImGui::DragFloat("OBB box width", &App->scene_base->obb_width, 0.1f, 0.1f, 5.0f);
 
 		ImGui::Separator();
 

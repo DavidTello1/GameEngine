@@ -280,7 +280,9 @@ void Inspector::Draw()
 		if (ImGui::CollapsingHeader("Renderer"))
 		{
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
-			ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
+			ImGui::Checkbox("AABB", &obj->show_aabb);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
+			ImGui::Checkbox("OBB", &obj->show_obb);
 
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 			ImGui::Checkbox("Wireframe", &renderer->show_wireframe);

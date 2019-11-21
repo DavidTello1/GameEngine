@@ -97,12 +97,16 @@ public:
 	// Bounding box
 	AABB aabb;
 	OBB obb;
-	GLuint bb_VBO = 0;
+
+	GLuint aabb_VBO = 0;
+	GLuint obb_VBO = 0;
+
 	float3 corners[8];
 
 	static GLuint bounding_box_IBO;
 
-	bool show_bounding_box = false;
+	bool show_aabb = false;
+	bool show_obb = false;
 
 	//Hierachy --------------------------------------
 public: 
