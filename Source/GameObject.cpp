@@ -167,7 +167,8 @@ void GameObject::UpdateTransform()
 
 	if (parent && parent->GetUID() != 0)
 	{
-		global_transform = local_transform + parent->GetGlobalTransform();
+		// If things goes strange change order of multiplication
+		global_transform = local_transform * parent->GetGlobalTransform();
 	}
 	else
 	{
