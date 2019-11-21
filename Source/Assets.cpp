@@ -13,6 +13,8 @@ Assets::Assets() : Panel("Assets")
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
+
+	UpdateAssets();
 }
 
 Assets::~Assets()
