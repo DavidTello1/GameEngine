@@ -7,6 +7,9 @@
 #include "Imgui/imgui.h"
 #include <vector>
 
+#define ICON_WIDTH 64
+#define ICON_HEIGHT 64
+
 class Assets : public Panel
 {
 public:
@@ -25,7 +28,7 @@ public:
 private:
 	void UpdateAssets();
 	void DrawHierarchy(const PathNode& node);
-	void DrawIcons(const PathNode& node);
+	uint GetIcon(const PathNode& node);
 
 public:
 	uint folder_icon;
@@ -34,8 +37,6 @@ public:
 	uint material_icon;
 	uint scene_icon;
 
-	uint selected_icon;
-
 private:
 	std::vector<uint> selected_assets;
 
@@ -43,9 +44,12 @@ private:
 	PathNode current_node;
 	PathNode next_node;
 
+	PathNode selected_node;
+
 	Timer timer;
 	uint rate = 5;
 
+	ImVec4 border_color;
 };
 
 #endif// __ASSETS_H__

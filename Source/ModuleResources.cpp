@@ -12,7 +12,6 @@
 
 #include "Assimp/include/cimport.h"
 
-#include "Devil/include/IL/il.h"
 #include "Devil/include/IL/ilu.h"
 #include "Devil/include/IL/ilut.h"
 
@@ -50,6 +49,7 @@ bool ModuleResources::Start(Config* config)
 	//LoadResourcesData();
 
 	//UpdateAssets();
+	LoadAssetsIcons();
 
 	return true;
 }
@@ -377,15 +377,6 @@ void ModuleResources::LoadAssetsIcons()
 	{
 		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
 			App->editor->tab_assets->scene_icon = ilutGLBindTexImage();
-
-		RELEASE_ARRAY(buffer);
-	}
-
-	size = App->file_system->Load("Settings/Icons/selected_icon.png", &buffer);
-	if (size > 0)
-	{
-		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
-			App->editor->tab_assets->selected_icon = ilutGLBindTexImage();
 
 		RELEASE_ARRAY(buffer);
 	}
