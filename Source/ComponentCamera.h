@@ -14,8 +14,8 @@
 
 class ComponentCamera : public Component
 {
-public:
 
+public:
 	ALIGN_CLASS_TO_16
 
 	ComponentCamera(GameObject* gameObject);
@@ -42,10 +42,13 @@ public:
 	//  -------------------------------------- Actions
 	void SetPosition(const float3 & position);
 	void Move(const float3 & distance);
-
 	void Look(const float3 & position);
 
-	//int ContainsAABB(const AABB & refBox) const;
+public:
+
+	void UpdatePlanes();
+
+	int ContainsAABB(const AABB & box) const;
 
 	void DrawFrustum();
 

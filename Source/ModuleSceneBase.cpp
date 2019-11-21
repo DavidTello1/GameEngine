@@ -89,7 +89,7 @@ void ModuleSceneBase::CameraFocusTo()
 
 		if (object != nullptr)
 		{
-			float3 v_distance = object->aabb.FaceCenterPoint(0) - viewport_camera->frustum.pos;
+			float3 v_distance = object->aabb.FaceCenterPoint(0) - viewport_camera->frustum.Pos();
 
 			float min = v_distance.Length();
 			int face = 0;
@@ -97,7 +97,7 @@ void ModuleSceneBase::CameraFocusTo()
 			// Check which face of the object is the closest one
 			for (int i = 1; i < 6; i++)
 			{
-				v_distance = object->aabb.FaceCenterPoint(i) - viewport_camera->frustum.pos;
+				v_distance = object->aabb.FaceCenterPoint(i) - viewport_camera->frustum.Pos();
 				
 				if (v_distance.Length() < min) {
 					min = v_distance.Length();
@@ -142,15 +142,15 @@ void ModuleSceneBase::CameraFreeMove(float dt)
 			App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
 			speed *= 2.0f;
 
-		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos += viewport_camera->frustum.front * speed;
-		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos -= viewport_camera->frustum.front * speed;
+		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) newPos += viewport_camera->frustum.Front() * speed;
+		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) newPos -= viewport_camera->frustum.Front() * speed;
 
 
 		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= viewport_camera->frustum.WorldRight() * speed;
 		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += viewport_camera->frustum.WorldRight() * speed;
 
-		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= viewport_camera->frustum.up * speed;
-		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += viewport_camera->frustum.up * speed;
+		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= viewport_camera->frustum.Up() * speed;
+		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += viewport_camera->frustum.Up() * speed;
 
 		viewport_camera->Move(newPos);
 
@@ -167,7 +167,7 @@ void ModuleSceneBase::CameraZoom(float dt)
 		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT || App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
 			speed *= 2.0f;
 
-		viewport_camera->Move(viewport_camera->frustum.front * speed);
+		viewport_camera->Move(viewport_camera->frustum.Front() * speed);
 	}
 }
 
@@ -183,19 +183,19 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 	if (dx != 0)
 	{
 		Quat quat = Quat::RotateY(dx*dt*Sensitivity);
-		viewport_camera->frustum.up = quat.Mul(viewport_camera->frustum.up).Normalized();
-		viewport_camera->frustum.front = quat.Mul(viewport_camera->frustum.front).Normalized();
+		viewport_camera->frustum.SetUp(quat.Mul(viewport_camera->frustum.Up()).Normalized());
+		viewport_camera->frustum.SetFront(quat.Mul(viewport_camera->frustum.Front()).Normalized());
 	}
 
 	if (dy != 0)
 	{
 		Quat quat = Quat::RotateAxisAngle(viewport_camera->frustum.WorldRight(), dy* dt *Sensitivity);
-		float3 up = quat.Mul(viewport_camera->frustum.up).Normalized();
+		float3 up = quat.Mul(viewport_camera->frustum.Up()).Normalized();
 
 		if (up.y > 0.0f)
 		{
-			viewport_camera->frustum.up = up;
-			viewport_camera->frustum.front = quat.Mul(viewport_camera->frustum.front).Normalized();
+			viewport_camera->frustum.SetUp(up);
+			viewport_camera->frustum.SetFront(quat.Mul(viewport_camera->frustum.Front()).Normalized());
 		}
 	}
 

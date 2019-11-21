@@ -116,11 +116,11 @@ void Configuration::DrawMainCamera()
 		ImGui::ColorEdit3("Background color", (float*)&viewport_camera->background);
 
 		// Dummy floats
-		float _fov  = viewport_camera->frustum.verticalFov * RADTODEG;
-		float _near = viewport_camera->frustum.nearPlaneDistance;
-		float _far  = viewport_camera->frustum.farPlaneDistance;
+		float _fov  = viewport_camera->GetFOV() * RADTODEG;
+		float _near = viewport_camera->GetNearPlane();
+		float _far  = viewport_camera->GetFarPlane();
 
-		if (ImGui::Checkbox("Perspective / Orthogonal", &viewport_camera->perspective))
+		/*if (ImGui::Checkbox("Perspective / Orthogonal", &viewport_camera->perspective))
 		{
 			if (viewport_camera->perspective)
 				viewport_camera->frustum.type = FrustumType::PerspectiveFrustum;
@@ -128,7 +128,7 @@ void Configuration::DrawMainCamera()
 				viewport_camera->frustum.type = FrustumType::OrthographicFrustum;
 
 			viewport_camera->update_projection = true;
-		}
+		}*/
 
 		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
 		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 180.0f,"%.1f"))

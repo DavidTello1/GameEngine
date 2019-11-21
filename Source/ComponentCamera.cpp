@@ -10,19 +10,18 @@
 
 ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Type::Camera, gameobj)
 {
-	frustum.type = FrustumType::PerspectiveFrustum;
+	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
 
-	frustum.pos = float3::zero;
-	frustum.front = float3::unitZ;
-	frustum.up = float3::unitY;
+	frustum.SetPos(float3::zero);
+	frustum.SetFront(float3::unitZ);
+	frustum.SetUp(float3::unitY);
 
-	frustum.nearPlaneDistance = 1.0f;
-	frustum.farPlaneDistance = 100.0f;
-	SetFov(60.0f);
+	frustum.SetViewPlaneDistances(0.1f, 100.0f);
+	frustum.SetVerticalFovAndAspectRatio(60.0f, 1.4f);
 
-	aspect_ratio = 1.4f;
-	SetAspectRatio(aspect_ratio);
+	//SetAspectRatio(aspect_ratio);
 
+	UpdatePlanes();
 	update_projection = true;
 }
 
@@ -33,27 +32,27 @@ ComponentCamera::~ComponentCamera()
 
 float ComponentCamera::GetNearPlane() const
 {
-	return frustum.nearPlaneDistance;
+	return frustum.NearPlaneDistance();
 }
 
 float ComponentCamera::GetFarPlane() const
 {
-	return frustum.farPlaneDistance;
+	return frustum.FarPlaneDistance();
 }
 
 float ComponentCamera::GetFOV(bool in_degree) const
 {
 	if (in_degree)
-		return frustum.verticalFov * RADTODEG;
+		return frustum.VerticalFov() * RADTODEG;
 
-	return frustum.verticalFov;
+	return frustum.VerticalFov();
 }
 float ComponentCamera::GetHorizontalFOV(bool in_degree) const
 {
 	if (in_degree)
-		return frustum.horizontalFov * RADTODEG;
+		return frustum.HorizontalFov() * RADTODEG;
 
-	return frustum.horizontalFov;
+	return frustum.HorizontalFov();
 }
 
 float ComponentCamera::GetAspectRatio() const
@@ -77,9 +76,10 @@ float* ComponentCamera::GetProjectionMatrix()
 
 void ComponentCamera::SetNearPlane(float distance)
 {
-	if (distance > 0 && distance < frustum.farPlaneDistance)
+	if (distance > 0 && distance < frustum.FarPlaneDistance())
 	{
-		frustum.nearPlaneDistance = distance;
+		frustum.SetViewPlaneDistances(distance, frustum.FarPlaneDistance());
+		UpdatePlanes();
 		update_projection = true;
 	}
 
@@ -87,9 +87,10 @@ void ComponentCamera::SetNearPlane(float distance)
 
 void ComponentCamera::SetFarPlane(float distance)
 {
-	if (distance > 0 && distance > frustum.nearPlaneDistance)
+	if (distance > 0 && distance > frustum.NearPlaneDistance())
 	{
-		frustum.farPlaneDistance = distance;
+		frustum.SetViewPlaneDistances(frustum.NearPlaneDistance(), distance);
+		UpdatePlanes();
 		update_projection = true;
 	}
 }
@@ -97,75 +98,89 @@ void ComponentCamera::SetFarPlane(float distance)
 void ComponentCamera::SetFov(float fov, bool in_degree)
 {
 	if (in_degree)
-		frustum.verticalFov = DEGTORAD * fov;
+		frustum.SetVerticalFovAndAspectRatio(fov * DEGTORAD, frustum.AspectRatio());
 	else
-		frustum.verticalFov =  fov;
-	
-	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
+		frustum.SetVerticalFovAndAspectRatio(fov, frustum.AspectRatio());
+	UpdatePlanes();
+	//frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
 
 	update_projection = true;
 }
 
 void ComponentCamera::SetAspectRatio(float ratio)
 {
-	aspect_ratio = ratio;
-	SetFov(frustum.verticalFov, false);	
+	/*aspect_ratio = ratio;
+	SetFov(frustum.verticalFov, false);	*/
+
+	float horizontalFov = frustum.HorizontalFov();
+	frustum.SetHorizontalFovAndAspectRatio(horizontalFov, ratio);
+	UpdatePlanes();
 }
 
 // Actions ---------------------------------------------------
 void ComponentCamera::SetPosition(const float3& position)
 {
-	frustum.pos = position;
+	frustum.SetPos(position);
+	UpdatePlanes();
 	update_projection = true;
 }
 
 void ComponentCamera::Move(const float3 & distance)
 {
 	frustum.Translate(distance);
+	UpdatePlanes();
 	update_projection = true;
 }
 
 void ComponentCamera::Look(const float3 & position)
 {
-	float3 vector = position - frustum.pos;
+	float3 vector = position - frustum.Pos();
 
-	float3x3 matrix = float3x3::LookAt(frustum.front, vector.Normalized(), frustum.up, float3::unitY);
+	float3x3 matrix = float3x3::LookAt(frustum.Front(), vector.Normalized(), frustum.Up(), float3::unitY);
 
-	frustum.front = matrix.MulDir(frustum.front).Normalized();
-	frustum.up = matrix.MulDir(frustum.up).Normalized();
+	frustum.SetFront(matrix.MulDir(frustum.Front()).Normalized());
+	frustum.SetUp(matrix.MulDir(frustum.Up()).Normalized());
 	
+	UpdatePlanes();
 	update_projection = true;
 }
 
-//int ComponentCamera::ContainsAABB(const AABB& refBox) const
-//{
-//	float3 corners[8];
-//	int total_in = 0;
-//	refBox.GetCornerPoints(corners);
-//	// test all 8 corners against the 6 sides
-//	// if all points are behind 1 specific plane, we are out
-//	// if we are in with all points, then we are fully in
-//	for (int p = 0; p < 6; ++p) {
-//		int iInCount = 8;
-//		int iPtIn = 1;
-//		for (int i = 0; i < 8; ++i) {
-//			// test this point against the planes
-//			if (m_plane[p].SideOfPlane(corners[i]) == BEHIND) {
-//				iPtIn = 0;
-//				--iInCount;
-//			}
-//		}
-//		if(iInCount == 0)
-//			return(AABB_OUT);
-//		// check if they were all on the right side of the plane
-//		total_in += iPtIn;
-//	}
-//	// so if iTotalIn is 6, then all are inside the view
-//	if (total_in == 6)
-//		return(AABB_IN);
-//	// we must be partly in then otherwise
-//	return(INTERSECT);
-//}
+void ComponentCamera::UpdatePlanes()
+{
+	frustum.GetPlanes(planes);
+}
+
+int ComponentCamera::ContainsAABB(const AABB& box) const
+{
+	//float3 corners[8];
+	//int total_in = 0;
+	//box.GetCornerPoints(corners);
+
+	//// test all 8 corners against the 6 sides
+	//// if all points are behind 1 specific plane, we are out
+	//// if we are in with all points, then we are fully in
+	//for (int p = 0; p < 6; ++p) {
+	//	int iInCount = 8;
+	//	int iPtIn = 1;
+	//	for (int i = 0; i < 8; ++i) {
+	//		// test this point against the planes
+	//		if (planes[p]. SideOfPlane(corners[i]) == BEHIND) {
+	//			iPtIn = 0;
+	//			--iInCount;
+	//		}
+	//	}
+	//	if(iInCount == 0)
+	//		return(AABB_OUT);
+	//	// check if they were all on the right side of the plane
+	//	total_in += iPtIn;
+	//}
+	//// so if iTotalIn is 6, then all are inside the view
+	//if (total_in == 6)
+	//	return(AABB_IN);
+	//// we must be partly in then otherwise
+	//return(INTERSECT);
+	return 1;
+}
 
 // Debug -----------------------------------------------------
 

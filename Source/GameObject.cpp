@@ -188,8 +188,9 @@ void GameObject::UpdateTransform()
 	if (cam)
 	{
 		cam->SetPosition(translation);
-		cam->frustum.front = GetGlobalTransform().WorldZ();
-		cam->frustum.up = GetGlobalTransform().WorldY();
+		cam->frustum.SetFront(GetGlobalTransform().WorldZ());
+		cam->frustum.SetUp(GetGlobalTransform().WorldY());
+		cam->UpdatePlanes();
 	}
 
 	UpdateBoundingBox();
