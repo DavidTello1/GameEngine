@@ -7,6 +7,8 @@
 
 #include "PhysFS/include/physfs.h"
 
+struct PathNode;
+
 struct SDL_RWops;
 int close_sdl_rwops(SDL_RWops *rw);
 
@@ -31,12 +33,17 @@ public:
 	bool CopyFromOutsideFS(const char* full_path, const char* destination);
 	bool Copy(const char* source, const char* destination);
 
+	PathNode GetAllFiles(const char* directory, std::vector<std::string>* filter_ext = nullptr, std::vector<std::string>* ignore_ext = nullptr) const;
 	std::string GetFileName(const char* full_path) const; //returns file name (baker_house.fbx)
 	std::string GetExtension(const char* full_path) const; //returns extension (fbx)
 	void NormalizePath(char* full_path) const;
 	void NormalizePath(std::string& full_path) const;
 	void ToLower(char* full_path) const;
 	void ToLower(std::string& full_path) const;
+
+	bool HasExtension(const char* path) const;
+	bool HasExtension(const char* path, std::string extension) const;
+	bool HasExtension(const char* path, std::vector<std::string> extensions) const;
 
 	// Open for Read/Write
 	unsigned int LoadFromPath(const char* path, const char* file, char** buffer) const;

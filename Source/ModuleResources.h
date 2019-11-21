@@ -15,6 +15,7 @@
 class Resource;
 class ResourceMesh;
 class ResourceMaterial;
+struct PathNode;
 
 class ModuleResources : public Module
 {
@@ -45,6 +46,9 @@ private:
 	void SaveUID() const;
 
 	//void MakeCheckersTexture();
+
+	void UpdateAssets();
+	void UpdateAssetsFolder(const PathNode& node);
 
 public:
 	GLuint bbox_indices[24] =

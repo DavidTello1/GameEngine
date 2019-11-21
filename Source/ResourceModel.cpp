@@ -36,12 +36,12 @@ ResourceModel::~ResourceModel()
 //	Resource::Load(config);
 //}
 
-bool ResourceModel::Import(const char* full_path, std::string& output, char* buffer, uint size)
+bool ResourceModel::Import(const char* full_path, std::string& output)
 {
 	Timer timer;
 	timer.Start();
 
-	const aiScene* scene = aiImportFileFromMemory(buffer, size, aiProcessPreset_TargetRealtime_MaxQuality, nullptr);
+	const aiScene* scene = aiImportFileEx(full_path, aiProcessPreset_TargetRealtime_MaxQuality, nullptr);
 	if (scene)
 	{
 		ResourceModel model(0);
@@ -89,7 +89,7 @@ bool ResourceModel::Import(const char* full_path, std::string& output, char* buf
 		}
 		LOG("[%s] imported in %d ms", model.GetFile(), timer.Read(), 'd');
 		timer.Stop();
-		model.LoadToMemory(); //should be called when loading after importing (just for testing)
+		//model.LoadToMemory(); //should be called when loading after importing (just for testing)
 		return ret;
 	}
 	return false;
@@ -160,6 +160,8 @@ void ResourceModel::UnLoad()
 
 		if (nodes[i].material != 0)
 			App->resources->GetResource(nodes[i].material)->ReleaseFromMemory();
+
+		ReleaseFromMemory();
 	}
 	nodes.clear();
 }

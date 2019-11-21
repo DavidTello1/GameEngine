@@ -21,6 +21,7 @@ ResourceMaterial::ResourceMaterial(UID id) : Resource(id, Resource::Type::materi
 
 ResourceMaterial::~ResourceMaterial()
 {
+	UnLoad();
 }
 
 UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_material)
@@ -48,14 +49,13 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 		LOG("Importing aiMaterial %s FAILED", source_file);
 	}
 
-	//material->UnLoad();
+	material->UnLoad();
 
 	return material->uid;
 }
 
-UID ResourceMaterial::ImportTexture(const char* path)
+bool ResourceMaterial::ImportTexture(const char* path)
 {
-	bool ret = false;
 	ILuint size;
 	ILubyte *data;
 
@@ -68,7 +68,7 @@ UID ResourceMaterial::ImportTexture(const char* path)
 			App->file_system->Save(path, data, size);
 
 		RELEASE_ARRAY(data);
-		return ret;
+		return true;
 	}
 	return false;
 }
@@ -124,12 +124,16 @@ bool ResourceMaterial::LoadMaterial(const char* path)
 	bool loaded = ilLoadImage(path);
 	if (!loaded)
 	{
-		LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
+		LOG("Image %s not loaded", path, 'e');
 		return false;
 	}
 	LogImageInfo();
 
-	ImportTexture(path);
+	if (ImportTexture(path) == false)
+	{
+		LOG("Texture not imported", 'e');
+		return false;
+	}
 
 	GLuint texture;
 	glGenTextures(1, &texture);

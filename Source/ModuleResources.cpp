@@ -6,6 +6,7 @@
 #include "ResourceMesh.h"
 #include "ResourceMaterial.h"
 #include "Config.h"
+#include "PathNode.h"
 
 #include "Assimp/include/cimport.h"
 #include "Devil/include/IL/il.h"
@@ -41,6 +42,9 @@ bool ModuleResources::Init(Config* config)
 bool ModuleResources::Start(Config* config)
 {
 	//MakeCheckersTexture();
+	//LoadResourcesData();
+	UpdateAssets();
+
 	return true;
 }
 
@@ -77,25 +81,25 @@ bool ModuleResources::ImportFromOutside(const char* path, UID uid)
 
 bool ModuleResources::ImportResource(const char* final_path, UID uid)
 {
-	if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded and if so, init uid
-	{
-		LOG("File is already loaded in memory", 'd');
-		return true;
-	}
-
 	bool import_ok = false;
 	std::string written_file;
 	Resource::Type type = GetResourceType(final_path); //get resource type
 
-	char* buffer;
-	uint size = App->file_system->Load(final_path, &buffer);
+	//if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded and if so, init uid
+	//{
+	//	Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
+	//	LOG("File is already loaded in memory", 'd');
+	//	return true;
+	//}
+
 
 	switch (type) //import depending on type
 	{
 	case Resource::model:
-		import_ok = ResourceModel::Import(final_path, written_file, buffer, size);
+	{
+		import_ok = ResourceModel::Import(final_path, written_file);
 		break;
-
+	}
 	case Resource::material:
 		import_ok = ResourceMaterial::Import(final_path);
 		break;
@@ -111,7 +115,6 @@ bool ModuleResources::ImportResource(const char* final_path, UID uid)
 		return false;
 	}
 	return true;
-
 }
 
 Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
@@ -296,6 +299,32 @@ bool ModuleResources::CheckLoaded(std::string path, UID uid)
 		}
 	}
 	return false;
+}
+
+void ModuleResources::UpdateAssets()
+{
+	std::vector<std::string> ignore_extensions;
+	ignore_extensions.push_back("meta");
+	PathNode assets = App->file_system->GetAllFiles("Assets", nullptr, &ignore_extensions);
+	UpdateAssetsFolder(assets);
+}
+
+void ModuleResources::UpdateAssetsFolder(const PathNode& node)
+{
+	//If node is a file
+	if (node.file == true)
+	{
+		ImportResource(node.path.c_str());
+	}
+
+	//If node folder has something inside
+	else if (node.leaf == false)
+	{
+		for (uint i = 0; i < node.children.size(); i++)
+		{
+			UpdateAssetsFolder(node.children[i]);
+		}
+	}
 }
 
 //void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)

@@ -22,7 +22,7 @@ public:
 	//void Save(Config& config) const override;
 	//void Load(const Config& config) override;
 		 
-	static bool Import(const char* full_path, std::string& output, char* buffer, uint size);
+	static bool Import(const char* full_path, std::string& output);
 	bool SaveOwnFormat(std::string& output) const;
 	bool LoadtoScene();
 	void UnLoad();

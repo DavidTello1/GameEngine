@@ -210,6 +210,7 @@
     <ClInclude Include="Panel.h" />
     <ClInclude Include="parson\parson.h" />
     <ClInclude Include="par_shapes.h" />
+    <ClInclude Include="PathNode.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceMaterial.h" />
     <ClInclude Include="ResourceMesh.h" />

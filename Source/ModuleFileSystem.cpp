@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleFileSystem.h"
+#include "PathNode.h"
 
 #pragma comment( lib, "PhysFS/libx86/physfs.lib" )
 
@@ -107,13 +108,13 @@ void ModuleFileSystem::DiscoverFiles(const char* directory, vector<string> & fil
 	char **i;
 
 	string dir(directory);
-
-	for (i = rc; *i != nullptr; i++) //fill lists
+	for (i = rc; *i != nullptr; i++)
 	{
-		if (PHYSFS_isDirectory((dir + *i).c_str())) //if directory add to dir list
+		string str = string(directory) + string("/") + string(*i);
+		if (IsDirectory(str.c_str()))
 			dir_list.push_back(*i);
 		else
-			file_list.push_back(*i); //add to file list
+			file_list.push_back(*i);
 	}
 
 	PHYSFS_freeList(rc);
@@ -185,9 +186,10 @@ std::string ModuleFileSystem::GetFileName(const char* path) const
 
 std::string ModuleFileSystem::GetExtension(const char* path) const
 {
-	char buffer[32];
+	char buffer[32] = "";
 	const char* last_dot = strrchr(path, '.');
-	strcpy_s(buffer, last_dot + 1);
+	if (last_dot != nullptr)
+		strcpy_s(buffer, last_dot + 1);
 
 	std::string extension(buffer);
 	return extension;
@@ -369,4 +371,77 @@ const char * ModuleFileSystem::GetReadPaths() const
 	}
 
 	return paths;
+}
+
+PathNode ModuleFileSystem::GetAllFiles(const char* directory, std::vector<std::string>* filter_ext, std::vector<std::string>* ignore_ext) const
+{
+	PathNode root;
+	if (Exists(directory))
+	{
+		root.path = directory;
+		root.localPath = GetFileName(directory);
+		if (root.localPath == "")
+			root.localPath = directory;
+
+		std::vector<string> file_list, dir_list;
+		DiscoverFiles(directory, file_list, dir_list);
+
+		//Adding all child directories
+		for (uint i = 0; i < dir_list.size(); i++)
+		{
+			std::string str = directory;
+			str.append("/").append(dir_list[i]);
+			root.children.push_back(GetAllFiles(str.c_str(), filter_ext, ignore_ext));
+		}
+		//Adding all child files
+		for (uint i = 0; i < file_list.size(); i++)
+		{
+			//Filtering extensions
+			bool filter = true, discard = false;
+			if (filter_ext != nullptr)
+			{
+				filter = HasExtension(file_list[i].c_str(), *filter_ext);
+			}
+			if (ignore_ext != nullptr)
+			{
+				discard = HasExtension(file_list[i].c_str(), *ignore_ext);
+			}
+			if (filter == true && discard == false)
+			{
+				std::string str = directory;
+				str.append("/").append(file_list[i]);
+				root.children.push_back(GetAllFiles(str.c_str(), filter_ext, ignore_ext));
+			}
+		}
+		root.file = HasExtension(root.path.c_str());
+		root.leaf = root.children.empty() == true;
+	}
+	return root;
+}
+
+bool ModuleFileSystem::HasExtension(const char* path) const
+{
+	std::string ext = "";
+	ext = GetExtension(path);
+	return ext != "";
+}
+
+bool ModuleFileSystem::HasExtension(const char* path, std::string extension) const
+{
+	std::string ext = "";
+	ext = GetExtension(path);
+	return ext == extension;
+}
+
+bool ModuleFileSystem::HasExtension(const char* path, std::vector<std::string> extensions) const
+{
+	std::string ext = "";
+	ext = GetExtension(path);
+
+	for (uint i = 0; i < extensions.size(); i++)
+	{
+		if (extensions[i] == ext)
+			return true;
+	}
+	return false;
 }

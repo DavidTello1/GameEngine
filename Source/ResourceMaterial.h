@@ -12,7 +12,7 @@ public:
 	virtual ~ResourceMaterial();
 
 	static UID Import(const char* source_file, const aiMaterial* material = nullptr);
-	static UID ImportTexture(const char* path);
+	bool ImportTexture(const char* path);
 	bool SaveOwnFormat(std::string& output) const;
 	bool LoadtoScene();
 	void UnLoad();
