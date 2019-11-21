@@ -80,6 +80,7 @@ void ComponentCamera::SetNearPlane(float distance)
 	if (distance > 0 && distance < frustum.farPlaneDistance)
 	{
 		frustum.nearPlaneDistance = distance;
+		UpdatePlanes();
 		update_projection = true;
 	}
 
@@ -90,6 +91,7 @@ void ComponentCamera::SetFarPlane(float distance)
 	if (distance > 0 && distance > frustum.nearPlaneDistance)
 	{
 		frustum.farPlaneDistance = distance;
+		UpdatePlanes();
 		update_projection = true;
 	}
 }
@@ -103,12 +105,14 @@ void ComponentCamera::SetFov(float fov, bool in_degree)
 	
 	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
 
+	UpdatePlanes();
 	update_projection = true;
 }
 
 void ComponentCamera::SetAspectRatio(float ratio)
 {
 	aspect_ratio = ratio;
+	UpdatePlanes();
 	SetFov(frustum.verticalFov, false);	
 }
 
@@ -116,12 +120,14 @@ void ComponentCamera::SetAspectRatio(float ratio)
 void ComponentCamera::SetPosition(const float3& position)
 {
 	frustum.pos = position;
+	UpdatePlanes();
 	update_projection = true;
 }
 
 void ComponentCamera::Move(const float3 & distance)
 {
 	frustum.Translate(distance);
+	UpdatePlanes();
 	update_projection = true;
 }
 
@@ -134,38 +140,47 @@ void ComponentCamera::Look(const float3 & position)
 	frustum.front = matrix.MulDir(frustum.front).Normalized();
 	frustum.up = matrix.MulDir(frustum.up).Normalized();
 	
+	UpdatePlanes();
 	update_projection = true;
 }
 
-//int ComponentCamera::ContainsAABB(const AABB& refBox) const
-//{
-//	float3 corners[8];
-//	int total_in = 0;
-//	refBox.GetCornerPoints(corners);
-//	// test all 8 corners against the 6 sides
-//	// if all points are behind 1 specific plane, we are out
-//	// if we are in with all points, then we are fully in
-//	for (int p = 0; p < 6; ++p) {
-//		int iInCount = 8;
-//		int iPtIn = 1;
-//		for (int i = 0; i < 8; ++i) {
-//			// test this point against the planes
-//			if (m_plane[p].SideOfPlane(corners[i]) == BEHIND) {
-//				iPtIn = 0;
-//				--iInCount;
-//			}
-//		}
-//		if(iInCount == 0)
-//			return(AABB_OUT);
-//		// check if they were all on the right side of the plane
-//		total_in += iPtIn;
-//	}
-//	// so if iTotalIn is 6, then all are inside the view
-//	if (total_in == 6)
-//		return(AABB_IN);
-//	// we must be partly in then otherwise
-//	return(INTERSECT);
-//}
+void ComponentCamera::UpdatePlanes()
+{
+	frustum.GetPlanes(planes);
+}
+
+bool ComponentCamera::ContainsAABB(const AABB& refBox) const
+{
+	float3 corners[8];
+	int total_in = 0;
+	refBox.GetCornerPoints(corners);
+	// test all 8 corners against the 6 sides
+	// if all points are behind 1 specific plane, we are out
+	// if we are in with all points, then we are fully in
+	for (int p = 0; p < 6; ++p) {
+		int iInCount = 8;
+		int iPtIn = 1;
+		for (int i = 0; i < 8; ++i) {
+			// test this point against the planes
+			if (planes[p].IsOnPositiveSide(corners[i])) {
+				iPtIn = 0;
+				--iInCount;
+			}
+		}
+		if (iInCount == 0)
+			return false;
+			//return(AABB_OUT);
+		// check if they were all on the right side of the plane
+		total_in += iPtIn;
+	}
+	// so if iTotalIn is 6, then all are inside the view
+	if (total_in == 6)
+		return true;
+		//return(AABB_IN);
+	// we must be partly in then otherwise
+	//return(INTERSECT);
+	return true;
+}
 
 // Debug -----------------------------------------------------
 

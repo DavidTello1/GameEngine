@@ -45,9 +45,13 @@ public:
 
 	void Look(const float3 & position);
 
-	//int ContainsAABB(const AABB & refBox) const;
+	void UpdatePlanes();
 
 	void DrawFrustum();
+
+	//  -------------------------------------- Consultors
+	bool ContainsAABB(const AABB & refBox) const;
+
 
 	bool viewport_focus = true;
 	bool perspective = true;

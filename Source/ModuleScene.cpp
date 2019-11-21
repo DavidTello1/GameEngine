@@ -127,7 +127,7 @@ bool ModuleScene::Draw()
 
 		if (App->scene_base->camera_culling)
 		{
-			if (test_camera->frustum.Contains(obj->aabb))
+			if (test_camera->ContainsAABB(obj->aabb))
 			{
 				glPushMatrix();
 				glMultMatrixf(obj->GetGlobalTransform().Transposed().ptr());
