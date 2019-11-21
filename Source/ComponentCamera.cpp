@@ -20,7 +20,8 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 	frustum.farPlaneDistance = 100.0f;
 	SetFov(60.0f);
 
-	SetAspectRatio(1.4f);
+	aspect_ratio = 1.4f;
+	SetAspectRatio(aspect_ratio);
 
 	update_projection = true;
 }
@@ -46,6 +47,13 @@ float ComponentCamera::GetFOV(bool in_degree) const
 		return frustum.verticalFov * RADTODEG;
 
 	return frustum.verticalFov;
+}
+float ComponentCamera::GetHorizontalFOV(bool in_degree) const
+{
+	if (in_degree)
+		return frustum.horizontalFov * RADTODEG;
+
+	return frustum.horizontalFov;
 }
 
 float ComponentCamera::GetAspectRatio() const
@@ -88,20 +96,20 @@ void ComponentCamera::SetFarPlane(float distance)
 
 void ComponentCamera::SetFov(float fov, bool in_degree)
 {
-	float aspect_ratio = frustum.AspectRatio();
-
 	if (in_degree)
 		frustum.verticalFov = DEGTORAD * fov;
 	else
 		frustum.verticalFov =  fov;
+	
+	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
 
-	SetAspectRatio(aspect_ratio);
+	update_projection = true;
 }
 
 void ComponentCamera::SetAspectRatio(float ratio)
 {
-	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov / 2) * ratio);
-	update_projection = true;
+	aspect_ratio = ratio;
+	SetFov(frustum.verticalFov, false);	
 }
 
 // Actions ---------------------------------------------------

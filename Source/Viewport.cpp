@@ -46,9 +46,6 @@ bool Viewport::PreUpdate()
 		viewport_camera->update_projection = false;
 	}
 
-	App->scene_base->Draw();
-	App->scene->Draw();
-
 	return true;
 }
 
@@ -63,6 +60,9 @@ void Viewport::Draw()
 // Is not automatically called
 bool Viewport::PostUpdate()
 {
+	App->scene_base->Draw();
+	App->scene->Draw();
+
 	// Background color of the editor (ImGui)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -129,7 +129,7 @@ void Viewport::RemoveBuffer(FrameBuffer& buffer)
 	}
 }
 
-void Viewport::OnResize(int width, int height)
+void Viewport::OnResize(float width, float height)
 {
 	glViewport(0, 0, width, height);
 
@@ -138,9 +138,14 @@ void Viewport::OnResize(int width, int height)
 
 void Viewport::OnCameraUpdate()
 {
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glLoadMatrixf(viewport_camera->GetProjectionMatrix());
+
 	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 	glLoadMatrixf(viewport_camera->GetViewMatrix());
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(viewport_camera->GetProjectionMatrix());
+	//glPopMatrix();
+
 }

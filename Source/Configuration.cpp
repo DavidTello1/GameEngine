@@ -103,7 +103,10 @@ void Configuration::DrawMainCamera()
 {
 	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		
+		ImGui::Text("Aspect ratio: "); ImGui::SameLine(); ImGui::TextColored(yellow, "%f", viewport_camera->GetAspectRatio());
+		ImGui::Text("Vertical FOV: "); ImGui::SameLine(); ImGui::TextColored(yellow, "%f", viewport_camera->GetFOV());
+		ImGui::Text("Horizontal FOV: "); ImGui::SameLine(); ImGui::TextColored(yellow, "%f", viewport_camera->GetHorizontalFOV());
+
 		ImGui::ColorEdit3("Background color", (float*)&viewport_camera->background);
 
 		// Dummy floats

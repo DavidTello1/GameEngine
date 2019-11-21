@@ -21,6 +21,7 @@ public:
 	float GetNearPlane() const;
 	float GetFarPlane() const;
 	float GetFOV(bool in_degree = true) const;
+	float GetHorizontalFOV(bool in_degree = true) const;
 	float GetAspectRatio() const;
 
 	float* GetViewMatrix();
@@ -43,6 +44,8 @@ public:
 	bool viewport_focus = true;
 	bool perspective = true;
 	bool update_projection = false;
+
+	float aspect_ratio = 0.0f;
 
 	Frustum frustum;
 

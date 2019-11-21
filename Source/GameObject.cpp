@@ -184,12 +184,12 @@ void GameObject::UpdateTransform()
 // ---------------------
 void GameObject::SetRotation(const float3& XYZ_euler_rotation)
 {
-	/*float3 diff = XYZ_euler_rotation - rotation;
+	float3 diff = (XYZ_euler_rotation - rotation);
 	Quat mod = Quat::FromEulerXYZ(diff.x, diff.y, diff.z);
 	rotation_quat = rotation_quat * mod;
-	rotation = XYZ_euler_rotation;*/
+	rotation = XYZ_euler_rotation;
 
-	rotation_quat = rotation_quat *Quat::FromEulerXYZ(XYZ_euler_rotation.x, XYZ_euler_rotation.y, XYZ_euler_rotation.z);
+	//rotation_quat = rotation_quat *Quat::FromEulerXYZ(XYZ_euler_rotation.x, XYZ_euler_rotation.y, XYZ_euler_rotation.z);
 	flags |= ProcessTransformUpdate;
 }
 
@@ -296,11 +296,12 @@ void GameObject::GenerateBoundingBox()
 
 	if (mesh)
 	{
-		obb = mesh->GetMesh()->GetAABB();
+		obb.SetFrom(mesh->GetMesh()->GetAABB());
 		obb.Transform(GetGlobalTransform());
 
-		b_box.SetNegativeInfinity();
-		b_box.Enclose(obb);
+		//b_box.SetNegativeInfinity();
+		b_box.SetFrom(obb);
+		//b_box.Enclose(obb);
 		//b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
 	}
 

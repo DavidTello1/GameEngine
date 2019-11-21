@@ -83,6 +83,8 @@ private:
 	std::vector<float> ms_log;
 
 	mutable hardware_info info_hw;
+
+	ImVec4 yellow = { 1.0f, 1.0f, 0.0f, 1.0f };
 };
 
 #endif// __CONFIGURATION_H__
