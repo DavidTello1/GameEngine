@@ -14,7 +14,6 @@ Hierarchy::Hierarchy() : Panel("Hierarchy")
 	pos_y = default_pos_y;
 
 	has_menubar = true;
-
 }
 
 Hierarchy::~Hierarchy()
@@ -50,7 +49,6 @@ void Hierarchy::DrawNodes(std::vector<GameObject*>& v)
 
 			if (ImGui::BeginPopupContextItem(obj->GetName())) // Options menu poped up when right clicking a node
 			{
-				in_menu = true;
 				if (ImGui::MenuItem("Rename"))
 					obj->is_rename = true;
 
@@ -59,10 +57,6 @@ void Hierarchy::DrawNodes(std::vector<GameObject*>& v)
 
 				ImGui::EndPopup();
 			}
-			else
-			{
-				in_menu = false;
-			}
 
 			if (ImGui::IsItemClicked() || ImGui::IsItemClicked(1)) // if treenode is clicked, check whether it is a single or multi selection
 			{
@@ -70,9 +64,10 @@ void Hierarchy::DrawNodes(std::vector<GameObject*>& v)
 				{
 					obj->is_rename = true;
 				}
-				else {
+				else 
+				{
 					// Single selection, clear selected nodes
-					if (!ImGui::GetIO().KeyCtrl) 
+					if (!ImGui::GetIO().KeyCtrl)
 					{
 						App->scene->UnSelectAll(obj);
 					}
@@ -87,6 +82,7 @@ void Hierarchy::DrawNodes(std::vector<GameObject*>& v)
 					}
 				}
 			}
+
 			if (is_open)
 			{
 				in_menu = true;

@@ -179,7 +179,8 @@ bool ModuleFileSystem::Copy(const char * source, const char * destination)
 std::string ModuleFileSystem::GetFileName(const char* path) const
 {
 	const char* file_name = strrchr(path, 92);
-	if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "empty";
+	if (file_name == nullptr) 
+		file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "";
 	file_name++;
 	return file_name;
 }

@@ -47,6 +47,7 @@ private:
 
 	//void MakeCheckersTexture();
 
+	void LoadAssetsIcons();
 	void UpdateAssets();
 	void UpdateAssetsFolder(const PathNode& node);
 

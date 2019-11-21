@@ -484,11 +484,12 @@ void ModuleEditor::DrawPanels(bool &is_auto_select)
 			
 			if (is_auto_select == true && ImGui::IsWindowHovered() == true && (*it)->in_menu == false) // auto-select
 				ImGui::SetWindowFocus();
-
-			if (App->scene->create_gameobj == true && (*it)->GetName() == "Inspector") //show inspector when a gameobject is created
+			
+			if ((*it)->GetName() == "Inspector" && (App->scene->is_creating || App->scene->is_selecting)) //show inspector when a gameobject is created/selected
 			{
 				ImGui::SetWindowFocus();
-				App->scene->create_gameobj = false;
+				App->scene->is_creating = false;
+				App->scene->is_selecting = false;
 			}
 			ImGui::End();
 		}
@@ -610,7 +611,7 @@ void ModuleEditor::DrawCreateMenu()
 	if (ImGui::MenuItem("Empty"))
 		App->scene->CreateGameObject();
 
-	GameObject* parent = App->scene->GetSelectedGameObjects();
+	GameObject* parent = App->scene->GetSelectedGameObject();
 
 	ImGui::Separator();
 	if (ImGui::BeginMenu("Basic shapes"))

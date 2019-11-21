@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "ModuleEditor.h"
 #include "GameObject.h"
 #include "ComponentMesh.h"
 #include "ComponentRenderer.h"
@@ -60,12 +61,14 @@ void GameObject::Select()
 {
 	hierarchy_flags |= ImGuiTreeNodeFlags_Selected;
 	is_selected = true;
+	App->scene->is_selecting = true;
 }
 
 void GameObject::UnSelect()
 {
 	hierarchy_flags &= ~ImGuiTreeNodeFlags_Selected;
 	is_selected = false;
+	App->scene->is_selecting = false;
 }
 
 bool GameObject::ToggleSelection() // Toggles the state of the node, returns current state after toggled

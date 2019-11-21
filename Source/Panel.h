@@ -21,7 +21,7 @@ public:
 
 public:
 	bool active = true;
-	bool has_menubar;
+	bool has_menubar = false;
 	int width, height, pos_x, pos_y;
 	bool in_menu = false;
 

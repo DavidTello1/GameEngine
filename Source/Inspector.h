@@ -8,6 +8,7 @@
 class ComponentMesh;
 class ComponentMaterial;
 class ComponentRenderer;
+class ComponentCamera;
 
 class Inspector : public Panel
 {
@@ -37,5 +38,6 @@ private:
 	ComponentMesh* mesh;
 	ComponentMaterial* material;
 	ComponentRenderer* renderer;
+	ComponentCamera* camera;
 
 };

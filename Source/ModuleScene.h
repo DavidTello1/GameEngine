@@ -30,7 +30,7 @@ public:
 	void DeleteGameObject(GameObject* obj);
 	void DeleteSelected();
 
-	GameObject* GetSelectedGameObjects() { 
+	GameObject* GetSelectedGameObject() { 
 		for (uint i=0;i<gameObjects.size();i++)
 			if (gameObjects[i]->is_selected)
 				return gameObjects[i];
@@ -42,11 +42,11 @@ public:
 	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 
 public:
-
 	char scene_name[NAME_LENGTH];
 	void SetSceneName(const char* name)	{strcpy_s(scene_name, name);}
 
-	bool create_gameobj = false;
+	bool is_creating = false;
+	bool is_selecting = false;
 
 	std::vector<GameObject*> gameObjects;
 	   

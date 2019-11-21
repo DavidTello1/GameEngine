@@ -2,6 +2,8 @@
 #define __ASSETS_H__
 
 #include "Panel.h"
+#include "PathNode.h"
+#include "Timer.h"
 #include "Imgui/imgui.h"
 #include <vector>
 
@@ -21,7 +23,29 @@ public:
 	void ImportAsset();
 
 private:
+	void UpdateAssets();
+	void DrawHierarchy(const PathNode& node);
+	void DrawIcons(const PathNode& node);
+
+public:
+	uint folder_icon;
+	uint file_icon;
+	uint model_icon;
+	uint material_icon;
+	uint scene_icon;
+
+	uint selected_icon;
+
+private:
 	std::vector<uint> selected_assets;
+
+	PathNode assets;
+	PathNode current_node;
+	PathNode next_node;
+
+	Timer timer;
+	uint rate = 5;
+
 };
 
 #endif// __ASSETS_H__

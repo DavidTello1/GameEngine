@@ -14,8 +14,6 @@ Viewport::Viewport() : Panel("Viewport")
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
-
-	has_menubar = false;
 }
 
 

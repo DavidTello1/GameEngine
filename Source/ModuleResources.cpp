@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "ModuleResources.h"
 #include "ModuleFileSystem.h"
+#include "ModuleEditor.h"
+#include "Assets.h"
 #include "ResourceModel.h"
 #include "ResourceMesh.h"
 #include "ResourceMaterial.h"
@@ -9,7 +11,10 @@
 #include "PathNode.h"
 
 #include "Assimp/include/cimport.h"
+
 #include "Devil/include/IL/il.h"
+#include "Devil/include/IL/ilu.h"
+#include "Devil/include/IL/ilut.h"
 
 #include "mmgr/mmgr.h"
 
@@ -43,7 +48,8 @@ bool ModuleResources::Start(Config* config)
 {
 	//MakeCheckersTexture();
 	//LoadResourcesData();
-	UpdateAssets();
+
+	//UpdateAssets();
 
 	return true;
 }
@@ -325,6 +331,66 @@ void ModuleResources::UpdateAssetsFolder(const PathNode& node)
 			UpdateAssetsFolder(node.children[i]);
 		}
 	}
+}
+
+void ModuleResources::LoadAssetsIcons()
+{
+	char* buffer = nullptr;
+	uint size = App->file_system->Load("Settings/Icons/folder_icon.png", &buffer);
+	if (size > 0)
+	{
+		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
+			App->editor->tab_assets->folder_icon = ilutGLBindTexImage();
+
+		RELEASE_ARRAY(buffer);
+	}
+
+	size = App->file_system->Load("Settings/Icons/file_icon.png", &buffer);
+	if (size > 0)
+	{
+		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
+			App->editor->tab_assets->file_icon = ilutGLBindTexImage();
+
+		RELEASE_ARRAY(buffer);
+	}
+
+	size = App->file_system->Load("Settings/Icons/model_icon.png", &buffer);
+	if (size > 0)
+	{
+		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
+			App->editor->tab_assets->model_icon = ilutGLBindTexImage();
+
+		RELEASE_ARRAY(buffer);
+	}
+
+	size = App->file_system->Load("Settings/Icons/material_icon.png", &buffer);
+	if (size > 0)
+	{
+		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
+			App->editor->tab_assets->material_icon = ilutGLBindTexImage();
+
+		RELEASE_ARRAY(buffer);
+	}
+
+	size = App->file_system->Load("Settings/Icons/scene_icon.png", &buffer);
+	if (size > 0)
+	{
+		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
+			App->editor->tab_assets->scene_icon = ilutGLBindTexImage();
+
+		RELEASE_ARRAY(buffer);
+	}
+
+	size = App->file_system->Load("Settings/Icons/selected_icon.png", &buffer);
+	if (size > 0)
+	{
+		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
+			App->editor->tab_assets->selected_icon = ilutGLBindTexImage();
+
+		RELEASE_ARRAY(buffer);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0); //reset the texture buffer
 }
 
 //void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)

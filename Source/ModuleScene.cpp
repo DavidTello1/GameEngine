@@ -150,7 +150,7 @@ GameObject* ModuleScene::FindById(uint id)
 
 GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent, bool visible)
 {
-	create_gameobj = true;
+	is_creating = true;
 
 	if (parent == nullptr) parent = root_object;
 

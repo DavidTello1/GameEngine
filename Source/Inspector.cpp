@@ -29,9 +29,10 @@ void Inspector::Draw()
 	static bool has_mesh = false;
 	static bool has_material = false;
 	static bool has_renderer = false;
+	static bool has_camera = false;
 	static bool rename = false;
 
-	obj = App->scene->GetSelectedGameObjects();
+	obj = App->scene->GetSelectedGameObject();
 	if (obj == nullptr)
 	{
 		position = rotation = scale = float3::zero;
@@ -50,6 +51,9 @@ void Inspector::Draw()
 	if (has_renderer = obj->HasComponent(Component::Type::Renderer))
 		renderer = (ComponentRenderer*)obj->GetComponent(Component::Type::Renderer);
 
+	if (has_camera = obj->HasComponent(Component::Type::Camera))
+		camera = (ComponentCamera*)obj->GetComponent(Component::Type::Camera);
+
 	if (ImGui::BeginMenuBar())
 	{
 		in_menu = false;
@@ -67,9 +71,9 @@ void Inspector::Draw()
 			if (ImGui::MenuItem("Renderer", nullptr, false, !has_renderer))
 				obj->AddComponent(Component::Type::Renderer);
 
-			if (ImGui::MenuItem("Light", nullptr, false, false))
+			if (ImGui::MenuItem("Camera", nullptr, false, !has_camera))
 			{
-				//obj->AddComponent(Component::Type::Light);
+				obj->AddComponent(Component::Type::Camera);
 			}
 
 			ImGui::EndMenu();
@@ -94,11 +98,11 @@ void Inspector::Draw()
 				if (ImGui::MenuItem("Renderer"))
 					obj->DeleteComponent(Component::Type::Renderer);
 			}
-			//if (has_light)
-			//{
-			//	if (ImGui::MenuItem("Light"))
-			//		//obj->DeleteComponent(Component::Type::Light);
-			//}
+			if (has_camera)
+			{
+				if (ImGui::MenuItem("Camera"))
+					obj->DeleteComponent(Component::Type::Camera);
+			}
 
 			ImGui::EndMenu();
 		}
