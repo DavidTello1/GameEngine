@@ -177,11 +177,21 @@ void GameObject::UpdateTransform()
 		global_transform = local_transform;
 	}
 
+	UpdateBoundingBox();
+
 	for (GameObject* child : childs)
 	{
 		child->UpdateTransform();
 	}
+}
 
+void GameObject::UpdateParentBoundingBox()
+{
+	if (GetUID() == 0) return;
+
+	GenerateBoundingBox();
+	if (parent)
+		parent->UpdateParentBoundingBox();
 }
 
 // ---------------------
@@ -303,71 +313,24 @@ void GameObject::GenerateBoundingBox()
 		obb.Transform(GetGlobalTransform());
 
 		aabb.SetFrom(obb);
-
-		//aabb.SetNegativeInfinity();
-		//b_box.SetFrom(obb);
-		//aabb.Enclose(obb);
-		//b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
 	}
-
-
-	//if (b_box.IsFinite())
-	//{
-	//	// Already generated bbox -> needs update
-	//	if (mesh)
-	//	{
-	//		obb.SetFrom(mesh->GetMesh()->GetAABB());
-	//		obb.Transform(GetGlobalTransform());
-
-	//		b_box.SetNegativeInfinity();
-	//		b_box.Enclose(obb);
-	//	}
-	//	else
-	//	{
-	//		if (HasChilds())
-	//		{
-	//			b_box.minPoint = childs.back()->b_box.minPoint;
-	//			b_box.maxPoint = childs.back()->b_box.maxPoint;
-
-	//			GetMinMaxVertex(this, &b_box.minPoint, &b_box.maxPoint);
-
-	//			b_box.Enclose(AABB(b_box.minPoint, b_box.maxPoint));
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	if (mesh)
-	//	{
-	//		b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
-	//	}
-	//}
-
-
-	/*if (b_box.IsFinite())
+	else if (HasChilds())
 	{
-		if (mesh)
-		{
-			b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
-		}
-		else
-		{
-			obb.SetFrom(b_box);
-			obb.Transform(GetGlobalTransform());
+		aabb.minPoint = childs.back()->aabb.minPoint;
+		aabb.maxPoint = childs.back()->aabb.maxPoint;
 
-			b_box.SetNegativeInfinity();
-			b_box.Enclose(obb);
-			
+		GetMinMaxVertex(this, &aabb.minPoint, &aabb.maxPoint);
+
+		if (obb_VBO != 0)
+		{
+			glDeleteFramebuffers(1, &obb_VBO);
+			obb_VBO = 0;
 		}
+		obb.SetNegativeInfinity();
+
+		//obb.SetFrom(aabb);
+		//obb.Transform(GetGlobalTransform());
 	}
-	else
-	{
-		if (mesh)
-		{
-			b_box.Enclose(mesh->GetMesh()->vertices, mesh->GetMesh()->num_vertices);
-		}
-
-	}*/
 
 	//AABB
 	if (aabb_VBO == 0) glGenBuffers(1, &aabb_VBO);

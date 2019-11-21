@@ -52,6 +52,7 @@ public:
 
 
 	void UpdateTransform();
+	void UpdateParentBoundingBox();
 
 	void SetRotation(const float3& XYZ_euler_rotation);
 	void SetRotation(const Quat& rotation);

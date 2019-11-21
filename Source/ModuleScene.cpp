@@ -83,7 +83,7 @@ bool ModuleScene::PostUpdate(float dt)
 		if (obj->flags & ProcessTransformUpdate)
 		{
 			obj->UpdateTransform();
-			obj->UpdateBoundingBox();
+			obj->parent->UpdateBoundingBox();
 			obj->flags &= ~ProcessTransformUpdate;
 		}
 	}
@@ -176,23 +176,6 @@ bool ModuleScene::Draw()
 			glColor3ub(255, 255, 255);
 		}
 
-		
-		/*if ((obj->show_bounding_box || App->scene_base->show_all_bounding_box) && obj->obb_VBO != 0)
-		{
-			glColor3ub(App->scene_base->obb_color.r * 255.0f, App->scene_base->obb_color.g * 255.0f, App->scene_base->obb_color.b * 255.0f);
-			glLineWidth(App->scene_base->obb_width);
-
-			glBindBuffer(GL_ARRAY_BUFFER, obj->obb_VBO);
-			glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GameObject::bounding_box_IBO);
-			glDrawElements(GL_LINES, sizeof(App->scene_base->bounding_box_indices), GL_UNSIGNED_INT, nullptr);
-
-
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			glColor3ub(255, 255, 255);
-		}*/
 		glDisableClientState(GL_VERTEX_ARRAY);
 
 		
