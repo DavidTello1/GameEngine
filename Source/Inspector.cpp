@@ -180,17 +180,47 @@ void Inspector::Draw()
 		ImGui::Text("Scale");
 		ImGui::SetNextItemWidth(60);
 		if (ImGui::DragFloat("x##3", &scale.x, precision))
-			SetScale(obj, scale);
+		{
+			if (lock_scale)
+			{
+				float diff = scale.x - obj->GetScale().x;
+				SetScale(obj, { scale.x, scale.y + diff, scale.z  + diff});
+			}
+			else
+				SetScale(obj, scale);
+		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 		if (ImGui::DragFloat("y##3", &scale.y, precision))
-			SetScale(obj, scale);
+		{
+			if (lock_scale)
+			{
+				float diff = scale.y - obj->GetScale().y;
+				SetScale(obj, { scale.x + diff, scale.y, scale.z + diff});
+			}
+			else
+				SetScale(obj, scale);
+		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 		if (ImGui::DragFloat("z##3", &scale.z, precision))
-			SetScale(obj, scale);
+		{
+			if (lock_scale)
+			{
+				float diff = scale.z - obj->GetScale().z;
+				SetScale(obj, { scale.x + diff, scale.y + diff,scale.z});
+			}
+			else
+				SetScale(obj, scale);
+		}
+
+		ImGui::SameLine();
+		//ImGui::SetNextItemWidth(60);
+		ImGui::Checkbox("lock##1", &lock_scale);
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Lock scale");
 
 		ImGui::Separator();
 	}

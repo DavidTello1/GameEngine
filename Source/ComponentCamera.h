@@ -56,6 +56,6 @@ public:
 	float aspect_ratio = 0.0f;
 
 	Frustum frustum;
-
+	Plane planes[6];
 	Color background = DarkGrey;
 };

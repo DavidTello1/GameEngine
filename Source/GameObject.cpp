@@ -183,6 +183,15 @@ void GameObject::UpdateTransform()
 		child->UpdateTransform();
 	}
 
+	// Too slow, needs better structure
+	ComponentCamera* cam = GetComponent<ComponentCamera>();
+	if (cam)
+	{
+		cam->SetPosition(translation);
+		cam->frustum.front = GetGlobalTransform().WorldZ();
+		cam->frustum.up = GetGlobalTransform().WorldY();
+	}
+
 	UpdateBoundingBox();
 }
 

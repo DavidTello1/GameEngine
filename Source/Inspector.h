@@ -33,6 +33,8 @@ private:
 	float3 position, rotation, scale;
 	float precision = 0.15f;
 
+	bool lock_scale = false;
+
 	Component* selected_component;
 
 	ComponentMesh* mesh;
