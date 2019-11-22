@@ -40,6 +40,7 @@ public:
 	Resource::Type GetResourceType(const char* path) const;
 
 	const char* GetDirectory(Resource::Type type) const;
+	bool IsResourcesEmpty() { return resources.empty(); }
 
 private:
 	void LoadUID();
@@ -58,6 +59,7 @@ public:
 		4,5,6,7,4,7,5,6,
 		0,4,1,5,2,6,3,7
 	};
+
 
 private:
 	std::map<UID, Resource*> resources;

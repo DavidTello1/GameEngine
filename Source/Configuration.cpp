@@ -68,73 +68,16 @@ void Configuration::Draw()
 	if (InitModuleDraw(App->input))
 		DrawModuleInput(App->input);
 
-	//DrawTextures();
+	if (InitModuleDraw(App->resources))
+		DrawResources();
 	
 	if (InitModuleDraw(App->file_system))
 		DrawModuleFileSystem(App->file_system);
 
-	DrawScene();
+	if (InitModuleDraw(App->scene))
+		DrawScene();
 
 	DrawMainCamera();
-}
-
-void Configuration::DrawScene()
-{
-	if (ImGui::CollapsingHeader("Scene"))
-	{
-		ImGui::Checkbox("Show all wireframe", &App->scene_base->show_all_wireframe);
-		ImGui::ColorEdit3("Wireframe color", (float*)&App->scene_base->wireframe_color);
-		ImGui::DragFloat("Wireframe width", &App->scene_base->wireframe_width, 0.1f, 0.1f, 5.0f);
-
-		ImGui::Separator();
-
-		ImGui::Checkbox("Show all bounding boxes", &App->scene_base->show_all_bounding_box);
-		ImGui::ColorEdit3("Bounding box color", (float*)&App->scene_base->bounding_box_color);
-		ImGui::DragFloat("Bounding box width", &App->scene_base->bounding_box_width, 0.1f,0.1f,5.0f);
-
-		ImGui::Separator();
-
-		ImGui::DragFloat("Plane length", &App->scene_base->plane_length, 1.0f, 0.0f, 5000.0f);
-		ImGui::DragFloat("Axis length", &App->scene_base->axis_length, 1.0f, 0.0f, 5000.0f);
-	}
-}
-
-void Configuration::DrawMainCamera()
-{
-	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
-	{
-		
-		ImGui::ColorEdit3("Background color", (float*)&viewport_camera->background);
-
-		// Dummy floats
-		float _fov  = viewport_camera->frustum.verticalFov * RADTODEG;
-		float _near = viewport_camera->frustum.nearPlaneDistance;
-		float _far  = viewport_camera->frustum.farPlaneDistance;
-
-		if (ImGui::Checkbox("Perspective / Orthogonal", &viewport_camera->perspective))
-		{
-			if (viewport_camera->perspective)
-				viewport_camera->frustum.type = FrustumType::PerspectiveFrustum;
-			else
-				viewport_camera->frustum.type = FrustumType::OrthographicFrustum;
-
-			viewport_camera->update_projection = true;
-		}
-
-		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
-		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 180.0f,"%.1f"))
-		{
-			viewport_camera->SetFov(_fov, true);
-		}
-		if (ImGui::DragFloat("Z Near", &_near, 0.25f, 0.1f, _far))
-		{
-			viewport_camera->SetNearPlane(_near);
-		}
-		if (ImGui::DragFloat("Z Far",  &_far,	0.25f, _near, 5000.0f))
-		{
-			viewport_camera->SetFarPlane(_far);
-		}
-	}
 }
 
 bool Configuration::InitModuleDraw(Module* module)
@@ -260,6 +203,7 @@ void Configuration::DrawApplication()
 
 			ImGui::TreePop();
 		}
+		ImGui::Separator();
 	}
 }
 
@@ -290,6 +234,8 @@ void Configuration::DrawHardware()
 		IMGUI_PRINT("VRAM Usage:", "%.1f Mb", info_hw.vram_mb_usage);
 		IMGUI_PRINT("VRAM Available:", "%.1f Mb", info_hw.vram_mb_available);
 		IMGUI_PRINT("VRAM Reserved:", "%.1f Mb", info_hw.vram_mb_reserved);
+
+		ImGui::Separator();
 	}
 }
 
@@ -365,6 +311,8 @@ void Configuration::DrawModuleWindow(ModuleWindow* module)
 	ImGui::SameLine();
 	if (ImGui::Checkbox("Full Desktop", &full_desktop))
 		App->window->SetFullScreenDesktop(full_desktop);
+
+	ImGui::Separator();
 }
 
 void Configuration::DrawModuleInput(ModuleInput* module)
@@ -397,46 +345,48 @@ void Configuration::DrawModuleInput(ModuleInput* module)
 	ImGui::Text("Mouse Wheel:");
 	ImGui::SameLine();
 	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", wheel);
+
+	ImGui::Separator();
 }
 
-//void Configuration::DrawTextures()
-//{
-//	if (ImGui::CollapsingHeader("Textures"))
-//	{
-//		if (App->scene->materials.empty())
-//		{
-//			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
-//			ImGui::TextWrapped("No textures loaded");
-//			ImGui::PopStyleColor();
-//			ImGui::NewLine();
-//			return;
-//		}
-//		char buffer[120];
-//		for (uint i = 0; i < App->scene->materials.size(); i++)
-//		{
-//			sprintf_s(buffer, 120, "Texture %d", i);
-//
-//			if (ImGui::TreeNode(buffer))
-//			{
-//				ImGui::Text("Size: ");
-//				ImGui::SameLine();
-//				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i, %i", App->scene->materials[i]->width, App->scene->materials[i]->height);
-//
-//				ImGui::Text("Path: ");
-//				ImGui::SameLine();
-//				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-//				ImGui::TextWrapped("%s", App->scene->materials[i]->path);
-//				ImGui::PopStyleColor();
-//
-//
-//				ImGui::Text("Image:");
-//				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
-//				ImGui::TreePop();
-//			}
-//			ImGui::Separator();
-//		}
-//	}
-//}
+void Configuration::DrawResources()
+{
+	if (App->resources->IsResourcesEmpty())
+	{
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
+		ImGui::TextWrapped("No resources loaded");
+		ImGui::PopStyleColor();
+		ImGui::NewLine();
+		return;
+	}
+	else
+	{
+		//		char buffer[120];
+		//		for (uint i = 0; i < App->scene->materials.size(); i++)
+		//		{
+		//			sprintf_s(buffer, 120, "Texture %d", i);
+		//
+		//			if (ImGui::TreeNode(buffer))
+		//			{
+		//				ImGui::Text("Size: ");
+		//				ImGui::SameLine();
+		//				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i, %i", App->scene->materials[i]->width, App->scene->materials[i]->height);
+		//
+		//				ImGui::Text("Path: ");
+		//				ImGui::SameLine();
+		//				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+		//				ImGui::TextWrapped("%s", App->scene->materials[i]->path);
+		//				ImGui::PopStyleColor();
+		//
+		//
+		//				ImGui::Text("Image:");
+		//				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		//				ImGui::TreePop();
+		//			}
+				//}
+	}
+	ImGui::Separator();
+}
 
 void Configuration::DrawModuleFileSystem(ModuleFileSystem* module)
 {
@@ -454,8 +404,69 @@ void Configuration::DrawModuleFileSystem(ModuleFileSystem* module)
 	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
 	ImGui::TextWrapped(module->GetWritePath());
 	ImGui::PopStyleColor();
+
+	ImGui::Separator();
 }
 
+void Configuration::DrawScene()
+{
+	ImGui::Checkbox("Show all wireframe", &App->scene_base->show_all_wireframe);
+	ImGui::ColorEdit3("Wireframe color", (float*)&App->scene_base->wireframe_color);
+	ImGui::DragFloat("Wireframe width", &App->scene_base->wireframe_width, 0.1f, 0.1f, 5.0f);
+
+	ImGui::Separator();
+
+	ImGui::Checkbox("Show all bounding boxes", &App->scene_base->show_all_bounding_box);
+	ImGui::ColorEdit3("Bounding box color", (float*)&App->scene_base->bounding_box_color);
+	ImGui::DragFloat("Bounding box width", &App->scene_base->bounding_box_width, 0.1f, 0.1f, 5.0f);
+
+	ImGui::Separator();
+
+	ImGui::DragFloat("Plane length", &App->scene_base->plane_length, 1.0f, 0.0f, 5000.0f);
+	ImGui::DragFloat("Axis length", &App->scene_base->axis_length, 1.0f, 0.0f, 5000.0f);
+
+	ImGui::Separator();
+}
+
+void Configuration::DrawMainCamera()
+{
+	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+
+		ImGui::ColorEdit3("Background color", (float*)&viewport_camera->background);
+
+		// Dummy floats
+		float _fov = viewport_camera->frustum.verticalFov * RADTODEG;
+		float _near = viewport_camera->frustum.nearPlaneDistance;
+		float _far = viewport_camera->frustum.farPlaneDistance;
+
+		if (ImGui::Checkbox("Perspective / Orthogonal", &viewport_camera->perspective))
+		{
+			if (viewport_camera->perspective)
+				viewport_camera->frustum.type = FrustumType::PerspectiveFrustum;
+			else
+				viewport_camera->frustum.type = FrustumType::OrthographicFrustum;
+
+			viewport_camera->update_projection = true;
+		}
+
+		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
+		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 180.0f, "%.1f"))
+		{
+			viewport_camera->SetFov(_fov, true);
+		}
+		if (ImGui::DragFloat("Z Near", &_near, 0.25f, 0.1f, _far))
+		{
+			viewport_camera->SetNearPlane(_near);
+		}
+		if (ImGui::DragFloat("Z Far", &_far, 0.25f, _near, 5000.0f))
+		{
+			viewport_camera->SetFarPlane(_far);
+		}
+	}
+
+	ImGui::Separator();
+}
 
 //---------------------------------
 void Configuration::AddFPS(float fps, float ms)

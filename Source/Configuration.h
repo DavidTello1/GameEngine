@@ -68,7 +68,7 @@ public:
 	void DrawHardware();
 	void DrawModuleWindow(ModuleWindow * module);
 	void DrawModuleInput(ModuleInput * module);
-	//void DrawTextures();
+	void DrawResources();
 	void DrawModuleFileSystem(ModuleFileSystem * module);
 
 	void AddFPS(float fps, float ms);
