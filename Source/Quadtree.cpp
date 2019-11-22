@@ -1,6 +1,10 @@
 #include "Quadtree.h"
 #include "GameObject.h"
 #include "Application.h"
+#include "ModuleResources.h"
+
+
+Color Quadtree::c = Yellow;
 
 Quadtree::Quadtree(const AABB& box)
 {
@@ -16,8 +20,7 @@ Quadtree::~Quadtree()
 void Quadtree::Draw()
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glColor3ub(Yellow.r * 255.0f, Yellow.g * 255.0f, Yellow.b * 255.0f);
-	glLineWidth(3.0f);
+	glLineWidth(1.0f);
 
 	root->Draw();
 
@@ -27,12 +30,9 @@ void Quadtree::Draw()
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void QuadtreeNode::Draw()
+void QuadtreeNode::DrawEx(Color c)
 {
-	for (QuadtreeNode child : childs)
-	{
-		child.Draw();
-	}
+	glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
@@ -40,12 +40,25 @@ void QuadtreeNode::Draw()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aabb_IBO);
 	glDrawElements(GL_LINES, sizeof(aabb_indices), GL_UNSIGNED_INT, nullptr);
 
+	//Quadtree::c -= 0.1f;
+
+	//for (QuadtreeNode* child : childs)
+	//{
+	//	child->Draw();
+	//}
+
 }
 
 void Quadtree::AddGameObject(const GameObject* gameObject)
 {
 	if (root->AddGameObject(gameObject) == false)
-		out_of_tree.push_back(gameObject);
+		ExpandRootNode(gameObject);
+		//out_of_tree.push_back(gameObject);
+}
+
+void Quadtree::ExpandRootNode(const GameObject* gameObject)
+{
+
 }
 
 bool Quadtree::RemoveGameObject(const GameObject* gameObject)
@@ -115,6 +128,14 @@ QuadtreeNode::QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index) : t
 	minPoint.z = index % 2 == 0 ? parent->box.minPoint.z : (parent->box.maxPoint.z + parent->box.minPoint.z) / 2;
 	maxPoint.z = index % 2 == 0 ? (parent->box.maxPoint.z + parent->box.minPoint.z) / 2 : parent->box.maxPoint.z;
 	box = AABB(minPoint, maxPoint);
+
+	if (VBO == 0) glGenBuffers(1, &VBO);
+
+	float3 corners[8];
+	box.GetCornerPoints(corners);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, box.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
 }
 
 
@@ -126,7 +147,7 @@ void QuadtreeNode::Split()
 	}
 	else {
 		for (uint i = 0; i < 4; i++)
-			childs.push_back(QuadtreeNode(tree, this, i));
+			childs.push_back(new QuadtreeNode(tree, this, i));
 	}
 }
 
@@ -172,7 +193,7 @@ bool QuadtreeNode::RemoveGameObject(const GameObject* gameObject)
 
 	for (uint i = 0; i < childs.size(); i++)
 	{
-		if (childs[i].RemoveGameObject(gameObject) == true)
+		if (childs[i]->RemoveGameObject(gameObject) == true)
 		{
 			TryRemovingChilds();
 			return true;
@@ -204,7 +225,7 @@ bool QuadtreeNode::SendToChilds(const GameObject* gameObject)
 
 	for (uint i = 0; i < childs.size(); i++)
 	{
-		if (childs[i].box.Intersects(gameObject->aabb))
+		if (childs[i]->box.Intersects(gameObject->aabb))
 		{
 			intersectionCount++;
 			intersectionChild = i;
@@ -212,7 +233,7 @@ bool QuadtreeNode::SendToChilds(const GameObject* gameObject)
 	}
 	if (intersectionCount == 1)
 	{
-		childs[intersectionChild].AddGameObject(gameObject);
+		childs[intersectionChild]->AddGameObject(gameObject);
 		return true;
 	}
 	else if (intersectionCount == 0)
@@ -247,32 +268,34 @@ void QuadtreeNode::GetChildsBuckets(std::vector<const GameObject*>& vector, bool
 
 	for (uint i = 0; i < childs.size(); i++)
 	{
-		childs[i].GetChildsBuckets(vector, true);
+		childs[i]->GetChildsBuckets(vector, true);
 	}
 }
 
-//void QuadtreeNode::Draw()
-//{
-//	Color color;
-//	switch (bucket.size())
-//	{
-//	case 0:
-//		color = Color(0, 1, 0, 1);
-//		break;
-//	case 1:
-//		color = Color(1, 1, 0, 1);
-//		break;
-//	default:
-//		color = Color(1, 0, 0, 1);
-//		break;
-//	}
-//	toDraw = box;
-//	toDraw.maxPoint.x -= 1;
-//	toDraw.maxPoint.z -= 1;
-//	toDraw.minPoint.x += 1;
-//	toDraw.minPoint.z += 1;
-//	//App->renderer3D->AddAABB(toDraw, color);
-//
-//	for (uint i = 0; i < childs.size(); i++)
-//		childs[i].Draw();
-//}
+void QuadtreeNode::Draw()
+{
+	Color color;
+	switch (bucket.size())
+	{
+	case 0:
+		color = Color(0, 1, 0, 1);
+		break;
+	case 1:
+		color = Color(1, 1, 0, 1);
+		break;
+	default:
+		color = Color(1, 0, 0, 1);
+		break;
+	}
+	toDraw = box;
+	toDraw.maxPoint.x -= 1;
+	toDraw.maxPoint.z -= 1;
+	toDraw.minPoint.x += 1;
+	toDraw.minPoint.z += 1;
+
+	UpdateVBO(toDraw);
+	DrawEx(color);
+
+	for (uint i = 0; i < childs.size(); i++)
+		childs[i]->Draw();
+}

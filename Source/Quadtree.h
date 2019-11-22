@@ -8,6 +8,7 @@ typedef unsigned int uint;
 
 class GameObject;
 class QuadtreeNode;
+class Color;
 
 class Quadtree
 {
@@ -19,6 +20,7 @@ public:
 	void Draw();
 
 	void AddGameObject(const GameObject* gameObject);
+	void ExpandRootNode(const GameObject * gameObject);
 	bool RemoveGameObject(const GameObject* gameObject);
 
 	void Clear();
@@ -28,6 +30,8 @@ public:
 	{
 		root->CollectCandidates(gameObjects, primitive);
 	}
+
+	static Color c;
 
 private:
 	QuadtreeNode* root;
@@ -42,7 +46,9 @@ class QuadtreeNode
 
 public:
 
+	// TO IMPROVE
 	void Draw();
+	void DrawEx(Color c);
 
 	QuadtreeNode(const AABB& box);
 	QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index);	//Index marking which node from parent. 0 starts at top left, and counting clockwise
@@ -73,7 +79,7 @@ private:
 	AABB box;
 	AABB toDraw;
 	uint VBO = 0;
-	std::vector<QuadtreeNode> childs;
+	std::vector<QuadtreeNode*> childs;
 
 	//Pointer to tree, maybe not necessary
 	Quadtree* tree;
