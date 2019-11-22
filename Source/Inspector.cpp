@@ -141,89 +141,101 @@ void Inspector::Draw()
 			ImGui::EndPopup();
 		}
 		ImGui::Checkbox("Static", &obj->is_static);
+
+		if (obj->is_static)
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		}
+		
 		// Position
 		ImGui::Text("Position");
 		ImGui::SetNextItemWidth(60);
-		if (obj->is_static) ImGui::TextDisabled(precision_char,position.x);
-		else if (ImGui::DragFloat("x##1", &position.x, precision, -inf, inf, precision_char))
-			SetPosition(obj, position);
+
+		if (ImGui::DragFloat("x##1", &position.x, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (obj->is_static) ImGui::TextDisabled(precision_char, position.y);
-		else if (ImGui::DragFloat("y##1", &position.y, precision,-inf,inf, precision_char))
-			SetPosition(obj, position);
+
+		if (ImGui::DragFloat("y##1", &position.y, precision,-inf,inf, precision_char))
+		if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (obj->is_static) ImGui::TextDisabled(precision_char, position.z);
-		else if (ImGui::DragFloat("z##1", &position.z, precision, -inf, inf, precision_char))
-			SetPosition(obj, position);
+		
+		if (ImGui::DragFloat("z##1", &position.z, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::Separator();
 
 		// Rotation
 		ImGui::Text("Rotation");
 		ImGui::SetNextItemWidth(60);
-		if (obj->is_static) ImGui::TextDisabled(precision_char, rotation.x);
-		else if (ImGui::DragFloat("x##2", &rotation.x, precision, -inf, inf, precision_char))
-		SetRotation(obj, rotation*DEGTORAD);
+
+		if (ImGui::DragFloat("x##2", &rotation.x, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (obj->is_static) ImGui::TextDisabled(precision_char, rotation.y);
-		else if (ImGui::DragFloat("y##2", &rotation.y, precision, -inf, inf, precision_char))
-		SetRotation(obj, rotation*DEGTORAD);
+	
+		if (ImGui::DragFloat("y##2", &rotation.y, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (obj->is_static) ImGui::TextDisabled(precision_char, rotation.z);
-		else if (ImGui::DragFloat("z##2", &rotation.z, precision, -inf, inf, precision_char))
-		SetRotation(obj, rotation*DEGTORAD);
+
+		if (ImGui::DragFloat("z##2", &rotation.z, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::Separator();
 
 		// Scale
 		ImGui::Text("Scale");
 		ImGui::SetNextItemWidth(60);
-		if (obj->is_static) ImGui::TextDisabled(precision_char, scale.x);
-		else if (ImGui::DragFloat("x##3", &scale.x, precision, -inf, inf, precision_char))
+		
+		if (ImGui::DragFloat("x##3", &scale.x, precision, -inf, inf, precision_char))
 		{
-			if (lock_scale)
-			{
-				float diff = scale.x - obj->GetScale().x;
-				SetScale(obj, { scale.x, scale.y + diff, scale.z  + diff});
+			if (!obj->is_static) {
+				if (lock_scale)
+				{
+					float diff = scale.x - obj->GetScale().x;
+					SetScale(obj, { scale.x, scale.y + diff, scale.z + diff });
+				}
+				else
+					SetScale(obj, scale);
 			}
-			else
-				SetScale(obj, scale);
 		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (obj->is_static) ImGui::TextDisabled(precision_char, scale.y);
-		else if (ImGui::DragFloat("y##3", &scale.y, precision, -inf, inf, precision_char))
+
+		if (ImGui::DragFloat("y##3", &scale.y, precision, -inf, inf, precision_char))
 		{
-			if (lock_scale)
-			{
-				float diff = scale.y - obj->GetScale().y;
-				SetScale(obj, { scale.x + diff, scale.y, scale.z + diff});
+			if (!obj->is_static) {
+				if (lock_scale)
+				{
+					float diff = scale.y - obj->GetScale().y;
+					SetScale(obj, { scale.x + diff, scale.y, scale.z + diff });
+				}
+				else
+					SetScale(obj, scale);
 			}
-			else
-				SetScale(obj, scale);
 		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (obj->is_static) ImGui::TextDisabled(precision_char, scale.z);
-		else if (ImGui::DragFloat("z##3", &scale.z, precision, -inf, inf, precision_char))
+		
+		if (ImGui::DragFloat("z##3", &scale.z, precision, -inf, inf, precision_char))
 		{
-			if (lock_scale)
-			{
-				float diff = scale.z - obj->GetScale().z;
-				SetScale(obj, { scale.x + diff, scale.y + diff,scale.z});
+			if (!obj->is_static) {
+				if (lock_scale)
+				{
+					float diff = scale.z - obj->GetScale().z;
+					SetScale(obj, { scale.x + diff, scale.y + diff,scale.z });
+				}
+				else
+					SetScale(obj, scale);
 			}
-			else
-				SetScale(obj, scale);
 		}
 
 		ImGui::SameLine();
@@ -233,6 +245,11 @@ void Inspector::Draw()
 			ImGui::SetTooltip("Lock scale");
 
 		ImGui::Separator();
+
+		if (obj->is_static)
+		{
+			ImGui::PopStyleVar();
+		}
 	}
 
 	if (has_mesh)
