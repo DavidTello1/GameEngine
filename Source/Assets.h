@@ -28,6 +28,7 @@ public:
 private:
 	void UpdateAssets();
 	void DrawHierarchy(const PathNode& node);
+	void DrawIcons(const PathNode& node);
 	uint GetIcon(const PathNode& node);
 
 public:
