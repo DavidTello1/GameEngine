@@ -28,9 +28,10 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 {
 	ResourceMaterial* material = static_cast<ResourceMaterial*>(App->resources->CreateResource(Resource::material)); //create new material
 
-	bool ret = material->LoadMaterial(source_file);
-	if (!ret)
-		LOG("Error Importing material from '%s'", source_file, 'e');
+	uint ret = 0;
+	ret = material->LoadTexture(source_file);
+	if (ret == 0)
+		LOG("Error Importing texture from '%s'", source_file, 'e');
 
 	// Saving to own format
 	std::string output;
@@ -113,7 +114,7 @@ void ResourceMaterial::UnLoad()
 }
 
 
-bool ResourceMaterial::LoadMaterial(const char* path)
+uint ResourceMaterial::LoadTexture(const char* path)
 {
 	uint imageID;
 	ilGenImages(1, &imageID);
@@ -129,11 +130,11 @@ bool ResourceMaterial::LoadMaterial(const char* path)
 	}
 	LogImageInfo();
 
-	if (ImportTexture(path) == false)
-	{
-		LOG("Texture not imported", 'e');
-		return false;
-	}
+	//if (ImportTexture(path) == false)
+	//{
+	//	LOG("Texture not imported", 'e');
+	//	return false;
+	//}
 
 	GLuint texture;
 	glGenTextures(1, &texture);
@@ -155,7 +156,7 @@ bool ResourceMaterial::LoadMaterial(const char* path)
 	tex_id = texture;
 
 	ilDeleteImages(1, &imageID);
-	return true;
+	return tex_id;
 }
 
 void ResourceMaterial::LogImageInfo()

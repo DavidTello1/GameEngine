@@ -335,51 +335,21 @@ void ModuleResources::UpdateAssetsFolder(const PathNode& node)
 
 void ModuleResources::LoadAssetsIcons()
 {
-	char* buffer = nullptr;
-	uint size = App->file_system->Load("Settings/Icons/folder_icon.png", &buffer);
-	if (size > 0)
-	{
-		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
-			App->editor->tab_assets->folder_icon = ilutGLBindTexImage();
 
-		RELEASE_ARRAY(buffer);
-	}
+	ResourceMaterial* resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	App->editor->tab_assets->folder_icon = resource->LoadTexture("Settings/Icons/folder_icon.png");
 
-	size = App->file_system->Load("Settings/Icons/file_icon.png", &buffer);
-	if (size > 0)
-	{
-		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
-			App->editor->tab_assets->file_icon = ilutGLBindTexImage();
+	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	App->editor->tab_assets->file_icon = resource->LoadTexture("Settings/Icons/file_icon.png");
 
-		RELEASE_ARRAY(buffer);
-	}
+	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	App->editor->tab_assets->model_icon = resource->LoadTexture("Settings/Icons/model_icon.png");
 
-	size = App->file_system->Load("Settings/Icons/model_icon.png", &buffer);
-	if (size > 0)
-	{
-		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
-			App->editor->tab_assets->model_icon = ilutGLBindTexImage();
+	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	App->editor->tab_assets->material_icon = resource->LoadTexture("Settings/Icons/material_icon.png");
 
-		RELEASE_ARRAY(buffer);
-	}
-
-	size = App->file_system->Load("Settings/Icons/material_icon.png", &buffer);
-	if (size > 0)
-	{
-		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
-			App->editor->tab_assets->material_icon = ilutGLBindTexImage();
-
-		RELEASE_ARRAY(buffer);
-	}
-
-	size = App->file_system->Load("Settings/Icons/scene_icon.png", &buffer);
-	if (size > 0)
-	{
-		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
-			App->editor->tab_assets->scene_icon = ilutGLBindTexImage();
-
-		RELEASE_ARRAY(buffer);
-	}
+	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	App->editor->tab_assets->scene_icon = resource->LoadTexture("Settings/Icons/scene_icon.png");
 
 	glBindTexture(GL_TEXTURE_2D, 0); //reset the texture buffer
 }

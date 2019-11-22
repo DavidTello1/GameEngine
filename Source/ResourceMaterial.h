@@ -12,15 +12,14 @@ public:
 	virtual ~ResourceMaterial();
 
 	static UID Import(const char* source_file, const aiMaterial* material = nullptr);
-	bool ImportTexture(const char* path);
 	bool SaveOwnFormat(std::string& output) const;
 	bool LoadtoScene();
 	void UnLoad();
 
-private:
-	bool LoadMaterial(const char* path);
+	bool ImportTexture(const char* path);
+	uint LoadTexture(const char* path);
 
-	//GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
+private:
 	void LogImageInfo();
 
 public:
