@@ -78,8 +78,16 @@ void Configuration::Draw()
 bool Configuration::InitModuleDraw(Module* module)
 {
 	bool ret = false;
+	const char* label = module->GetName();
 
-	if (ImGui::CollapsingHeader(module->GetName()))
+	if (module == App->resources)
+	{
+		char tmp[256];
+		sprintf_s(tmp, 255, "%s: %d", label, App->resources->GetResourcesSize());
+		label = tmp;
+	}
+
+	if (ImGui::CollapsingHeader(label))
 	{
 		bool active = module->IsActive();
 		if (ImGui::Checkbox("Active", &active))
@@ -346,7 +354,7 @@ void Configuration::DrawModuleInput(ModuleInput* module)
 
 void Configuration::DrawResources()
 {
-	if (App->resources->IsResourcesEmpty())
+	if (App->resources->GetResourcesSize() == 0)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
 		ImGui::TextWrapped("No resources loaded");
@@ -356,29 +364,30 @@ void Configuration::DrawResources()
 	}
 	else
 	{
-		//		char buffer[120];
-		//		for (uint i = 0; i < App->scene->materials.size(); i++)
-		//		{
-		//			sprintf_s(buffer, 120, "Texture %d", i);
-		//
-		//			if (ImGui::TreeNode(buffer))
-		//			{
-		//				ImGui::Text("Size: ");
-		//				ImGui::SameLine();
-		//				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i, %i", App->scene->materials[i]->width, App->scene->materials[i]->height);
-		//
-		//				ImGui::Text("Path: ");
-		//				ImGui::SameLine();
-		//				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-		//				ImGui::TextWrapped("%s", App->scene->materials[i]->path);
-		//				ImGui::PopStyleColor();
-		//
-		//
-		//				ImGui::Text("Image:");
-		//				ImGui::Image((ImTextureID)App->scene->materials[i]->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
-		//				ImGui::TreePop();
-		//			}
-				//}
+		if (ImGui::TreeNode("Meshes"))
+		{
+			std::vector<Resource*> meshes = App->resources->GetAllResourcesOfType(Resource::Type::mesh);
+			if (meshes.size() == 0)
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No meshes loaded");
+
+			for (uint i = 0; i < meshes.size(); ++i)
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), meshes[i]->GetName());
+			ImGui::TreePop();
+		}
+
+		ImGui::Separator();
+		if (ImGui::TreeNode("Materials"))
+		{
+			std::vector<Resource*> materials = App->resources->GetAllResourcesOfType(Resource::Type::material);
+			if (materials.size() == 0)
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No materials loaded");
+
+			for (uint i = 0; i < materials.size(); ++i)
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), materials[i]->GetName());
+
+			ImGui::TreePop();
+		}
+
 	}
 	ImGui::Separator();
 }

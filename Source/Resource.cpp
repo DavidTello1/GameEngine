@@ -3,7 +3,7 @@
 #include "Application.h"
 #include "ModuleFileSystem.h"
 
-Resource::Resource(UID uid, Resource::Type type) : uid(uid), type(type)
+Resource::Resource(UID Uid, Resource::Type Type) : uid(Uid), type(Type)
 {
 }
 

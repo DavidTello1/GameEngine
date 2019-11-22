@@ -10,8 +10,6 @@
 
 #include "glew\include\GL\glew.h"
 
-#define RESERVED_RESOURCES 1 // checker texture
-
 class Resource;
 class ResourceMesh;
 class ResourceMaterial;
@@ -39,8 +37,10 @@ public:
 	Resource * GetResource(UID uid);
 	Resource::Type GetResourceType(const char* path) const;
 
+	uint GetResourcesSize() { return resources.size(); }
+	std::vector<Resource*> GetAllResourcesOfType(Resource::Type type);
+
 	const char* GetDirectory(Resource::Type type) const;
-	bool IsResourcesEmpty() { return resources.empty(); }
 
 private:
 	void LoadUID();
@@ -65,7 +65,7 @@ private:
 	std::map<UID, Resource*> resources;
 	std::vector<Resource*> removed;
 
-	UID last_uid = RESERVED_RESOURCES;
+	UID last_uid = -1;
 };
 
 #endif

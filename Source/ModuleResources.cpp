@@ -294,6 +294,19 @@ Resource::Type ModuleResources::GetResourceType(const char* path) const
 	return type;
 }
 
+std::vector<Resource*> ModuleResources::GetAllResourcesOfType(Resource::Type type)
+{
+	std::vector<Resource*> ret;
+
+	for (uint i = 0; i < resources.size(); ++i)
+	{
+		if (resources[i]->type == type)
+			ret.push_back(resources[i]);
+	}
+
+	return ret;
+}
+
 bool ModuleResources::CheckLoaded(std::string path, UID uid)
 {
 	for (std::map<UID, Resource*>::const_iterator it = resources.begin(); it != resources.end(); ++it)
@@ -335,23 +348,25 @@ void ModuleResources::UpdateAssetsFolder(const PathNode& node)
 
 void ModuleResources::LoadAssetsIcons()
 {
-
 	ResourceMaterial* resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->folder_icon = resource->LoadTexture("Settings/Icons/folder_icon.png");
+	resource->SetName("Folder Icon");
 
 	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->file_icon = resource->LoadTexture("Settings/Icons/file_icon.png");
+	resource->SetName("File Icon");
 
 	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->model_icon = resource->LoadTexture("Settings/Icons/model_icon.png");
+	resource->SetName("Model Icon");
 
 	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->material_icon = resource->LoadTexture("Settings/Icons/material_icon.png");
+	resource->SetName("Material Icon");
 
 	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->scene_icon = resource->LoadTexture("Settings/Icons/scene_icon.png");
-
-	glBindTexture(GL_TEXTURE_2D, 0); //reset the texture buffer
+	resource->SetName("Scene Icon");
 }
 
 //void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
