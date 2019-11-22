@@ -76,8 +76,6 @@ void Console::Draw()
 	{
 		if (ImGui::BeginMenu("Options"))
 		{
-			in_menu = true;
-
 			ImGui::MenuItem("Auto-scroll", NULL, &AutoScroll);
 			ImGui::Separator();
 
@@ -91,8 +89,6 @@ void Console::Draw()
 
 			ImGui::EndMenu();
 		}
-		else
-			in_menu = false;
 
 		if (ImGui::MenuItem("Clear")) { ClearLog(); }
 		copy_to_clipboard = ImGui::MenuItem("Copy");

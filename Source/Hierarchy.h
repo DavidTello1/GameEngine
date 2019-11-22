@@ -24,6 +24,12 @@ public:
 
 	char buffer[NAME_LENGTH];
 
+private:
+	void DrawCreateMenu();
+
+private:
+	bool rename = false;
+
 };
 
 #endif// __HIERARCHY_H__

@@ -200,7 +200,6 @@ void ModuleEditor::Draw()
 	static bool is_draw_menu = true;
 	static bool is_show_main_dockspace = true;
 	static bool is_show_demo = false;
-	static bool is_auto_select = true;
 	static bool is_about = false;
 	static bool is_new = false;
 	static bool is_open = false;
@@ -212,10 +211,10 @@ void ModuleEditor::Draw()
 
 	// Draw functions
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
-	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import, is_auto_select, is_plane, is_axis, is_wireframe);
+	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import, is_plane, is_axis, is_wireframe);
 	DrawDemo(is_show_demo);
 	DrawAbout(is_about);
-	DrawPanels(is_auto_select);
+	DrawPanels();
 
 	// Menu Functionalities
 	if (is_new)
@@ -257,7 +256,7 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_auto_select, bool &is_plane, bool &is_axis, bool &is_wireframe)
+void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_plane, bool &is_axis, bool &is_wireframe)
 {
 	bool ret = true;
 
@@ -318,12 +317,6 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("GameObjects")) //gameobject
-			{
-				DrawCreateMenu();
-				ImGui::EndMenu();
-			}
-
 			if (ImGui::BeginMenu("View")) //view
 			{
 				if (ImGui::MenuItem("Show Plane", NULL, &is_plane))
@@ -337,8 +330,6 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 
 			if (ImGui::BeginMenu("Options")) //options
 			{
-				ImGui::MenuItem("Autoselect windows", NULL, &is_auto_select);
-
 				if (ImGui::BeginMenu("Style"))
 				{
 					if (ImGui::MenuItem("New", NULL, style == Style::NEW))
@@ -462,7 +453,7 @@ void ModuleEditor::DrawAbout(bool &is_about)
 	}
 }
 
-void ModuleEditor::DrawPanels(bool &is_auto_select)
+void ModuleEditor::DrawPanels()
 {
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
@@ -481,10 +472,7 @@ void ModuleEditor::DrawPanels(bool &is_auto_select)
 				if (ImGui::Begin((*it)->GetName(), &(*it)->active))
 					(*it)->Draw();
 			}
-			
-			if (is_auto_select == true && ImGui::IsWindowHovered() == true && (*it)->in_menu == false) // auto-select
-				ImGui::SetWindowFocus();
-			
+						
 			if ((*it)->GetName() == "Inspector" && (App->scene->is_creating || App->scene->is_selecting)) //show inspector when a gameobject is created/selected
 			{
 				ImGui::SetWindowFocus();
@@ -603,67 +591,6 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 	if (ImGui::InvisibleButton(text, ImVec2(size)))
 	{
 		ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
-	}
-}
-
-void ModuleEditor::DrawCreateMenu()
-{
-	if (ImGui::MenuItem("Empty"))
-		App->scene->CreateGameObject();
-
-	GameObject* parent = App->scene->GetSelectedGameObject();
-
-	ImGui::Separator();
-	if (ImGui::BeginMenu("Basic shapes"))
-	{
-		//if (ImGui::MenuItem("Cylinder"))
-		//	App->resources->CreateShape(CYLINDER, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Cone"))
-		//	App->resources->CreateShape(CONE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Sphere"))
-		//	App->resources->CreateShape(SPHERE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Plane"))
-		//	App->resources->CreateShape(PLANE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Cube"))
-		//	App->resources->CreateShape(CUBE, 9, 9,0,0,0,0.5f, parent);
-
-		ImGui::EndMenu();
-	}
-
-	if (ImGui::BeginMenu("Extended shapes"))
-	{
-		//if (ImGui::MenuItem("Torus"))
-		//	App->resources->CreateShape(TORUS, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Bottle"))
-		//	App->resources->CreateShape(BOTTLE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Knot"))
-		//	App->resources->CreateShape(KNOT, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Hemisphere"))
-		//	App->resources->CreateShape(HEMISPHERE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Icosahedron"))
-		//	App->resources->CreateShape(ICOSAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Dodecahedron"))
-		//	App->resources->CreateShape(DODECAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Octahedron"))
-		//	App->resources->CreateShape(OCTAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Tetrahedron"))
-		//	App->resources->CreateShape(TETRAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Rock"))
-		//	App->resources->CreateShape(ROCK, 9, 9,0,0,0,0.5f, parent);
-
-		ImGui::EndMenu();
 	}
 }
 

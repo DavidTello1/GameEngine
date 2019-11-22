@@ -41,12 +41,9 @@ void Inspector::Draw()
 
 	if (ImGui::BeginMenuBar())
 	{
-		in_menu = false;
 
 		if (ImGui::BeginMenu("Add"))
 		{
-			in_menu = true;
-
 			if (ImGui::MenuItem("Mesh", nullptr, false, !obj->GetComponent(Component::Type::Mesh)))
 				obj->AddComponent(Component::Type::Mesh);
 
@@ -66,8 +63,6 @@ void Inspector::Draw()
 		
 		if (ImGui::BeginMenu("Remove", !obj->components.empty()))
 		{
-			in_menu = true;
-
 			if (obj->GetComponent(Component::Type::Mesh))
 			{
 				if (ImGui::MenuItem("Mesh"))
