@@ -128,6 +128,7 @@ QuadtreeNode::QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index) : t
 	minPoint.z = index % 2 == 0 ? parent->box.minPoint.z : (parent->box.maxPoint.z + parent->box.minPoint.z) / 2;
 	maxPoint.z = index % 2 == 0 ? (parent->box.maxPoint.z + parent->box.minPoint.z) / 2 : parent->box.maxPoint.z;
 	box = AABB(minPoint, maxPoint);
+	this->index = index;
 
 	if (VBO == 0) glGenBuffers(1, &VBO);
 
@@ -153,7 +154,7 @@ void QuadtreeNode::Split()
 
 bool QuadtreeNode::AddGameObject(const GameObject* gameObject)
 {
-	if (box.Intersects(gameObject->aabb))
+	if (this->box.Intersects(gameObject->aabb))
 	{
 		if (childs.empty())
 		{
@@ -222,7 +223,7 @@ bool QuadtreeNode::SendToChilds(const GameObject* gameObject)
 {
 	uint intersectionCount = 0;
 	uint intersectionChild = -1;
-
+	//ALgo funciona mal aqui, no intersecta amb cap child excepte en un que interescta 4 cops
 	for (uint i = 0; i < childs.size(); i++)
 	{
 		if (childs[i]->box.Intersects(gameObject->aabb))

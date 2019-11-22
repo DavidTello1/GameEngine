@@ -85,6 +85,8 @@ private:
 	Quadtree* tree;
 	uint maxBucketSize = 2;
 	std::vector<const GameObject*> bucket;
+
+	uint index = 0;
 };
 
 template<typename PRIMITIVE>
