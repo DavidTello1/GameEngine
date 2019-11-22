@@ -82,4 +82,6 @@ typedef unsigned long long UID;
 #define LIBRARY_MATERIAL_FOLDER "Library/Materials/"
 #define LIBRARY_MESH_FOLDER "Library/Meshes/"
 
+#define DEFAULT_RESOURCES 6 //Assets Icons + Checkers Texture
+
 #define NAME_LENGTH 128

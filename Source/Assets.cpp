@@ -173,24 +173,10 @@ void Assets::DrawIcons(const PathNode& node)
 		if (ImGui::IsItemClicked())
 			selected_node = node.children[i];
 
-		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) //open
+		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0) && selected_node.file == false) //open folder
 		{
-			if (node.file == false) //if folder
-			{
-				next_node = node.children[i];
-				current_node = next_node;
-			}
-			//else
-			//{
-			//	std::string metaFile = current_node.path + (".meta");
-			//	uint64 id = App->resources->GetIDFromMeta(metaFile.c_str());
-			//	Resource* resource = App->resources->GetResource(id);
-
-			//	if (resource && resource->GetType() == Resource::PREFAB)
-			//	{
-			//		App->moduleResources->LoadPrefab(node.path.c_str());
-			//	}
-			//}
+			next_node = node.children[i];
+			current_node = next_node;
 		}
 	}
 }

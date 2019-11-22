@@ -78,16 +78,8 @@ void Configuration::Draw()
 bool Configuration::InitModuleDraw(Module* module)
 {
 	bool ret = false;
-	const char* label = module->GetName();
 
-	if (module == App->resources)
-	{
-		char tmp[256];
-		sprintf_s(tmp, 255, "%s: %d", label, App->resources->GetResourcesSize());
-		label = tmp;
-	}
-
-	if (ImGui::CollapsingHeader(label))
+	if (ImGui::CollapsingHeader(module->GetName()))
 	{
 		bool active = module->IsActive();
 		if (ImGui::Checkbox("Active", &active))
@@ -354,41 +346,27 @@ void Configuration::DrawModuleInput(ModuleInput* module)
 
 void Configuration::DrawResources()
 {
-	if (App->resources->GetResourcesSize() == 0)
-	{
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
-		ImGui::TextWrapped("No resources loaded");
-		ImGui::PopStyleColor();
-		ImGui::NewLine();
-		return;
-	}
-	else
-	{
-		if (ImGui::TreeNode("Meshes"))
-		{
-			std::vector<Resource*> meshes = App->resources->GetAllResourcesOfType(Resource::Type::mesh);
-			if (meshes.size() == 0)
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No meshes loaded");
+	ImGui::Text("Total Resources Loaded:");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", App->resources->GetResourcesSize());
 
-			for (uint i = 0; i < meshes.size(); ++i)
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s (%d)", meshes[i]->GetName(), meshes[i]->CountReferences());
-			ImGui::TreePop();
-		}
+	ImGui::Text("Default Resources:");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", DEFAULT_RESOURCES);
 
-		ImGui::Separator();
-		if (ImGui::TreeNode("Materials"))
-		{
-			std::vector<Resource*> materials = App->resources->GetAllResourcesOfType(Resource::Type::material);
-			if (materials.size() == 0)
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No materials loaded");
+	ImGui::Separator();
 
-			for (uint i = 0; i < materials.size(); ++i)
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s (%d)", materials[i]->GetName(), materials[i]->CountReferences());
+	ImGui::Text("Meshes Loaded:");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", App->resources->GetAllResourcesOfType(Resource::Type::mesh).size());
 
-			ImGui::TreePop();
-		}
+	int num_materials = App->resources->GetAllResourcesOfType(Resource::Type::material).size() - DEFAULT_RESOURCES;
+	if (num_materials < 0)
+		num_materials = 0;
+	ImGui::Text("Materials Loaded:");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", num_materials);
 
-	}
 	ImGui::Separator();
 }
 
