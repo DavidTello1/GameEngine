@@ -371,7 +371,7 @@ void Configuration::DrawResources()
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No meshes loaded");
 
 			for (uint i = 0; i < meshes.size(); ++i)
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), meshes[i]->GetName());
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s (%d)", meshes[i]->GetName(), meshes[i]->CountReferences());
 			ImGui::TreePop();
 		}
 
@@ -383,7 +383,7 @@ void Configuration::DrawResources()
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No materials loaded");
 
 			for (uint i = 0; i < materials.size(); ++i)
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), materials[i]->GetName());
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s (%d)", materials[i]->GetName(), materials[i]->CountReferences());
 
 			ImGui::TreePop();
 		}

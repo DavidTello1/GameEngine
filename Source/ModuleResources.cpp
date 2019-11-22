@@ -351,22 +351,27 @@ void ModuleResources::LoadAssetsIcons()
 	ResourceMaterial* resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->folder_icon = resource->LoadTexture("Settings/Icons/folder_icon.png");
 	resource->SetName("Folder Icon");
+	resource->times_loaded++;
 
 	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->file_icon = resource->LoadTexture("Settings/Icons/file_icon.png");
 	resource->SetName("File Icon");
+	resource->times_loaded++;
 
 	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->model_icon = resource->LoadTexture("Settings/Icons/model_icon.png");
 	resource->SetName("Model Icon");
+	resource->times_loaded++;
 
 	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->material_icon = resource->LoadTexture("Settings/Icons/material_icon.png");
 	resource->SetName("Material Icon");
+	resource->times_loaded++;
 
 	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 	App->editor->tab_assets->scene_icon = resource->LoadTexture("Settings/Icons/scene_icon.png");
 	resource->SetName("Scene Icon");
+	resource->times_loaded++;
 }
 
 //void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
