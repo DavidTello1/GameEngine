@@ -83,10 +83,11 @@ private:
 
 	//Pointer to tree, maybe not necessary
 	Quadtree* tree;
-	uint maxBucketSize = 2;
+	uint level;
+	uint maxBucketSize = 1;
 	std::vector<const GameObject*> bucket;
 
-	uint index = 0;
+	//uint index = 0;
 };
 
 template<typename PRIMITIVE>

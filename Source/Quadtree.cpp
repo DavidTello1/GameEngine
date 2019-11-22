@@ -8,7 +8,14 @@ Color Quadtree::c = Yellow;
 
 Quadtree::Quadtree(const AABB& box)
 {
-	root = new QuadtreeNode(box);
+	AABB box1;
+	box1.SetNegativeInfinity();
+	box1.SetFrom(box);
+	box1.padding = 0;
+	box1.padding2 = 0;
+	
+	root = new QuadtreeNode(box1);
+	root->level = 0;
 	root->tree = this;
 }
 
@@ -119,16 +126,24 @@ QuadtreeNode::QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index) : t
 	//0 1
 	//2 3
 	float3 minPoint, maxPoint;
-	minPoint.y = parent->box.minPoint.y;
-	maxPoint.y = parent->box.maxPoint.y;
 
-	minPoint.x = (index / 2) == 1 ? parent->box.minPoint.x : (parent->box.maxPoint.x + parent->box.minPoint.x) / 2;
-	maxPoint.x = (index / 2) == 1 ? (parent->box.maxPoint.x + parent->box.minPoint.x) / 2 : parent->box.maxPoint.x;
+	// Y oscillates each index
+	minPoint.x = ((index % 2) == 0) ? parent->box.minPoint.x : (parent->box.maxPoint.x + parent->box.minPoint.x) / 2;
+	maxPoint.x = ((index % 2) == 0) ? (parent->box.maxPoint.x + parent->box.minPoint.x) / 2 : parent->box.maxPoint.x;
 
-	minPoint.z = index % 2 == 0 ? parent->box.minPoint.z : (parent->box.maxPoint.z + parent->box.minPoint.z) / 2;
-	maxPoint.z = index % 2 == 0 ? (parent->box.maxPoint.z + parent->box.minPoint.z) / 2 : parent->box.maxPoint.z;
+	// Y oscillates every 4 index
+	minPoint.y = (index < 4) ? parent->box.minPoint.y : (parent->box.maxPoint.y + parent->box.minPoint.y) / 2;
+	maxPoint.y = (index < 4) ? (parent->box.maxPoint.y + parent->box.minPoint.y) / 2 : parent->box.maxPoint.y;
+
+	// Z oscillates every 2 index
+	minPoint.z = ((index / 2) % 2 == 0) ? parent->box.minPoint.z : (parent->box.maxPoint.z + parent->box.minPoint.z) / 2;
+	maxPoint.z = ((index / 2) % 2 == 0) ? (parent->box.maxPoint.z + parent->box.minPoint.z) / 2 : parent->box.maxPoint.z;
+
+
 	box = AABB(minPoint, maxPoint);
-	this->index = index;
+	box.padding = 0;
+	box.padding2 = 0;
+	this->level = parent->level+1;
 
 	if (VBO == 0) glGenBuffers(1, &VBO);
 
@@ -147,7 +162,7 @@ void QuadtreeNode::Split()
 		LOG("[error] Quadtree Node splitting when it already has childs");
 	}
 	else {
-		for (uint i = 0; i < 4; i++)
+		for (uint i = 0; i < 8; i++)
 			childs.push_back(new QuadtreeNode(tree, this, i));
 	}
 }
@@ -221,24 +236,23 @@ void QuadtreeNode::Redistribute()
 
 bool QuadtreeNode::SendToChilds(const GameObject* gameObject)
 {
-	uint intersectionCount = 0;
 	uint intersectionChild = -1;
 	//ALgo funciona mal aqui, no intersecta amb cap child excepte en un que interescta 4 cops
 	for (uint i = 0; i < childs.size(); i++)
 	{
 		if (childs[i]->box.Intersects(gameObject->aabb))
 		{
-			intersectionCount++;
 			intersectionChild = i;
+			break;
 		}
 	}
-	if (intersectionCount == 1)
+	if (intersectionChild >= 0 && intersectionChild < childs.size())
 	{
 		childs[intersectionChild]->AddGameObject(gameObject);
 		return true;
 	}
-	else if (intersectionCount == 0)
-		LOG("[error] Quadtree parent node intersecting but not child intersection found");
+	else if (intersectionChild == -1)
+		LOG("[error] Quadtree parent node intersecting but not child intersection found",'e');
 	return false;
 }
 
@@ -279,20 +293,46 @@ void QuadtreeNode::Draw()
 	switch (bucket.size())
 	{
 	case 0:
-		color = Color(0, 1, 0, 1);
+		color = Color(1, 0, 0, 1);
 		break;
 	case 1:
+		color = Color(0, 1, 0, 1);
+		break;
+	case 2:
+		color = Color(0, 0, 1, 1);
+		break;
+	default:
+		color = Color(1, 1, 0, 1);
+		break;
+	}
+
+	switch (level)
+	{
+	case 0:
+		color = Color(1, 0, 0, 1);
+		break;
+	case 1:
+		color = Color(0, 1, 0, 1);
+		break;
+	case 2:
+		color = Color(0, 0, 1, 1);
+		break;
+	case 3:
 		color = Color(1, 1, 0, 1);
 		break;
 	default:
-		color = Color(1, 0, 0, 1);
+		color = Color(0, 1, 1, 1);
 		break;
 	}
+
 	toDraw = box;
-	toDraw.maxPoint.x -= 1;
-	toDraw.maxPoint.z -= 1;
-	toDraw.minPoint.x += 1;
-	toDraw.minPoint.z += 1;
+	toDraw.maxPoint.x -= 0.25f;
+	toDraw.maxPoint.y -= 0.25f;
+	toDraw.maxPoint.z -= 0.25f;
+						   
+	toDraw.minPoint.x += 0.25f;
+	toDraw.minPoint.y += 0.25f;
+	toDraw.minPoint.z += 0.25f;
 
 	UpdateVBO(toDraw);
 	DrawEx(color);
@@ -300,3 +340,27 @@ void QuadtreeNode::Draw()
 	for (uint i = 0; i < childs.size(); i++)
 		childs[i]->Draw();
 }
+
+
+//bool QuadtreeNode::SendToChilds(const GameObject* gameObject)
+//{
+//	uint intersectionCount = 0;
+//	uint intersectionChild = -1;
+//	//ALgo funciona mal aqui, no intersecta amb cap child excepte en un que interescta 4 cops
+//	for (uint i = 0; i < childs.size(); i++)
+//	{
+//		if (childs[i]->box.Intersects(gameObject->aabb))
+//		{
+//			intersectionCount++;
+//			intersectionChild = i;
+//		}
+//	}
+//	if (intersectionCount == 1)
+//	{
+//		childs[intersectionChild]->AddGameObject(gameObject);
+//		return true;
+//	}
+//	else if (intersectionCount == 0)
+//		LOG("[error] Quadtree parent node intersecting but not child intersection found");
+//	return false;
+//}

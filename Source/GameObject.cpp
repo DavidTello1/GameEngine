@@ -30,6 +30,10 @@ GameObject::GameObject(const char* name, GameObject* Parent)
 	}
 
 	aabb.SetNegativeInfinity();
+	aabb.padding = 0;
+	aabb.padding2 = 0;
+
+	obb.SetNegativeInfinity();
 }
 
 GameObject::~GameObject()
