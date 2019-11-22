@@ -88,10 +88,25 @@ void Assets::Draw()
 			border_color = ImVec4(0.0f, 1.0f, 0.0f, 0.0f);
 
 		// Draw
+		const int size = 75;
+		const int padding = 15;
+		int columns = (int)ImGui::GetWindowWidth() / size;
+		int total_size = (columns*size) + (padding * (columns - 1));
+
+		if (total_size > ImGui::GetWindowWidth())
+			columns--;
+
+		if (i % columns != 0)
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding);
+
+		ImGui::SetNextItemWidth(size);
 		ImGui::BeginGroup();
 		ImGui::Image((ImTextureID)GetIcon(current_node.children[i]), ImVec2(ICON_WIDTH, ICON_HEIGHT), ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), border_color);
-		ImGui::Text(current_node.children[i].localPath.c_str());
+		//ImGui::Text(current_node.children[i].localPath.c_str());
 		ImGui::EndGroup();
+
+		if ((i+1) % columns != 0)
+			ImGui::SameLine();
 
 		// Item clicking
 		if (ImGui::IsItemClicked())
