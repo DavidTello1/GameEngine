@@ -15,12 +15,6 @@ ModuleSceneBase::~ModuleSceneBase()
 
 bool ModuleSceneBase::Start(Config* config)
 {
-	// Creation of the Index Buffer Object of the bounding boxes array, as all uses the same
-	if (GameObject::bounding_box_IBO == 0) glGenBuffers(1, &GameObject::bounding_box_IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GameObject::bounding_box_IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(bounding_box_indices), bounding_box_indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
 	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
 
@@ -44,11 +38,6 @@ bool ModuleSceneBase::PostUpdate(float dt)
 bool ModuleSceneBase::CleanUp()
 {
 	LOG("Unloading SceneBase");
-
-	if (GameObject::bounding_box_IBO != 0)
-	{
-		glDeleteBuffers(1, &GameObject::bounding_box_IBO);
-	}
 
 	return true;
 }

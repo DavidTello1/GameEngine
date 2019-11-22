@@ -105,12 +105,13 @@ public:
 	AABB aabb;
 	OBB obb;
 
+	const AABB& GetAABB() { return aabb; }
+	const OBB& GetOBB() { return obb; }
+
 	GLuint aabb_VBO = 0;
 	GLuint obb_VBO = 0;
 
 	float3 corners[8];
-
-	static GLuint bounding_box_IBO;
 
 	bool show_aabb = false;
 	bool show_obb = false;

@@ -1,0 +1,99 @@
+#pragma once
+
+#include <vector>
+#include "Math.h"
+#include <map>
+
+typedef unsigned int uint;
+
+class GameObject;
+class QuadtreeNode;
+
+class Quadtree
+{
+public:
+
+	Quadtree(const AABB& box);
+	~Quadtree();
+
+	void Draw();
+
+	void AddGameObject(const GameObject* gameObject);
+	bool RemoveGameObject(const GameObject* gameObject);
+
+	void Clear();
+
+	template<typename PRIMITIVE>
+	void CollectCandidates(std::vector<const GameObject*>& gameObjects, const PRIMITIVE& primitive)
+	{
+		root->CollectCandidates(gameObjects, primitive);
+	}
+
+private:
+	QuadtreeNode* root;
+	std::vector<const GameObject*> out_of_tree;
+};
+
+
+
+class QuadtreeNode
+{
+	friend class Quadtree;
+
+public:
+
+	void Draw();
+
+	QuadtreeNode(const AABB& box);
+	QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index);	//Index marking which node from parent. 0 starts at top left, and counting clockwise
+
+	~QuadtreeNode();
+
+	void UpdateVBO(const math::AABB & box);
+	void DeleteVBO();
+
+	bool AddGameObject(const GameObject* gameObject);
+	bool RemoveGameObject(const GameObject* gameObject);
+
+	template<typename PRIMITIVE>
+	void CollectCandidates(std::vector<const GameObject*>& gameObjects, const PRIMITIVE& primitive);
+
+private:
+	//void Draw();
+
+	void Split();
+	void Redistribute();
+
+	bool SendToChilds(const GameObject* gameObject);
+	void TryRemovingChilds();
+	void GetChildsBuckets(std::vector<const GameObject*>& vector, bool addSelf) const;
+
+private:
+
+	AABB box;
+	AABB toDraw;
+	uint VBO = 0;
+	std::vector<QuadtreeNode> childs;
+
+	//Pointer to tree, maybe not necessary
+	Quadtree* tree;
+	uint maxBucketSize = 2;
+	std::vector<const GameObject*> bucket;
+};
+
+template<typename PRIMITIVE>
+void QuadtreeNode::CollectCandidates(std::vector<const GameObject*>& gameObjects, const PRIMITIVE& primitive)
+{
+	if (primitive.Intersects(box))
+	{
+		for (uint i = 0; i < bucket.size(); i++)
+		{
+			gameObjects.push_back(bucket[i]);
+		}
+
+		for (uint i = 0; i < childs.size(); i++)
+		{
+			childs[i].CollectCandidates(gameObjects, primitive);
+		}
+	}
+}

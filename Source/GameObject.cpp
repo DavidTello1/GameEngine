@@ -7,7 +7,6 @@
 
 #include "mmgr/mmgr.h"
 
-GLuint GameObject::bounding_box_IBO = 0;
 
 GameObject::GameObject(const char* name, GameObject* Parent)
 {

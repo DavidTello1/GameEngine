@@ -5,6 +5,7 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 #include "ResourceModel.h"
+#include "Quadtree.h"
 
 #include "mmgr/mmgr.h"
 
@@ -19,15 +20,19 @@ ModuleScene::~ModuleScene()
 	delete root_object;
 }
 
+bool ModuleScene::Init(Config* config)
+{
+	root_object = new GameObject("Root", nullptr);
+	root_object->uid = 0;
+	// Create game objects after this ^^^^^^^^^^^^	
+
+	return true;
+}
 // Load assets
 bool ModuleScene::Start(Config* config)
 {
 	LOG("Loading main scene", 'v');
 
-	root_object = new GameObject("Root", nullptr);
-	root_object->uid = 0;
-
-	// Create game objects after this ^^^^^^^^^^^^	
 	GameObject* go = CreateGameObject("test camera");
 	go->AddComponent(Component::Type::Camera);
 
@@ -42,15 +47,9 @@ bool ModuleScene::Start(Config* config)
 	std::string tmp = "MyBakerHouse.dvs";
 	bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
 
-	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
-	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
 
-	// ParShapes 
-	/*GameObject* pparent = CreateGameObj("ParShapes");
-	for (int i = 0; i < shape_type::UNKNOWN; i++)
-	{
-		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10, 0.5f, pparent->GetUID());
-	}*/
+	quadtree = new Quadtree(AABB({ -20,-20,-20 }, { 20,20,20 }));
+
 
 	UnSelectAll();
 
@@ -62,6 +61,7 @@ bool ModuleScene::Update(float dt)
 	if (test_camera)
 		test_camera->DrawFrustum();
 
+	quadtree->Draw();
 	return true;
 }
 
@@ -165,8 +165,8 @@ bool ModuleScene::Draw()
 			glBindBuffer(GL_ARRAY_BUFFER, obj->aabb_VBO);
 			glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GameObject::bounding_box_IBO);
-			glDrawElements(GL_LINES, sizeof(App->scene_base->bounding_box_indices), GL_UNSIGNED_INT, nullptr);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aabb_IBO);
+			glDrawElements(GL_LINES, sizeof(aabb_indices), GL_UNSIGNED_INT, nullptr);
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -183,8 +183,8 @@ bool ModuleScene::Draw()
 			glBindBuffer(GL_ARRAY_BUFFER, obj->obb_VBO);
 			glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GameObject::bounding_box_IBO);
-			glDrawElements(GL_LINES, sizeof(App->scene_base->bounding_box_indices), GL_UNSIGNED_INT, nullptr);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aabb_IBO);
+			glDrawElements(GL_LINES, sizeof(aabb_indices), GL_UNSIGNED_INT, nullptr);
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

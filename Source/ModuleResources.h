@@ -52,4 +52,7 @@ private:
 	UID last_uid = RESERVED_RESOURCES;
 };
 
+extern GLuint aabb_indices[24];
+extern GLuint aabb_IBO;
+
 #endif
