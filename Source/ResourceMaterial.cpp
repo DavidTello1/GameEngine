@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleFileSystem.h"
 #include "ResourceMaterial.h"
+#include "ComponentMaterial.h"
 
 #include "Assimp/include/types.h"
 #include "Assimp/include/material.h"
@@ -51,6 +52,18 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 	}
 
 	material->UnLoad();
+
+	GameObject* obj = App->scene->GetSelectedGameObject();
+	if (obj != nullptr)
+	{
+		ComponentMaterial* mat = (ComponentMaterial*)obj->GetComponent(Component::Type::Material);
+		if (mat == nullptr)
+			mat = (ComponentMaterial*)obj->AddComponent(Component::Type::Material);
+
+		material->LoadToMemory();
+		mat->SetMaterial(material);
+	}
+
 
 	return material->uid;
 }

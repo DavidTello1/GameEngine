@@ -46,13 +46,15 @@ private:
 	void LoadUID();
 	void SaveUID() const;
 
-	//void MakeCheckersTexture();
+	void LoadCheckersTexture();
 
 	void LoadAssetsIcons();
 	void UpdateAssets();
 	void UpdateAssetsFolder(const PathNode& node);
 
 public:
+	ResourceMaterial* checkers_texture = nullptr;
+
 	GLuint bbox_indices[24] =
 	{
 		0,1,2,3,0,3,1,2,

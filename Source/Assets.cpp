@@ -38,6 +38,11 @@ void Assets::Draw()
 			ImGui::EndMenu();
 		}
 
+		if (ImGui::MenuItem("Import", NULL, false, (selected_node.path != "" && selected_node.file == true)))
+		{
+			ImportAsset(selected_node); // Load Asset
+		}
+
 		if (ImGui::MenuItem("Refresh"))
 		{
 			UpdateAssets(); // Update Assets Nodes
@@ -81,7 +86,7 @@ void Assets::Draw()
 	ImGui::EndChild();
 }
 
-void Assets::ImportAsset()
+void Assets::ImportAsset(const PathNode& node)
 {
 }
 

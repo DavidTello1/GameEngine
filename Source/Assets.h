@@ -23,7 +23,7 @@ public:
 	virtual ~Assets();
 
 	void Draw();
-	void ImportAsset();
+	void ImportAsset(const PathNode& node);
 
 private:
 	void UpdateAssets();

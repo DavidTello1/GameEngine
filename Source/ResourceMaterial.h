@@ -23,9 +23,6 @@ private:
 	void LogImageInfo();
 
 public:
-	//GLuint checker_texture;
-
-public:
 	uint tex_id = 0;
 	uint tex_width = 0;
 	uint tex_height = 0;

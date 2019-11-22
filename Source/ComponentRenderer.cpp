@@ -68,8 +68,8 @@ void ComponentRenderer::Draw(ComponentMesh& mesh, ComponentMaterial* material) c
 	if (show_wireframe || App->scene_base->show_all_wireframe) //wireframe
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-	//else if (show_checkers) //checkers
-		//glBindTexture(GL_TEXTURE_2D, App->resources->checker_texture);
+	else if (show_checkers) //checkers
+		glBindTexture(GL_TEXTURE_2D, App->resources->checkers_texture->tex_id);
 
 	else if (material != nullptr && material->IsActive())
 		glBindTexture(GL_TEXTURE_2D, material->GetMaterial()->tex_id);

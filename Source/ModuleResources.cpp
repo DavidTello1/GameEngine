@@ -7,6 +7,7 @@
 #include "ResourceModel.h"
 #include "ResourceMesh.h"
 #include "ResourceMaterial.h"
+#include "ComponentMaterial.h"
 #include "Config.h"
 #include "PathNode.h"
 
@@ -45,11 +46,11 @@ bool ModuleResources::Init(Config* config)
 
 bool ModuleResources::Start(Config* config)
 {
-	//MakeCheckersTexture();
-	//LoadResourcesData();
-
-	//UpdateAssets();
+	LoadCheckersTexture();
 	LoadAssetsIcons();
+
+	//LoadResourcesData();
+	//UpdateAssets();
 
 	return true;
 }
@@ -114,6 +115,7 @@ bool ModuleResources::ImportResource(const char* final_path, UID uid)
 	if (import_ok == true)
 	{
 		Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
+
 	}
 	else
 	{
@@ -300,7 +302,7 @@ std::vector<Resource*> ModuleResources::GetAllResourcesOfType(Resource::Type typ
 
 	for (uint i = 0; i < resources.size(); ++i)
 	{
-		if (resources[i]->type == type)
+		if (resources[i] != nullptr && resources[i]->type == type)
 			ret.push_back(resources[i]);
 	}
 
@@ -348,30 +350,20 @@ void ModuleResources::UpdateAssetsFolder(const PathNode& node)
 
 void ModuleResources::LoadAssetsIcons()
 {
-	ResourceMaterial* resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	ResourceMaterial* resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
 	App->editor->tab_assets->folder_icon = resource->LoadTexture("Settings/Icons/folder_icon.png");
-	resource->SetName("Folder Icon");
-	resource->times_loaded++;
 
-	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
 	App->editor->tab_assets->file_icon = resource->LoadTexture("Settings/Icons/file_icon.png");
-	resource->SetName("File Icon");
-	resource->times_loaded++;
 
-	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
 	App->editor->tab_assets->model_icon = resource->LoadTexture("Settings/Icons/model_icon.png");
-	resource->SetName("Model Icon");
-	resource->times_loaded++;
 
-	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
 	App->editor->tab_assets->material_icon = resource->LoadTexture("Settings/Icons/material_icon.png");
-	resource->SetName("Material Icon");
-	resource->times_loaded++;
 
-	resource = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
 	App->editor->tab_assets->scene_icon = resource->LoadTexture("Settings/Icons/scene_icon.png");
-	resource->SetName("Scene Icon");
-	resource->times_loaded++;
 }
 
 //void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, GameObject* parent)
@@ -521,37 +513,42 @@ void ModuleResources::LoadAssetsIcons()
 //	}
 //}
 
-//void ModuleResources::MakeCheckersTexture()
-//{
-//	const int checkImageWidth = 256;
-//	const int checkImageHeight = 256;
-//	static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
-//
-//	int c;
-//	for (int i = 0; i < checkImageHeight; i++)
-//	{
-//		for (int j = 0; j < checkImageWidth; j++)
-//		{
-//			c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
-//			checkImage[i][j][0] = (GLubyte)c;
-//			checkImage[i][j][1] = (GLubyte)c;
-//			checkImage[i][j][2] = (GLubyte)c;
-//			checkImage[i][j][3] = (GLubyte)255;
-//		}
-//	}
-//
-//	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-//
-//	glGenTextures(1, &checker_texture);
-//	glBindTexture(GL_TEXTURE_2D, checker_texture);
-//
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-//		GL_NEAREST);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-//		GL_NEAREST);
-//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
-//		checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-//		checkImage);
-//}
+void ModuleResources::LoadCheckersTexture()
+{
+	const int checkImageWidth = 256;
+	const int checkImageHeight = 256;
+
+	checkers_texture = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	checkers_texture->tex_width = checkImageWidth;
+	checkers_texture->tex_height = checkImageHeight;
+
+	static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
+
+	int c;
+	for (int i = 0; i < checkImageHeight; i++)
+	{
+		for (int j = 0; j < checkImageWidth; j++)
+		{
+			c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
+			checkImage[i][j][0] = (GLubyte)c;
+			checkImage[i][j][1] = (GLubyte)c;
+			checkImage[i][j][2] = (GLubyte)c;
+			checkImage[i][j][3] = (GLubyte)255;
+		}
+	}
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glGenTextures(1, &checkers_texture->tex_id);
+	glBindTexture(GL_TEXTURE_2D, checkers_texture->tex_id);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
+		checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+		checkImage);
+}
