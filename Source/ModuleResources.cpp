@@ -206,14 +206,14 @@ void ModuleResources::RemoveResource(UID uid)
 	}
 }
 
-const Resource * ModuleResources::GetResource(UID uid) const
+const Resource* ModuleResources::GetResource(UID uid) const
 {
 	if (resources.find(uid) != resources.end())
 		return resources.at(uid);
 	return nullptr;
 }
 
-Resource * ModuleResources::GetResource(UID uid)
+Resource* ModuleResources::GetResource(UID uid)
 {
 	std::map<UID, Resource*>::iterator it = resources.find(uid);
 	if (it != resources.end())

@@ -88,6 +88,8 @@ void Assets::Draw()
 
 void Assets::ImportAsset(const PathNode& node)
 {
+	//Resource* resource = App->resources->GetResource(id);
+	//resource->LoadToMemory();
 }
 
 void Assets::UpdateAssets()
@@ -145,19 +147,12 @@ void Assets::DrawIcons(const PathNode& node)
 
 		// Draw
 		const int size = 75;
-		const int padding = 15;
-		int columns = (int)ImGui::GetWindowWidth() / size;
-		int total_size = (columns*size) + (padding * (columns - 1));
-
-		if (total_size > ImGui::GetWindowWidth())
-			columns--;
-
-		if (i % columns != 0)
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding);
+		const int spacing = 8;
+		int columns = ((int)ImGui::GetWindowWidth() - spacing) / (size + spacing);
 
 		ImGui::SetNextItemWidth(size);
 		ImGui::BeginGroup();
-		ImGui::Image((ImTextureID)GetIcon(node.children[i]), ImVec2(ICON_WIDTH, ICON_HEIGHT), ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), border_color);
+		ImGui::Image((ImTextureID)GetIcon(node.children[i]), ImVec2(size, size), ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), border_color);
 
 		// Text size
 		std::string text = node.children[i].localPath;
