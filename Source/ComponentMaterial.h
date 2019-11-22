@@ -12,6 +12,8 @@ public:
 	ComponentMaterial(GameObject* obj);
 	virtual ~ComponentMaterial();
 
+	void DrawInspector();
+
 	void SetMaterial(ResourceMaterial* Material) { material = Material; }
 	ResourceMaterial* GetMaterial() const { return material; }
 

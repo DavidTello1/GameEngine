@@ -17,6 +17,8 @@ public:
 	ComponentCamera(GameObject* gameObject);
 	~ComponentCamera();
 
+	void DrawInspector();
+
 	//  -------------------------------------- Getters
 	float GetNearPlane() const;
 	float GetFarPlane() const;

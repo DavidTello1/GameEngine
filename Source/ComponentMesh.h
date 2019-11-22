@@ -11,6 +11,8 @@ public:
 	ComponentMesh(GameObject* obj/*, ResourceMesh* mesh*/);
 	virtual ~ComponentMesh();
 
+	void DrawInspector();
+
 	void SetMesh(ResourceMesh* Mesh) { mesh = Mesh; }
 	ResourceMesh* GetMesh() const { return mesh; }
 

@@ -14,13 +14,37 @@ ComponentRenderer::~ComponentRenderer()
 {
 }
 
+void ComponentRenderer::DrawInspector()
+{
+	bool active = IsActive();
+	if (ImGui::Checkbox("##check3", &active))
+		SwitchActive();
+
+	ImGui::SameLine();
+	if (ImGui::CollapsingHeader("Renderer"))
+	{
+		if (object->GetComponent(Component::Type::Mesh) == nullptr)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
+			ImGui::TextWrapped("No mesh loaded");
+			ImGui::PopStyleColor();
+		}
+		else
+		{
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
+			ImGui::Checkbox("Wireframe", &show_wireframe);
+		}
+		ImGui::Separator();
+	}
+}
+
 void ComponentRenderer::Draw()
 {
 	ComponentMesh* mesh = nullptr;
 	for (uint i = 0; i < object->components.size(); i++)
 	{
 		mesh = (ComponentMesh*)object->components[i];
-		if (mesh->GetType() == Component::Type::Mesh && mesh->IsActive())
+		if (mesh->GetMesh() != nullptr && mesh->GetType() == Component::Type::Mesh && mesh->IsActive())
 		{
 			Draw(*mesh, (ComponentMaterial*)mesh->GetGameobj()->GetComponent(Component::Type::Material));
 

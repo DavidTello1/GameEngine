@@ -29,6 +29,8 @@ public:
 	Component::Type GetType() { return type; }
 	GameObject* GetGameobj() { return object; }
 
+	virtual void DrawInspector() = 0;
+
 protected:
 	bool active = true;
 	GameObject* object = nullptr;

@@ -26,7 +26,14 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 }
 
 ComponentCamera::~ComponentCamera()
-{}
+{
+}
+
+void ComponentCamera::DrawInspector()
+{
+
+}
+
 
 // Getters -----------------------------------------------------------------
 

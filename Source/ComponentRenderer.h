@@ -10,6 +10,8 @@ public:
 	ComponentRenderer(GameObject* obj);
 	virtual ~ComponentRenderer();
 
+	void DrawInspector();
+
 	void Draw();
 
 private:
