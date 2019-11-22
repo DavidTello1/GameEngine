@@ -32,6 +32,7 @@ private:
 	GameObject* obj = nullptr;
 	float3 position, rotation, scale;
 	float precision = 0.15f;
+	const char* precision_char = "%.2f";
 
 	bool lock_scale = false;
 

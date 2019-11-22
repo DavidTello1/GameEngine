@@ -93,6 +93,7 @@ private:
 	//float3 velocity = float3::zero;
 
 public:
+	bool is_static = false;
 
 	// Objects
 	int flags = NoFlags;
