@@ -306,7 +306,7 @@ void QuadtreeNode::Draw()
 		break;
 	}
 
-	switch (level)
+	/*switch (level)
 	{
 	case 0:
 		color = Color(1, 0, 0, 1);
@@ -323,16 +323,16 @@ void QuadtreeNode::Draw()
 	default:
 		color = Color(0, 1, 1, 1);
 		break;
-	}
+	}*/
 
 	toDraw = box;
-	toDraw.maxPoint.x -= 0.25f;
-	toDraw.maxPoint.y -= 0.25f;
-	toDraw.maxPoint.z -= 0.25f;
+	toDraw.maxPoint.x -= 0.5f;
+	toDraw.maxPoint.y -= 0.5f;
+	toDraw.maxPoint.z -= 0.5f;
 						   
-	toDraw.minPoint.x += 0.25f;
-	toDraw.minPoint.y += 0.25f;
-	toDraw.minPoint.z += 0.25f;
+	toDraw.minPoint.x += 0.5f;
+	toDraw.minPoint.y += 0.5f;
+	toDraw.minPoint.z += 0.5f;
 
 	UpdateVBO(toDraw);
 	DrawEx(color);

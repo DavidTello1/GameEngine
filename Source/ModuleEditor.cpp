@@ -40,7 +40,7 @@ bool ModuleEditor::is_plane					= true;
 bool ModuleEditor::is_axis					= true;
 bool ModuleEditor::is_wireframe				= false;
 bool ModuleEditor::is_show_plane			= true;
-bool ModuleEditor::is_show_axis				= true;
+bool ModuleEditor::is_show_axis				= false;
 
 ModuleEditor::ModuleEditor(bool start_enabled) : Module("ModuleEditor", start_enabled)
 {
