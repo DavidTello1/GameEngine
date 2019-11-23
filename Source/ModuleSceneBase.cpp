@@ -197,21 +197,39 @@ void ModuleSceneBase::CameraMousePicking()
 {
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
 	{
-		float3 start = { 0, 0, viewport_camera->GetNearPlane() };
-		//float3 start = viewport_camera->.get
-		float3 end = { 0, 0,viewport_camera->GetFarPlane() };
+		ComponentCamera* cam = App->scene->test_camera;
+		//ComponentCamera* cam = viewport_camera;
 
-		glLineWidth(2.0f);
+		Ray ray = cam->frustum.UnProjectFromNearPlane(0.25f, 0.25f);
+		
+		bool intersects = false;
+
+		for (int i = 2;i< App->scene->gameObjects.size();i++)
+		{
+			if (ray.Intersects(App->scene->gameObjects[i]->aabb))
+				intersects = true;
+		}
+
+		float3 start = ray.pos;
+		//float3 start = viewport_camera->.get
+		float3 end = ray.pos + ray.dir.Normalized() * cam->GetFarPlane();
+
+		// Drawiinggg
+		Color c = (intersects) ? Yellow : Cyan;
+
+		glLineWidth(3.0f);
+		glColor3ub(c.r*255.0f,c.g*255.0f,c.b*255.0f);
 
 		glBegin(GL_LINES);
-		glColor3ub(0, 255, 255);
+
 
 		glVertex3f(start.x, start.y, start.z);
 		glVertex3f(end.x, end.y, end.z);
 
 		glEnd();
 
-		LOG("Start [%f,%f,%f]   End [%f,%f,%f]", start.x, start.y, start.z, end.x, end.y, end.z, 'd');
+		if (App->input->GetKey(SDL_SCANCODE_C) == KEY_REPEAT)
+			LOG("Start [%f,%f,%f]   End [%f,%f,%f]", start.x, start.y, start.z, end.x, end.y, end.z, 'd');
 	}
 }
 
