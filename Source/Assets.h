@@ -27,9 +27,12 @@ public:
 
 private:
 	void UpdateAssets();
+	void UpdateFilters(PathNode& node);
 	void DrawHierarchy(const PathNode& node);
 	void DrawIcons(const PathNode& node);
 	uint GetIcon(const PathNode& node);
+
+	void FilterFolders(PathNode& node, PathNode& parent);
 
 public:
 	uint folder_icon;
@@ -42,6 +45,10 @@ private:
 	std::vector<uint> selected_assets;
 
 	PathNode assets;
+	PathNode models;
+	PathNode materials;
+	PathNode scenes;
+
 	PathNode current_node;
 	PathNode next_node;
 
@@ -51,6 +58,10 @@ private:
 	uint rate = 5;
 
 	ImVec4 border_color;
+
+	bool filter_scenes = false;
+	bool filter_models = false;
+	bool filter_materials = false;
 };
 
 #endif// __ASSETS_H__

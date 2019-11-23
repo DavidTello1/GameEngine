@@ -17,6 +17,12 @@ Assets::Assets() : Panel("Assets")
 	pos_y = default_pos_y;
 
 	UpdateAssets();
+
+	UpdateFilters(models);
+	UpdateFilters(materials);
+	UpdateFilters(scenes);
+
+	current_node = assets;
 }
 
 Assets::~Assets()
@@ -32,9 +38,27 @@ void Assets::Draw()
 	{
 		if (ImGui::BeginMenu("Show All")) //Resource types
 		{
-			ImGui::MenuItem("Models");
-			ImGui::MenuItem("Meshes");
-			ImGui::MenuItem("Materials");
+			if (ImGui::MenuItem("Models", NULL, &filter_models, models.children.size() > 0))
+			{
+				UpdateFilters(models);
+				filter_models = true;
+				filter_scenes = false;
+				filter_materials = false;
+			}
+			if (ImGui::MenuItem("Materials", NULL, &filter_materials, materials.children.size() > 0))
+			{
+				UpdateFilters(materials);
+				filter_models = false;
+				filter_materials = true;
+				filter_scenes = false;
+			}
+			if (ImGui::MenuItem("Scenes", NULL, filter_scenes, scenes.children.size() > 0))
+			{
+				UpdateFilters(scenes);
+				filter_models = false;
+				filter_materials = false;
+				filter_scenes = true;
+			}
 			ImGui::EndMenu();
 		}
 
@@ -79,7 +103,18 @@ void Assets::Draw()
 
 	if (ImGui::BeginMenuBar()) //Show path
 	{
-		ImGui::Text(current_node.path.c_str());
+		if (filter_models)
+			ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.0f, 1.0f), "Showing All Models");
+		
+		else if (filter_materials)
+			ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.0f, 1.0f), "Showing All Materials");
+		
+		else if (filter_scenes)
+			ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.0f, 1.0f), "Showing All Scenes");
+
+		else
+			ImGui::Text(current_node.path.c_str());
+		
 		ImGui::EndMenuBar();
 	}
 	DrawIcons(current_node); // Draw Icons
@@ -99,8 +134,58 @@ void Assets::UpdateAssets()
 	std::vector<std::string> ignore_ext;
 	ignore_ext.push_back("meta");
 	assets = App->file_system->GetAllFiles("Assets", nullptr, &ignore_ext);
-	timer.Start();
+	//timer.Start();
 	//}
+}
+
+void Assets::UpdateFilters(PathNode& node)
+{
+	std::vector<std::string> filter_ext;
+
+	if (node.children == models.children)
+	{
+		filter_ext.push_back("fbx");
+		filter_ext.push_back("obj");
+	}
+	else if (node.children == materials.children)
+	{
+		filter_ext.push_back("png");
+		filter_ext.push_back("dds");
+		filter_ext.push_back("jpg");
+	}
+	else if (node.children == scenes.children)
+	{
+		filter_ext.push_back("dvs");
+	}
+
+	node = App->file_system->GetAllFiles("Assets", &filter_ext);
+	FilterFolders(node, node);
+
+	uint size = node.children.size();
+	uint cont = 0;
+	for (uint i = 0; i < size; ++i)
+	{
+		uint j = i - cont;
+		if (node.children[j].file == false)
+		{
+			node.children.erase(node.children.begin() + j);
+			cont++;
+		}
+	}
+
+	current_node = node;
+}
+
+void Assets::FilterFolders(PathNode& node, PathNode& parent)
+{
+	for (uint i = 0; i < node.children.size(); ++i)
+	{
+		if (node.children[i].file == false) // if folder filter again
+			FilterFolders(node.children[i], node);
+
+		else if (parent.children != node.children)//if file
+			parent.children.push_back(node.children[i]); //add children to node
+	}
 }
 
 void Assets::DrawHierarchy(const PathNode& node)
@@ -122,7 +207,10 @@ void Assets::DrawHierarchy(const PathNode& node)
 		bool open = ImGui::TreeNodeEx(node.localPath.c_str(), nodeFlags, node.localPath.c_str());
 
 		if (ImGui::IsItemClicked()) //current_node update
+		{
 			current_node = node;
+			filter_models = filter_materials = filter_scenes = false;
+		}
 
 		if (open && !node.IsLastFolder())
 		{
