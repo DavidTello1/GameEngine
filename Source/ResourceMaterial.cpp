@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleFileSystem.h"
+#include "ModuleScene.h"
 #include "ResourceMaterial.h"
 #include "ComponentMaterial.h"
 

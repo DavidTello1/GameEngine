@@ -45,6 +45,8 @@ public:
 	bool LoadtoScene();
 	void UnLoad();
 
+	const AABB& GetAABB() { return aabb; }
+
 	void CreateShape(ResourceMesh* mesh, const shape_type& type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f);
 	const char* GetShapeName(shape_type type) { return shape_to_string[type]; }
 

@@ -1,5 +1,6 @@
 #include "ResourceMesh.h"
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
 #include "ComponentMesh.h"
@@ -354,19 +355,7 @@ void ResourceMesh::CreateShape(ResourceMesh* mesh, const shape_type &type, int s
 	// Vertices ------------------
 	mesh->num_vertices = m->npoints;
 	mesh->vertices = new float3[mesh->num_vertices];
-	if (mesh->num_vertices >= 3)
-	{
-		object->min_vertex.x = m->points[0];
-		object->min_vertex.y = m->points[1];
-		object->min_vertex.z = m->points[2];
-		object->max_vertex.x = m->points[0];
-		object->max_vertex.y = m->points[1];
-		object->max_vertex.z = m->points[2];
-	}
-	else {
-		LOG("Mesh has no vertices", 'e');
-		return;
-	}
+
 	for (uint i = 0; i < mesh->num_vertices; ++i)
 	{
 		int k = i * 3;
@@ -377,15 +366,6 @@ void ResourceMesh::CreateShape(ResourceMesh* mesh, const shape_type &type, int s
 		mesh->vertices[i].x = x; 
 		mesh->vertices[i].y = y; 
 		mesh->vertices[i].z = z; 
-
-		// Bounding box setting up
-		if (x < object->min_vertex.x) object->min_vertex.x = x;
-		if (y < object->min_vertex.y) object->min_vertex.y = y;
-		if (z < object->min_vertex.z) object->min_vertex.z = z;
-
-		if (x > object->max_vertex.x) object->max_vertex.x = x;
-		if (y > object->max_vertex.y) object->max_vertex.y = y;
-		if (z > object->max_vertex.z) object->max_vertex.z = z;
 	}
 
 	mesh->GenVBO();
@@ -418,12 +398,6 @@ void ResourceMesh::CreateShape(ResourceMesh* mesh, const shape_type &type, int s
 	par_shapes_free_mesh(m);
 
 	mesh->GenTexture();
-
-	if (type < 8) //idk but has to be like this for now, otherwise ImGui crashes
-	{
-		object->GenBoundingBox();
-		object->is_valid_dimensions = true;
-	}
 
 	mesh_comp->SetMesh(mesh);
 }

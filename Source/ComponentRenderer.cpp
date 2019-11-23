@@ -51,7 +51,7 @@ void ComponentRenderer::Draw()
 		mesh = (object->components[i]->type == Component::Type::Mesh) ? (ComponentMesh*)object->components[i] : nullptr;
 		if (mesh && mesh->IsActive())
 		{
-			Draw(*mesh, (ComponentMaterial*)mesh->GetGameobj()->GetComponent(Component::Type::Material));
+			Render(*mesh, (ComponentMaterial*)mesh->GetGameobj()->GetComponent(Component::Type::Material));
 
 			if (show_face_normals)
 				DrawFaceNormals();
@@ -62,7 +62,7 @@ void ComponentRenderer::Draw()
 	}
 }
 
-void ComponentRenderer::Draw(ComponentMesh& mesh, ComponentMaterial* material) const
+void ComponentRenderer::Render(ComponentMesh& mesh, ComponentMaterial* material) const
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);

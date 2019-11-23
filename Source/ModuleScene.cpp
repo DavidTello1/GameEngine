@@ -42,21 +42,21 @@ bool ModuleScene::Start(Config* config)
 	//std::string tmdp = "MyCamera.dvs";
 	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
 
-	for (int i = 0; i < 6; i++) {
+	//for (int i = 0; i < 6; i++) {
 
-	ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
-	std::string tmp = "MyBakerHouse.dvs";
-	bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
+	//ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
+	//std::string tmp = "MyBakerHouse.dvs";
+	//bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
 
-	
-	gameObjects[2+i*3]->SetLocalPosition({ 5.0f*i,0.0f,-5.0f* i });
-	}
+	//
+	//gameObjects[2+i*3]->SetLocalPosition({ 5.0f*i,0.0f,-5.0f* i });
+	//}
 
 	quadtree = new Quadtree(AABB({ -20,-20,-20 }, { 20,20,20 }));
 
 	
 	//quadtree->AddGameObject(bhmodel.)
-	UnSelectAll();
+	//UnSelectAll();
 
 	return true;
 }

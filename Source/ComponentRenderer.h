@@ -16,7 +16,7 @@ public:
 	void Draw();
 
 private:
-	void Draw(ComponentMesh& mesh, ComponentMaterial* material) const;
+	void Render(ComponentMesh& mesh, ComponentMaterial* material) const;
 	void DrawFaceNormals();
 	void DrawVertexNormals();
 

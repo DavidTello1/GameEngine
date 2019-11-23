@@ -21,8 +21,6 @@ public:
 	~ModuleScene();
 
 	bool Init(Config * config);
-
-
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
 	bool PostUpdate(float dt);
@@ -44,8 +42,6 @@ public:
 	}
 
 	void UnSelectAll(GameObject * keep_selected = nullptr);
-
-	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
 
 public:
 	char scene_name[NAME_LENGTH];
