@@ -92,13 +92,12 @@ bool ModuleResources::ImportResource(const char* final_path, UID uid)
 	std::string written_file;
 	Resource::Type type = GetResourceType(final_path); //get resource type
 
-	//if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded and if so, init uid
-	//{
-	//	Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
-	//	LOG("File is already loaded in memory", 'd');
-	//	return true;
-	//}
-
+	if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded and if so, init uid
+	{
+		Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
+		LOG("File is already loaded in memory", 'd');
+		return true;
+	}
 
 	switch (type) //import depending on type
 	{

@@ -64,29 +64,26 @@ void ComponentRenderer::Draw(ComponentMesh& mesh, ComponentMaterial* material) c
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
 
-
 	if (show_wireframe || App->scene_base->show_all_wireframe) //wireframe
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 	else if (show_checkers) //checkers
 		glBindTexture(GL_TEXTURE_2D, App->resources->checkers_texture->tex_id);
 
-	else if (material->GetMaterial()->tex_id != 0 && material->IsActive())
+	else if (material->GetMaterial() != nullptr && material->GetMaterial()->tex_id != 0 && material->IsActive())
 		glBindTexture(GL_TEXTURE_2D, material->GetMaterial()->tex_id);
 
 	else
 		glBindTexture(GL_TEXTURE_2D, 0);
 
+	glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->tex_coords_id);
+	glTexCoordPointer(2, GL_FLOAT, 0, NULL);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->VBO);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.GetMesh()->IBO);
 	glDrawElements(GL_TRIANGLES, mesh.GetMesh()->num_indices, GL_UNSIGNED_INT, nullptr);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mesh.GetMesh()->tex_coords_id);
-	glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
