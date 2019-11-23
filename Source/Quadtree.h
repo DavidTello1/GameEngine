@@ -107,7 +107,7 @@ private:
 template<typename PRIMITIVE>
 void QuadtreeNode::CollectCandidates(std::vector<GameObject*>& gameObjects, const PRIMITIVE& primitive)
 {
-	if (primitive.Intersects(box))
+	if (primitive.DO_Intersects(box))
 	{
 		for (uint i = 0; i < bucket.size(); i++)
 		{
@@ -116,11 +116,17 @@ void QuadtreeNode::CollectCandidates(std::vector<GameObject*>& gameObjects, cons
 
 		for (uint i = 0; i < childs.size(); i++)
 		{
-			childs[i]->CollectCandidates(gameObjects, primitive);
+			if (!(childs[i]->childs.empty() && childs[i]->bucket.empty()))
+			//if ((!childs[i]->childs.empty() || !childs[i]->bucket.empty()))
+				childs[i]->CollectCandidates(gameObjects, primitive);
+			else
+				childs[i]->is_culling = true;
 		}
+
 		is_culling = false;
 	}
 	else {
+		// Skips drawing
 		is_culling = true;
 	}
 }

@@ -173,7 +173,7 @@ bool ModuleScene::Draw()
 		//obj->is_drawn = true;
 
 		// Draw GameObjects
-		if (!App->scene_base->camera_culling || test_camera->ContainsAABB(obj->aabb))
+		if (!App->scene_base->camera_culling || test_camera->frustum.DO_Intersects(obj->aabb))
 		{
 			//test_camera->frustum.Intersects()
 			glPushMatrix();

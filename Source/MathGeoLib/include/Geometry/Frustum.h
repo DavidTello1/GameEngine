@@ -402,6 +402,7 @@ public:
 	bool Intersects(const Line &line) const;
 	bool Intersects(const LineSegment &lineSegment) const;
 	bool Intersects(const AABB &aabb) const;
+	bool DO_Intersects(const AABB & refBox) const;
 	bool Intersects(const OBB &obb) const;
 	bool Intersects(const Plane &plane) const;
 	bool Intersects(const Triangle &triangle) const;
