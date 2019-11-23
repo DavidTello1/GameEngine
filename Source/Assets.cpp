@@ -194,7 +194,7 @@ void Assets::DrawHierarchy(const PathNode& node)
 	if (current_node == node)
 		nodeFlags |= ImGuiTreeNodeFlags_Selected;
 
-	if (node.path == current_node.path)
+	if (node.path == current_node.path && !filter_models && !filter_materials && !filter_scenes)
 		current_node = node;
 
 	if (node.file == false) //if folder is not empty
@@ -229,7 +229,7 @@ void Assets::DrawIcons(const PathNode& node)
 			border_color = ImVec4(0.0f, 1.0f, 0.0f, 0.0f);
 
 		// Draw
-		const int size = 75;
+		const int size = 84;
 		const int spacing = 8;
 		int columns = ((int)ImGui::GetWindowWidth() - spacing) / (size + spacing);
 
@@ -240,12 +240,17 @@ void Assets::DrawIcons(const PathNode& node)
 		// Text size
 		std::string text = node.children[i].localPath;
 		std::string dots = "...";
-
-		if (ImGui::CalcTextSize(text.c_str()).x > size)
+		
+		uint text_size = ImGui::CalcTextSize(text.c_str()).x;
+		uint max_size = (size - ImGui::CalcTextSize(dots.c_str()).x) / 7;
+		if (text_size > size)
 		{
-			text = text.substr(0, 7);
+			text = text.substr(0, max_size);
 			text.append(dots);
 		}
+		else if (text_size < size)
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ((size - text_size) / 2));
+
 		ImGui::Text(text.c_str());
 		ImGui::EndGroup();
 
