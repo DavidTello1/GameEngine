@@ -30,12 +30,23 @@ public:
 
 	void CameraMousePicking();
 
+public:
+
+	bool camera_culling = true;
+
+	Ray print_ray;
+	ComponentCamera* cam;
+	//ComponentCamera* cam = viewport_camera;
+
+	float zoom_speed = 75.0f;
+
 	bool Draw();
+
+public:
 
 	float plane_length = 40.0f;
 	float axis_length = 40.0f;
 
-	// Misc
 	Color wireframe_color = White;
 	float wireframe_width = 1.0f;
 	bool show_all_wireframe = false;
@@ -48,14 +59,6 @@ public:
 
 	bool show_all_aabb = true;
 	bool show_all_obb = true;
-
-	bool camera_culling = true;
-
-	Ray print_ray;
-	ComponentCamera* cam;
-	//ComponentCamera* cam = viewport_camera;
-
-	float zoom_speed = 75.0f;
 
 private:
 

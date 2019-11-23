@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "ModuleSceneBase.h"
 #include "ModuleScene.h"
+#include "Viewport.h"
 
 #include "glew/include/GL/glew.h"
 #include "mmgr/mmgr.h"
@@ -204,21 +205,22 @@ void ModuleSceneBase::CameraMousePicking()
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 	{
 
-		int x, y;
-		App->input->GetMousePosition(x, y);
+		float2 pos = App->input->GetMousePosition();
 		//x = -x;
 
 		// Converting origin to viewport center origin
-		x -= 212;//(250 + 738/2);
-		y -= 19;//(19 + 563/2);
+		//x -= 212;//(250 + 738/2);
+		//y -= 19;//(19 + 563/2);
 
-		float xn = (float)x / 776.0f;	// viewport_camera->GetWidth();
-		float yn = (float)y / -558.0f ;		// -viewport_camera->GetHeight();
+		pos.x = (float)(( pos.x - (float)App->editor->tab_viewport->pos_x ) / (float)App->editor->tab_viewport->width  );	// viewport_camera->GetWidth();
+		pos.y = (float)(( pos.y - (float)App->editor->tab_viewport->pos_y ) / -(float)App->editor->tab_viewport->height );		// -viewport_camera->GetHeight();
 
-		xn = (xn - 0.5f) * 2.0f;
-		yn = (yn + 0.5f) * 2.0f;
+		pos.x = (pos.x - 0.5f) * 2.0f;
+		pos.y = (pos.y + 0.5f) * 2.0f;
 
-		Ray ray = cam->frustum.UnProjectFromNearPlane((float)xn, (float)yn);
+		pos = pos.Clamp(-1.0f, 1.0f);
+
+		Ray ray = cam->frustum.UnProjectFromNearPlane(pos.x, pos.y);
 		//Ray ray = cam->frustum.UnProjectFromNearPlane((float)xn, (float)yn);
 		print_ray = ray;
 
