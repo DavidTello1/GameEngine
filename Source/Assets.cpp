@@ -31,6 +31,9 @@ Assets::~Assets()
 
 void Assets::Draw()
 {
+	if (timer.ReadSec() > REFRESH_RATE) // Update Assets Hierarchy
+		UpdateAssets();
+
 	// Child Hierarchy -------------------------------
 	ImGui::BeginChild("Hierarchy", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.2f, 0), true, ImGuiWindowFlags_MenuBar);
 
@@ -66,12 +69,6 @@ void Assets::Draw()
 		{
 			ImportAsset(selected_node); // Load Asset
 		}
-
-		if (ImGui::MenuItem("Refresh"))
-		{
-			UpdateAssets(); // Update Assets Nodes
-		}
-
 		ImGui::EndMenuBar();
 	}
 
@@ -129,13 +126,10 @@ void Assets::ImportAsset(const PathNode& node)
 
 void Assets::UpdateAssets()
 {
-	//if (timer.ReadSec() > rate)
-	//{
 	std::vector<std::string> ignore_ext;
 	ignore_ext.push_back("meta");
 	assets = App->file_system->GetAllFiles("Assets", nullptr, &ignore_ext);
-	//timer.Start();
-	//}
+	timer.Start();
 }
 
 void Assets::UpdateFilters(PathNode& node)
@@ -198,9 +192,10 @@ void Assets::DrawHierarchy(const PathNode& node)
 	}
 
 	if (current_node == node)
-	{
 		nodeFlags |= ImGuiTreeNodeFlags_Selected;
-	}
+
+	if (node.path == current_node.path)
+		current_node = node;
 
 	if (node.file == false) //if folder is not empty
 	{

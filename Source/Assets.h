@@ -7,8 +7,7 @@
 #include "Imgui/imgui.h"
 #include <vector>
 
-#define ICON_WIDTH 64
-#define ICON_HEIGHT 64
+#define REFRESH_RATE 3
 
 class Assets : public Panel
 {
@@ -51,11 +50,9 @@ private:
 
 	PathNode current_node;
 	PathNode next_node;
-
 	PathNode selected_node;
 
 	Timer timer;
-	uint rate = 5;
 
 	ImVec4 border_color;
 
