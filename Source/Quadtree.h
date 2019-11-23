@@ -21,6 +21,8 @@ public:
 	Quadtree(const AABB& box);
 	~Quadtree();
 
+	void CreateRoot(const AABB & box);
+
 	void Draw();
 
 	void AddGameObject(GameObject* gameObject);
@@ -40,7 +42,7 @@ public:
 	static Color c;
 
 private:
-	QuadtreeNode* root;
+	QuadtreeNode* root = nullptr;
 	std::vector<GameObject*> out_of_tree;
 };
 

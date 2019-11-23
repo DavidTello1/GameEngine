@@ -8,6 +8,13 @@ Color Quadtree::c = Yellow;
 
 Quadtree::Quadtree(const AABB& box)
 {
+	CreateRoot(box);
+}
+
+void Quadtree::CreateRoot(const AABB& box)
+{
+	RELEASE(root);
+
 	root = new QuadtreeNode(box);
 	root->level = 0;
 	root->tree = this;
@@ -54,13 +61,16 @@ void Quadtree::AddGameObject(GameObject* gameObject)
 
 void Quadtree::ExpandRootNode(GameObject* gameObject)
 {
-	if (root->box.MinX() > gameObject->aabb.MinX()) root->box.minPoint.x = gameObject->aabb.MinX();
-	if (root->box.MinY() > gameObject->aabb.MinY()) root->box.minPoint.y = gameObject->aabb.MinY();
-	if (root->box.MinZ() > gameObject->aabb.MinZ()) root->box.minPoint.z = gameObject->aabb.MinZ();
+	float3 min = root->box.minPoint;
+	float3 max = root->box.maxPoint;
 
-	if (root->box.MaxX() < gameObject->aabb.MaxX()) root->box.maxPoint.x = gameObject->aabb.MaxX();
-	if (root->box.MaxY() < gameObject->aabb.MaxY()) root->box.maxPoint.y = gameObject->aabb.MaxY();
-	if (root->box.MaxZ() < gameObject->aabb.MaxZ()) root->box.maxPoint.z = gameObject->aabb.MaxZ();
+	if (min.x > gameObject->aabb.MinX()) min.x = gameObject->aabb.MinX();
+	if (min.y > gameObject->aabb.MinY()) min.y = gameObject->aabb.MinY();
+	if (min.z > gameObject->aabb.MinZ()) min.z = gameObject->aabb.MinZ();
+
+	if (max.x < gameObject->aabb.MaxX()) max.x = gameObject->aabb.MaxX();
+	if (max.y < gameObject->aabb.MaxY()) max.y = gameObject->aabb.MaxY();
+	if (max.z < gameObject->aabb.MaxZ()) max.z = gameObject->aabb.MaxZ();
 
 	//root->UpdateVBO();
 
@@ -68,7 +78,10 @@ void Quadtree::ExpandRootNode(GameObject* gameObject)
 	
 	root->GetAllBuckets(all_bucket);
 
+
 	Clear();
+	RELEASE(root);
+	CreateRoot(AABB(min,max));
 
 	for (GameObject* obj : all_bucket)
 	{
@@ -86,10 +99,10 @@ void QuadtreeNode::ResetCullingState()
 
 	for (GameObject* b : bucket)
 	{
-		b->is_drawn = false;
+		b->is_drawn = true;
 	}
 
-	//is_culling = false;
+	is_culling = false;
 }
 
 void QuadtreeNode::GetAllBuckets(std::vector<GameObject*>& all_bucket)
@@ -399,7 +412,7 @@ void QuadtreeNode::Draw()
 	toDraw.minPoint.y += 0.5f;
 	toDraw.minPoint.z += 0.5f;
 
-	//UpdateVBO(toDraw);
+	UpdateVBO(toDraw);
 	DrawEx(color);
 
 	for (uint i = 0; i < childs.size(); i++)

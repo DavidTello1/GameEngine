@@ -33,10 +33,10 @@ bool ModuleScene::Start(Config* config)
 {
 	LOG("Loading main scene", 'v');
 
-	GameObject* go = CreateGameObject("test camera");
-	go->AddComponent(Component::Type::Camera);
+	test_camera_obj = CreateGameObject("test camera");
+	test_camera_obj->AddComponent(Component::Type::Camera);
 
-	test_camera = go->GetComponent<ComponentCamera>();
+	test_camera = test_camera_obj->GetComponent<ComponentCamera>();
 	
 	//ResourceModel* tcmodel = new ResourceModel(root_object->GetUID());
 	//std::string tmdp = "MyCamera.dvs";
@@ -127,6 +127,17 @@ bool ModuleScene::PostUpdate(float dt)
 		{
 			obj->UpdateTransform();
 			obj->parent->UpdateBoundingBox();
+
+			if (test_camera_obj != obj)
+			{
+				quadtree->Clear();
+				
+				for (GameObject* obj : gameObjects)
+				{
+					quadtree->AddGameObject(obj);
+				}
+			}
+
 			obj->flags &= ~ProcessTransformUpdate;
 		}
 	}
@@ -156,6 +167,7 @@ bool ModuleScene::CleanUp()
 
 bool ModuleScene::Draw()
 {
+	// ALL this need a big rework
 	quadtree->root->ResetCullingState();
 
 	// Cheap fix
@@ -245,7 +257,7 @@ bool ModuleScene::Draw()
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 
-		
+		//obj->is_drawn = true;
 	}
 	return true;
 }
