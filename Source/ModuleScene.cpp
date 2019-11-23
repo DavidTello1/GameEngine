@@ -42,7 +42,7 @@ bool ModuleScene::Start(Config* config)
 	//std::string tmdp = "MyCamera.dvs";
 	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
 
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 3; i++) {
 
 	ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
 	std::string tmp = "MyBakerHouse.dvs";
@@ -162,7 +162,7 @@ bool ModuleScene::Draw()
 	glColor3ub(255, 255, 255);
 
 	Color c;
-	static std::vector< GameObject*> candidates;
+	std::vector< GameObject*> candidates;
 	quadtree->CollectCandidates(candidates, test_camera->frustum);
 
 	for ( GameObject* obj : candidates)
@@ -173,8 +173,7 @@ bool ModuleScene::Draw()
 		//obj->is_drawn = true;
 
 		// Draw GameObjects
-		//if (!App->scene_base->camera_culling || test_camera->ContainsAABB(obj->aabb))
-		if (test_camera->ContainsAABB(obj->aabb))
+		if (!App->scene_base->camera_culling || test_camera->ContainsAABB(obj->aabb))
 		{
 			//test_camera->frustum.Intersects()
 			glPushMatrix();

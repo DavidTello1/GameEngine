@@ -139,37 +139,45 @@ QuadtreeNode::QuadtreeNode(const AABB& box) : box(box)
 }
 
 QuadtreeNode::QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index) : tree(tree)
-{
-	//Index positions from top view
-	//0 1
-	//2 3
+{	
 	float3 minPoint, maxPoint;
 
-	// Y oscillates each index
-	minPoint.x = ((index % 2) == 0) ? parent->box.minPoint.x : (parent->box.maxPoint.x + parent->box.minPoint.x) / 2;
-	maxPoint.x = ((index % 2) == 0) ? (parent->box.maxPoint.x + parent->box.minPoint.x) / 2 : parent->box.maxPoint.x;
+	if (QUADTREE == 4)
+	{
+		// X oscillates each index
+		minPoint.x = ((index % 2) == 0) ? parent->box.minPoint.x : (parent->box.maxPoint.x + parent->box.minPoint.x) / 2;
+		maxPoint.x = ((index % 2) == 0) ? (parent->box.maxPoint.x + parent->box.minPoint.x) / 2 : parent->box.maxPoint.x;
 
-	// Y oscillates every 4 index
-	minPoint.y = (index < 4) ? parent->box.minPoint.y : (parent->box.maxPoint.y + parent->box.minPoint.y) / 2;
-	maxPoint.y = (index < 4) ? (parent->box.maxPoint.y + parent->box.minPoint.y) / 2 : parent->box.maxPoint.y;
+		// Y Do not oscillates
+		minPoint.z = parent->box.minPoint.z;
+		maxPoint.z = parent->box.maxPoint.z;
 
-	// Z oscillates every 2 index
-	minPoint.z = ((index / 2) % 2 == 0) ? parent->box.minPoint.z : (parent->box.maxPoint.z + parent->box.minPoint.z) / 2;
-	maxPoint.z = ((index / 2) % 2 == 0) ? (parent->box.maxPoint.z + parent->box.minPoint.z) / 2 : parent->box.maxPoint.z;
+		// Z oscillates every 2 index
+		minPoint.y = ((index / 2) % 2 == 0) ? parent->box.minPoint.y : (parent->box.maxPoint.y + parent->box.minPoint.y) / 2;
+		maxPoint.y = ((index / 2) % 2 == 0) ? (parent->box.maxPoint.y + parent->box.minPoint.y) / 2 : parent->box.maxPoint.y;
 
+	}
+	else if (QUADTREE == 8)
+	{
+		// Y oscillates each index
+		minPoint.x = ((index % 2) == 0) ? parent->box.minPoint.x : (parent->box.maxPoint.x + parent->box.minPoint.x) / 2;
+		maxPoint.x = ((index % 2) == 0) ? (parent->box.maxPoint.x + parent->box.minPoint.x) / 2 : parent->box.maxPoint.x;
 
+		// Y oscillates every 4 index
+		minPoint.y = (index < 4) ? parent->box.minPoint.y : (parent->box.maxPoint.y + parent->box.minPoint.y) / 2;
+		maxPoint.y = (index < 4) ? (parent->box.maxPoint.y + parent->box.minPoint.y) / 2 : parent->box.maxPoint.y;
+
+		// Z oscillates every 2 index
+		minPoint.z = ((index / 2) % 2 == 0) ? parent->box.minPoint.z : (parent->box.maxPoint.z + parent->box.minPoint.z) / 2;
+		maxPoint.z = ((index / 2) % 2 == 0) ? (parent->box.maxPoint.z + parent->box.minPoint.z) / 2 : parent->box.maxPoint.z;
+
+	}
 	box = AABB(minPoint, maxPoint);
 	box.padding = 0;
 	box.padding2 = 0;
 	this->level = parent->level+1;
 
-	if (VBO == 0) glGenBuffers(1, &VBO);
-
-	float3 corners[8];
-	box.GetCornerPoints(corners);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, box.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
+	UpdateVBO(box);
 }
 
 
@@ -187,7 +195,7 @@ void QuadtreeNode::UpdateVBO(const math::AABB & box)
 {
 	if (VBO == 0) glGenBuffers(1, &VBO);
 
-	float3 corners[8];
+	//float3 corners[8];
 	box.GetCornerPoints(corners);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -216,7 +224,7 @@ void QuadtreeNode::Split()
 		LOG("[error] Quadtree Node splitting when it already has childs");
 	}
 	else {
-		for (uint i = 0; i < 8; i++)
+		for (uint i = 0; i < QUADTREE; i++)
 			childs.push_back(new QuadtreeNode(tree, this, i));
 	}
 }
@@ -391,7 +399,7 @@ void QuadtreeNode::Draw()
 	toDraw.minPoint.y += 0.5f;
 	toDraw.minPoint.z += 0.5f;
 
-	UpdateVBO(toDraw);
+	//UpdateVBO(toDraw);
 	DrawEx(color);
 
 	for (uint i = 0; i < childs.size(); i++)

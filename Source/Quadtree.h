@@ -11,6 +11,8 @@ class GameObject;
 class QuadtreeNode;
 class Color;
 
+#define QUADTREE 4
+
 class Quadtree
 {
 	friend class ModuleScene; //ToRemove
@@ -96,6 +98,7 @@ private:
 	uint maxBucketSize = 3;
 	std::vector<GameObject*> bucket;
 
+	float3 corners[8];
 	Color culling_color = LightGrey;
 	bool is_culling = false;
 	//uint index = 0;
