@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
+#include "ComponentMesh.h"
 
 #include "Assimp/include/mesh.h"
 #include "par_shapes.h"
@@ -277,4 +278,148 @@ void ResourceMesh::GenTexture()
 	glBindBuffer(GL_ARRAY_BUFFER, tex_coords_id);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float2) * num_tex_coords, tex_coords, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void ResourceMesh::CreateShape(ResourceMesh* mesh, const shape_type &type, int slices, int stacks, float x, float y, float z, float radius)
+{
+	par_shapes_mesh* m;
+
+	if (slices < 3)
+	{
+		slices = 3;
+		LOG("Slices less than 3, setting to 3", 'w');
+	}
+
+	switch (type)
+	{
+	case CYLINDER:
+		m = par_shapes_create_cylinder(slices, stacks);
+		break;
+	case CONE:
+		m = par_shapes_create_cone(slices, stacks);
+		break;
+	case TORUS:
+		m = par_shapes_create_torus(slices, stacks, radius);
+		break;
+	case SPHERE:
+		m = par_shapes_create_parametric_sphere(slices, stacks);
+		break;
+	case BOTTLE:
+		m = par_shapes_create_klein_bottle(slices, stacks);
+		break;
+	case KNOT:
+		m = par_shapes_create_trefoil_knot(slices, stacks, radius);
+		break;
+	case HEMISPHERE:
+		m = par_shapes_create_hemisphere(slices, stacks);
+		break;
+	case PLANE:
+		m = par_shapes_create_plane(slices, stacks);
+		break;
+	case ICOSAHEDRON:
+		m = par_shapes_create_icosahedron();
+		break;
+	case DODECAHEDRON:
+		m = par_shapes_create_dodecahedron();
+		break;
+	case OCTAHEDRON:
+		m = par_shapes_create_octahedron();
+		break;
+	case TETRAHEDRON:
+		m = par_shapes_create_tetrahedron();
+		break;
+	case CUBE:
+		m = par_shapes_create_cube();
+		break;
+	case ROCK:
+		m = par_shapes_create_rock(slices*stacks, 2);
+		break;
+
+	default:
+		break;
+	}
+
+	par_shapes_translate(m, x, y, z);
+
+	LOG("Creating primitive '%s'", GetShapeName(type), 'v');
+
+	GameObject* object = App->scene->CreateGameObject(GetShapeName(type), nullptr, true);
+	ComponentMesh* mesh_comp = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
+	ComponentMaterial* material = (ComponentMaterial*)object->AddComponent(Component::Type::Material);
+
+	// Vertices ------------------
+	mesh->num_vertices = m->npoints;
+	mesh->vertices = new float3[mesh->num_vertices];
+	if (mesh->num_vertices >= 3)
+	{
+		object->min_vertex.x = m->points[0];
+		object->min_vertex.y = m->points[1];
+		object->min_vertex.z = m->points[2];
+		object->max_vertex.x = m->points[0];
+		object->max_vertex.y = m->points[1];
+		object->max_vertex.z = m->points[2];
+	}
+	else {
+		LOG("Mesh has no vertices", 'e');
+		return;
+	}
+	for (uint i = 0; i < mesh->num_vertices; ++i)
+	{
+		int k = i * 3;
+		float x = m->points[k];
+		float y = m->points[k + 1];
+		float z = m->points[k + 2];
+
+		mesh->vertices[i].x = x; 
+		mesh->vertices[i].y = y; 
+		mesh->vertices[i].z = z; 
+
+		// Bounding box setting up
+		if (x < object->min_vertex.x) object->min_vertex.x = x;
+		if (y < object->min_vertex.y) object->min_vertex.y = y;
+		if (z < object->min_vertex.z) object->min_vertex.z = z;
+
+		if (x > object->max_vertex.x) object->max_vertex.x = x;
+		if (y > object->max_vertex.y) object->max_vertex.y = y;
+		if (z > object->max_vertex.z) object->max_vertex.z = z;
+	}
+
+	mesh->GenVBO();
+
+
+	// Indices ---------------------
+	mesh->num_indices = m->ntriangles * 3;
+	mesh->indices = new GLuint[mesh->num_indices];
+
+	for (uint i = 0; i < mesh->num_indices; ++i)
+	{
+		mesh->indices[i] = (GLuint)m->triangles[i];
+	}
+
+	mesh->GenIBO();
+
+	// Texture -----------------------
+	if (m->tcoords != nullptr) {
+
+		mesh->num_tex_coords = m->npoints;
+		mesh->tex_coords = new float2[mesh->num_tex_coords];
+
+		for (unsigned i = 0; i < mesh->num_tex_coords; ++i)
+		{
+			int k = i * 2;
+			mesh->tex_coords[i].x = m->tcoords[k];
+			mesh->tex_coords[i].y = m->tcoords[k + 1];
+		}
+	}
+	par_shapes_free_mesh(m);
+
+	mesh->GenTexture();
+
+	if (type < 8) //idk but has to be like this for now, otherwise ImGui crashes
+	{
+		object->GenBoundingBox();
+		object->is_valid_dimensions = true;
+	}
+
+	mesh_comp->SetMesh(mesh);
 }

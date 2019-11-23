@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Hierarchy.h"
 #include "Globals.h"
+#include "ResourceMesh.h"
 
 #include "ImGui/imgui.h"
 #include "mmgr/mmgr.h"
@@ -103,53 +104,81 @@ void Hierarchy::DrawCreateMenu()
 	ImGui::Separator();
 	if (ImGui::BeginMenu("Basic shapes"))
 	{
-		//if (ImGui::MenuItem("Cylinder"))
-		//	App->resources->CreateShape(CYLINDER, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Cone"))
-		//	App->resources->CreateShape(CONE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Sphere"))
-		//	App->resources->CreateShape(SPHERE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Plane"))
-		//	App->resources->CreateShape(PLANE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Cube"))
-		//	App->resources->CreateShape(CUBE, 9, 9,0,0,0,0.5f, parent);
-
+		if (ImGui::MenuItem("Cylinder"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, CYLINDER, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Cone"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, CONE, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Sphere"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, SPHERE, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Plane"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, PLANE, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Cube"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, CUBE, 9, 9, 0, 0, 0, 0.5f);
+		}
 		ImGui::EndMenu();
 	}
 
 	if (ImGui::BeginMenu("Extended shapes"))
 	{
-		//if (ImGui::MenuItem("Torus"))
-		//	App->resources->CreateShape(TORUS, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Bottle"))
-		//	App->resources->CreateShape(BOTTLE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Knot"))
-		//	App->resources->CreateShape(KNOT, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Hemisphere"))
-		//	App->resources->CreateShape(HEMISPHERE, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Icosahedron"))
-		//	App->resources->CreateShape(ICOSAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Dodecahedron"))
-		//	App->resources->CreateShape(DODECAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Octahedron"))
-		//	App->resources->CreateShape(OCTAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Tetrahedron"))
-		//	App->resources->CreateShape(TETRAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		//if (ImGui::MenuItem("Rock"))
-		//	App->resources->CreateShape(ROCK, 9, 9,0,0,0,0.5f, parent);
-
+		if (ImGui::MenuItem("Torus"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, TORUS, 9, 9, 0, 0, 0, 0.5f);
+		}			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+		if (ImGui::MenuItem("Bottle"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, BOTTLE, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Knot"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, KNOT, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Hemisphere"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, HEMISPHERE, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Icosahedron"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, ICOSAHEDRON, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Dodecahedron"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, DODECAHEDRON, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Octahedron"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, OCTAHEDRON, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Tetrahedron"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, TETRAHEDRON, 9, 9, 0, 0, 0, 0.5f);
+		}
+		if (ImGui::MenuItem("Rock"))
+		{
+			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+			res->CreateShape(res, ROCK, 9, 9, 0, 0, 0, 0.5f);
+		}
 		ImGui::EndMenu();
 	}
 	ImGui::EndMenu();

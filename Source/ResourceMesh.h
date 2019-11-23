@@ -1,5 +1,6 @@
 #pragma once
 #include "Resource.h"
+#include "GameObject.h"
 #include "Math.h"
 #include <string>
 
@@ -44,10 +45,8 @@ public:
 	bool LoadtoScene();
 	void UnLoad();
 
-	//void Draw();
-	//void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, GameObject* parent = nullptr);
-
-	//const char* GetShapeName(shape_type type) { return shape_to_string[type]; }
+	void CreateShape(ResourceMesh* mesh, const shape_type& type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f);
+	const char* GetShapeName(shape_type type) { return shape_to_string[type]; }
 
 private:
 	bool LoadMesh(const aiMesh* mesh);
