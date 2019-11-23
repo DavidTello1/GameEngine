@@ -92,7 +92,7 @@ bool Configuration::InitModuleDraw(Module* module)
 
 void Configuration::DrawApplication()
 {
-	if (ImGui::CollapsingHeader("Application"))
+	if (ImGui::CollapsingHeader("Application", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		static char app_name[120];
 		strcpy_s(app_name, 120, App->GetAppName());
@@ -141,7 +141,7 @@ void Configuration::DrawApplication()
 		ImGui::Separator();
 
 		// FPS 
-		if (ImGui::TreeNode("FPS"))
+		if (ImGui::TreeNodeEx("FPS", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			bool vsync = App->renderer3D->GetVSync();
 			if (ImGui::Checkbox("Vertical Sync", &vsync))

@@ -33,10 +33,10 @@ bool ModuleScene::Start(Config* config)
 {
 	LOG("Loading main scene", 'v');
 
-	GameObject* go = CreateGameObject("test camera");
-	go->AddComponent(Component::Type::Camera);
+	test_camera_obj = CreateGameObject("test camera");
+	test_camera_obj->AddComponent(Component::Type::Camera);
 
-	test_camera = go->GetComponent<ComponentCamera>();
+	test_camera = test_camera_obj->GetComponent<ComponentCamera>();
 	
 	//ResourceModel* tcmodel = new ResourceModel(root_object->GetUID());
 	//std::string tmdp = "MyCamera.dvs";
@@ -127,6 +127,17 @@ bool ModuleScene::PostUpdate(float dt)
 		{
 			obj->UpdateTransform();
 			obj->parent->UpdateBoundingBox();
+
+			if (test_camera_obj != obj)
+			{
+				quadtree->Clear();
+				
+				for (GameObject* obj : gameObjects)
+				{
+					quadtree->AddGameObject(obj);
+				}
+			}
+
 			obj->flags &= ~ProcessTransformUpdate;
 		}
 	}
@@ -149,13 +160,14 @@ bool ModuleScene::CleanUp()
 
 bool ModuleScene::Draw()
 {
-	quadtree->root->ResetCullingState();
+	// ALL this need a big rework
+	quadtree->ResetCullingState();
 
 	// Cheap fix
 	glColor3ub(255, 255, 255);
 
 	Color c;
-	static std::vector< GameObject*> candidates;
+	std::vector< GameObject*> candidates;
 	quadtree->CollectCandidates(candidates, test_camera->frustum);
 
 	for ( GameObject* obj : candidates)
@@ -166,8 +178,7 @@ bool ModuleScene::Draw()
 		//obj->is_drawn = true;
 
 		// Draw GameObjects
-		//if (!App->scene_base->camera_culling || test_camera->ContainsAABB(obj->aabb))
-		if (test_camera->ContainsAABB(obj->aabb))
+		if (!App->scene_base->camera_culling || test_camera->frustum.DO_Intersects(obj->aabb))
 		{
 			//test_camera->frustum.Intersects()
 			glPushMatrix();
@@ -239,7 +250,7 @@ bool ModuleScene::Draw()
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 
-		
+		//obj->is_drawn = true;
 	}
 	return true;
 }

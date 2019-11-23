@@ -55,6 +55,7 @@ public:
 	static GameObject* root_object;
 
 	ComponentCamera* test_camera = nullptr;
+	GameObject* test_camera_obj = nullptr;
 
 private:
 	Quadtree* quadtree;
