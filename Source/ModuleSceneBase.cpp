@@ -209,14 +209,14 @@ void ModuleSceneBase::CameraMousePicking()
 		//x = -x;
 
 		// Converting origin to viewport center origin
-		x -= 250;//(250 + 738/2);
+		x -= 212;//(250 + 738/2);
 		y -= 19;//(19 + 563/2);
 
-		float xn = (float)x / 738.0f;
-		float yn = (float)y / 563.0f;
+		float xn = (float)x / 776.0f;	// viewport_camera->GetWidth();
+		float yn = (float)y / -558.0f ;		// -viewport_camera->GetHeight();
 
-		/*xn = (xn - 0.5) * 2;
-		yn = (yn - 0.5) * 2;*/
+		xn = (xn - 0.5f) * 2.0f;
+		yn = (yn + 0.5f) * 2.0f;
 
 		Ray ray = cam->frustum.UnProjectFromNearPlane((float)xn, (float)yn);
 		//Ray ray = cam->frustum.UnProjectFromNearPlane((float)xn, (float)yn);
