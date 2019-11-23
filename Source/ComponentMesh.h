@@ -12,13 +12,13 @@ public:
 	virtual ~ComponentMesh();
 
 	void DrawInspector();
+	static inline Component::Type GetType() { return Component::Type::Mesh; }
 
 	void SetMesh(ResourceMesh* Mesh) { mesh = Mesh; }
 	ResourceMesh* GetMesh() const { return mesh; }
 
-	void SetBoundingBox();
-
 private:
 	ResourceMesh* mesh = nullptr;
+
 };
 

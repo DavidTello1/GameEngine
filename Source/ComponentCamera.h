@@ -8,6 +8,10 @@
 #include "Math.h"
 #include "Color.h"
 
+#define AABB_OUT 0
+#define AABB_IN	1
+#define INTERSECT 2
+
 class ComponentCamera : public Component
 {
 public:
@@ -18,11 +22,13 @@ public:
 	~ComponentCamera();
 
 	void DrawInspector();
+	static inline Component::Type GetType() { return Component::Type::Camera; }
 
 	//  -------------------------------------- Getters
 	float GetNearPlane() const;
 	float GetFarPlane() const;
 	float GetFOV(bool in_degree = true) const;
+	float GetHorizontalFOV(bool in_degree = true) const;
 	float GetAspectRatio() const;
 
 	float* GetViewMatrix();
@@ -40,13 +46,21 @@ public:
 
 	void Look(const float3 & position);
 
+	void UpdatePlanes();
+
 	void DrawFrustum();
+
+	//  -------------------------------------- Consultors
+	bool ContainsAABB(const AABB & refBox) const;
+
 
 	bool viewport_focus = true;
 	bool perspective = true;
 	bool update_projection = false;
 
-	Frustum frustum;
+	float aspect_ratio = 0.0f;
 
+	Frustum frustum;
+	Plane planes[6];
 	Color background = DarkGrey;
 };

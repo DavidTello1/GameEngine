@@ -4,6 +4,8 @@
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
+#include "ResourceModel.h"
+#include "Quadtree.h"
 
 #include "mmgr/mmgr.h"
 
@@ -18,31 +20,42 @@ ModuleScene::~ModuleScene()
 	delete root_object;
 }
 
+bool ModuleScene::Init(Config* config)
+{
+	root_object = new GameObject("Root", nullptr);
+	root_object->uid = 0;
+	// Create game objects after this ^^^^^^^^^^^^	
+
+	return true;
+}
 // Load assets
 bool ModuleScene::Start(Config* config)
 {
 	LOG("Loading main scene", 'v');
 
-	root_object = new GameObject("Root", nullptr);
-	root_object->uid = 0;
+	GameObject* go = CreateGameObject("test camera");
+	go->AddComponent(Component::Type::Camera);
 
-	// Create game objects after this ^^^^^^^^^^^^	
+	test_camera = go->GetComponent<ComponentCamera>();
+	
+	//ResourceModel* tcmodel = new ResourceModel(root_object->GetUID());
+	//std::string tmdp = "MyCamera.dvs";
+	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
 
-	test_camera = CreateGameObject("test camera");
-	test_camera->AddComponent(Component::Type::Camera);
+	for (int i = 0; i < 6; i++) {
 
-	//GameObject* bparent = CreateGameObject("BakerHouse");
+	ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
+	std::string tmp = "MyBakerHouse.dvs";
+	bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
 
-	//App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent);
-	//App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
+	
+	gameObjects[2+i*3]->SetLocalPosition({ 5.0f*i,0.0f,-5.0f* i });
+	}
 
-	// ParShapes 
-	/*GameObject* pparent = CreateGameObj("ParShapes");
-	for (int i = 0; i < shape_type::UNKNOWN; i++)
-	{
-		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10, 0.5f, pparent->GetUID());
-	}*/
+	quadtree = new Quadtree(AABB({ -20,-20,-20 }, { 20,20,20 }));
 
+	
+	//quadtree->AddGameObject(bhmodel.)
 	UnSelectAll();
 
 	return true;
@@ -50,6 +63,44 @@ bool ModuleScene::Start(Config* config)
 
 bool ModuleScene::Update(float dt)
 {
+	if (test_camera)
+		test_camera->DrawFrustum();
+
+	if (App->input->GetKey(SDL_SCANCODE_0) == KEY_DOWN)
+	{
+		for (GameObject* obj : gameObjects)
+		{
+			//obj->UpdateBoundingBox();
+			quadtree->RemoveGameObject(obj);
+		}
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
+	{
+		for (GameObject* obj : gameObjects)
+		{
+			//obj->UpdateBoundingBox();
+			quadtree->AddGameObject(obj);
+		}
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
+	{
+
+		//quadtree->RemoveGameObject(gameObjects.back());
+		quadtree->OptimizeSpace();
+
+	}
+	if (App->input->GetKey(SDL_SCANCODE_3) == KEY_DOWN)
+	{
+
+		quadtree->RemoveGameObject(gameObjects.back());
+
+	}
+
+	quadtree->Draw();
+	
+
 	return true;
 }
 
@@ -72,6 +123,12 @@ bool ModuleScene::PostUpdate(float dt)
 			obj->ChildDeleted();
 			obj->flags &= ~ProcessDeletedChild;
 		}
+		if (obj->flags & ProcessTransformUpdate)
+		{
+			obj->UpdateTransform();
+			obj->parent->UpdateBoundingBox();
+			obj->flags &= ~ProcessTransformUpdate;
+		}
 	}
 
 	return true;
@@ -92,50 +149,97 @@ bool ModuleScene::CleanUp()
 
 bool ModuleScene::Draw()
 {
-	// Draw GameObjects
-	for (uint i = 0; i < gameObjects.size(); ++i)
+	quadtree->root->ResetCullingState();
+
+	// Cheap fix
+	glColor3ub(255, 255, 255);
+
+	Color c;
+	static std::vector< GameObject*> candidates;
+	quadtree->CollectCandidates(candidates, test_camera->frustum);
+
+	for ( GameObject* obj : candidates)
 	{
-		glPushMatrix();
-		glMultMatrixf(gameObjects[i]->GetLocalTransform().ptr());
 
-		ComponentRenderer* renderer = (ComponentRenderer*)gameObjects[i]->GetComponent(Component::Type::Renderer);
-		if (renderer != nullptr && renderer->IsActive())
+		c = (!obj->HasChilds()) ? App->scene_base->aabb_color : Cyan;
+		// Just boxes colors things
+		//obj->is_drawn = true;
+
+		// Draw GameObjects
+		//if (!App->scene_base->camera_culling || test_camera->ContainsAABB(obj->aabb))
+		if (test_camera->ContainsAABB(obj->aabb))
 		{
-			if (renderer->show_wireframe || App->scene_base->show_all_wireframe) //wireframe
+			//test_camera->frustum.Intersects()
+			glPushMatrix();
+			glMultMatrixf(obj->GetGlobalTransform().Transposed().ptr());
+
+			ComponentRenderer* renderer = obj->GetComponent<ComponentRenderer>();
+			if (renderer != nullptr && renderer->IsActive())
 			{
-
-				glColor3ub(App->scene_base->wireframe_color.r*255.0f, App->scene_base->wireframe_color.g * 255.0f, App->scene_base->wireframe_color.b * 255.0f);
-				glLineWidth(App->scene_base->wireframe_width);
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				if (renderer->show_wireframe || App->scene_base->show_all_wireframe) //wireframe
+				{
+					glColor3ub(App->scene_base->wireframe_color.r*255.0f, App->scene_base->wireframe_color.g * 255.0f, App->scene_base->wireframe_color.b * 255.0f);
+					glLineWidth(App->scene_base->wireframe_width);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					glColor3ub(255, 255, 255);
+				}
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				
+				renderer->Draw();
 			}
-			else
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-			renderer->Draw();
+			glPopMatrix();
 		}
-
-		// Bounding boxes
-		GameObject* obj = gameObjects[i];
-		glEnableClientState(GL_VERTEX_ARRAY);
-		if ((obj->show_bounding_box || App->scene_base->show_all_bounding_box) && obj->bb_VBO != 0)
+		else
 		{
-			glColor3ub(App->scene_base->bounding_box_color.r * 255.0f, App->scene_base->bounding_box_color.g * 255.0f, App->scene_base->bounding_box_color.b * 255.0f);
-			glLineWidth(App->scene_base->bounding_box_width);
+			obj->is_drawn = false;
+		}
+	}
 
-			glBindBuffer(GL_ARRAY_BUFFER, obj->bb_VBO);
+	for (GameObject* obj : gameObjects)
+	{		
+		glEnableClientState(GL_VERTEX_ARRAY);
+
+		// AABB
+		if ((obj->show_aabb || App->scene_base->show_all_aabb) && obj->aabb_VBO != 0)
+		{
+			c = (obj->is_drawn) ? App->scene_base->aabb_color : LightGrey;
+
+			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
+			glLineWidth(App->scene_base->aabb_width);
+
+			glBindBuffer(GL_ARRAY_BUFFER, obj->aabb_VBO);
 			glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->bb_IBO);
-			glDrawElements(GL_LINES, sizeof(App->resources->bbox_indices), GL_UNSIGNED_INT, nullptr);
-
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aabb_IBO);
+			glDrawElements(GL_LINES, sizeof(aabb_indices), GL_UNSIGNED_INT, nullptr);
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glColor3ub(255, 255, 255);
 		}
+		// OBB
+		if ((obj->show_obb || App->scene_base->show_all_obb) && obj->obb_VBO != 0)
+		{
+			c = (obj->is_drawn) ? App->scene_base->obb_color : DarkGrey;
+
+			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
+			glLineWidth(App->scene_base->obb_width);
+
+			glBindBuffer(GL_ARRAY_BUFFER, obj->obb_VBO);
+			glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aabb_IBO);
+			glDrawElements(GL_LINES, sizeof(aabb_indices), GL_UNSIGNED_INT, nullptr);
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glColor3ub(255, 255, 255);
+		}
+
 		glDisableClientState(GL_VERTEX_ARRAY);
 
-		glPopMatrix();
+		
 	}
 	return true;
 }

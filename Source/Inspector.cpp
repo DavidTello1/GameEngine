@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleEditor.h"
 #include "GameObject.h"
+#include "ModuleScene.h"
 #include "Component.h"
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
@@ -35,7 +36,7 @@ void Inspector::Draw()
 		return;
 	}
 	position = obj->GetPosition();
-	rotation = obj->GetRotation();
+	rotation = obj->GetRotation() * RADTODEG;
 	scale = obj->GetScale();
 
 
@@ -117,65 +118,122 @@ void Inspector::Draw()
 
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		if (ImGui::BeginPopupContextItem("Transform"))
+		{
+			if (ImGui::MenuItem("Reset"))
+				obj->ResetTransform();
+			ImGui::EndPopup();
+		}
+		ImGui::Checkbox("Static", &obj->is_static);
+
+		if (obj->is_static)
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		}
+		
 		// Position
 		ImGui::Text("Position");
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("x##1", &position.x, 0.5f))
-			SetPosition(obj, position);
+
+		if (ImGui::DragFloat("x##1", &position.x, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("y##1", &position.y, 0.5f))
-			SetPosition(obj, position);
+
+		if (ImGui::DragFloat("y##1", &position.y, precision,-inf,inf, precision_char))
+		if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("z##1", &position.z, 0.5f))
-			SetPosition(obj, position);
+		
+		if (ImGui::DragFloat("z##1", &position.z, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::Separator();
 
 		// Rotation
 		ImGui::Text("Rotation");
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("x##2", &rotation.x, 0.5f, 0.0f, 360.0f))
-			SetRotation(obj, rotation);
+
+		if (ImGui::DragFloat("x##2", &rotation.x, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("y##2", &rotation.y, 0.5f, 0.0f, 360.0f))
-			SetRotation(obj, rotation);
+	
+		if (ImGui::DragFloat("y##2", &rotation.y, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("z##2", &rotation.z, 0.5f, 0.0f, 360.0f))
-			SetRotation(obj, rotation);
+
+		if (ImGui::DragFloat("z##2", &rotation.z, precision, -inf, inf, precision_char))
+		if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::Separator();
 
 		// Scale
 		ImGui::Text("Scale");
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("x##3", &scale.x, 0.2f))
-			SetScale(obj, scale);
+		
+		if (ImGui::DragFloat("x##3", &scale.x, precision, -inf, inf, precision_char))
+		{
+			if (!obj->is_static) {
+				if (lock_scale)
+				{
+					float diff = scale.x - obj->GetScale().x;
+					SetScale(obj, { scale.x, scale.y + diff, scale.z + diff });
+				}
+				else
+					SetScale(obj, scale);
+			}
+		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("y##3", &scale.y, 0.2f))
-			SetScale(obj, scale);
+
+		if (ImGui::DragFloat("y##3", &scale.y, precision, -inf, inf, precision_char))
+		{
+			if (!obj->is_static) {
+				if (lock_scale)
+				{
+					float diff = scale.y - obj->GetScale().y;
+					SetScale(obj, { scale.x + diff, scale.y, scale.z + diff });
+				}
+				else
+					SetScale(obj, scale);
+			}
+		}
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		if (ImGui::DragFloat("z##3", &scale.z, 0.2f))
-			SetScale(obj, scale);
+		
+		if (ImGui::DragFloat("z##3", &scale.z, precision, -inf, inf, precision_char))
+		{
+			if (!obj->is_static) {
+				if (lock_scale)
+				{
+					float diff = scale.z - obj->GetScale().z;
+					SetScale(obj, { scale.x + diff, scale.y + diff,scale.z });
+				}
+				else
+					SetScale(obj, scale);
+			}
+		}
+
+		ImGui::SameLine();
+		//ImGui::SetNextItemWidth(60);
+		ImGui::Checkbox("lock##1", &lock_scale);
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Lock scale");
 
 		ImGui::Separator();
-		ImGui::NewLine();
 
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
-		ImGui::Checkbox("BoundingBox", &obj->show_bounding_box);
-
-		ImGui::Separator();
+		if (obj->is_static)
+		{
+			ImGui::PopStyleVar();
+		}
 	}
 
 	// Draw Components

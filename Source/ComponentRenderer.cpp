@@ -32,6 +32,11 @@ void ComponentRenderer::DrawInspector()
 		else
 		{
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
+			ImGui::Checkbox("AABB", &object->show_aabb);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
+			ImGui::Checkbox("OBB", &object->show_obb);
+
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 			ImGui::Checkbox("Wireframe", &show_wireframe);
 		}
 		ImGui::Separator();
@@ -43,8 +48,8 @@ void ComponentRenderer::Draw()
 	ComponentMesh* mesh = nullptr;
 	for (uint i = 0; i < object->components.size(); i++)
 	{
-		mesh = (ComponentMesh*)object->components[i];
-		if (mesh->GetMesh() != nullptr && mesh->GetType() == Component::Type::Mesh && mesh->IsActive())
+		mesh = (object->components[i]->type == Component::Type::Mesh) ? (ComponentMesh*)object->components[i] : nullptr;
+		if (mesh && mesh->IsActive())
 		{
 			Draw(*mesh, (ComponentMaterial*)mesh->GetGameobj()->GetComponent(Component::Type::Material));
 

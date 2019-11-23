@@ -27,7 +27,7 @@ public:
 
 	void RemoveBuffer(FrameBuffer & buffer);
 
-	void OnResize(int width, int height);
+	void OnResize(float width, float height);
 
 	void OnCameraUpdate();
 

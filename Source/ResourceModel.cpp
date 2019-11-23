@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
+#include "ModuleScene.h"
 #include "ResourceModel.h"
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"
@@ -238,7 +239,8 @@ void ResourceModel::CreateGameObjects(const char* name)
 			ResourceMesh* r_mesh = (ResourceMesh*)App->resources->GetResource(nodes[i].mesh);
 			r_mesh->LoadToMemory(); //load mesh data
 			mesh->SetMesh(r_mesh);
-			mesh->SetBoundingBox();
+
+			obj->GenerateBoundingBox();
 
 			obj->AddComponent(Component::Type::Renderer);
 		}

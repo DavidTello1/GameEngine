@@ -5,6 +5,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleInput.h"
 #include "ModuleEditor.h"
+#include "ModuleScene.h"
 #include "Console.h"
 #include "Hierarchy.h"
 #include "Inspector.h"
@@ -24,6 +25,23 @@
 
 using namespace std;
 
+static void ShowExampleAppDockSpace(bool* p_open);
+// Editor booleans
+bool ModuleEditor::is_draw_menu				= true;
+bool ModuleEditor::is_show_main_dockspace	= true;
+bool ModuleEditor::is_show_demo				= false;
+bool ModuleEditor::is_auto_select			= false;
+bool ModuleEditor::is_about					= false;
+bool ModuleEditor::is_new					= false;
+bool ModuleEditor::is_open					= false;
+bool ModuleEditor::is_save					= false;
+bool ModuleEditor::is_import				= false;
+bool ModuleEditor::is_plane					= true;
+bool ModuleEditor::is_axis					= true;
+bool ModuleEditor::is_wireframe				= false;
+bool ModuleEditor::is_show_plane			= true;
+bool ModuleEditor::is_show_axis				= false;
+
 ModuleEditor::ModuleEditor(bool start_enabled) : Module("ModuleEditor", start_enabled)
 {
 }
@@ -33,7 +51,7 @@ ModuleEditor::~ModuleEditor()
 {
 }
 
-static void ShowExampleAppDockSpace(bool* p_open);
+
 void ShowExampleAppDockSpace(bool* p_open)
 {
 	static bool opt_fullscreen_persistant = true;
@@ -196,24 +214,11 @@ void ModuleEditor::Draw()
 	ImGui_ImplSDL2_NewFrame(App->window->GetWindow());
 	ImGui::NewFrame();
 
-	// Bools
-	static bool is_draw_menu = true;
-	static bool is_show_main_dockspace = true;
-	static bool is_show_demo = false;
-	static bool is_about = false;
-	static bool is_new = false;
-	static bool is_open = false;
-	static bool is_save = false;
-	static bool is_import = false;
-	static bool is_plane = true;
-	static bool is_axis = true;
-	static bool is_wireframe = false;
-
 	// Draw functions
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
-	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import, is_plane, is_axis, is_wireframe);
-	DrawDemo(is_show_demo);
-	DrawAbout(is_about);
+	DrawMenu();
+	DrawDemo();
+	DrawAbout();
 	DrawPanels();
 
 	// Menu Functionalities
@@ -240,7 +245,7 @@ void ModuleEditor::Draw()
 	}
 
 	// Shortcuts
-	Shortcuts(is_new, is_open, is_save);
+	Shortcuts();
 
 	// Are you sure you want to Quit
 	if (App->input->quit == true)
@@ -256,7 +261,7 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_plane, bool &is_axis, bool &is_wireframe)
+void ModuleEditor::DrawMenu()
 {
 	bool ret = true;
 
@@ -320,10 +325,10 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 			if (ImGui::BeginMenu("View")) //view
 			{
 				if (ImGui::MenuItem("Show Plane", NULL, &is_plane))
-					show_plane = !show_plane;
+					is_show_plane = !is_show_plane;
 
 				if (ImGui::MenuItem("Show Axis", NULL, &is_axis))
-					show_axis = !show_axis;
+					is_show_axis = !is_show_axis;
 
 				ImGui::EndMenu();
 			}
@@ -399,7 +404,7 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 	}
 }
 
-void ModuleEditor::DrawDemo(bool &is_show_demo)
+void ModuleEditor::DrawDemo()
 {
 	if (is_show_demo) //show demo
 	{
@@ -408,18 +413,15 @@ void ModuleEditor::DrawDemo(bool &is_show_demo)
 	}
 }
 
-void ModuleEditor::DrawAbout(bool &is_about)
+void ModuleEditor::DrawAbout()
 {
 	if (is_about) //about
 	{
 		ImGui::OpenPopup("About");
 		if (ImGui::BeginPopupModal("About"))
 		{
-			//ImGui::Text("Davos Game Engine");
 			CreateLink("Davos Game Engine", "https://github.com/ponspack9/GameEngine");
 			ImGui::Text("Davos is a game engine developed by two students of CITM:");
-			//ImGui::Text("By");
-			//ImGui::SameLine();
 			CreateLink("Oscar Pons", "https://github.com/ponspack9");
 			ImGui::SameLine();
 			ImGui::Text("&");
@@ -533,7 +535,7 @@ void ModuleEditor::ConfirmExit()
 	}
 }
 
-void ModuleEditor::Shortcuts(bool &is_new, bool &is_open, bool &is_save)
+void ModuleEditor::Shortcuts()
 {
 	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
 		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))

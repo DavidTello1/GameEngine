@@ -71,6 +71,9 @@ public:
 	uint num_normals = 0;			// Number of normal coordinates
 
 private:
+
+	AABB aabb;
+
 	const char* shape_to_string[shape_type::UNKNOWN] =
 	{ "Cylinder","Cone", "Torus", "Sphere", "Bottle", "Knot",
 		"Hemisphere", "Plane", "Icosahedron", "Dodecahedron",

@@ -62,12 +62,14 @@ public:
 		0,4,1,5,2,6,3,7
 	};
 
-
 private:
 	std::map<UID, Resource*> resources;
 	std::vector<Resource*> removed;
 
 	UID last_uid = -1;
 };
+
+extern GLuint aabb_indices[24];
+extern GLuint aabb_IBO;
 
 #endif

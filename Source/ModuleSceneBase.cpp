@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "ModuleSceneBase.h"
+#include "ModuleScene.h"
 
 #include "glew/include/GL/glew.h"
 #include "mmgr/mmgr.h"
@@ -17,7 +18,8 @@ bool ModuleSceneBase::Start(Config* config)
 	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
 	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
 
-	viewport_camera->Move({ 0, 5.0f, -10.5f });
+	viewport_camera->Move({ 0, 5.0f, -60.0f });
+	viewport_camera->SetFarPlane(5000.0f);
 
 	return true;
 }
@@ -64,7 +66,7 @@ void ModuleSceneBase::CameraOrbit(float dt)
 		GameObject* object = App->scene->GetSelectedGameObject();
 		if (object != nullptr)
 		{
-			viewport_camera->Look(object->center);
+			viewport_camera->Look(object->aabb.CenterPoint());
 		}
 	}
 }
@@ -77,15 +79,15 @@ void ModuleSceneBase::CameraFocusTo()
 
 		if (object != nullptr)
 		{
-			float3 v_distance = object->bounding_box[9] - viewport_camera->frustum.pos;
+			float3 v_distance = object->aabb.FaceCenterPoint(0) - viewport_camera->frustum.pos;
 
 			float min = v_distance.Length();
-			int face = 9;
+			int face = 0;
 
 			// Check which face of the object is the closest one
-			for (int i = 10; i < 13; i++)
+			for (int i = 1; i < 6; i++)
 			{
-				v_distance = object->bounding_box[i] - viewport_camera->frustum.pos;
+				v_distance = object->aabb.FaceCenterPoint(i) - viewport_camera->frustum.pos;
 				
 				if (v_distance.Length() < min) {
 					min = v_distance.Length();
@@ -93,30 +95,28 @@ void ModuleSceneBase::CameraFocusTo()
 				}
 			}
 
-			float size = object->size.MaxElement();
-			float offset = Sqrt((size*size) - (size*size / 4)); // superformula to define the offset to the object
-			float parent = (object->HasChilds()) ? 1.0f : -1.0f;
+			float size = object->aabb.Size().MaxElement();
+			// superformula to define the offset to the object
+			float offset = Sqrt((size*size) - (size*size / 4)); 
 
-			switch (face)
+			//XOR with if is parent and the position (parity) of the face inside the b_box.FaceCenterPoint
+			// code reference at commit "Cleaned Focus Camera" +- 280 commit number
+			float xor = (object->HasChilds() ^ face % 2 == 0) ? -1.0f : 1.0f;
+
+			if (face < 2)
 			{
-			case 9:
-				viewport_camera->SetPosition(object->bounding_box[face] + (float3::unitZ * offset * parent));
-				break;
-			case 10:
-				viewport_camera->SetPosition(object->bounding_box[face] + (float3::unitX * offset* parent));
-				break;
-			case 11:
-				viewport_camera->SetPosition(object->bounding_box[face] - (float3::unitX * offset* parent));
-				break;
-			case 12:
-				viewport_camera->SetPosition(object->bounding_box[face] - (float3::unitZ * offset* parent));
-				break;
-			default:
-				LOG("Could not detect closest face", 'w');
-				break;
+				viewport_camera->SetPosition(object->aabb.FaceCenterPoint(face) + (float3::unitX * offset * xor));
+			}
+			else if (face < 4)
+			{
+				viewport_camera->SetPosition(object->aabb.FaceCenterPoint(face) + (float3::unitY * offset * xor));
+			}
+			else if (face < 6)
+			{
+				viewport_camera->SetPosition(object->aabb.FaceCenterPoint(face) + (float3::unitZ * offset * xor));
 			}
 
-			viewport_camera->Look(object->bounding_box[face]);
+			viewport_camera->Look(object->aabb.FaceCenterPoint(face));
 		}
 	}
 }
@@ -193,10 +193,10 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 
 bool ModuleSceneBase::Draw()
 {
-	if (App->editor->show_plane) // plane
+	if (App->editor->is_show_plane) // plane
 		DrawGridPlane();
 
-	if (App->editor->show_axis) // axis
+	if (App->editor->is_show_axis) // axis
 		DrawAxis();
 
 	return true;

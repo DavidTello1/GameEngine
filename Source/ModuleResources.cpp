@@ -18,6 +18,15 @@
 
 #include "mmgr/mmgr.h"
 
+GLuint aabb_indices[24]=
+{
+	0,1,2,3,0,2,1,3,
+	4,5,6,7,4,6,5,7,
+	0,4,1,5,2,6,3,7
+};
+
+GLuint aabb_IBO = 0;
+
 void AssimpLogCallback(const char *msg, char *userData) 
 {
 	LOG("%s", msg,'g');
@@ -41,6 +50,9 @@ bool ModuleResources::Init(Config* config)
 	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
 	stream.callback = AssimpLogCallback;
 	aiAttachLogStream(&stream);
+
+	
+
 	return true;
 }
 
@@ -52,6 +64,12 @@ bool ModuleResources::Start(Config* config)
 	//LoadResourcesData();
 	//UpdateAssets();
 
+	// Creation of the Index Buffer Object of the bounding boxes array, as all uses the same
+	if (aabb_IBO == 0) glGenBuffers(1, &aabb_IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aabb_IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(aabb_indices), aabb_indices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 	return true;
 }
 
@@ -60,6 +78,11 @@ bool ModuleResources::CleanUp()
 	LOG("Unloading Resource Manager");
 
 	//SaveResources();
+
+	if (aabb_IBO != 0)
+	{
+		glDeleteBuffers(1, &aabb_IBO);
+	}
 
 	for (std::map<UID, Resource*>::iterator it = resources.begin(); it != resources.end(); ++it)
 		RELEASE(it->second);

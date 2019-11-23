@@ -11,6 +11,7 @@ public:
 	virtual ~ComponentRenderer();
 
 	void DrawInspector();
+	static inline Component::Type GetType() { return Component::Type::Renderer; }
 
 	void Draw();
 

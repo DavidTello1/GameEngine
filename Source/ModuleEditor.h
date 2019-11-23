@@ -54,12 +54,12 @@ public:
 	bool GetPanelActive(Panel* panel) const { return panel->active; }
 
 private:
-	void DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_plane, bool &is_axis, bool &is_wireframe);
-	void DrawDemo(bool &is_show_demo);
-	void DrawAbout(bool &is_about);
+	void DrawMenu();
+	void DrawDemo();
+	void DrawAbout();
 	void DrawPanels();
 	void ConfirmExit();
-	void Shortcuts(bool &is_new, bool &is_open, bool &is_save);
+	void Shortcuts();
 
 public:
 	Configuration* tab_configuration = nullptr;
@@ -69,8 +69,21 @@ public:
 	Viewport* tab_viewport = nullptr;
 	Assets* tab_assets = nullptr;
 
-	bool show_plane = true;
-	bool show_axis = true;
+	//Bools
+	static bool is_draw_menu ;
+	static bool is_show_main_dockspace ;
+	static bool is_show_demo ;
+	static bool is_auto_select ;
+	static bool is_about ;
+	static bool is_new ;
+	static bool is_open ;
+	static bool is_save ;
+	static bool is_import ;
+	static bool is_plane ;
+	static bool is_axis ;
+	static bool is_wireframe ;
+	static bool is_show_plane ;
+	static bool is_show_axis ;
 
 private:
 	bool close = false;

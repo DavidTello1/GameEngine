@@ -10,12 +10,14 @@
 #include "ModuleEditor.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
-#include "ModuleScene.h"
+
 #include "Config.h"
 
 #include "MathGeoLib/include/Algorithm/Random/LCG.h"
 
 #include <list>
+
+class ModuleScene;
 
 class Application
 {

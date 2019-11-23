@@ -139,6 +139,10 @@ bool ResourceMesh::LoadtoScene()
 		}
 
 		delete[] buffer;
+
+		aabb.SetNegativeInfinity();
+		aabb.Enclose(vertices, num_vertices);
+
 		return true;
 	}
 	return false;

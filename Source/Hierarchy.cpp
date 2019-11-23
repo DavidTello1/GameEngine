@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "ResourceMesh.h"
 
+#include "ModuleScene.h"
 #include "ImGui/imgui.h"
 #include "mmgr/mmgr.h"
 

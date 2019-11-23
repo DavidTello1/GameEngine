@@ -26,13 +26,13 @@ public:
 	bool IsActive() { return active; }
 	void SwitchActive() { active = !active; }
 
-	Component::Type GetType() { return type; }
 	GameObject* GetGameobj() { return object; }
 
 	virtual void DrawInspector() = 0;
+	mutable Component::Type type;
 
 protected:
+
 	bool active = true;
 	GameObject* object = nullptr;
-	Component::Type type;
 };

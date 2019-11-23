@@ -4,10 +4,14 @@
 #include "GameObject.h"
 #include "Hierarchy.h"
 #include "ModuleResources.h"
+#include "Math.h" //AGDGSDGMSKGSDK
 #include <vector>
 
 class ComponentRenderer;
 class ComponentMesh;
+class ComponentCamera;
+class Quadtree;
+
 
 class ModuleScene :	public Module
 {
@@ -15,6 +19,8 @@ public:
 
 	ModuleScene(bool start_enabled = true);
 	~ModuleScene();
+
+	bool Init(Config * config);
 
 
 	bool Start(Config* config = nullptr);
@@ -52,10 +58,10 @@ public:
 	   
 	static GameObject* root_object;
 
-	GameObject* test_camera = nullptr;
+	ComponentCamera* test_camera = nullptr;
 
 private:
-
+	Quadtree* quadtree;
 	GameObject* selected_gameobj = nullptr;
 
 };
