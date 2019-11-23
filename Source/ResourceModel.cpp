@@ -89,7 +89,9 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		}
 		LOG("[%s] imported in %d ms", model.GetFile(), timer.Read(), 'd');
 		timer.Stop();
-		model.LoadToMemory(); //should be called when loading after importing (just for testing)
+
+		model.LoadToMemory(); // HARDCODED : should be called when loading after importing (just for testing)
+		
 		return ret;
 	}
 	return false;
@@ -160,8 +162,6 @@ void ResourceModel::UnLoad()
 
 		if (nodes[i].material != 0)
 			App->resources->GetResource(nodes[i].material)->ReleaseFromMemory();
-
-		ReleaseFromMemory();
 	}
 	nodes.clear();
 }

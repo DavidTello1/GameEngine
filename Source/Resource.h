@@ -15,6 +15,7 @@ public:
 		model,
 		material,
 		mesh,
+		scene
 	};
 
 public:

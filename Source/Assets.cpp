@@ -198,5 +198,8 @@ uint Assets::GetIcon(const PathNode& node)
 
 	//	else if (resource->GetType() == Resource::Type::scene) //if scene
 	//		return scene_icon;
+
+	//	else
+	//		return file_icon;
 	//}
 }

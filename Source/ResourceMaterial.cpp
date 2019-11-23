@@ -53,6 +53,7 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 
 	material->UnLoad();
 
+	// HARDCODED ------------------------------------------------------
 	GameObject* obj = App->scene->GetSelectedGameObject();
 	if (obj != nullptr)
 	{
@@ -63,7 +64,7 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 		material->LoadToMemory();
 		mat->SetMaterial(material);
 	}
-
+	// ---------------------------------------------------------------------
 
 	return material->uid;
 }
