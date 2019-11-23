@@ -42,13 +42,18 @@ bool ModuleScene::Start(Config* config)
 	//std::string tmdp = "MyCamera.dvs";
 	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
 
+	for (int i = 0; i < 6; i++) {
+
 	ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
 	std::string tmp = "MyBakerHouse.dvs";
 	bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
 
+	
+	gameObjects[2+i*3]->SetLocalPosition({ 5.0f*i,0.0f,-5.0f* i });
+	}
+
 	quadtree = new Quadtree(AABB({ -20,-20,-20 }, { 20,20,20 }));
 
-	gameObjects[2]->SetLocalPosition({ 10,0,-10 });
 	
 	//quadtree->AddGameObject(bhmodel.)
 	UnSelectAll();
@@ -58,8 +63,8 @@ bool ModuleScene::Start(Config* config)
 
 bool ModuleScene::Update(float dt)
 {
-	/*if (test_camera)
-		test_camera->DrawFrustum();*/
+	if (test_camera)
+		test_camera->DrawFrustum();
 
 	if (App->input->GetKey(SDL_SCANCODE_0) == KEY_DOWN)
 	{
@@ -79,7 +84,23 @@ bool ModuleScene::Update(float dt)
 		}
 	}
 
+	if (App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
+	{
+
+		//quadtree->RemoveGameObject(gameObjects.back());
+		quadtree->OptimizeSpace();
+
+	}
+	if (App->input->GetKey(SDL_SCANCODE_3) == KEY_DOWN)
+	{
+
+		quadtree->RemoveGameObject(gameObjects.back());
+
+	}
+
 	quadtree->Draw();
+	
+
 	return true;
 }
 
@@ -135,48 +156,62 @@ bool ModuleScene::CleanUp()
 
 bool ModuleScene::Draw()
 {
+	quadtree->root->ResetCullingState();
 
-	// Draw GameObjects
-	for (GameObject* obj : gameObjects)
+	// Cheap fix
+	glColor3ub(255, 255, 255);
+
+	Color c;
+	static std::vector< GameObject*> candidates;
+	quadtree->CollectCandidates(candidates, test_camera->frustum);
+
+	for ( GameObject* obj : candidates)
 	{
+
+		c = (!obj->HasChilds()) ? App->scene_base->aabb_color : Cyan;
 		// Just boxes colors things
-		Color c = (!obj->HasChilds())?App->scene_base->aabb_color : Cyan;
-		bool is_drawn = true;
+		//obj->is_drawn = true;
 
-		if (App->scene_base->camera_culling)
+		// Draw GameObjects
+		//if (!App->scene_base->camera_culling || test_camera->ContainsAABB(obj->aabb))
+		if (test_camera->ContainsAABB(obj->aabb))
 		{
-			if (test_camera->ContainsAABB(obj->aabb))
-			{
-				glPushMatrix();
-				glMultMatrixf(obj->GetGlobalTransform().Transposed().ptr());
+			//test_camera->frustum.Intersects()
+			glPushMatrix();
+			glMultMatrixf(obj->GetGlobalTransform().Transposed().ptr());
 
-				ComponentRenderer* renderer = obj->GetComponent<ComponentRenderer>();
-				if (renderer != nullptr && renderer->IsActive())
+			ComponentRenderer* renderer = obj->GetComponent<ComponentRenderer>();
+			if (renderer != nullptr && renderer->IsActive())
+			{
+				if (renderer->show_wireframe || App->scene_base->show_all_wireframe) //wireframe
 				{
-					if (renderer->show_wireframe || App->scene_base->show_all_wireframe) //wireframe
-					{
-						glColor3ub(App->scene_base->wireframe_color.r*255.0f, App->scene_base->wireframe_color.g * 255.0f, App->scene_base->wireframe_color.b * 255.0f);
-						glLineWidth(App->scene_base->wireframe_width);
-						glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-					}
-					else
-						glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-					renderer->Draw();
+					glColor3ub(App->scene_base->wireframe_color.r*255.0f, App->scene_base->wireframe_color.g * 255.0f, App->scene_base->wireframe_color.b * 255.0f);
+					glLineWidth(App->scene_base->wireframe_width);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					glColor3ub(255, 255, 255);
 				}
-				glPopMatrix();
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				
+				renderer->Draw();
 			}
-			else
-			{
-				c = LightGrey;
-				is_drawn = false;
-			}
+			glPopMatrix();
 		}
+		else
+		{
+			obj->is_drawn = false;
+		}
+	}
+
+	for (GameObject* obj : gameObjects)
+	{		
 		glEnableClientState(GL_VERTEX_ARRAY);
 
 		// AABB
 		if ((obj->show_aabb || App->scene_base->show_all_aabb) && obj->aabb_VBO != 0)
 		{
+			c = (obj->is_drawn) ? App->scene_base->aabb_color : LightGrey;
+
 			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->aabb_width);
 
@@ -193,7 +228,7 @@ bool ModuleScene::Draw()
 		// OBB
 		if ((obj->show_obb || App->scene_base->show_all_obb) && obj->obb_VBO != 0)
 		{
-			c = (is_drawn) ? App->scene_base->obb_color : Grey;
+			c = (obj->is_drawn) ? App->scene_base->obb_color : DarkGrey;
 
 			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->obb_width);

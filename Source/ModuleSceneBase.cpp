@@ -19,6 +19,7 @@ bool ModuleSceneBase::Start(Config* config)
 	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
 
 	viewport_camera->Move({ 0, 5.0f, -60.0f });
+	viewport_camera->SetFarPlane(5000.0f);
 
 	return true;
 }

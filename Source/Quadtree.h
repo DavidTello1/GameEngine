@@ -3,6 +3,7 @@
 #include <vector>
 #include "Math.h"
 #include <map>
+#include "Color.h"
 
 typedef unsigned int uint;
 
@@ -12,6 +13,7 @@ class Color;
 
 class Quadtree
 {
+	friend class ModuleScene; //ToRemove
 public:
 
 	Quadtree(const AABB& box);
@@ -19,16 +21,16 @@ public:
 
 	void Draw();
 
-	void AddGameObject(const GameObject* gameObject);
-	void ExpandRootNode(const GameObject * gameObject);
-	bool RemoveGameObject(const GameObject* gameObject);
+	void AddGameObject(GameObject* gameObject);
+	void ExpandRootNode(GameObject * gameObject);
+	bool RemoveGameObject(GameObject* gameObject);
 
 	void Clear();
 
 	void OptimizeSpace();
 
 	template<typename PRIMITIVE>
-	void CollectCandidates(std::vector<const GameObject*>& gameObjects, const PRIMITIVE& primitive)
+	void CollectCandidates(std::vector<GameObject*>& gameObjects, const PRIMITIVE& primitive)
 	{
 		root->CollectCandidates(gameObjects, primitive);
 	}
@@ -37,7 +39,7 @@ public:
 
 private:
 	QuadtreeNode* root;
-	std::vector<const GameObject*> out_of_tree;
+	std::vector<GameObject*> out_of_tree;
 };
 
 
@@ -52,7 +54,9 @@ public:
 	void Draw();
 	void DrawEx(Color c);
 
-	void GetAllBuckets(std::vector<const GameObject*>& all_bucket);
+	void ResetCullingState();
+
+	void GetAllBuckets(std::vector<GameObject*>& all_bucket);
 
 	QuadtreeNode(const AABB& box);
 	QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index);	//Index marking which node from parent. 0 starts at top left, and counting clockwise
@@ -63,11 +67,11 @@ public:
 	void Clear();
 	void DeleteVBO();
 
-	bool AddGameObject(const GameObject* gameObject);
-	bool RemoveGameObject(const GameObject* gameObject);
+	bool AddGameObject(GameObject* gameObject);
+	bool RemoveGameObject(GameObject* gameObject);
 
 	template<typename PRIMITIVE>
-	void CollectCandidates(std::vector<const GameObject*>& gameObjects, const PRIMITIVE& primitive);
+	void CollectCandidates(std::vector< GameObject*>& gameObjects, const PRIMITIVE& primitive);
 
 private:
 	//void Draw();
@@ -75,9 +79,9 @@ private:
 	void Split();
 	void Redistribute();
 
-	bool SendToChilds(const GameObject* gameObject);
+	bool SendToChilds(GameObject* gameObject);
 	void TryRemovingChilds();
-	void GetChildsBuckets(std::vector<const GameObject*>& vector, bool addSelf) const;
+	void GetChildsBuckets(std::vector<GameObject*>& vector, bool addSelf) const;
 
 private:
 
@@ -90,13 +94,15 @@ private:
 	Quadtree* tree;
 	uint level;
 	uint maxBucketSize = 3;
-	std::vector<const GameObject*> bucket;
+	std::vector<GameObject*> bucket;
 
+	Color culling_color = LightGrey;
+	bool is_culling = false;
 	//uint index = 0;
 };
 
 template<typename PRIMITIVE>
-void QuadtreeNode::CollectCandidates(std::vector<const GameObject*>& gameObjects, const PRIMITIVE& primitive)
+void QuadtreeNode::CollectCandidates(std::vector<GameObject*>& gameObjects, const PRIMITIVE& primitive)
 {
 	if (primitive.Intersects(box))
 	{
@@ -107,7 +113,11 @@ void QuadtreeNode::CollectCandidates(std::vector<const GameObject*>& gameObjects
 
 		for (uint i = 0; i < childs.size(); i++)
 		{
-			childs[i].CollectCandidates(gameObjects, primitive);
+			childs[i]->CollectCandidates(gameObjects, primitive);
 		}
+		is_culling = false;
+	}
+	else {
+		is_culling = true;
 	}
 }

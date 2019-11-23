@@ -39,7 +39,7 @@ public:
 	bool IsActive() { return active; }
 
 	template<typename ComponentType> 
-	ComponentType* GetComponent() { return (ComponentType*)GetComponent(ComponentType::GetType()); }
+	ComponentType* GetComponent()  { return (ComponentType*)GetComponent(ComponentType::GetType()); }
 
 	Component* GetComponent(Component::Type type);
 	Component* AddComponent(Component::Type type);
@@ -51,7 +51,7 @@ public:
 	Quat GetRotationQ() const { return rotation_quat; }
 	float3 GetScale() const { return scale; }
 	float4x4 GetLocalTransform() { return local_transform; }
-	float4x4 GetGlobalTransform() { return global_transform; }
+	float4x4 GetGlobalTransform() const { return global_transform; }
 	//float3 GetVelocity() const { return velocity; }
 
 
@@ -62,7 +62,7 @@ public:
 	void SetRotation(const Quat& rotation);
 	void SetTransform(const float4x4& transform);
 
-	bool HasChilds() { return !childs.empty(); }
+	bool HasChilds() const { return !childs.empty(); } 
 	void ChildAdded();
 	void ChildDeleted();
 
@@ -94,6 +94,7 @@ private:
 
 public:
 	bool is_static = false;
+	bool is_drawn = false;
 
 	// Objects
 	int flags = NoFlags;

@@ -34,7 +34,10 @@ void Quadtree::Draw()
 
 void QuadtreeNode::DrawEx(Color c)
 {
-	glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
+	if (!is_culling)
+		glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
+	else
+		glColor3ub(culling_color.r * 255.0f, culling_color.g * 255.0f, culling_color.b * 255.0f);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
@@ -43,13 +46,13 @@ void QuadtreeNode::DrawEx(Color c)
 	glDrawElements(GL_LINES, sizeof(aabb_indices), GL_UNSIGNED_INT, nullptr);
 }
 
-void Quadtree::AddGameObject(const GameObject* gameObject)
+void Quadtree::AddGameObject(GameObject* gameObject)
 {
 	if (root->AddGameObject(gameObject) == false)
 		ExpandRootNode(gameObject);
 }
 
-void Quadtree::ExpandRootNode(const GameObject* gameObject)
+void Quadtree::ExpandRootNode(GameObject* gameObject)
 {
 	if (root->box.MinX() > gameObject->aabb.MinX()) root->box.minPoint.x = gameObject->aabb.MinX();
 	if (root->box.MinY() > gameObject->aabb.MinY()) root->box.minPoint.y = gameObject->aabb.MinY();
@@ -61,33 +64,48 @@ void Quadtree::ExpandRootNode(const GameObject* gameObject)
 
 	//root->UpdateVBO();
 
-	std::vector<const GameObject*> all_bucket;
+	std::vector<GameObject*> all_bucket;
 	
 	root->GetAllBuckets(all_bucket);
 
 	Clear();
 
-	for (const GameObject* obj : all_bucket)
+	for (GameObject* obj : all_bucket)
 	{
 		AddGameObject(obj);
 	}
 }
 
 
-void QuadtreeNode::GetAllBuckets(std::vector<const GameObject*>& all_bucket)
+void QuadtreeNode::ResetCullingState()
+{
+	for (QuadtreeNode* child : childs)
+	{
+		child->ResetCullingState();
+	}
+
+	for (GameObject* b : bucket)
+	{
+		b->is_drawn = false;
+	}
+
+	//is_culling = false;
+}
+
+void QuadtreeNode::GetAllBuckets(std::vector<GameObject*>& all_bucket)
 {
 	for (QuadtreeNode* child : childs)
 	{
 		child->GetAllBuckets(all_bucket);
 	}
 
-	for (const GameObject* obj : bucket)
+	for (GameObject* obj : bucket)
 	{
 		all_bucket.push_back(obj);
 	}
 }
 
-bool Quadtree::RemoveGameObject(const GameObject* gameObject)
+bool Quadtree::RemoveGameObject(GameObject* gameObject)
 {
 	if (root->RemoveGameObject(gameObject) == true)
 	{
@@ -95,7 +113,7 @@ bool Quadtree::RemoveGameObject(const GameObject* gameObject)
 	}
 	else
 	{
-		for (std::vector<const GameObject*>::iterator it = out_of_tree.begin(); it < out_of_tree.end(); it++)
+		for (std::vector<GameObject*>::iterator it = out_of_tree.begin(); it < out_of_tree.end(); it++)
 		{
 			if (*it == gameObject)
 			{
@@ -203,7 +221,7 @@ void QuadtreeNode::Split()
 	}
 }
 
-bool QuadtreeNode::AddGameObject(const GameObject* gameObject)
+bool QuadtreeNode::AddGameObject(GameObject* gameObject)
 {
 	if (this->box.Intersects(gameObject->aabb))
 	{
@@ -231,9 +249,9 @@ bool QuadtreeNode::AddGameObject(const GameObject* gameObject)
 
 }
 
-bool QuadtreeNode::RemoveGameObject(const GameObject* gameObject)
+bool QuadtreeNode::RemoveGameObject(GameObject* gameObject)
 {
-	for (std::vector<const GameObject*>::iterator it = bucket.begin(); it != bucket.end(); it++)
+	for (std::vector<GameObject*>::iterator it = bucket.begin(); it != bucket.end(); it++)
 	{
 		if (*it == gameObject)
 		{
@@ -257,7 +275,7 @@ bool QuadtreeNode::RemoveGameObject(const GameObject* gameObject)
 
 void QuadtreeNode::Redistribute()
 {
-	for (std::vector<const GameObject*>::iterator it = bucket.begin(); it != bucket.end();)
+	for (std::vector<GameObject*>::iterator it = bucket.begin(); it != bucket.end();)
 	{
 		if (SendToChilds(*it))
 		{
@@ -276,7 +294,7 @@ void Quadtree::OptimizeSpace()
 
 }
 
-bool QuadtreeNode::SendToChilds(const GameObject* gameObject)
+bool QuadtreeNode::SendToChilds(GameObject* gameObject)
 {
 
 	for (QuadtreeNode* child : childs)
@@ -294,7 +312,7 @@ bool QuadtreeNode::SendToChilds(const GameObject* gameObject)
 
 void QuadtreeNode::TryRemovingChilds()
 {
-	std::vector<const GameObject*> childsBucket;
+	std::vector<GameObject*> childsBucket;
 	GetChildsBuckets(childsBucket, false);
 	if (childsBucket.size() + bucket.size() <= maxBucketSize)
 	{
@@ -307,7 +325,7 @@ void QuadtreeNode::TryRemovingChilds()
 	childsBucket.clear();
 }
 
-void QuadtreeNode::GetChildsBuckets(std::vector<const GameObject*>& vector, bool addSelf) const
+void QuadtreeNode::GetChildsBuckets(std::vector<GameObject*>& vector, bool addSelf) const
 {
 	if (addSelf)
 	{
@@ -380,7 +398,7 @@ void QuadtreeNode::Draw()
 		childs[i]->Draw();
 }
 
-//bool QuadtreeNode::SendToChilds(const GameObject* gameObject)
+//bool QuadtreeNode::SendToChilds(GameObject* gameObject)
 //{
 //	uint intersectionChild = -1;
 //	//ALgo funciona mal aqui, no intersecta amb cap child excepte en un que interescta 4 cops
@@ -402,7 +420,7 @@ void QuadtreeNode::Draw()
 //	return false;
 //}
 
-//bool QuadtreeNode::SendToChilds(const GameObject* gameObject)
+//bool QuadtreeNode::SendToChilds(GameObject* gameObject)
 //{
 //	uint intersectionCount = 0;
 //	uint intersectionChild = -1;
