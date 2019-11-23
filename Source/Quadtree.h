@@ -25,6 +25,8 @@ public:
 
 	void Clear();
 
+	void OptimizeSpace();
+
 	template<typename PRIMITIVE>
 	void CollectCandidates(std::vector<const GameObject*>& gameObjects, const PRIMITIVE& primitive)
 	{
@@ -50,12 +52,15 @@ public:
 	void Draw();
 	void DrawEx(Color c);
 
+	void GetAllBuckets(std::vector<const GameObject*>& all_bucket);
+
 	QuadtreeNode(const AABB& box);
 	QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index);	//Index marking which node from parent. 0 starts at top left, and counting clockwise
 
 	~QuadtreeNode();
 
 	void UpdateVBO(const math::AABB & box);
+	void Clear();
 	void DeleteVBO();
 
 	bool AddGameObject(const GameObject* gameObject);
@@ -84,7 +89,7 @@ private:
 	//Pointer to tree, maybe not necessary
 	Quadtree* tree;
 	uint level;
-	uint maxBucketSize = 1;
+	uint maxBucketSize = 3;
 	std::vector<const GameObject*> bucket;
 
 	//uint index = 0;
