@@ -211,6 +211,7 @@
     <ClInclude Include="parson\parson.h" />
     <ClInclude Include="par_shapes.h" />
     <ClInclude Include="Quadtree.h" />
+    <ClInclude Include="QuadtreeNode.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceMaterial.h" />
     <ClInclude Include="ResourceMesh.h" />
@@ -294,6 +295,7 @@
     <ClCompile Include="parson\parson.c" />
     <ClCompile Include="par_shapes.cpp" />
     <ClCompile Include="Quadtree.cpp" />
+    <ClCompile Include="QuadtreeNode.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceMaterial.cpp" />
     <ClCompile Include="ResourceMesh.cpp" />

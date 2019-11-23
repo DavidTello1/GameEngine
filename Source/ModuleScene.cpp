@@ -168,7 +168,7 @@ bool ModuleScene::CleanUp()
 bool ModuleScene::Draw()
 {
 	// ALL this need a big rework
-	quadtree->root->ResetCullingState();
+	quadtree->ResetCullingState();
 
 	// Cheap fix
 	glColor3ub(255, 255, 255);

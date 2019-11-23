@@ -55,6 +55,8 @@ void ModuleSceneBase::UpdateMainCamera(float dt)
 	CameraFreeMove(dt);
 
 	CameraOrbit(dt);
+
+	CameraMousePicking();
 }
 
 void ModuleSceneBase::CameraOrbit(float dt)
@@ -189,6 +191,28 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 		}
 	}
 
+}
+
+void ModuleSceneBase::CameraMousePicking()
+{
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
+	{
+		float3 start = { 0, 0, viewport_camera->GetNearPlane() };
+		//float3 start = viewport_camera->.get
+		float3 end = { 0, 0,viewport_camera->GetFarPlane() };
+
+		glLineWidth(2.0f);
+
+		glBegin(GL_LINES);
+		glColor3ub(0, 255, 255);
+
+		glVertex3f(start.x, start.y, start.z);
+		glVertex3f(end.x, end.y, end.z);
+
+		glEnd();
+
+		LOG("Start [%f,%f,%f]   End [%f,%f,%f]", start.x, start.y, start.z, end.x, end.y, end.z, 'd');
+	}
 }
 
 bool ModuleSceneBase::Draw()

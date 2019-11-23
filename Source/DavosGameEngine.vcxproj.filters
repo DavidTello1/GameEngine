@@ -505,6 +505,7 @@
       <Filter>Sources\GameObjects\Components</Filter>
     </ClInclude>
     <ClInclude Include="Quadtree.h" />
+    <ClInclude Include="QuadtreeNode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -733,6 +734,7 @@
       <Filter>Sources\GameObjects\Components</Filter>
     </ClCompile>
     <ClCompile Include="Quadtree.cpp" />
+    <ClCompile Include="QuadtreeNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">
