@@ -51,7 +51,8 @@ public:
 	void DrawFrustum();
 
 	//  -------------------------------------- Consultors
-	bool ContainsAABB(const AABB & refBox) const;
+	// Use camera frustum.DO_Intersects(const AABB & refBox);
+	//bool ContainsAABB(const AABB & refBox) const;
 
 
 	bool viewport_focus = true;

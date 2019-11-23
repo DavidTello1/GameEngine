@@ -211,11 +211,13 @@
     <ClInclude Include="parson\parson.h" />
     <ClInclude Include="par_shapes.h" />
     <ClInclude Include="PathNode.h" />
-	<ClInclude Include="Quadtree.h" />
+    <ClInclude Include="Quadtree.h" />
+    <ClInclude Include="QuadtreeNode.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceMaterial.h" />
     <ClInclude Include="ResourceMesh.h" />
     <ClInclude Include="ResourceModel.h" />
+    <ClInclude Include="ResourceScene.h" />
     <ClInclude Include="SimpleBinStream.h" />
     <ClInclude Include="src\glew\include\GL\eglew.h" />
     <ClInclude Include="src\glew\include\GL\glew.h" />
@@ -295,10 +297,12 @@
     <ClCompile Include="parson\parson.c" />
     <ClCompile Include="par_shapes.cpp" />
     <ClCompile Include="Quadtree.cpp" />
+    <ClCompile Include="QuadtreeNode.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceMaterial.cpp" />
     <ClCompile Include="ResourceMesh.cpp" />
     <ClCompile Include="ResourceModel.cpp" />
+    <ClCompile Include="ResourceScene.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Viewport.cpp" />
   </ItemGroup>

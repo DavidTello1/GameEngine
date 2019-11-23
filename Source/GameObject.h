@@ -94,7 +94,7 @@ private:
 
 public:
 	bool is_static = false;
-	bool is_drawn = false;
+	bool is_drawn = true;
 
 	// Objects
 	int flags = NoFlags;

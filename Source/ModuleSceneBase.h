@@ -27,6 +27,8 @@ public:
 	void CameraOrbit(float dt);
 	void CameraRotateWithMouse(float dt);
 
+	void CameraMousePicking();
+
 	bool Draw();
 
 	float plane_length = 40.0f;
