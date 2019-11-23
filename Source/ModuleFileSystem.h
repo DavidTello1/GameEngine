@@ -12,10 +12,11 @@ struct PathNode;
 struct SDL_RWops;
 int close_sdl_rwops(SDL_RWops *rw);
 
+struct aiFileIO;
+
 class ModuleFileSystem : public Module
 {
 public:
-
 	ModuleFileSystem(const char* game_path = nullptr);
 	~ModuleFileSystem();
 
@@ -57,6 +58,16 @@ public:
 	const char* GetBasePath() const { return PHYSFS_getBaseDir(); }
 	const char* GetWritePath() const { return PHYSFS_getWriteDir(); }
 	const char* GetReadPaths() const;
+
+	// Assimp
+	aiFileIO* GetAssimpIO();
+
+private:
+	void CreateAssimpIO();
+
+private:
+	aiFileIO* AssimpIO = nullptr;
+
 };
 
 #endif // __MODULEFILESYSTEM_H__

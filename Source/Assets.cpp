@@ -32,7 +32,10 @@ Assets::~Assets()
 void Assets::Draw()
 {
 	if (timer.ReadSec() > REFRESH_RATE) // Update Assets Hierarchy
+	{
 		UpdateAssets();
+		timer.Start();
+	}
 
 	// Child Hierarchy -------------------------------
 	ImGui::BeginChild("Hierarchy", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.2f, 0), true, ImGuiWindowFlags_MenuBar);
@@ -129,7 +132,6 @@ void Assets::UpdateAssets()
 	std::vector<std::string> ignore_ext;
 	ignore_ext.push_back("meta");
 	assets = App->file_system->GetAllFiles("Assets", nullptr, &ignore_ext);
-	timer.Start();
 }
 
 void Assets::UpdateFilters(PathNode& node)

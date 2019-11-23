@@ -1,6 +1,7 @@
 #include "Quadtree.h"
-
 #include "Application.h"
+
+#include "mmgr/mmgr.h"
 
 Color Quadtree::c = Yellow;
 

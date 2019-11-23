@@ -1,7 +1,8 @@
 #include "QuadtreeNode.h"
 #include "GameObject.h"
-
 #include "ModuleResources.h"
+
+#include "mmgr/mmgr.h"
 
 void QuadtreeNode::DrawEx(Color c)
 {

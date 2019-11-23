@@ -509,6 +509,7 @@
     </ClInclude>
     <ClInclude Include="Quadtree.h" />
     <ClInclude Include="QuadtreeNode.h" />
+    <ClInclude Include="ResourceScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -738,6 +739,7 @@
     </ClCompile>
     <ClCompile Include="Quadtree.cpp" />
     <ClCompile Include="QuadtreeNode.cpp" />
+    <ClCompile Include="ResourceScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">
