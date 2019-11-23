@@ -18,8 +18,8 @@ bool ModuleSceneBase::Start(Config* config)
 	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
 	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
 
-	viewport_camera->Move({ 0, 5.0f, -60.0f });
-	viewport_camera->SetFarPlane(5000.0f);
+	viewport_camera->Move({ 0, 1.95f, -5.0f });
+	viewport_camera->SetFarPlane(500.0f);
 
 	return true;
 }
@@ -195,42 +195,68 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 
 void ModuleSceneBase::CameraMousePicking()
 {
-	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
-	{
-		ComponentCamera* cam = App->scene->test_camera;
-		//ComponentCamera* cam = viewport_camera;
+	Color c = Cyan;
+	cam = App->scene->test_camera;
+	float3 start = print_ray.pos;
+	//float3 end = ray.b + ray.Dir().Normalized() * cam->GetFarPlane();
+	float3 end = print_ray.pos + print_ray.dir.Normalized() * cam->GetFarPlane();
 
-		Ray ray = cam->frustum.UnProjectFromNearPlane(0.25f, 0.25f);
-		
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+	{
+
+		int x, y;
+		App->input->GetMousePosition(x, y);
+		//x = -x;
+
+		// Converting origin to viewport center origin
+		x -= 250;//(250 + 738/2);
+		y -= 19;//(19 + 563/2);
+
+		float xn = (float)x / 738.0f;
+		float yn = (float)y / 563.0f;
+
+		/*xn = (xn - 0.5) * 2;
+		yn = (yn - 0.5) * 2;*/
+
+		Ray ray = cam->frustum.UnProjectFromNearPlane((float)xn, (float)yn);
+		//Ray ray = cam->frustum.UnProjectFromNearPlane((float)xn, (float)yn);
+		print_ray = ray;
+
 		bool intersects = false;
 
 		for (int i = 2;i< App->scene->gameObjects.size();i++)
 		{
-			if (ray.Intersects(App->scene->gameObjects[i]->aabb))
+			if (ray.Intersects(App->scene->gameObjects[i]->aabb)) 
+			{
+				LOG("Selecting %s", App->scene->gameObjects[i]->GetName(),'d');
 				intersects = true;
+			}
 		}
 
-		float3 start = ray.pos;
-		//float3 start = viewport_camera->.get
-		float3 end = ray.pos + ray.dir.Normalized() * cam->GetFarPlane();
 
-		// Drawiinggg
-		Color c = (intersects) ? Yellow : Cyan;
-
-		glLineWidth(3.0f);
-		glColor3ub(c.r*255.0f,c.g*255.0f,c.b*255.0f);
-
-		glBegin(GL_LINES);
-
-
-		glVertex3f(start.x, start.y, start.z);
-		glVertex3f(end.x, end.y, end.z);
-
-		glEnd();
+		
 
 		if (App->input->GetKey(SDL_SCANCODE_C) == KEY_REPEAT)
 			LOG("Start [%f,%f,%f]   End [%f,%f,%f]", start.x, start.y, start.z, end.x, end.y, end.z, 'd');
 	}
+
+	// Drawiinggg
+	//Color c = (intersects) ? Yellow : Cyan;
+	
+
+	glLineWidth(3.0f);
+	glColor3ub(c.r*255.0f, c.g*255.0f, c.b*255.0f);
+
+	glBegin(GL_LINES);
+
+
+	glVertex3f(start.x, start.y, start.z);
+	glVertex3f(end.x, end.y, end.z);
+
+	glLineWidth(1.0f);
+	glColor3ub(255.0f, 255.0f, 255.0f);
+
+	glEnd();
 }
 
 bool ModuleSceneBase::Draw()

@@ -41,8 +41,6 @@ public:
 
 	FrameBuffer frame_buffer;
 
-	mat4x4 model_matrix, view_matrix, projection_matrix;
-
 	ImVec2 window_avail_size = { default_width, default_height };
 
 };

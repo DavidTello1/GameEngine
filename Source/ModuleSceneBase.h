@@ -8,6 +8,7 @@
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
+
 class ModuleSceneBase : public Module
 {
 public:
@@ -50,6 +51,9 @@ public:
 
 	bool camera_culling = true;
 
+	Ray print_ray;
+	ComponentCamera* cam;
+	//ComponentCamera* cam = viewport_camera;
 
 	float zoom_speed = 75.0f;
 
