@@ -66,8 +66,9 @@ bool ModuleScene::Start(Config* config)
 
 	//gameObjects[2]->SetLocalPosition({ 0.0f,0.0f,20.0f });
 
-	quadtree = new Quadtree(AABB({ -1,-1,-1 }, { 1,1,1 }));
+	quadtree = new Quadtree(AABB({ -50,-50,-50 }, { 50,50,50 }));
 
+	RedoQuatree();
 	
 	//quadtree->AddGameObject(bhmodel.)
 	//UnSelectAll();
@@ -142,10 +143,10 @@ bool ModuleScene::PostUpdate(float dt)
 			obj->UpdateTransform();
 			obj->parent->UpdateBoundingBox();
 
-			/*if (test_camera_obj != obj)
+			if (quadtree->experimental && test_camera_obj != obj)
 			{
 				RedoQuatree();
-			}*/
+			}
 
 			obj->flags &= ~ProcessTransformUpdate;
 		}

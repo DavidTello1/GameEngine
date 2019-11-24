@@ -64,7 +64,7 @@ private:
 	//Pointer to tree, maybe not necessary
 	Quadtree* tree;
 	uint level;
-	uint maxBucketSize = 6;
+	uint maxBucketSize = 8;
 	std::vector<GameObject*> bucket;
 
 	float3 corners[8];

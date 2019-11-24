@@ -2,8 +2,7 @@
 
 #include "Application.h"
 
-Color Quadtree::c = Yellow;
-
+int Quadtree::depth = 0;
 Quadtree::Quadtree(const AABB& box)
 {
 	CreateRoot(box);
@@ -16,6 +15,9 @@ void Quadtree::CreateRoot(const AABB& box)
 	root = new QuadtreeNode(box);
 	root->level = 0;
 	root->tree = this;
+	depth = 0;
+	min = { 0,0,0 };
+	max = { 0,0,0 };
 }
 
 Quadtree::~Quadtree()
@@ -40,7 +42,7 @@ void Quadtree::Draw()
 void Quadtree::AddGameObject(GameObject* gameObject)
 {
 	if (root->AddGameObject(gameObject) == false)
-		ExpandRootNode(gameObject);
+		if (experimental) ExpandRootNode(gameObject);
 }
 bool Quadtree::RemoveGameObject(GameObject* gameObject)
 {
@@ -63,6 +65,7 @@ bool Quadtree::RemoveGameObject(GameObject* gameObject)
 }
 void Quadtree::ExpandRootNode(GameObject* gameObject)
 {
+	return;
 	float3 min = root->box.minPoint;
 	float3 max = root->box.maxPoint;
 

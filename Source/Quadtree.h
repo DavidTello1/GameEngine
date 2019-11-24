@@ -42,14 +42,16 @@ public:
 	{
 		root->CollectCandidates(gameObjects, primitive);
 	}
-
-	static Color c;
+	float3 GetMinPoint(){return root->box.minPoint;}
+	float3 GetMaxPoint(){return root->box.maxPoint;}
+	static int depth;
+	bool experimental = false;
 
 private:
 	QuadtreeNode* root = nullptr;
 
-	GameObject* min = nullptr;
-	GameObject* max = nullptr;
+	float3 min = {0,0,0};
+	float3 max = {0,0,0};
 
 	std::vector<GameObject*> out_of_tree;
 };

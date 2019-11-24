@@ -32,7 +32,44 @@ ComponentCamera::~ComponentCamera()
 
 void ComponentCamera::DrawInspector()
 {
+	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
+	{
 
+		ImGui::ColorEdit3("Background", (float*)&background);
+
+		// Dummy floats
+		float _fov = frustum.verticalFov * RADTODEG;
+		float _near = frustum.nearPlaneDistance;
+		float _far = frustum.farPlaneDistance;
+
+		if (ImGui::Checkbox("Perspective / Orthogonal", &perspective))
+		{
+			if (perspective)
+				frustum.type = FrustumType::PerspectiveFrustum;
+			else
+				frustum.type = FrustumType::OrthographicFrustum;
+
+			update_projection = true;
+		}
+
+		ImGui::Text("Aspect ratio: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", GetAspectRatio());
+		ImGui::Text("Vertical FOV: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", GetFOV());
+		ImGui::Text("Horizontal FOV: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", GetHorizontalFOV());
+
+		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
+		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 180.0f, "%.1f"))
+		{
+			SetFov(_fov, true);
+		}
+		if (ImGui::DragFloat("Z Near", &_near, 0.25f, 0.1f, _far))
+		{
+			SetNearPlane(_near);
+		}
+		if (ImGui::DragFloat("Z Far", &_far, 0.25f, _near, 5000.0f))
+		{
+			SetFarPlane(_far);
+		}
+	}
 }
 
 
