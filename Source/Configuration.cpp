@@ -409,6 +409,7 @@ void Configuration::DrawModuleFileSystem(ModuleFileSystem* module)
 void Configuration::DrawScene()
 {
 	ImGui::Checkbox("Camera culling", &App->scene_base->camera_culling);
+	ImGui::Checkbox("Mouse picking", &App->scene_base->mouse_picking);
 
 	ImGui::Separator();
 

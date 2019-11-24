@@ -55,6 +55,7 @@ public:
 
 	bool show_all_aabb = false;
 	bool show_all_obb = false;
+	bool mouse_picking = false;
 
 private:
 

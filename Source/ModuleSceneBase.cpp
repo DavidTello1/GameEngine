@@ -32,7 +32,8 @@ bool ModuleSceneBase::Update(float dt)
 
 	CameraOrbit(dt);
 
-	CameraMousePicking();
+	if (mouse_picking)
+		CameraMousePicking();
 
 	return true;
 }
@@ -220,7 +221,7 @@ void ModuleSceneBase::CameraMousePicking()
 	Color c = (intersects) ? Yellow : Cyan;
 	
 
-	glLineWidth(3.0f);
+	glLineWidth(1.0f);
 	glColor3ub(c.r*255.0f, c.g*255.0f, c.b*255.0f);
 
 	glBegin(GL_LINES);
