@@ -285,7 +285,10 @@ void Assets::DrawIcons(const PathNode& node)
 
 		// Item clicking
 		if (ImGui::IsItemClicked())
+		{
 			selected_node = node.children[i];
+			//App->editor.t
+		}
 
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0) && selected_node.file == false) //open folder
 		{
@@ -318,4 +321,15 @@ uint Assets::GetIcon(const PathNode& node)
 		else
 			return file_icon;
 	}
+}
+
+Resource* Assets::GetSelectedResource()
+{
+	if (selected_node.path != "" && selected_node.file == true)
+	{
+		std::string metaFile = selected_node.path + (".meta");
+		uint64 resourceID = App->resources->GetIDFromMeta(metaFile.c_str());
+		return App->resources->GetResource(resourceID);
+	}
+	return nullptr;
 }

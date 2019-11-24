@@ -446,6 +446,8 @@ uint64 ModuleResources::GetIDFromMeta(const char* path)
 	if (size > 0)
 		ret = Config(buffer).GetNumber("ID");
 
+	delete[] buffer;
+
 	return ret;
 }
 

@@ -24,6 +24,8 @@ public:
 	void Draw();
 	void ImportAsset(const PathNode& node);
 
+	Resource* GetSelectedResource();
+
 private:
 	void UpdateAssets();
 	void UpdateFilters(PathNode& node);

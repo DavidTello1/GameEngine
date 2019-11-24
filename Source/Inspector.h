@@ -4,6 +4,7 @@
 #include "Math.h"
 #include "GameObject.h"
 #include "Component.h"
+#include "Resource.h"
 
 class ComponentMesh;
 class ComponentMaterial;
@@ -30,7 +31,12 @@ public:
 	//void GetTriangles();
 
 private:
+	void DrawComponents(GameObject* obj, bool res);
+	void DrawResource(Resource* res);
+
+private:
 	GameObject* obj = nullptr;
+	Resource* res = nullptr;
 	float3 position, rotation, scale;
 	float precision = 0.15f;
 	const char* precision_char = "%.2f";

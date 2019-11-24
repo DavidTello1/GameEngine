@@ -3,10 +3,10 @@
 #include "ModuleEditor.h"
 #include "GameObject.h"
 #include "ModuleScene.h"
-#include "Component.h"
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
 #include "ComponentRenderer.h"
+#include "Assets.h"
 
 #include "Imgui/imgui.h"
 #include "mmgr/mmgr.h"
@@ -27,22 +27,58 @@ Inspector::~Inspector()
 
 void Inspector::Draw()
 {
-	static bool rename = false;
-
 	obj = App->scene->GetSelectedGameObject();
-	if (obj == nullptr)
+	res = App->editor->tab_assets->GetSelectedResource();
+
+	if (obj != nullptr)
+		DrawComponents(obj, res != nullptr);
+
+	if (res != nullptr)
+		DrawResource(res);
+}
+
+void Inspector::DrawResource(Resource* res)
+{
+	ImGui::BeginChild("Resource", ImVec2(0, 0), false, ImGuiWindowFlags_MenuBar);
+
+	if (ImGui::BeginMenuBar()) //Show path
 	{
-		position = rotation = scale = float3::zero;
-		return;
+		ImGui::Text("Resources");
+		ImGui::EndMenuBar();
 	}
+
+	ImGui::Text("Name: ");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), res->GetName());
+
+	ImGui::Text("ID: ");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%d", res->GetID());
+
+	ImGui::Text("Original File: ");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), res->GetFile());
+
+	ImGui::Text("Exported File: ");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), res->GetExportedFile());
+
+	ImGui::Text("Times Loaded: ");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%d", res->CountReferences());
+	
+	ImGui::EndChild();
+}
+
+void Inspector::DrawComponents(GameObject* obj, bool res)
+{
+	static bool rename = false;
 	position = obj->GetPosition();
 	rotation = obj->GetRotation() * RADTODEG;
 	scale = obj->GetScale();
 
-
 	if (ImGui::BeginMenuBar())
 	{
-
 		if (ImGui::BeginMenu("Add"))
 		{
 			if (ImGui::MenuItem("Mesh", nullptr, false, !obj->GetComponent(Component::Type::Mesh)))
@@ -61,7 +97,7 @@ void Inspector::Draw()
 
 			ImGui::EndMenu();
 		}
-		
+
 		if (ImGui::BeginMenu("Remove", !obj->components.empty()))
 		{
 			if (obj->GetComponent(Component::Type::Mesh))
@@ -89,6 +125,9 @@ void Inspector::Draw()
 		}
 		ImGui::EndMenuBar();
 	}
+
+	if (res == true) //Resource Selected
+		ImGui::BeginChild("Components", ImVec2(0, ImGui::GetWindowContentRegionMax().y * 0.7f), false, ImGuiWindowFlags_NoTitleBar);
 
 	if (rename)
 	{
@@ -130,25 +169,25 @@ void Inspector::Draw()
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 		}
-		
+
 		// Position
 		ImGui::Text("Position");
 		ImGui::SetNextItemWidth(60);
 
 		if (ImGui::DragFloat("x##1", &position.x, precision, -inf, inf, precision_char))
-		if (!obj->is_static) SetPosition(obj, position);
+			if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("y##1", &position.y, precision,-inf,inf, precision_char))
-		if (!obj->is_static) SetPosition(obj, position);
+		if (ImGui::DragFloat("y##1", &position.y, precision, -inf, inf, precision_char))
+			if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		
+
 		if (ImGui::DragFloat("z##1", &position.z, precision, -inf, inf, precision_char))
-		if (!obj->is_static) SetPosition(obj, position);
+			if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::Separator();
 
@@ -157,26 +196,26 @@ void Inspector::Draw()
 		ImGui::SetNextItemWidth(60);
 
 		if (ImGui::DragFloat("x##2", &rotation.x, precision, -inf, inf, precision_char))
-		if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
+			if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-	
+
 		if (ImGui::DragFloat("y##2", &rotation.y, precision, -inf, inf, precision_char))
-		if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
+			if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 
 		if (ImGui::DragFloat("z##2", &rotation.z, precision, -inf, inf, precision_char))
-		if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
+			if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::Separator();
 
 		// Scale
 		ImGui::Text("Scale");
 		ImGui::SetNextItemWidth(60);
-		
+
 		if (ImGui::DragFloat("x##3", &scale.x, precision, -inf, inf, precision_char))
 		{
 			if (!obj->is_static) {
@@ -208,7 +247,7 @@ void Inspector::Draw()
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		
+
 		if (ImGui::DragFloat("z##3", &scale.z, precision, -inf, inf, precision_char))
 		{
 			if (!obj->is_static) {
@@ -241,4 +280,7 @@ void Inspector::Draw()
 	{
 		obj->components[i]->DrawInspector();
 	}
+
+	if (res == true) //Resource Selected
+		ImGui::EndChild();
 }
