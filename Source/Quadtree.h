@@ -24,6 +24,7 @@ public:
 
 	void AddGameObject(GameObject* gameObject);
 	void ExpandRootNode(GameObject * gameObject);
+	bool IsExcluded(GameObject * gameObject);
 	bool NeedsExpansion(GameObject * gameObject);
 	bool RemoveGameObject(GameObject* gameObject);
 

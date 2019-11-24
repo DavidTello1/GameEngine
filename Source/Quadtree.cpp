@@ -1,5 +1,5 @@
 #include "Quadtree.h"
-
+#include "ComponentMesh.h"
 #include "Application.h"
 
 int Quadtree::depth = 0;
@@ -45,11 +45,21 @@ void Quadtree::Draw()
 
 void Quadtree::AddGameObject(GameObject* gameObject)
 {
+	if (IsExcluded(gameObject))
+		return;
 	if (root->AddGameObject(gameObject) == false)
 		if (experimental && NeedsExpansion(gameObject))
 			ExpandRootNode(gameObject);
 }
 
+bool Quadtree::IsExcluded(GameObject* gameObject)
+{
+	if (gameObject->GetComponent<ComponentCamera>() ||
+		!gameObject->GetComponent<ComponentMesh>())
+		return true;
+
+	return false;
+}
 bool Quadtree::NeedsExpansion(GameObject* gameObject)
 {
 	bool expand = false;

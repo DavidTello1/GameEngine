@@ -30,7 +30,7 @@ public:
 
 public:
 
-	bool camera_culling = true;
+	bool camera_culling = false;
 
 	Ray print_ray;
 

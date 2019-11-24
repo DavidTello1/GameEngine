@@ -148,6 +148,7 @@ void Assets::ImportAsset(const PathNode& node)
 		resource->LoadToMemory();
 		ResourceModel* res = (ResourceModel*)resource;
 		res->CreateGameObjects(App->file_system->GetFileName(node.path.c_str()).c_str()); //create gameobjects from model
+		App->scene->RedoQuatree();
 	}
 }
 

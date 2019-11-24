@@ -51,32 +51,9 @@ bool ModuleScene::Start(Config* config)
 
 	test_camera = test_camera_obj->GetComponent<ComponentCamera>();
 	
-	//ResourceModel* tcmodel = new ResourceModel(root_object->GetUID());
-	//std::string tmdp = "MyCamera.dvs";
-	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
-
-	//for (int i = 0; i < 6; i++) {
-	//ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
-	//std::string tmp = "MyBakerHouse.dvs";
-	//bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
-
-	//
-	//gameObjects[2+i*3]->SetLocalPosition({ 5.0f*i,0.0f,-5.0f* i });
-	//}
-
-	//App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/Street/Street environment_V01.fbx");
-
-	App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/BakerHouse.fbx");
-
-	//gameObjects[2]->SetLocalPosition({ 0.0f,0.0f,20.0f });
-
-
 	quadtree = new Quadtree(AABB(Quadtree::min_point,Quadtree::max_point));
 
 	RedoQuatree();
-	
-	//quadtree->AddGameObject(bhmodel.)
-	//UnSelectAll();
 
 	return true;
 }
