@@ -51,6 +51,10 @@ public:
 	static float3 min_point;
 	static float3 max_point;
 
+	bool debug = false;
+	
+	static bool bucket_depth;
+
 private:
 	QuadtreeNode* root = nullptr;
 

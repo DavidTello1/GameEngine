@@ -82,7 +82,8 @@ bool ModuleScene::Update(float dt)
 	if (test_camera)
 		test_camera->DrawFrustum();
 
-	quadtree->Draw();
+	if (quadtree->debug)
+		quadtree->Draw();
 	
 
 	return true;

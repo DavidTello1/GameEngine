@@ -488,6 +488,14 @@ void Configuration::DrawQuadtree()
 			App->scene->RedoQuatree();
 		}
 
+		ImGui::Checkbox("Visualize tree", &App->scene->quadtree->debug);
+		ImGui::Checkbox("Color set by [bucket/depth]", &Quadtree::bucket_depth);
+		ImGui::SameLine();
+		ImGui::Text("?");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Color pattern design based on per box bucket or level of deepth. \nBoxes unseen by the camera will be colored grey");
+
+
 		ImGui::Checkbox("Experimental Dynamic", &App->scene->quadtree->experimental);
 
 		ImGui::Text("Tree depth: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%i", App->scene->quadtree->depth);
@@ -500,31 +508,33 @@ void Configuration::DrawQuadtree()
 
 		ImGui::Separator();
 
-		if (ImGui::Button("Recalculate tree below settings"))
+		if (ImGui::Button("Recalculate tree"))
 		{
 			App->scene->RedoQuatree();
 		}
+		ImGui::SameLine();
+		ImGui::Text("?");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Below settings are going to be used to recalculate the tree. \nIs recommended to recalculate with experimental dynamic tree checked");
 
-		ImGui::Text("Position");
-		ImGui::SetNextItemWidth(60);
 		float precision = 0.25f;
 		const char* precision_char = "%.2f";
 
 		ImGui::Text("Min point");
+		ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("x##32", &Quadtree::min_point.x, precision, -inf, inf, precision_char);
 		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("y##32", &Quadtree::min_point.y, precision, -inf, inf, precision_char);
 		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("z##32", &Quadtree::min_point.z, precision, -inf, inf, precision_char);
-		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
 
 		ImGui::Text("Max point");
+		ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("x##35", &Quadtree::max_point.x, precision, -inf, inf, precision_char);
 		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("y##35", &Quadtree::max_point.y, precision, -inf, inf, precision_char);
 		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("z##35", &Quadtree::max_point.z, precision, -inf, inf, precision_char);
-		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
 
 
 		ImGui::Separator();

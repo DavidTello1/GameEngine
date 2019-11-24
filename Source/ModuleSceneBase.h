@@ -53,8 +53,8 @@ public:
 	Color obb_color = Green;
 	float obb_width = 1.0f;
 
-	bool show_all_aabb = true;
-	bool show_all_obb = true;
+	bool show_all_aabb = false;
+	bool show_all_obb = false;
 
 private:
 

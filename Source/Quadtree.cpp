@@ -3,6 +3,7 @@
 #include "Application.h"
 
 int Quadtree::depth = 0;
+bool Quadtree::bucket_depth = true;
 float3 Quadtree::min_point = { -50,-50,-50 };
 float3 Quadtree::max_point = { 50,50,50 };
 

@@ -266,43 +266,60 @@ void QuadtreeNode::GetChildsBuckets(std::vector<GameObject*>& vector, bool addSe
 void QuadtreeNode::Draw()
 {
 	Color color;
-	switch (bucket.size())
+	if (Quadtree::bucket_depth)
 	{
-	case 0:
-		color = Color(1, 0, 0, 1);
-		break;
-	case 1:
-		color = Color(0, 1, 0, 1);
-		break;
-	case 2:
-		color = Color(0, 0, 1, 1);
-		break;
-	case 3:
-		color = Color(1, 1, 0, 1);
-		break;
-	default:
-		color = Color(0, 1, 1, 1);
-		break;
+		switch (bucket.size())
+		{
+		case 0:
+			color = Color(1, 0, 0, 1);
+			break;
+		case 1:
+			color = Color(0, 1, 0, 1);
+			break;
+		case 2:
+			color = Color(0, 0, 1, 1);
+			break;
+		case 3:
+			color = Color(1, 1, 0, 1);
+			break;
+		case 4:
+			color = Color(0, 1, 1, 1);
+			break;
+		default:
+			color = Color(1, 0, 1, 1);
+			break;
+		}
 	}
-
-	/*switch (level)
+	else
 	{
-	case 0:
-		color = Color(1, 0, 0, 1);
-		break;
-	case 1:
-		color = Color(0, 1, 0, 1);
-		break;
-	case 2:
-		color = Color(0, 0, 1, 1);
-		break;
-	case 3:
-		color = Color(1, 1, 0, 1);
-		break;
-	default:
-		color = Color(0, 1, 1, 1);
-		break;
-	}*/
+		switch (level)
+		{
+		case 0:
+			color = Color(1, 0, 0, 1);
+			break;
+		case 1:
+			color = Color(0, 1, 0, 1);
+			break;
+		case 2:
+			color = Color(0, 0, 1, 1);
+			break;
+		case 3:
+			color = Color(1, 1, 0, 1);
+			break;
+		case 4:
+			color = Color(0, 1, 1, 1);
+			break;
+		case 5:
+			color = Color(1, 0, 1, 1);
+			break;
+		case 6:
+			color = Color(1, 1, 1, 1);
+			break;
+		default:
+			color = Color(0.5f, 0.5f, 0.5f, 1);
+			break;
+		}
+	}
 
 	toDraw = box;
 	toDraw.maxPoint.x -= 0.5f;
@@ -319,48 +336,3 @@ void QuadtreeNode::Draw()
 	for (uint i = 0; i < childs.size(); i++)
 		childs[i]->Draw();
 }
-
-//bool QuadtreeNode::SendToChilds(GameObject* gameObject)
-//{
-//	uint intersectionChild = -1;
-//	//ALgo funciona mal aqui, no intersecta amb cap child excepte en un que interescta 4 cops
-//	for (uint i = 0; i < childs.size(); i++)
-//	{
-//		if (childs[i]->box.Intersects(gameObject->aabb))
-//		{
-//			intersectionChild = i;
-//			break;
-//		}
-//	}
-//	if (intersectionChild >= 0 && intersectionChild < childs.size())
-//	{
-//		childs[intersectionChild]->AddGameObject(gameObject);
-//		return true;
-//	}
-//	else if (intersectionChild == -1)
-//		LOG("[error] Quadtree parent node intersecting but not child intersection found",'e');
-//	return false;
-//}
-
-//bool QuadtreeNode::SendToChilds(GameObject* gameObject)
-//{
-//	uint intersectionCount = 0;
-//	uint intersectionChild = -1;
-//	//ALgo funciona mal aqui, no intersecta amb cap child excepte en un que interescta 4 cops
-//	for (uint i = 0; i < childs.size(); i++)
-//	{
-//		if (childs[i]->box.Intersects(gameObject->aabb))
-//		{
-//			intersectionCount++;
-//			intersectionChild = i;
-//		}
-//	}
-//	if (intersectionCount == 1)
-//	{
-//		childs[intersectionChild]->AddGameObject(gameObject);
-//		return true;
-//	}
-//	else if (intersectionCount == 0)
-//		LOG("[error] Quadtree parent node intersecting but not child intersection found");
-//	return false;
-//}
