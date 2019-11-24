@@ -37,6 +37,11 @@ public:
 	{
 		root->CollectCandidates(gameObjects, primitive);
 	}
+	template<typename PRIMITIVE>
+	void CollectCandidates(std::map<float, GameObject*>& gameObjects, const PRIMITIVE& primitive)
+	{
+		root->CollectCandidates(gameObjects, primitive);
+	}
 
 	static Color c;
 

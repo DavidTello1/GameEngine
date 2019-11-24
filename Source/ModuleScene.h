@@ -34,6 +34,9 @@ public:
 	void DeleteGameObject(GameObject* obj);
 	void DeleteSelected();
 
+	std::map<float, GameObject*> pick_candidates;
+	GameObject* PickFromRay(Ray ray);
+
 	GameObject* GetSelectedGameObject() { 
 		for (uint i=0;i<gameObjects.size();i++)
 			if (gameObjects[i]->is_selected)

@@ -19,7 +19,7 @@ bool ModuleSceneBase::Start(Config* config)
 	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
 	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
 
-	viewport_camera->Move({ 0, 1.95f, -5.0f });
+	viewport_camera->Move({ 0, 1.95f, -35.0f });
 	viewport_camera->SetFarPlane(500.0f);
 
 	return true;
@@ -196,54 +196,33 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 
 void ModuleSceneBase::CameraMousePicking()
 {
-	Color c = Cyan;
-	cam = App->scene->test_camera;
+
 	float3 start = print_ray.pos;
-	//float3 end = ray.b + ray.Dir().Normalized() * cam->GetFarPlane();
-	float3 end = print_ray.pos + print_ray.dir.Normalized() * cam->GetFarPlane();
+	bool intersects = false;
+
+	float3 end = print_ray.pos + print_ray.dir.Normalized() * viewport_camera->GetFarPlane();
 
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 	{
-
 		float2 pos = App->input->GetMousePosition();
-		//x = -x;
 
-		// Converting origin to viewport center origin
-		//x -= 212;//(250 + 738/2);
-		//y -= 19;//(19 + 563/2);
-
-		pos.x = (float)(( pos.x - (float)App->editor->tab_viewport->pos_x ) / (float)App->editor->tab_viewport->width  );	// viewport_camera->GetWidth();
-		pos.y = (float)(( pos.y - (float)App->editor->tab_viewport->pos_y ) / -(float)App->editor->tab_viewport->height );		// -viewport_camera->GetHeight();
-
-		pos.x = (pos.x - 0.5f) * 2.0f;
-		pos.y = (pos.y + 0.5f) * 2.0f;
+		pos.x = (((float)(( pos.x - (float)App->editor->tab_viewport->pos_x ) / (float)App->editor->tab_viewport->width   )) -0.5f) * 2.0f;	
+		pos.y = (((float)(( pos.y - (float)App->editor->tab_viewport->pos_y ) / -(float)App->editor->tab_viewport->height )) +0.5f) * 2.0f;
 
 		pos = pos.Clamp(-1.0f, 1.0f);
 
-		Ray ray = cam->frustum.UnProjectFromNearPlane(pos.x, pos.y);
-		//Ray ray = cam->frustum.UnProjectFromNearPlane((float)xn, (float)yn);
+		Ray ray = viewport_camera->frustum.UnProjectFromNearPlane(pos.x, pos.y);
 		print_ray = ray;
 
-		bool intersects = false;
-
-		for (int i = 2;i< App->scene->gameObjects.size();i++)
-		{
-			if (ray.Intersects(App->scene->gameObjects[i]->aabb)) 
-			{
-				LOG("Selecting %s", App->scene->gameObjects[i]->GetName(),'d');
-				intersects = true;
-			}
-		}
-
-
-		
+		// Starts collect
+		intersects = App->scene->PickFromRay(ray);
 
 		if (App->input->GetKey(SDL_SCANCODE_C) == KEY_REPEAT)
 			LOG("Start [%f,%f,%f]   End [%f,%f,%f]", start.x, start.y, start.z, end.x, end.y, end.z, 'd');
 	}
 
 	// Drawiinggg
-	//Color c = (intersects) ? Yellow : Cyan;
+	Color c = (intersects) ? Yellow : Cyan;
 	
 
 	glLineWidth(3.0f);
