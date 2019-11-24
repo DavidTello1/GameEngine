@@ -492,16 +492,43 @@ void Configuration::DrawQuadtree()
 
 		ImGui::Text("Tree depth: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%i", App->scene->quadtree->depth);
 
-		if (ImGui::Button("Calculate tree"))
-		{
-			App->scene->RedoQuatree();
-		}
-
 		ImGui::Text("Min point"); ImGui::SameLine();
 		PrintPosColored(App->scene->quadtree->GetMinPoint());
 
 		ImGui::Text("Max point"); ImGui::SameLine();
 		PrintPosColored(App->scene->quadtree->GetMaxPoint());
+
+		ImGui::Separator();
+
+		if (ImGui::Button("Recalculate tree below settings"))
+		{
+			App->scene->RedoQuatree();
+		}
+
+		ImGui::Text("Position");
+		ImGui::SetNextItemWidth(60);
+		float precision = 0.25f;
+		const char* precision_char = "%.2f";
+
+		ImGui::Text("Min point");
+		ImGui::DragFloat("x##32", &Quadtree::min_point.x, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("y##32", &Quadtree::min_point.y, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("z##32", &Quadtree::min_point.z, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+
+		ImGui::Text("Max point");
+		ImGui::DragFloat("x##35", &Quadtree::max_point.x, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("y##35", &Quadtree::max_point.y, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("z##35", &Quadtree::max_point.z, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+
+
+		ImGui::Separator();
+
 	}
 }
 

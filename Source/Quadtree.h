@@ -24,6 +24,7 @@ public:
 
 	void AddGameObject(GameObject* gameObject);
 	void ExpandRootNode(GameObject * gameObject);
+	bool NeedsExpansion(GameObject * gameObject);
 	bool RemoveGameObject(GameObject* gameObject);
 
 	void Clear();
@@ -47,11 +48,10 @@ public:
 	static int depth;
 	bool experimental = false;
 
+	static float3 min_point;
+	static float3 max_point;
+
 private:
 	QuadtreeNode* root = nullptr;
 
-	float3 min = {0,0,0};
-	float3 max = {0,0,0};
-
-	std::vector<GameObject*> out_of_tree;
 };

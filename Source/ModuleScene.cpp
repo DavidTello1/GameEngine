@@ -66,7 +66,8 @@ bool ModuleScene::Start(Config* config)
 
 	//gameObjects[2]->SetLocalPosition({ 0.0f,0.0f,20.0f });
 
-	quadtree = new Quadtree(AABB({ -50,-50,-50 }, { 50,50,50 }));
+
+	quadtree = new Quadtree(AABB(Quadtree::min_point,Quadtree::max_point));
 
 	RedoQuatree();
 	
@@ -80,38 +81,6 @@ bool ModuleScene::Update(float dt)
 {
 	if (test_camera)
 		test_camera->DrawFrustum();
-
-	if (App->input->GetKey(SDL_SCANCODE_0) == KEY_DOWN)
-	{
-		for (GameObject* obj : gameObjects)
-		{
-			//obj->UpdateBoundingBox();
-			quadtree->RemoveGameObject(obj);
-		}
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	{
-		for (GameObject* obj : gameObjects)
-		{
-			//obj->UpdateBoundingBox();
-			quadtree->AddGameObject(obj);
-		}
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
-	{
-
-		//quadtree->RemoveGameObject(gameObjects.back());
-		quadtree->OptimizeSpace();
-
-	}
-	if (App->input->GetKey(SDL_SCANCODE_3) == KEY_DOWN)
-	{
-
-		quadtree->RemoveGameObject(gameObjects.back());
-
-	}
 
 	quadtree->Draw();
 	
