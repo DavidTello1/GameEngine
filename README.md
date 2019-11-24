@@ -10,20 +10,11 @@
 - Holding SHIFT duplicates movement speed
 
 ## Innovation
-- Option to automatically focus to window hovered *may cause some problems (WIP)*
-- Add/Remove Components from Inspector panel
-- Hierarchy panel has trees
-- Rename GameObjects from Hierarchy panel (Double-click | Right-click)
-- Extensive primitives creation options
-- GPU detection & Memory statistics
-- Bounding Box for each mesh (with editable options in Configuration->Scene panel)
-- Bounding Box for parent of meshes *WIP*
+- 
 
-## Features
-- Multiple game objects can be selected (with Left CTRL) to make texture loading process faster
-- Selected game objects can be deleted with button _Delete_ or with the key _SUPR_ (*may cause some problems [WIP]*)
-- If a game object is selected inside _Hierarchy_, the new gameobjects will be created as childs of it
-- All loading actions can be automatically made drag and dropping the file directly to the editor
+## Work division
+- Óscar: quadtrees, mousepicking, camera FOV, frustum culling, time management
+- David: inspector properties, own file format, reference counting, resource management
 
 ## Model loading instructions
 
