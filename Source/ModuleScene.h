@@ -18,6 +18,7 @@ enum SceneState {
 	PLAY,
 	PAUSE,
 	STOP
+
 };
 
 class ModuleScene :	public Module
@@ -65,6 +66,7 @@ public:
 	   
 	static GameObject* root_object;
 	static SceneState state;
+	static const char* state_to_string[STOP+1];
 	ComponentCamera* test_camera = nullptr;
 	GameObject* test_camera_obj = nullptr;
 

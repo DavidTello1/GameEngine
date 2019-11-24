@@ -52,6 +52,8 @@ void Hierarchy::Draw()
 		&& (ModuleScene::state == PLAY || ModuleScene::state == PAUSE))
 		ModuleScene::state = STOP;
 
+	ImGui::SameLine();
+	ImGui::TextColored({ 1,1,0,1 },ModuleScene::state_to_string[ModuleScene::state]);
 	ImGui::Separator();
 	// Drawing scene gameobjects as nodes
 	DrawNodes(ModuleScene::root_object->childs);

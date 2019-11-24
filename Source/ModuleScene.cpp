@@ -14,6 +14,7 @@
 
 GameObject* ModuleScene::root_object;
 SceneState ModuleScene::state = EDIT;
+const char* ModuleScene::state_to_string[STOP+1] = { "EDIT","START","PLAY","PAUSE","STOP" };
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 {}
@@ -43,7 +44,7 @@ bool ModuleScene::Start(Config* config)
 {
 	LOG("Loading main scene", 'v');
 
-	test_camera_obj = CreateGameObject("test camera");
+	test_camera_obj = CreateGameObject("Main camera");
 	test_camera_obj->AddComponent(Component::Type::Camera);
 
 	test_camera = test_camera_obj->GetComponent<ComponentCamera>();

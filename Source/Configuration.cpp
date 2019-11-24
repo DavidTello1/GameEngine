@@ -86,9 +86,9 @@ bool Configuration::InitModuleDraw(Module* module)
 	if (ImGui::CollapsingHeader(module->GetName()))
 	{
 		bool active = module->IsActive();
-		if (ImGui::Checkbox("Active", &active))
-			module->SetActive(active);
-		ret = true;
+		ImGui::Checkbox("Active", &active);
+			//module->SetActive(active);
+		ret = true;	
 	}
 
 	return ret;
