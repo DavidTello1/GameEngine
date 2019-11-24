@@ -63,6 +63,7 @@ public:
 
 	// Utilities
 	const char* GetDirectory(Resource::Type type) const;
+	uint64 GetIDFromMeta(const char* path);
 
 private:
 	void LoadUID();
@@ -79,8 +80,8 @@ public:
 
 	GLuint bbox_indices[24] =
 	{
-		0,1,2,3,0,3,1,2,
-		4,5,6,7,4,7,5,6,
+		0,1,2,3,0,2,1,3,
+		4,5,6,7,4,6,5,7,
 		0,4,1,5,2,6,3,7
 	};
 

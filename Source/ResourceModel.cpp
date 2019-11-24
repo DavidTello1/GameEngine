@@ -48,6 +48,11 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		ResourceModel model(0);
 		std::vector<UID> materials, meshes;
 
+		model.name = App->file_system->GetFileName(full_path);
+		model.name = model.name.substr(0, model.name.size() - 4);
+		LOG("Importing model '%s'", (model.name.c_str()), 'g');
+
+
 		// Generate Materials
 		materials.reserve(scene->mNumMaterials); //reserve capacity for num of materials
 		for (unsigned i = 0; i < scene->mNumMaterials; ++i)
@@ -90,8 +95,6 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		}
 		LOG("[%s] imported in %d ms", model.GetFile(), timer.Read(), 'd');
 		timer.Stop();
-
-		model.LoadToMemory(); // HARDCODED : should be called when loading after importing (just for testing)
 		
 		return ret;
 	}
@@ -108,13 +111,14 @@ bool ResourceModel::SaveOwnFormat(std::string& output) const
 	{
 		write_stream << nodes[i].name;
 		write_stream << nodes[i].parent;
+		write_stream << nodes[i].transform;
 		write_stream << nodes[i].mesh;
 		write_stream << nodes[i].material;
 	}
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get stream vector
 
-	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MODEL_FOLDER, std::to_string(GetID()).c_str(), "dvs_model"); //save file
+	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MODEL_FOLDER, name.c_str(), "dvs_model"); //save file
 }
 
 bool ResourceModel::LoadtoScene()
@@ -138,13 +142,17 @@ bool ResourceModel::LoadtoScene()
 
 			read_stream >> node.name;
 			read_stream >> node.parent;
+
+			for (uint i = 0; i < 16; ++i)
+			{
+				read_stream >> reinterpret_cast<float*>(&node.transform)[i];
+			}
+
 			read_stream >> node.mesh;
 			read_stream >> node.material;
 
 			nodes.push_back(node); //add node to vector nodes
 		}
-
-		CreateGameObjects(App->file_system->GetFileName(original_file.c_str()).c_str()); //create gameobjects from model
 
 		LOG("[%s] loaded in %d ms", GetExportedFile(), timer.Read(), 'd');
 		timer.Stop();
@@ -252,7 +260,6 @@ void ResourceModel::CreateGameObjects(const char* name)
 			r_material->LoadToMemory(); //load material data
 			material->SetMaterial(r_material);
 		}
-
 	}
 
 	objects.clear();

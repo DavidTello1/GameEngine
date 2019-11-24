@@ -11,6 +11,7 @@ public:
 	{
 		std::string name;
 		uint parent = 0;
+		float4x4 transform = float4x4::identity;
 		UID mesh = 0;
 		UID material = 0;
 	};
@@ -27,9 +28,10 @@ public:
 	unsigned GetNumNodes() const { return nodes.size(); }
 	const Node& GetNode(uint index) const { return nodes[index]; }
 
+	void CreateGameObjects(const char* name = nullptr);
+
 private:
 	void CreateNodes(const aiScene* model, const aiNode* node, uint parent, const std::vector<UID>& meshes, const std::vector<UID>& materials);
-	void CreateGameObjects(const char* name = nullptr);
 
 private:
 	std::vector<Node> nodes;

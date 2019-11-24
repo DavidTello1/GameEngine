@@ -54,19 +54,6 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 
 	material->UnLoad();
 
-	// HARDCODED ------------------------------------------------------
-	GameObject* obj = App->scene->GetSelectedGameObject();
-	if (obj != nullptr)
-	{
-		ComponentMaterial* mat = (ComponentMaterial*)obj->GetComponent(Component::Type::Material);
-		if (mat == nullptr)
-			mat = (ComponentMaterial*)obj->AddComponent(Component::Type::Material);
-
-		material->LoadToMemory();
-		mat->SetMaterial(material);
-	}
-	// ---------------------------------------------------------------------
-
 	return material->uid;
 }
 

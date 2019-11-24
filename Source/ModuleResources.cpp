@@ -60,7 +60,7 @@ bool ModuleResources::Start(Config* config)
 	LoadAssetsIcons();
 
 	//LoadResourcesData();
-	//UpdateAssets();
+	UpdateAssets();
 
 	// Creation of the Index Buffer Object of the bounding boxes array, as all uses the same
 	if (aabb_IBO == 0) glGenBuffers(1, &aabb_IBO);
@@ -436,6 +436,19 @@ void ModuleResources::LoadCheckersTexture()
 		checkImage);
 }
 
+uint64 ModuleResources::GetIDFromMeta(const char* path)
+{
+	uint64 ret = 0;
+
+	char* buffer = nullptr;
+	uint size = App->file_system->Load(path, &buffer);
+
+	if (size > 0)
+		ret = Config(buffer).GetNumber("ID");
+
+	return ret;
+}
+
 void ModuleResources::SaveMeta(const Resource* resource)
 {
 	Config config;
@@ -478,7 +491,6 @@ bool ModuleResources::LoadMeta(const char* file)
 
 			LoadSceneMeta(resFile.c_str(), sourceFile.c_str());
 		}
-
 		return true;
 	}
 	return false;
