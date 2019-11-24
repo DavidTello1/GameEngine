@@ -21,7 +21,8 @@ bool ModuleSceneBase::Start(Config* config)
 
 bool ModuleSceneBase::Update(float dt)
 {
-	if (viewport_camera == nullptr || App->editor->focused_panel != App->editor->tab_viewport) return true;
+	if (viewport_camera == nullptr 
+		|| App->editor->focused_panel  == nullptr || App->editor->focused_panel != App->editor->tab_viewport) return true;
 
 	CameraZoom(dt);
 
@@ -184,11 +185,15 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 
 void ModuleSceneBase::CameraMousePicking()
 {
+	float3 start = { 0,0,0 };
+	float3 end = { 0,0,0 };
+	if (print_ray.IsFinite()) {
+		 start = print_ray.pos;
+		 end = print_ray.pos + print_ray.dir.Normalized() * viewport_camera->GetFarPlane();
 
-	float3 start = print_ray.pos;
+	}
 	bool intersects = false;
 
-	float3 end = print_ray.pos + print_ray.dir.Normalized() * viewport_camera->GetFarPlane();
 
 
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
@@ -205,7 +210,7 @@ void ModuleSceneBase::CameraMousePicking()
 		print_ray = ray;
 
 		// Starts collect
-		intersects = App->scene->PickFromRay(ray);
+		intersects = App->scene->PickFromRay(ray) != nullptr;
 
 		if (App->input->GetKey(SDL_SCANCODE_C) == KEY_REPEAT)
 			LOG("Start [%f,%f,%f]   End [%f,%f,%f]", start.x, start.y, start.z, end.x, end.y, end.z, 'd');

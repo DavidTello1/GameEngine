@@ -264,6 +264,8 @@ void ResourceModel::CreateGameObjects(const char* name)
 		}
 	}
 
+
+	// Removing useless parents, maybe not the better algth, but works :D
 	std::vector<GameObject*> childs_to_remove;
 	std::vector<int> pos_to_remove;
 
@@ -272,7 +274,6 @@ void ResourceModel::CreateGameObjects(const char* name)
 		if (strstr(objects[i]->GetName(), "$AssimpFbx$") != nullptr)
 		{
 			childs_to_remove.push_back(objects[i]);
-			//pos_to_remove.push_back(i);
 		}
 		else
 		{
