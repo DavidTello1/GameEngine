@@ -13,7 +13,7 @@
 - 
 
 ## Work division
-- Óscar: quadtrees, mousepicking, camera FOV, frustum culling, time management
+- Óscar: quadtrees, mousepicking(option to enable/disable in Panel Configuration>Scene), camera FOV, frustum culling, time management
 - David: inspector properties, own file format, reference counting, resource management
 
 ## Model loading instructions
