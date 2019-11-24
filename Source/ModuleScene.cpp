@@ -33,6 +33,8 @@ bool ModuleScene::Start(Config* config)
 {
 	LOG("Loading main scene", 'v');
 
+	scene_name = "Default_Scene";
+
 	test_camera_obj = CreateGameObject("test camera");
 	test_camera_obj->AddComponent(Component::Type::Camera);
 

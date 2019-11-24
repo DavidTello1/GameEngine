@@ -30,8 +30,8 @@ bool ModuleWindow::Init(Config* config)
 		SDL_GetDesktopDisplayMode(0, &DM);
 
 		//Create window
-		screen_width = config->GetInt("Width", uint(DM.w*0.75f));
-		screen_height = config->GetInt("Height", uint(DM.h*0.75f));
+		screen_width = config->GetNumber("Width", uint(DM.w*0.75f));
+		screen_height = config->GetNumber("Height", uint(DM.h*0.75f));
 
 		Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
@@ -80,7 +80,7 @@ bool ModuleWindow::Start(Config* config)
 	//if (icon_file.size() > 1)
 	//	SetIcon(icon_file.c_str());
 
-	SetBrightness(config->GetFloat("Brightness", 1.0f));
+	SetBrightness(config->GetNumber("Brightness", 1.0f));
 
 	// Force to trigger a chain of events to refresh aspect ratios	
 	SDL_SetWindowSize(window, screen_width, screen_height);
@@ -105,21 +105,21 @@ bool ModuleWindow::CleanUp()
 void ModuleWindow::Save(Config* config) const
 {
 	//config->AddString("Icon", icon_file.c_str());
-	config->AddFloat("Brightness", GetBrightness());
-	config->AddInt("Width", GetWidth());
-	config->AddInt("Height", this->GetHeight());
-	config->AddBool("Fullscreen", IsFullscreen());
-	config->AddBool("Resizable", IsResizable());
-	config->AddBool("Borderless", IsBorderless());
-	config->AddBool("Fullscreen Desktop", IsFullscreenDesktop());
+	config->SetNumber("Brightness", GetBrightness());
+	config->SetNumber("Width", GetWidth());
+	config->SetNumber("Height", this->GetHeight());
+	config->SetBool("Fullscreen", IsFullscreen());
+	config->SetBool("Resizable", IsResizable());
+	config->SetBool("Borderless", IsBorderless());
+	config->SetBool("Fullscreen Desktop", IsFullscreenDesktop());
 }
 
 void ModuleWindow::Load(Config* config)
 {
 	//SetIcon(config->GetString("Icon", ""));
-	SetBrightness(config->GetFloat("Brightness", 1.0f));
-	SetWidth(config->GetInt("Width", 1280));
-	SetHeigth(config->GetInt("Height", 1024));
+	SetBrightness(config->GetNumber("Brightness", 1.0f));
+	SetWidth(config->GetNumber("Width", 1280));
+	SetHeigth(config->GetNumber("Height", 1024));
 	SetFullscreen(config->GetBool("Fullscreen", false));
 	SetResizable(config->GetBool("Resizable", false));
 	SetBorderless(config->GetBool("Borderless", false));

@@ -7,7 +7,7 @@
 #include "ResourceModel.h"
 #include "ResourceMesh.h"
 #include "ResourceMaterial.h"
-#include "ComponentMaterial.h"
+#include "ResourceScene.h"
 #include "Config.h"
 #include "PathNode.h"
 
@@ -50,8 +50,6 @@ bool ModuleResources::Init(Config* config)
 	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
 	stream.callback = AssimpLogCallback;
 	aiAttachLogStream(&stream);
-
-	
 
 	return true;
 }
@@ -132,11 +130,14 @@ bool ModuleResources::ImportResource(const char* final_path, UID uid)
 	case Resource::material:
 		import_ok = ResourceMaterial::Import(final_path);
 		break;
+	case Resource::scene:
+		import_ok = ResourceScene::Import(final_path, written_file);
 	}
 
 	if (import_ok == true)
 	{
 		Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
+		SaveMeta(res);
 	}
 	else
 	{
@@ -168,6 +169,9 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 		break;
 	case Resource::material:
 		ret = (Resource*) new ResourceMaterial(uid);
+		break;
+	case Resource::scene:
+		ret = (Resource*) new ResourceScene(uid);
 		break;
 	}
 
@@ -308,6 +312,11 @@ Resource::Type ModuleResources::GetResourceType(const char* path) const
 		type = Resource::Type::material;
 		LOG("Importing resource material from %s", path, 'd');
 	}
+	else if (strcmp("dvs", extension.c_str()) == 0)
+	{
+		type = Resource::Type::scene;
+		LOG("Importing resource scene from %s", path, 'd');
+	}
 	else
 	{
 		type = Resource::Type::unknown;
@@ -425,4 +434,84 @@ void ModuleResources::LoadCheckersTexture()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
 		checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 		checkImage);
+}
+
+void ModuleResources::SaveMeta(const Resource* resource)
+{
+	Config config;
+
+	config.SetNumber("ID", resource->uid);
+	config.SetString("Name", resource->name.c_str());
+	config.SetNumber("Type", static_cast<int>(resource->GetType()));
+
+	char* buffer = nullptr;
+	uint size = config.Serialize(&buffer);
+	if (size > 0)
+	{
+		std::string path = resource->original_file + ".meta";
+		App->file_system->Save(path.c_str(), buffer, size);
+	}
+}
+
+bool ModuleResources::LoadMeta(const char* file)
+{
+	char* buffer = nullptr;
+	uint size = App->file_system->Load(file, &buffer);
+	MetaFile meta;
+	if (size > 0)
+	{
+		Config config(buffer);
+
+		std::string sourceFile = file;
+		sourceFile = std::string(file).substr(0, sourceFile.size() - 5);
+
+		meta.original_file = sourceFile;
+		meta.resource_name = config.GetString("Name");
+		meta.id = config.GetNumber("ID");
+		meta.type = static_cast<Resource::Type>((int)(config.GetNumber("Type")));
+		existing_res[meta.id] = meta;
+
+		if (meta.type == Resource::model)
+		{
+			std::string resFile = "/Library/GameObjects/";
+			resFile.append(std::to_string(meta.id));
+
+			LoadSceneMeta(resFile.c_str(), sourceFile.c_str());
+		}
+
+		return true;
+	}
+	return false;
+}
+
+bool ModuleResources::LoadSceneMeta(const char* file, const char* source_file)
+{
+	char* buffer = nullptr;
+	uint size = App->file_system->Load(file, &buffer);
+	if (size > 0)
+	{
+		Config config(buffer);
+		Config_Array GameObjects = config.GetArray("GameObjects");
+
+		for (uint i = 0; i < GameObjects.GetSize(); i++)
+		{
+			Config_Array components = GameObjects.GetNode(i).GetArray("Components");
+
+			for (uint i = 0; i < components.GetSize(); i++)
+			{
+				Config resource = components.GetNode(i);
+				if (resource.GetBool("HasResource"))
+				{
+					MetaFile meta;
+					meta.id = resource.GetNumber("ID");
+					meta.type = static_cast<Resource::Type>((int)resource.GetNumber("Type"));
+					meta.resource_name = resource.GetString("ResourceName");
+					meta.original_file = source_file;
+					existing_res[meta.id] = meta;
+				}
+			}
+		}
+		return true;
+	}
+	return false;
 }

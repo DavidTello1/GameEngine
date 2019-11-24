@@ -18,9 +18,6 @@ public:
 public:
 	ResourceModel(UID id);
 	virtual ~ResourceModel();
-
-	//void Save(Config& config) const override;
-	//void Load(const Config& config) override;
 		 
 	static bool Import(const char* full_path, std::string& output);
 	bool SaveOwnFormat(std::string& output) const;

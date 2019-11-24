@@ -276,9 +276,6 @@
     <ClInclude Include="Viewport.h">
       <Filter>Sources\Panels</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleResources.h">
-      <Filter>Sources\Modules</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Sources\GameObjects</Filter>
     </ClInclude>
@@ -509,7 +506,12 @@
     </ClInclude>
     <ClInclude Include="Quadtree.h" />
     <ClInclude Include="QuadtreeNode.h" />
-    <ClInclude Include="ResourceScene.h" />
+    <ClInclude Include="ResourceScene.h">
+      <Filter>Sources\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleResources.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -739,7 +741,9 @@
     </ClCompile>
     <ClCompile Include="Quadtree.cpp" />
     <ClCompile Include="QuadtreeNode.cpp" />
-    <ClCompile Include="ResourceScene.cpp" />
+    <ClCompile Include="ResourceScene.cpp">
+      <Filter>Sources\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

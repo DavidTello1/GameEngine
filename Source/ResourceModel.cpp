@@ -114,7 +114,7 @@ bool ResourceModel::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get stream vector
 
-	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MODEL_FOLDER, "model", "dvs_model"); //save file
+	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MODEL_FOLDER, std::to_string(GetID()).c_str(), "dvs_model"); //save file
 }
 
 bool ResourceModel::LoadtoScene()

@@ -87,7 +87,7 @@ void ModuleRenderer3D::Load(Config * config)
 
 void ModuleRenderer3D::Save(Config * config) const
 {
-	config->AddBool("Vertical Sync", GetVSync());
+	config->SetBool("Vertical Sync", GetVSync());
 	//viewport->Save(config);
 }
 

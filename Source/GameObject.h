@@ -25,6 +25,7 @@ enum GameObjectFlags
 class GameObject
 {
 	friend class ModuleScene;
+	friend class ResourceScene;
 	ALIGN_CLASS_TO_16
 
 private:
@@ -36,7 +37,9 @@ public:
 	const char* GetName() const { return name; }
 
 	uint GetUID() const { return uid; }
+	void SetUID(UID id) { uid = id; }
 	bool IsActive() { return active; }
+	void SetActive(bool act) { active = act; }
 
 	template<typename ComponentType> 
 	ComponentType* GetComponent()  { return (ComponentType*)GetComponent(ComponentType::GetType()); }

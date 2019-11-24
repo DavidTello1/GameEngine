@@ -15,6 +15,20 @@ class ResourceMesh;
 class ResourceMaterial;
 struct PathNode;
 
+struct MetaFile
+{
+	Resource::Type type = Resource::unknown;
+	std::string original_file = "";
+	std::string resource_name = "";
+	uint id = 0;
+
+	bool Compare(const char* file, const char* name, Resource::Type type)
+	{
+		return (original_file == file && resource_name == name && type == this->type);
+	}
+
+};
+
 class ModuleResources : public Module
 {
 public:
@@ -25,11 +39,13 @@ public:
 	bool Start(Config* config = nullptr);
 	bool CleanUp();
 
+	// Importing
 	UID GenerateUID();
 	bool ImportFromOutside(const char* path, UID uid = 0);
 	bool ImportResource(const char* path, UID uid = 0);
 	bool CheckLoaded(std::string path, UID uid);
 
+	// Resources
 	Resource* CreateResource(Resource::Type type, UID uid = 0);
 	Resource* CreateInitResource(Resource::Type type, UID uid, const char* path, std::string& written_file);
 	void RemoveResource(UID uid);
@@ -40,6 +56,12 @@ public:
 	uint GetResourcesSize() { return resources.size(); }
 	std::vector<Resource*> GetAllResourcesOfType(Resource::Type type);
 
+	// Meta files
+	void SaveMeta(const Resource* resource);
+	bool LoadMeta(const char* file);
+	bool LoadSceneMeta(const char* file, const char* source_file);
+
+	// Utilities
 	const char* GetDirectory(Resource::Type type) const;
 
 private:
@@ -65,6 +87,8 @@ public:
 private:
 	std::map<UID, Resource*> resources;
 	std::vector<Resource*> removed;
+
+	std::map<uint64, MetaFile> existing_res;
 
 	UID last_uid = -1;
 };
