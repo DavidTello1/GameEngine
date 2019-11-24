@@ -430,10 +430,10 @@ void Configuration::DrawScene()
 
 void Configuration::DrawMainCamera()
 {
-	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader("Main camera"))
 	{
 
-		ImGui::ColorEdit3("Background color", (float*)&viewport_camera->background);
+		ImGui::ColorEdit3("Background", (float*)&viewport_camera->background);
 
 		// Dummy floats
 		float _fov = viewport_camera->frustum.verticalFov * RADTODEG;
@@ -450,8 +450,12 @@ void Configuration::DrawMainCamera()
 			viewport_camera->update_projection = true;
 		}
 
+		ImGui::Text("Aspect ratio: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", viewport_camera->GetAspectRatio());
+		ImGui::Text("Vertical FOV: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", viewport_camera->GetFOV());
+		ImGui::Text("Horizontal FOV: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", viewport_camera->GetHorizontalFOV());
+
 		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
-		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 180.0f, "%.1f"))
+		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 179.9f, "%.1f"))
 		{
 			viewport_camera->SetFov(_fov, true);
 		}
@@ -464,8 +468,6 @@ void Configuration::DrawMainCamera()
 			viewport_camera->SetFarPlane(_far);
 		}
 	}
-
-	ImGui::Separator();
 }
 
 //---------------------------------
