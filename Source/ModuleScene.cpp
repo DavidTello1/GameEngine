@@ -4,12 +4,17 @@
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
+#include "ComponentMesh.h"
 #include "ResourceModel.h"
+#include "Viewport.h"
 #include "Quadtree.h"
+
 
 #include "mmgr/mmgr.h"
 
 GameObject* ModuleScene::root_object;
+SceneState ModuleScene::state = EDIT;
+const char* ModuleScene::state_to_string[STOP+1] = { "EDIT","START","PLAY","PAUSE","STOP" };
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 {}
@@ -22,6 +27,12 @@ ModuleScene::~ModuleScene()
 
 bool ModuleScene::Init(Config* config)
 {
+	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
+	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
+
+	viewport_camera->Move({ 0, 1.95f, -35.0f });
+	viewport_camera->SetFarPlane(500.0f);
+
 	root_object = new GameObject("Root", nullptr);
 	root_object->uid = 0;
 	// Create game objects after this ^^^^^^^^^^^^	
@@ -32,32 +43,17 @@ bool ModuleScene::Init(Config* config)
 bool ModuleScene::Start(Config* config)
 {
 	LOG("Loading main scene", 'v');
-
+	
 	scene_name = "Default_Scene";
 
-	test_camera_obj = CreateGameObject("test camera");
+	test_camera_obj = CreateGameObject("Main camera");
 	test_camera_obj->AddComponent(Component::Type::Camera);
 
 	test_camera = test_camera_obj->GetComponent<ComponentCamera>();
 	
-	//ResourceModel* tcmodel = new ResourceModel(root_object->GetUID());
-	//std::string tmdp = "MyCamera.dvs";
-	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
+	quadtree = new Quadtree(AABB(Quadtree::min_point,Quadtree::max_point));
 
-	//for (int i = 0; i < 6; i++) {
-	//ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
-	//std::string tmp = "MyBakerHouse.dvs";
-	//bhmodel->Import("/Assets/BakerHouse.fbx",tmp);
-
-	//
-	//gameObjects[2+i*3]->SetLocalPosition({ 5.0f*i,0.0f,-5.0f* i });
-	//}
-
-	quadtree = new Quadtree(AABB({ -20,-20,-20 }, { 20,20,20 }));
-
-	
-	//quadtree->AddGameObject(bhmodel.)
-	//UnSelectAll();
+	RedoQuatree();
 
 	return true;
 }
@@ -67,39 +63,8 @@ bool ModuleScene::Update(float dt)
 	if (test_camera)
 		test_camera->DrawFrustum();
 
-	if (App->input->GetKey(SDL_SCANCODE_0) == KEY_DOWN)
-	{
-		for (GameObject* obj : gameObjects)
-		{
-			//obj->UpdateBoundingBox();
-			quadtree->RemoveGameObject(obj);
-		}
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	{
-		for (GameObject* obj : gameObjects)
-		{
-			//obj->UpdateBoundingBox();
-			quadtree->AddGameObject(obj);
-		}
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
-	{
-
-		//quadtree->RemoveGameObject(gameObjects.back());
-		quadtree->OptimizeSpace();
-
-	}
-	if (App->input->GetKey(SDL_SCANCODE_3) == KEY_DOWN)
-	{
-
-		quadtree->RemoveGameObject(gameObjects.back());
-
-	}
-
-	quadtree->Draw();
+	if (quadtree->debug)
+		quadtree->Draw();
 	
 
 	return true;
@@ -129,21 +94,57 @@ bool ModuleScene::PostUpdate(float dt)
 			obj->UpdateTransform();
 			obj->parent->UpdateBoundingBox();
 
-			if (test_camera_obj != obj)
+			if (quadtree->experimental && test_camera_obj != obj)
 			{
-				quadtree->Clear();
-				
-				for (GameObject* obj : gameObjects)
-				{
-					quadtree->AddGameObject(obj);
-				}
+				RedoQuatree();
 			}
 
 			obj->flags &= ~ProcessTransformUpdate;
 		}
 	}
 
+	switch (state)
+	{
+	case EDIT:
+		//Do edit things
+		break;
+	case START:
+		//SaveScene
+		state = PLAY;
+		App->editor->tab_viewport->current_camera = test_camera;
+		App->editor->tab_viewport->OnCameraUpdate();
+		break;
+	case PLAY:
+		//App->Unpause();
+		//Enjoy your game
+		break;
+	case PAUSE:
+		//App->Pause();
+		break;
+	case STOP:
+		//App->Unpause();
+		//LoadScene
+		state = EDIT;
+		App->editor->tab_viewport->current_camera = viewport_camera;
+		App->editor->tab_viewport->OnCameraUpdate();
+
+		break;
+	default:
+		state = EDIT;
+		break;
+	}
+
 	return true;
+}
+
+void ModuleScene::RedoQuatree()
+{
+	quadtree->Clear();
+
+	for (GameObject* obj : gameObjects)
+	{
+		quadtree->AddGameObject(obj);
+	}
 }
 
 bool ModuleScene::CleanUp()
@@ -162,7 +163,7 @@ bool ModuleScene::CleanUp()
 bool ModuleScene::Draw()
 {
 	// ALL this need a big rework
-	quadtree->ResetCullingState();
+	//quadtree->ResetCullingState();
 
 	// Cheap fix
 	glColor3ub(255, 255, 255);
@@ -324,6 +325,42 @@ void ModuleScene::DeleteSelected()
 			DeleteGameObject(gameObjects[i]);
 		
 	}
+}
+
+GameObject * ModuleScene::PickFromRay(Ray ray)
+{
+	quadtree->CollectCandidates(pick_candidates, ray);
+	std::map<float, GameObject*>::iterator it = pick_candidates.begin();
+
+	// candidates are in order, first to be picked will be the closest one
+	for (;it != pick_candidates.end(); it++)
+	{
+		ComponentMesh* c_mesh = it->second->GetComponent<ComponentMesh>();
+		if (!c_mesh) continue;
+
+		ResourceMesh* mesh = c_mesh->GetMesh();
+		if (!mesh) continue;
+		
+		Ray tmpRay = ray;
+		tmpRay.Transform(it->second->GetGlobalTransform().Inverted());
+
+		for (uint i = 0; i < mesh->num_indices; i += 3)
+		{
+			float3 one	 = mesh->vertices[mesh->indices[i]];
+			float3 two	 = mesh->vertices[mesh->indices[i+1]];
+			float3 three = mesh->vertices[mesh->indices[i+2]];
+
+			if (tmpRay.Intersects(Triangle(one,two,three), nullptr, nullptr))
+			{
+				UnSelectAll();
+				it->second->Select();
+				return it->second;
+			}
+		}
+		
+	}
+
+	return nullptr;
 }
 
 void ModuleScene::UnSelectAll(GameObject* keep_selected)

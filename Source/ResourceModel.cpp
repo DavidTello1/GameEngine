@@ -226,6 +226,7 @@ void ResourceModel::CreateNodes(const aiScene* model, const aiNode* node, uint p
 void ResourceModel::CreateGameObjects(const char* name)
 {
 	std::vector<GameObject*> objects;
+
 	GameObject* obj;
 
 	for (uint i = 0; i < nodes.size(); ++i)
@@ -239,6 +240,7 @@ void ResourceModel::CreateGameObjects(const char* name)
 			obj = App->scene->CreateGameObject(name, parent);
 		else
 			obj = App->scene->CreateGameObject(nodes[i].name.c_str(), parent);
+		
 
 		objects.push_back(obj);
 
@@ -263,5 +265,36 @@ void ResourceModel::CreateGameObjects(const char* name)
 		}
 	}
 
+
+	// Removing useless parents, maybe not the better algth, but works :D
+	std::vector<GameObject*> childs_to_remove;
+	std::vector<int> pos_to_remove;
+
+	for (int i = 0; i < objects.size(); i++)
+	{
+		if (strstr(objects[i]->GetName(), "$AssimpFbx$") != nullptr)
+		{
+			childs_to_remove.push_back(objects[i]);
+		}
+		else
+		{
+			if (!childs_to_remove.empty())
+			{
+				objects[i]->parent = childs_to_remove[0]->parent;
+				objects[i]->parent->childs.push_back(objects[i]);
+				objects[i]->parent->flags |= ProcessNewChild;
+			}
+
+			while (!childs_to_remove.empty())
+			{
+				childs_to_remove.back()->childs.clear();
+				App->scene->DeleteGameObject(childs_to_remove.back());
+				childs_to_remove.pop_back();
+			}
+		}
+
+	}
+
+	childs_to_remove.clear();
 	objects.clear();
 }

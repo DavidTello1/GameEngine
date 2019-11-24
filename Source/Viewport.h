@@ -41,7 +41,7 @@ public:
 
 	FrameBuffer frame_buffer;
 
-	mat4x4 model_matrix, view_matrix, projection_matrix;
+	ComponentCamera* current_camera = viewport_camera;
 
 	ImVec2 window_avail_size = { default_width, default_height };
 

@@ -8,6 +8,7 @@
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "MathGeoLib/include/MathGeoLib.h"
 
+
 class ModuleSceneBase : public Module
 {
 public:
@@ -19,8 +20,6 @@ public:
 	bool PostUpdate(float dt);
 	bool CleanUp();
 
-	void UpdateMainCamera(float dt);
-
 	void CameraZoom(float dt);
 	void CameraFreeMove(float dt);
 	void CameraFocusTo();
@@ -29,12 +28,21 @@ public:
 
 	void CameraMousePicking();
 
+public:
+
+	bool camera_culling = false;
+
+	Ray print_ray;
+
+	float zoom_speed = 75.0f;
+
 	bool Draw();
+
+public:
 
 	float plane_length = 40.0f;
 	float axis_length = 40.0f;
 
-	// Misc
 	Color wireframe_color = White;
 	float wireframe_width = 1.0f;
 	bool show_all_wireframe = false;
@@ -45,13 +53,8 @@ public:
 	Color obb_color = Green;
 	float obb_width = 1.0f;
 
-	bool show_all_aabb = true;
-	bool show_all_obb = true;
-
-	bool camera_culling = true;
-
-
-	float zoom_speed = 75.0f;
+	bool show_all_aabb = false;
+	bool show_all_obb = false;
 
 private:
 

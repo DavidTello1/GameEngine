@@ -52,6 +52,7 @@ public:
 	int GetPanelPosX(Panel* panel) const { return panel->pos_x; }
 	int GetPanelPosY(Panel* panel) const { return panel->pos_y; }
 	bool GetPanelActive(Panel* panel) const { return panel->active; }
+	Panel* GetPanelFocused() { return focused_panel; }
 
 private:
 	void DrawMenu();
@@ -62,6 +63,8 @@ private:
 	void Shortcuts();
 
 public:
+	Panel* focused_panel = nullptr;
+
 	Configuration* tab_configuration = nullptr;
 	Hierarchy* tab_hierarchy = nullptr;
 	Console* tab_console = nullptr;

@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "ModuleSceneBase.h"
 #include "ModuleScene.h"
+#include "Viewport.h"
 
 #include "glew/include/GL/glew.h"
 #include "mmgr/mmgr.h"
@@ -15,18 +16,23 @@ ModuleSceneBase::~ModuleSceneBase()
 
 bool ModuleSceneBase::Start(Config* config)
 {
-	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
-	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
-
-	viewport_camera->Move({ 0, 5.0f, -60.0f });
-	viewport_camera->SetFarPlane(5000.0f);
-
 	return true;
 }
 
 bool ModuleSceneBase::Update(float dt)
 {
-	UpdateMainCamera(dt);
+	if (viewport_camera == nullptr 
+		|| App->editor->focused_panel  == nullptr || App->editor->focused_panel != App->editor->tab_viewport) return true;
+
+	CameraZoom(dt);
+
+	CameraFocusTo();
+
+	CameraFreeMove(dt);
+
+	CameraOrbit(dt);
+
+	CameraMousePicking();
 
 	return true;
 }
@@ -41,22 +47,6 @@ bool ModuleSceneBase::CleanUp()
 	LOG("Unloading SceneBase");
 
 	return true;
-}
-
-
-void ModuleSceneBase::UpdateMainCamera(float dt)
-{
-	if (viewport_camera == nullptr || viewport_camera->viewport_focus == false) return;
-
-	CameraZoom(dt);
-
-	CameraFocusTo();
-
-	CameraFreeMove(dt);
-
-	CameraOrbit(dt);
-
-	CameraMousePicking();
 }
 
 void ModuleSceneBase::CameraOrbit(float dt)
@@ -195,24 +185,54 @@ void ModuleSceneBase::CameraRotateWithMouse(float dt) {
 
 void ModuleSceneBase::CameraMousePicking()
 {
-	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
-	{
-		float3 start = { 0, 0, viewport_camera->GetNearPlane() };
-		//float3 start = viewport_camera->.get
-		float3 end = { 0, 0,viewport_camera->GetFarPlane() };
+	float3 start = { 0,0,0 };
+	float3 end = { 0,0,0 };
+	if (print_ray.IsFinite()) {
+		 start = print_ray.pos;
+		 end = print_ray.pos + print_ray.dir.Normalized() * viewport_camera->GetFarPlane();
 
-		glLineWidth(2.0f);
-
-		glBegin(GL_LINES);
-		glColor3ub(0, 255, 255);
-
-		glVertex3f(start.x, start.y, start.z);
-		glVertex3f(end.x, end.y, end.z);
-
-		glEnd();
-
-		LOG("Start [%f,%f,%f]   End [%f,%f,%f]", start.x, start.y, start.z, end.x, end.y, end.z, 'd');
 	}
+	bool intersects = false;
+
+
+
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+	{
+		float2 pos = App->input->GetMousePosition();
+
+		pos.x = (((float)(( pos.x - (float)App->editor->tab_viewport->pos_x - 7.0f) / (float)App->editor->tab_viewport->width   )) -0.5f) * 2.0f;	
+		pos.y = (((float)(( pos.y - (float)App->editor->tab_viewport->pos_y - 26.0f ) / -(float)App->editor->tab_viewport->height )) +0.5f) * 2.0f;
+
+		pos = pos.Clamp(-1.0f, 1.0f);
+
+		
+		Ray ray = viewport_camera->frustum.UnProjectFromNearPlane(pos.x, pos.y);
+		print_ray = ray;
+
+		// Starts collect
+		intersects = App->scene->PickFromRay(ray) != nullptr;
+
+		if (App->input->GetKey(SDL_SCANCODE_C) == KEY_REPEAT)
+			LOG("Start [%f,%f,%f]   End [%f,%f,%f]", start.x, start.y, start.z, end.x, end.y, end.z, 'd');
+	}
+
+	// Drawiinggg
+	Color c = (intersects) ? Yellow : Cyan;
+	
+
+	glLineWidth(3.0f);
+	glColor3ub(c.r*255.0f, c.g*255.0f, c.b*255.0f);
+
+	glBegin(GL_LINES);
+
+
+	glVertex3f(start.x, start.y, start.z);
+	glVertex3f(end.x, end.y, end.z);
+
+	glLineWidth(1.0f);
+	glColor3ub(255.0f, 255.0f, 255.0f);
+
+	glEnd();
 }
 
 bool ModuleSceneBase::Draw()

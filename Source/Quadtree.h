@@ -24,6 +24,8 @@ public:
 
 	void AddGameObject(GameObject* gameObject);
 	void ExpandRootNode(GameObject * gameObject);
+	bool IsExcluded(GameObject * gameObject);
+	bool NeedsExpansion(GameObject * gameObject);
 	bool RemoveGameObject(GameObject* gameObject);
 
 	void Clear();
@@ -37,14 +39,24 @@ public:
 	{
 		root->CollectCandidates(gameObjects, primitive);
 	}
+	template<typename PRIMITIVE>
+	void CollectCandidates(std::map<float, GameObject*>& gameObjects, const PRIMITIVE& primitive)
+	{
+		root->CollectCandidates(gameObjects, primitive);
+	}
+	float3 GetMinPoint(){return root->box.minPoint;}
+	float3 GetMaxPoint(){return root->box.maxPoint;}
+	static int depth;
+	bool experimental = false;
 
-	static Color c;
+	static float3 min_point;
+	static float3 max_point;
+
+	bool debug = false;
+	
+	static bool bucket_depth;
 
 private:
 	QuadtreeNode* root = nullptr;
 
-	GameObject* min = nullptr;
-	GameObject* max = nullptr;
-
-	std::vector<GameObject*> out_of_tree;
 };

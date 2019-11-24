@@ -1,8 +1,12 @@
 #include "QuadtreeNode.h"
+#include "Quadtree.h"
 #include "GameObject.h"
-#include "ModuleResources.h"
 
+#include "ModuleResources.h"
 #include "mmgr/mmgr.h"
+
+int QuadtreeNode::QUADTREE = 4;
+bool QuadtreeNode::is_quadtree = true;
 
 void QuadtreeNode::DrawEx(Color c)
 {
@@ -89,7 +93,9 @@ QuadtreeNode::QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index) : t
 	box = AABB(minPoint, maxPoint);
 	box.padding = 0;
 	box.padding2 = 0;
-	this->level = parent->level + 1;
+
+	level = parent->level + 1;
+	if (level > Quadtree::depth) Quadtree::depth = level;
 
 	UpdateVBO(box);
 }
@@ -261,43 +267,61 @@ void QuadtreeNode::GetChildsBuckets(std::vector<GameObject*>& vector, bool addSe
 void QuadtreeNode::Draw()
 {
 	Color color;
-	switch (bucket.size())
-	{
-	case 0:
-		color = Color(1, 0, 0, 1);
-		break;
-	case 1:
-		color = Color(0, 1, 0, 1);
-		break;
-	case 2:
-		color = Color(0, 0, 1, 1);
-		break;
-	case 3:
-		color = Color(1, 1, 0, 1);
-		break;
-	default:
-		color = Color(0, 1, 1, 1);
-		break;
-	}
 
-	/*switch (level)
+	if (Quadtree::bucket_depth)
 	{
-	case 0:
-		color = Color(1, 0, 0, 1);
-		break;
-	case 1:
-		color = Color(0, 1, 0, 1);
-		break;
-	case 2:
-		color = Color(0, 0, 1, 1);
-		break;
-	case 3:
-		color = Color(1, 1, 0, 1);
-		break;
-	default:
-		color = Color(0, 1, 1, 1);
-		break;
-	}*/
+		switch (bucket.size())
+		{
+		case 0:
+			color = Color(1, 0, 0, 1);
+			break;
+		case 1:
+			color = Color(0, 1, 0, 1);
+			break;
+		case 2:
+			color = Color(0, 0, 1, 1);
+			break;
+		case 3:
+			color = Color(1, 1, 0, 1);
+			break;
+		case 4:
+			color = Color(0, 1, 1, 1);
+			break;
+		default:
+			color = Color(1, 0, 1, 1);
+			break;
+		}
+	}
+	else
+	{
+		switch (level)
+		{
+		case 0:
+			color = Color(1, 0, 0, 1);
+			break;
+		case 1:
+			color = Color(0, 1, 0, 1);
+			break;
+		case 2:
+			color = Color(0, 0, 1, 1);
+			break;
+		case 3:
+			color = Color(1, 1, 0, 1);
+			break;
+		case 4:
+			color = Color(0, 1, 1, 1);
+			break;
+		case 5:
+			color = Color(1, 0, 1, 1);
+			break;
+		case 6:
+			color = Color(1, 1, 1, 1);
+			break;
+		default:
+			color = Color(0.5f, 0.5f, 0.5f, 1);
+			break;
+		}
+	}
 
 	toDraw = box;
 	toDraw.maxPoint.x -= 0.5f;
@@ -314,48 +338,3 @@ void QuadtreeNode::Draw()
 	for (uint i = 0; i < childs.size(); i++)
 		childs[i]->Draw();
 }
-
-//bool QuadtreeNode::SendToChilds(GameObject* gameObject)
-//{
-//	uint intersectionChild = -1;
-//	//ALgo funciona mal aqui, no intersecta amb cap child excepte en un que interescta 4 cops
-//	for (uint i = 0; i < childs.size(); i++)
-//	{
-//		if (childs[i]->box.Intersects(gameObject->aabb))
-//		{
-//			intersectionChild = i;
-//			break;
-//		}
-//	}
-//	if (intersectionChild >= 0 && intersectionChild < childs.size())
-//	{
-//		childs[intersectionChild]->AddGameObject(gameObject);
-//		return true;
-//	}
-//	else if (intersectionChild == -1)
-//		LOG("[error] Quadtree parent node intersecting but not child intersection found",'e');
-//	return false;
-//}
-
-//bool QuadtreeNode::SendToChilds(GameObject* gameObject)
-//{
-//	uint intersectionCount = 0;
-//	uint intersectionChild = -1;
-//	//ALgo funciona mal aqui, no intersecta amb cap child excepte en un que interescta 4 cops
-//	for (uint i = 0; i < childs.size(); i++)
-//	{
-//		if (childs[i]->box.Intersects(gameObject->aabb))
-//		{
-//			intersectionCount++;
-//			intersectionChild = i;
-//		}
-//	}
-//	if (intersectionCount == 1)
-//	{
-//		childs[intersectionChild]->AddGameObject(gameObject);
-//		return true;
-//	}
-//	else if (intersectionCount == 0)
-//		LOG("[error] Quadtree parent node intersecting but not child intersection found");
-//	return false;
-//}

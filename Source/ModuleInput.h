@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include "MathGeoLib/include/Math/float2.h"
 
 #define MAX_MOUSE_BUTTONS 5
 
@@ -38,6 +39,8 @@ public:
 	// Get mouse / axis position
 	void GetMouseMotion(int& x, int& y) const { x = mouse_motion_x; y = mouse_motion_y; }
 	void GetMousePosition(int& x, int& y) const { x = mouse_x; y = mouse_y; }
+	void GetMousePosition(float2& pos) const { pos.x = (float)mouse_x; pos.y = (float)mouse_y; }
+	float2 GetMousePosition() const { return float2(mouse_x , mouse_y); }
 	int GetMouseWheel() const { return mouse_wheel; }
 
 private:

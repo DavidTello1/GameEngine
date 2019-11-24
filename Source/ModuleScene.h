@@ -12,6 +12,14 @@ class ComponentMesh;
 class ComponentCamera;
 class Quadtree;
 
+enum SceneState {
+	EDIT,
+	START,
+	PLAY,
+	PAUSE,
+	STOP
+
+};
 
 class ModuleScene :	public Module
 {
@@ -24,6 +32,7 @@ public:
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
 	bool PostUpdate(float dt);
+	void RedoQuatree();
 	bool CleanUp();
 
 	bool Draw();
@@ -33,6 +42,9 @@ public:
 	GameObject* CreateGameObject(const char* name = "GameObject", GameObject* parent = nullptr, bool visible = false);
 	void DeleteGameObject(GameObject* obj);
 	void DeleteSelected();
+
+	std::map<float, GameObject*> pick_candidates;
+	GameObject* PickFromRay(Ray ray);
 
 	GameObject* GetSelectedGameObject() { 
 		for (uint i=0;i<gameObjects.size();i++)
@@ -53,12 +65,13 @@ public:
 	std::vector<GameObject*> gameObjects;
 	   
 	static GameObject* root_object;
-
+	static SceneState state;
+	static const char* state_to_string[STOP+1];
 	ComponentCamera* test_camera = nullptr;
 	GameObject* test_camera_obj = nullptr;
 
-private:
 	Quadtree* quadtree;
+private:
 	GameObject* selected_gameobj = nullptr;
 
 };

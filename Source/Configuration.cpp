@@ -10,6 +10,8 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 #include "ModuleSceneBase.h"
+#include "QuadtreeNode.h"
+#include "Quadtree.h"
 
 #include "gpudetect/DeviceId.h"
 #include "Devil/include/IL/il.h"
@@ -73,6 +75,8 @@ void Configuration::Draw()
 		DrawScene();
 
 	DrawMainCamera();
+
+	DrawQuadtree();
 }
 
 bool Configuration::InitModuleDraw(Module* module)
@@ -82,9 +86,9 @@ bool Configuration::InitModuleDraw(Module* module)
 	if (ImGui::CollapsingHeader(module->GetName()))
 	{
 		bool active = module->IsActive();
-		if (ImGui::Checkbox("Active", &active))
-			module->SetActive(active);
-		ret = true;
+		ImGui::Checkbox("Active", &active);
+			//module->SetActive(active);
+		ret = true;	
 	}
 
 	return ret;
@@ -141,7 +145,7 @@ void Configuration::DrawApplication()
 		ImGui::Separator();
 
 		// FPS 
-		if (ImGui::TreeNodeEx("FPS", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::TreeNodeEx("FPS"))
 		{
 			bool vsync = App->renderer3D->GetVSync();
 			if (ImGui::Checkbox("Vertical Sync", &vsync))
@@ -324,6 +328,18 @@ void Configuration::DrawModuleInput(ModuleInput* module)
 	ImGui::SameLine();
 	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_y);
 
+	if (App->editor->focused_panel)
+	{
+		ImGui::Text("Mouse relative to %s:",App->editor->focused_panel->GetName());
+		ImGui::SameLine();
+		ImGui::Text("x");
+		ImGui::SameLine();
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_x - App->editor->focused_panel->pos_x);
+		ImGui::SameLine();
+		ImGui::Text("y");
+		ImGui::SameLine();
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_y - App->editor->focused_panel->pos_y);
+	}
 
 	module->GetMouseMotion(mouse_x, mouse_y);
 	ImGui::Text("Mouse Motion:");
@@ -392,6 +408,10 @@ void Configuration::DrawModuleFileSystem(ModuleFileSystem* module)
 
 void Configuration::DrawScene()
 {
+	ImGui::Checkbox("Camera culling", &App->scene_base->camera_culling);
+
+	ImGui::Separator();
+
 	ImGui::Checkbox("Show all wireframe", &App->scene_base->show_all_wireframe);
 	ImGui::ColorEdit3("Wireframe color", (float*)&App->scene_base->wireframe_color);
 	ImGui::DragFloat("Wireframe width", &App->scene_base->wireframe_width, 0.1f, 0.1f, 5.0f);
@@ -418,10 +438,10 @@ void Configuration::DrawScene()
 
 void Configuration::DrawMainCamera()
 {
-	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader("Viewport"))
 	{
 
-		ImGui::ColorEdit3("Background color", (float*)&viewport_camera->background);
+		ImGui::ColorEdit3("Background", (float*)&viewport_camera->background);
 
 		// Dummy floats
 		float _fov = viewport_camera->frustum.verticalFov * RADTODEG;
@@ -438,8 +458,12 @@ void Configuration::DrawMainCamera()
 			viewport_camera->update_projection = true;
 		}
 
+		ImGui::Text("Aspect ratio: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", viewport_camera->GetAspectRatio());
+		ImGui::Text("Vertical FOV: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", viewport_camera->GetFOV());
+		ImGui::Text("Horizontal FOV: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", viewport_camera->GetHorizontalFOV());
+
 		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
-		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 180.0f, "%.1f"))
+		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 179.9f, "%.1f"))
 		{
 			viewport_camera->SetFov(_fov, true);
 		}
@@ -452,8 +476,86 @@ void Configuration::DrawMainCamera()
 			viewport_camera->SetFarPlane(_far);
 		}
 	}
+}
 
-	ImGui::Separator();
+void Configuration::DrawQuadtree()
+{
+	if (ImGui::CollapsingHeader("Quadtree"))
+	{
+		if (ImGui::Checkbox("Quadtree / Octree", &QuadtreeNode::is_quadtree))
+		{
+			if (QuadtreeNode::is_quadtree)
+				QuadtreeNode::QUADTREE = 4;
+			else
+				QuadtreeNode::QUADTREE = 8;
+
+			App->scene->RedoQuatree();
+		}
+
+		ImGui::Checkbox("Visualize tree", &App->scene->quadtree->debug);
+		ImGui::Checkbox("Color set by [bucket/depth]", &Quadtree::bucket_depth);
+		ImGui::SameLine();
+		ImGui::Text("?");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Color pattern design based on per box bucket or level of deepth. \nBoxes unseen by the camera will be colored grey");
+
+
+		ImGui::Checkbox("Experimental Dynamic", &App->scene->quadtree->experimental);
+
+		ImGui::Text("Tree depth: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%i", App->scene->quadtree->depth);
+
+		ImGui::Text("Min point"); ImGui::SameLine();
+		PrintPosColored(App->scene->quadtree->GetMinPoint());
+
+		ImGui::Text("Max point"); ImGui::SameLine();
+		PrintPosColored(App->scene->quadtree->GetMaxPoint());
+
+		ImGui::Separator();
+
+		if (ImGui::Button("Recalculate tree"))
+		{
+			App->scene->RedoQuatree();
+		}
+		ImGui::SameLine();
+		ImGui::Text("?");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Below settings are going to be used to recalculate the tree. \nIs recommended to recalculate with experimental dynamic tree checked");
+
+		float precision = 0.25f;
+		const char* precision_char = "%.2f";
+
+		ImGui::Text("Min point");
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("x##32", &Quadtree::min_point.x, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("y##32", &Quadtree::min_point.y, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("z##32", &Quadtree::min_point.z, precision, -inf, inf, precision_char);
+
+		ImGui::Text("Max point");
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("x##35", &Quadtree::max_point.x, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("y##35", &Quadtree::max_point.y, precision, -inf, inf, precision_char);
+		ImGui::SameLine(); ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("z##35", &Quadtree::max_point.z, precision, -inf, inf, precision_char);
+
+
+		ImGui::Separator();
+
+	}
+}
+
+void Configuration::PrintPosColored(const float3& pos)
+{
+	ImGui::Text("["); ImGui::SameLine();
+	ImGui::TextColored({ 1,1,0,1 }, "%.2f", pos.x); ImGui::SameLine();
+	ImGui::Text(","); ImGui::SameLine();
+	ImGui::TextColored({ 1,1,0,1 }, "%.2f", pos.y); ImGui::SameLine();
+	ImGui::Text(","); ImGui::SameLine();
+	ImGui::TextColored({ 1,1,0,1 }, "%.2f", pos.z); ImGui::SameLine();
+	ImGui::Text("]");
+
 }
 
 //---------------------------------
