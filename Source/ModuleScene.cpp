@@ -60,13 +60,13 @@ bool ModuleScene::Start(Config* config)
 	//gameObjects[2+i*3]->SetLocalPosition({ 5.0f*i,0.0f,-5.0f* i });
 	//}
 
-	//App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/Tank/tank.fbx");
+	App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/Street/Street environment_V01.fbx");
 
-	App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/BakerHouse.fbx");
+	//App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/BakerHouse.fbx");
 
-	gameObjects[2]->SetLocalPosition({ 0.0f,0.0f,20.0f });
+	//gameObjects[2]->SetLocalPosition({ 0.0f,0.0f,20.0f });
 
-	quadtree = new Quadtree(AABB({ -20,-20,-20 }, { 20,20,20 }));
+	quadtree = new Quadtree(AABB({ -1,-1,-1 }, { 1,1,1 }));
 
 	
 	//quadtree->AddGameObject(bhmodel.)
@@ -142,21 +142,26 @@ bool ModuleScene::PostUpdate(float dt)
 			obj->UpdateTransform();
 			obj->parent->UpdateBoundingBox();
 
-			if (test_camera_obj != obj)
+			/*if (test_camera_obj != obj)
 			{
-				quadtree->Clear();
-				
-				for (GameObject* obj : gameObjects)
-				{
-					quadtree->AddGameObject(obj);
-				}
-			}
+				RedoQuatree();
+			}*/
 
 			obj->flags &= ~ProcessTransformUpdate;
 		}
 	}
 
 	return true;
+}
+
+void ModuleScene::RedoQuatree()
+{
+	quadtree->Clear();
+
+	for (GameObject* obj : gameObjects)
+	{
+		quadtree->AddGameObject(obj);
+	}
 }
 
 bool ModuleScene::CleanUp()

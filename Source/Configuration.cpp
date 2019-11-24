@@ -10,6 +10,8 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 #include "ModuleSceneBase.h"
+#include "QuadtreeNode.h"
+#include "Quadtree.h"
 
 #include "gpudetect/DeviceId.h"
 #include "Devil/include/IL/il.h"
@@ -73,6 +75,8 @@ void Configuration::Draw()
 		DrawScene();
 
 	DrawMainCamera();
+
+	DrawQuadtree();
 }
 
 bool Configuration::InitModuleDraw(Module* module)
@@ -92,7 +96,7 @@ bool Configuration::InitModuleDraw(Module* module)
 
 void Configuration::DrawApplication()
 {
-	if (ImGui::CollapsingHeader("Application", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader("Application"))
 	{
 		static char app_name[120];
 		strcpy_s(app_name, 120, App->GetAppName());
@@ -141,7 +145,7 @@ void Configuration::DrawApplication()
 		ImGui::Separator();
 
 		// FPS 
-		if (ImGui::TreeNodeEx("FPS", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::TreeNodeEx("FPS"))
 		{
 			bool vsync = App->renderer3D->GetVSync();
 			if (ImGui::Checkbox("Vertical Sync", &vsync))
@@ -468,6 +472,49 @@ void Configuration::DrawMainCamera()
 			viewport_camera->SetFarPlane(_far);
 		}
 	}
+}
+
+void Configuration::DrawQuadtree()
+{
+	if (ImGui::CollapsingHeader("Quadtree"))
+	{
+		if (ImGui::Checkbox("Quadtree / Octree", &QuadtreeNode::is_quadtree))
+		{
+			if (QuadtreeNode::is_quadtree)
+				QuadtreeNode::QUADTREE = 4;
+			else
+				QuadtreeNode::QUADTREE = 8;
+
+			App->scene->RedoQuatree();
+		}
+
+		ImGui::Checkbox("Experimental Dynamic", &App->scene->quadtree->experimental);
+
+		ImGui::Text("Tree depth: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%i", App->scene->quadtree->depth);
+
+		if (ImGui::Button("Calculate tree"))
+		{
+			App->scene->RedoQuatree();
+		}
+
+		ImGui::Text("Min point"); ImGui::SameLine();
+		PrintPosColored(App->scene->quadtree->GetMinPoint());
+
+		ImGui::Text("Max point"); ImGui::SameLine();
+		PrintPosColored(App->scene->quadtree->GetMaxPoint());
+	}
+}
+
+void Configuration::PrintPosColored(const float3& pos)
+{
+	ImGui::Text("["); ImGui::SameLine();
+	ImGui::TextColored({ 1,1,0,1 }, "%.2f", pos.x); ImGui::SameLine();
+	ImGui::Text(","); ImGui::SameLine();
+	ImGui::TextColored({ 1,1,0,1 }, "%.2f", pos.y); ImGui::SameLine();
+	ImGui::Text(","); ImGui::SameLine();
+	ImGui::TextColored({ 1,1,0,1 }, "%.2f", pos.z); ImGui::SameLine();
+	ImGui::Text("]");
+
 }
 
 //---------------------------------

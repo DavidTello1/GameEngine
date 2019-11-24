@@ -4,6 +4,7 @@
 #include "Panel.h"
 #include "Imgui/imgui.h"
 #include <vector>
+#include "MathGeoLib/include/Math/float3.h"
 
 #define FPS_LOG_SIZE 100
 
@@ -62,6 +63,10 @@ public:
 	void DrawScene();
 
 	void DrawMainCamera();
+
+	void DrawQuadtree();
+
+	void PrintPosColored(const float3 & pos);
 
 	bool InitModuleDraw(Module* module);
 	void DrawApplication();

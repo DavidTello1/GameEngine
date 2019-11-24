@@ -1,7 +1,11 @@
 #include "QuadtreeNode.h"
+#include "Quadtree.h"
 #include "GameObject.h"
 
 #include "ModuleResources.h"
+
+int QuadtreeNode::QUADTREE = 4;
+bool QuadtreeNode::is_quadtree = true;
 
 void QuadtreeNode::DrawEx(Color c)
 {
@@ -88,7 +92,9 @@ QuadtreeNode::QuadtreeNode(Quadtree* tree, QuadtreeNode* parent, uint index) : t
 	box = AABB(minPoint, maxPoint);
 	box.padding = 0;
 	box.padding2 = 0;
-	this->level = parent->level + 1;
+
+	level = parent->level + 1;
+	if (level > Quadtree::depth) Quadtree::depth = level;
 
 	UpdateVBO(box);
 }

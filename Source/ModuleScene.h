@@ -24,6 +24,7 @@ public:
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
 	bool PostUpdate(float dt);
+	void RedoQuatree();
 	bool CleanUp();
 
 	bool Draw();
@@ -60,8 +61,8 @@ public:
 	ComponentCamera* test_camera = nullptr;
 	GameObject* test_camera_obj = nullptr;
 
-private:
 	Quadtree* quadtree;
+private:
 	GameObject* selected_gameobj = nullptr;
 
 };

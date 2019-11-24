@@ -211,7 +211,7 @@ bool ResourceMesh::LoadMesh(const aiMesh* mesh)
 	LOG("Importing faces %u", mesh->mNumFaces, 'g');
 	for (uint i = 0; i < mesh->mNumFaces; ++i)
 	{
-		assert(mesh->mFaces[i].mNumIndices == 3); // assert if face is not a triangle
+		//assert(mesh->mFaces[i].mNumIndices == 3); // assert if face is not a triangle
 		memcpy(&indices[i * 3], mesh->mFaces[i].mIndices, 3 * sizeof(GLuint));
 	}
 	GenIBO();

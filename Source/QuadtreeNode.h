@@ -5,8 +5,6 @@
 #include "Math.h"
 #include "Color.h"
 
-#define QUADTREE 4
-
 typedef unsigned int uint;
 
 class GameObject;
@@ -18,7 +16,8 @@ class QuadtreeNode
 	friend class Quadtree;
 
 public:
-
+	static bool is_quadtree;
+	static int QUADTREE;
 	// TO IMPROVE
 	void Draw();
 	void DrawEx(Color c);
@@ -65,7 +64,7 @@ private:
 	//Pointer to tree, maybe not necessary
 	Quadtree* tree;
 	uint level;
-	uint maxBucketSize = 3;
+	uint maxBucketSize = 6;
 	std::vector<GameObject*> bucket;
 
 	float3 corners[8];
