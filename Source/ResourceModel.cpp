@@ -185,7 +185,7 @@ void ResourceModel::CreateNodes(const aiScene* model, const aiNode* node, uint p
 	dst.name = node->mName.C_Str();
 	dst.parent = parent;
 	nodes.push_back(dst); //add node to vector
-
+	////////////////////////////////
 	aiVector3D		translation;
 	aiVector3D		scaling;
 	aiQuaternion	rotation;
@@ -217,7 +217,11 @@ void ResourceModel::CreateNodes(const aiScene* model, const aiNode* node, uint p
 		else
 			dummyFound = false;
 	}
+	nodes.back().transform.SetTranslatePart(pos);
+	nodes.back().transform.SetRotatePart(rot);
+	nodes.back().transform.Scale(scale);
 
+	///////////////////////////////
 	for (unsigned i = 0; i < node->mNumChildren; ++i) //check for children and create respective nodes with actual node as parent
 	{
 		CreateNodes(model, node->mChildren[i], index, meshes, materials);
@@ -273,6 +277,7 @@ void ResourceModel::CreateGameObjects(const char* name)
 		else
 			obj = App->scene->CreateGameObject(nodes[i].name.c_str(), parent);
 		
+		obj->SetTransform(nodes[i].transform);
 
 		objects.push_back(obj);
 
@@ -298,33 +303,35 @@ void ResourceModel::CreateGameObjects(const char* name)
 	}
 
 	//// Removing useless parents, maybe not the better algth, but works :D
-	//std::vector<GameObject*> childs_to_remove;
-	//std::vector<int> pos_to_remove;
+	/*std::vector<GameObject*> childs_to_remove;
+	std::vector<int> pos_to_remove;
 
-	//for (int i = 0; i < objects.size(); i++)
-	//{
-	//	if (strstr(objects[i]->GetName(), "$AssimpFbx$") != nullptr)
-	//	{
-	//		childs_to_remove.push_back(objects[i]);
-	//	}
-	//	else
-	//	{
-	//		if (!childs_to_remove.empty())
-	//		{
-	//			objects[i]->parent = childs_to_remove[0]->parent;
-	//			objects[i]->parent->childs.push_back(objects[i]);
-	//			objects[i]->parent->flags |= ProcessNewChild;
-	//		}
 
-	//		while (!childs_to_remove.empty())
-	//		{
-	//			childs_to_remove.back()->childs.clear();
-	//			App->scene->DeleteGameObject(childs_to_remove.back());
-	//			childs_to_remove.pop_back();
-	//		}
-	//	}
 
-	//}
+	for (int i = 0; i < objects.size(); i++)
+	{
+		if (strstr(objects[i]->GetName(), "$AssimpFbx$") != nullptr)
+		{
+			childs_to_remove.push_back(objects[i]);
+		}
+		else
+		{
+			if (!childs_to_remove.empty())
+			{
+				objects[i]->parent = childs_to_remove[0]->parent;
+				objects[i]->parent->childs.push_back(objects[i]);
+				objects[i]->parent->flags |= ProcessNewChild;
+			}
+
+			while (!childs_to_remove.empty())
+			{
+				childs_to_remove.back()->childs.clear();
+				App->scene->DeleteGameObject(childs_to_remove.back());
+				childs_to_remove.pop_back();
+			}
+		}
+
+	}*/
 
 	//childs_to_remove.clear();
 	objects.clear();
