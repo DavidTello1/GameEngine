@@ -4,6 +4,7 @@
 #include "Panel.h"
 #include "Imgui/imgui.h"
 #include <vector>
+#include "MathGeoLib/include/Math/float3.h"
 
 #define FPS_LOG_SIZE 100
 
@@ -63,6 +64,10 @@ public:
 
 	void DrawMainCamera();
 
+	void DrawQuadtree();
+
+	void PrintPosColored(const float3 & pos);
+
 	bool InitModuleDraw(Module* module);
 	void DrawApplication();
 	void DrawHardware();
@@ -84,7 +89,6 @@ private:
 
 	mutable hardware_info info_hw;
 
-	ImVec4 yellow = { 1.0f, 1.0f, 0.0f, 1.0f };
 };
 
 #endif// __CONFIGURATION_H__

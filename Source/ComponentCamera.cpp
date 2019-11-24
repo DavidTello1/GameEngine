@@ -32,7 +32,44 @@ ComponentCamera::~ComponentCamera()
 
 void ComponentCamera::DrawInspector()
 {
+	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+	{
 
+		ImGui::ColorEdit3("Background", (float*)&background);
+
+		// Dummy floats
+		float _fov = frustum.verticalFov * RADTODEG;
+		float _near = frustum.nearPlaneDistance;
+		float _far = frustum.farPlaneDistance;
+
+		if (ImGui::Checkbox("Perspective / Orthogonal", &perspective))
+		{
+			if (perspective)
+				frustum.type = FrustumType::PerspectiveFrustum;
+			else
+				frustum.type = FrustumType::OrthographicFrustum;
+
+			update_projection = true;
+		}
+
+		ImGui::Text("Aspect ratio: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", GetAspectRatio());
+		ImGui::Text("Vertical FOV: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", GetFOV());
+		ImGui::Text("Horizontal FOV: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", GetHorizontalFOV());
+
+		//if (ImGui::DragFloat("Fov Y", &fov, 0.001f, 0.01f, PI)) //radians
+		if (ImGui::DragFloat("Fov Y", &_fov, 0.1f, 0.1f, 180.0f, "%.1f"))
+		{
+			SetFov(_fov, true);
+		}
+		if (ImGui::DragFloat("Z Near", &_near, 0.25f, 0.1f, _far))
+		{
+			SetNearPlane(_near);
+		}
+		if (ImGui::DragFloat("Z Far", &_far, 0.25f, _near, 5000.0f))
+		{
+			SetFarPlane(_far);
+		}
+	}
 }
 
 
@@ -156,46 +193,13 @@ void ComponentCamera::UpdatePlanes()
 	frustum.GetPlanes(planes);
 }
 
-//bool ComponentCamera::ContainsAABB(const AABB& refBox) const
-//{
-//	float3 corners[8];
-//	int total_in = 0;
-//	refBox.GetCornerPoints(corners);
-//	// test all 8 corners against the 6 sides
-//	// if all points are behind 1 specific plane, we are out
-//	// if we are in with all points, then we are fully in
-//	for (int p = 0; p < 6; ++p) {
-//		int iInCount = 8;
-//		int iPtIn = 1;
-//		for (int i = 0; i < 8; ++i) {
-//			// test this point against the planes
-//			if (planes[p].IsOnPositiveSide(corners[i])) {
-//				iPtIn = 0;
-//				--iInCount;
-//			}
-//		}
-//		if (iInCount == 0)
-//			return false;
-//			//return(AABB_OUT);
-//		// check if they were all on the right side of the plane
-//		total_in += iPtIn;
-//	}
-//	// so if iTotalIn is 6, then all are inside the view
-//	if (total_in == 6)
-//		return true;
-//		//return(AABB_IN);
-//	// we must be partly in then otherwise
-//	//return(INTERSECT);
-//	return true;
-//}
-
 // Debug -----------------------------------------------------
 
 void ComponentCamera::DrawFrustum()
 {
 	glBegin(GL_LINES);
-	glLineWidth(2.0f);
-	glColor4f(Red.r, Red.g, Red.b, Red.a);
+	glLineWidth(1.0f);
+	glColor4f(White.r, White.g, White.b, White.a);
 
 	for (int i = 0; i < frustum.NumEdges(); i++)
 	{

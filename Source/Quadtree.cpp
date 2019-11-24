@@ -1,9 +1,11 @@
 #include "Quadtree.h"
+
 #include "Application.h"
 
-#include "mmgr/mmgr.h"
-
-Color Quadtree::c = Yellow;
+int Quadtree::depth = 0;
+bool Quadtree::bucket_depth = true;
+float3 Quadtree::min_point = { -50,-50,-50 };
+float3 Quadtree::max_point = { 50,50,50 };
 
 Quadtree::Quadtree(const AABB& box)
 {
@@ -17,6 +19,9 @@ void Quadtree::CreateRoot(const AABB& box)
 	root = new QuadtreeNode(box);
 	root->level = 0;
 	root->tree = this;
+	depth = 0;
+	/*min = { 0,0,0 };
+	max = { 0,0,0 };*/
 }
 
 Quadtree::~Quadtree()
@@ -41,7 +46,23 @@ void Quadtree::Draw()
 void Quadtree::AddGameObject(GameObject* gameObject)
 {
 	if (root->AddGameObject(gameObject) == false)
-		ExpandRootNode(gameObject);
+		if (experimental && NeedsExpansion(gameObject))
+			ExpandRootNode(gameObject);
+}
+
+bool Quadtree::NeedsExpansion(GameObject* gameObject)
+{
+	bool expand = false;
+
+	if (root->box.minPoint.x > gameObject->aabb.MinX()) { root->box.minPoint.x = gameObject->aabb.MinX(); expand = true;}
+	if (root->box.minPoint.y > gameObject->aabb.MinY()) { root->box.minPoint.y = gameObject->aabb.MinY(); expand = true;}
+	if (root->box.minPoint.z > gameObject->aabb.MinZ()) { root->box.minPoint.z = gameObject->aabb.MinZ(); expand = true;}
+	
+	if (root->box.maxPoint.x < gameObject->aabb.MaxX()) { root->box.maxPoint.x = gameObject->aabb.MaxX(); expand = true;}
+	if (root->box.maxPoint.y < gameObject->aabb.MaxY()) { root->box.maxPoint.y = gameObject->aabb.MaxY(); expand = true;}
+	if (root->box.maxPoint.z < gameObject->aabb.MaxZ()) { root->box.maxPoint.z = gameObject->aabb.MaxZ(); expand = true;}
+
+	return expand;
 }
 bool Quadtree::RemoveGameObject(GameObject* gameObject)
 {
@@ -49,47 +70,12 @@ bool Quadtree::RemoveGameObject(GameObject* gameObject)
 	{
 		return true;
 	}
-	else
-	{
-		for (std::vector<GameObject*>::iterator it = out_of_tree.begin(); it < out_of_tree.end(); it++)
-		{
-			if (*it == gameObject)
-			{
-				out_of_tree.erase(it);
-				return true;
-			}
-		}
-		return false;
-	}
+	return false;
 }
 void Quadtree::ExpandRootNode(GameObject* gameObject)
 {
-	float3 min = root->box.minPoint;
-	float3 max = root->box.maxPoint;
-
-	if (min.x > gameObject->aabb.MinX()) min.x = gameObject->aabb.MinX();
-	if (min.y > gameObject->aabb.MinY()) min.y = gameObject->aabb.MinY();
-	if (min.z > gameObject->aabb.MinZ()) min.z = gameObject->aabb.MinZ();
-
-	if (max.x < gameObject->aabb.MaxX()) max.x = gameObject->aabb.MaxX();
-	if (max.y < gameObject->aabb.MaxY()) max.y = gameObject->aabb.MaxY();
-	if (max.z < gameObject->aabb.MaxZ()) max.z = gameObject->aabb.MaxZ();
-
-	//root->UpdateVBO();
-
-	std::vector<GameObject*> all_bucket;
-	
-	root->GetAllBuckets(all_bucket);
-
-
-	Clear();
-	RELEASE(root);
-	CreateRoot(AABB(min,max));
-
-	for (GameObject* obj : all_bucket)
-	{
-		AddGameObject(obj);
-	}
+	root->UpdateVBO(root->box);
+	AddGameObject(gameObject);
 }
 
 
@@ -106,4 +92,6 @@ void Quadtree::ResetCullingState()
 void Quadtree::Clear()
 {
 	root->Clear();
+	root->box.minPoint = min_point;
+	root->box.maxPoint = max_point;
 }
