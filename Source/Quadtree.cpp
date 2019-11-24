@@ -74,18 +74,8 @@ bool Quadtree::RemoveGameObject(GameObject* gameObject)
 }
 void Quadtree::ExpandRootNode(GameObject* gameObject)
 {
-	//std::vector<GameObject*> all_bucket;
-	
-	//root->GetAllBuckets(all_bucket);
-
-
-	//Clear();
-	//RELEASE(root);
-	//CreateRoot(AABB(min,max));
-
 	root->UpdateVBO(root->box);
 	AddGameObject(gameObject);
-	
 }
 
 

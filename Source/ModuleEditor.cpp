@@ -12,6 +12,7 @@
 #include "Configuration.h"
 #include "Assets.h"
 #include "Viewport.h"
+#include "ResourceScene.h"
 
 #include <string.h>
 #include <algorithm>
@@ -196,12 +197,12 @@ bool ModuleEditor::CleanUp()
 
 void ModuleEditor::Save(Config* config) const
 {
-	config->AddInt("Style", style);
+	config->SetNumber("Style", style);
 }
 
 void ModuleEditor::Load(Config* config)
 {
-	style = config->GetInt("Style", Style::NEW);
+	style = config->GetNumber("Style", Style::NEW);
 }
 
 // Drawing of the FULL gui
@@ -234,8 +235,13 @@ void ModuleEditor::Draw()
 	}
 	if (is_save) //save
 	{
-		App->file_system->Save(SETTINGS_FOLDER "Engine.log", App->GetLog().c_str(), App->GetLog().size());
-		App->SavePrefs();
+		//uint id = 0;
+		//std::string path = App->scene->scene_name;
+		//path = ASSETS_FOLDER + path;
+		//std::string written_file;
+
+		//ResourceScene* scene = (ResourceScene*)App->resources->CreateInitResource(Resource::Type::scene, id, path.c_str(), written_file);
+		//scene->SaveOwnFormat(written_file);
 		is_save = false;
 	}
 	if (is_import)
@@ -277,7 +283,7 @@ void ModuleEditor::DrawMenu()
 				if (ImGui::MenuItem("Open", "Ctrl+O", false, false))
 					is_open = true;
 
-				if (ImGui::MenuItem("Save", "Ctrl+S", false, false))
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
 					is_save = true;
 
 				ImGui::Separator();

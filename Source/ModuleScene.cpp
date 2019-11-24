@@ -43,6 +43,8 @@ bool ModuleScene::Init(Config* config)
 bool ModuleScene::Start(Config* config)
 {
 	LOG("Loading main scene", 'v');
+	
+	scene_name = "Default_Scene";
 
 	test_camera_obj = CreateGameObject("Main camera");
 	test_camera_obj->AddComponent(Component::Type::Camera);
@@ -54,7 +56,6 @@ bool ModuleScene::Start(Config* config)
 	//tcmodel->Import("/Assets/camera_mesh.fbx", tmdp);
 
 	//for (int i = 0; i < 6; i++) {
-
 	//ResourceModel* bhmodel = new ResourceModel(root_object->GetUID());
 	//std::string tmp = "MyBakerHouse.dvs";
 	//bhmodel->Import("/Assets/BakerHouse.fbx",tmp);

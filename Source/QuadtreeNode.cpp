@@ -3,6 +3,7 @@
 #include "GameObject.h"
 
 #include "ModuleResources.h"
+#include "mmgr/mmgr.h"
 
 int QuadtreeNode::QUADTREE = 4;
 bool QuadtreeNode::is_quadtree = true;
@@ -266,6 +267,7 @@ void QuadtreeNode::GetChildsBuckets(std::vector<GameObject*>& vector, bool addSe
 void QuadtreeNode::Draw()
 {
 	Color color;
+
 	if (Quadtree::bucket_depth)
 	{
 		switch (bucket.size())

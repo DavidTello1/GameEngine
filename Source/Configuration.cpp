@@ -96,7 +96,7 @@ bool Configuration::InitModuleDraw(Module* module)
 
 void Configuration::DrawApplication()
 {
-	if (ImGui::CollapsingHeader("Application"))
+	if (ImGui::CollapsingHeader("Application", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		static char app_name[120];
 		strcpy_s(app_name, 120, App->GetAppName());

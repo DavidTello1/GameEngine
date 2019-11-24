@@ -54,19 +54,6 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 
 	material->UnLoad();
 
-	// HARDCODED ------------------------------------------------------
-	GameObject* obj = App->scene->GetSelectedGameObject();
-	if (obj != nullptr)
-	{
-		ComponentMaterial* mat = (ComponentMaterial*)obj->GetComponent(Component::Type::Material);
-		if (mat == nullptr)
-			mat = (ComponentMaterial*)obj->AddComponent(Component::Type::Material);
-
-		material->LoadToMemory();
-		mat->SetMaterial(material);
-	}
-	// ---------------------------------------------------------------------
-
 	return material->uid;
 }
 
@@ -99,7 +86,7 @@ bool ResourceMaterial::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
 
-	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MATERIAL_FOLDER, "material", "dvs_material"); //save
+	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MATERIAL_FOLDER, std::to_string(GetID()).c_str(), "dvs_material"); //save
 }
 
 bool ResourceMaterial::LoadtoScene()

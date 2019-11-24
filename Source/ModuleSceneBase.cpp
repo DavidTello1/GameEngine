@@ -48,7 +48,6 @@ bool ModuleSceneBase::CleanUp()
 	return true;
 }
 
-
 void ModuleSceneBase::CameraOrbit(float dt)
 {
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT))

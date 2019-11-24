@@ -1,7 +1,10 @@
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleResources.h"
 #include "ModuleFileSystem.h"
 #include "ResourceMaterial.h"
+#include "ResourceModel.h"
+#include "ComponentMaterial.h"
 #include "Assets.h"
 
 #include "mmgr/mmgr.h"
@@ -32,7 +35,10 @@ Assets::~Assets()
 void Assets::Draw()
 {
 	if (timer.ReadSec() > REFRESH_RATE) // Update Assets Hierarchy
+	{
 		UpdateAssets();
+		timer.Start();
+	}
 
 	// Child Hierarchy -------------------------------
 	ImGui::BeginChild("Hierarchy", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.2f, 0), true, ImGuiWindowFlags_MenuBar);
@@ -120,8 +126,29 @@ void Assets::Draw()
 
 void Assets::ImportAsset(const PathNode& node)
 {
-	//Resource* resource = App->resources->GetResource(id);
-	//resource->LoadToMemory();
+	std::string metaFile = node.path + (".meta");
+	uint64 resourceID = App->resources->GetIDFromMeta(metaFile.c_str());
+	Resource* resource = App->resources->GetResource(resourceID);
+
+	if (resource && resource->GetType() == Resource::material)
+	{
+		GameObject* obj = App->scene->GetSelectedGameObject();
+		if (obj != nullptr)
+		{
+			ComponentMaterial* mat = (ComponentMaterial*)obj->GetComponent(Component::Type::Material);
+			if (mat == nullptr)
+				mat = (ComponentMaterial*)obj->AddComponent(Component::Type::Material);
+
+			resource->LoadToMemory();
+			mat->SetMaterial((ResourceMaterial*)resource);
+		}
+	}
+	else if (resource && resource->GetType() == Resource::model)
+	{
+		resource->LoadToMemory();
+		ResourceModel* res = (ResourceModel*)resource;
+		res->CreateGameObjects(App->file_system->GetFileName(node.path.c_str()).c_str()); //create gameobjects from model
+	}
 }
 
 void Assets::UpdateAssets()
@@ -129,7 +156,6 @@ void Assets::UpdateAssets()
 	std::vector<std::string> ignore_ext;
 	ignore_ext.push_back("meta");
 	assets = App->file_system->GetAllFiles("Assets", nullptr, &ignore_ext);
-	timer.Start();
 }
 
 void Assets::UpdateFilters(PathNode& node)
@@ -274,20 +300,22 @@ uint Assets::GetIcon(const PathNode& node)
 	if (node.file == false) //if folder
 		return folder_icon;
 
-	//else
-	//{
-	//	Resource* resource = App->resources->GetResource(node.id); //get resource
+	else
+	{
+		std::string metaFile = node.path + (".meta");
+		uint64 resourceID = App->resources->GetIDFromMeta(metaFile.c_str());
+		Resource* resource = App->resources->GetResource(resourceID);
 
-	//	if (resource->GetType() == Resource::Type::model) //if model
-	//		return model_icon;
+		if (resource->GetType() == Resource::Type::model) //if model
+			return model_icon;
 
-	//	else if (resource->GetType() == Resource::Type::material) //if material
-	//		return material_icon;
+		else if (resource->GetType() == Resource::Type::material) //if material
+			return material_icon;
 
-	//	else if (resource->GetType() == Resource::Type::scene) //if scene
-	//		return scene_icon;
+		else if (resource->GetType() == Resource::Type::scene) //if scene
+			return scene_icon;
 
-	//	else
-	//		return file_icon;
-	//}
+		else
+			return file_icon;
+	}
 }

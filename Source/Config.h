@@ -1,10 +1,16 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
+#include "parson\parson.h"
+#include <string>
 #include "Globals.h"
+#include <vector>
 
-// C++ wrapper for JSON parser library "Parson"
-// http://www.w3schools.com/json/json_syntax.asp
+#include "MathGeoLib/include/MathBuildConfig.h"
+#include "MathGeoLib/include/MathGeoLib.h"
+
+
+//http://kgabis.github.io/parson/
 
 struct json_object_t;
 typedef struct json_object_t JSON_Object;
@@ -15,58 +21,81 @@ typedef struct json_value_t  JSON_Value;
 struct json_array_t;
 typedef struct json_array_t  JSON_Array;
 
+class Config_Array;
 class Config
 {
+	///Brief parson explanation
+	/*
+	-	Save a JSON file into a buffer then create a new file with fileSystem:
+		JSON_Status json_serialize_to_buffer(const JSON_Value *value, char *buf, size_t buf_size_in_bytes);
+	-	JSON nodes are called objects
+	-	Append attributes to object: json_object_set_[type of attribute]. Attribute types are bool, number, string and value (any attribute or an object)
+	-	Get values from a node: same function as append, but with "get"
+	*/
+
 public:
-	Config();
-	Config(const char* data);
-	Config(JSON_Object* section);
-	~Config();
+	Config();						//Contructor used for new files
+	Config(const char* buffer);		//Constructor used for data read
+	Config(JSON_Object* obj);		//Constructor used for node append
+	~Config();						//Free data if initialized
 
-	bool IsValid() const;
+	uint Serialize(char** buffer);	//Returns a filled buffer
+	bool NodeExists();
+	void Release();
 
-	size_t Save(char** buf, const char* title_comment) const;
+	//Append attributes -----------
+	void SetNumber(const char* name, double data);
+	void SetString(const char* name, const char* data);
+	void SetBool(const char* name, bool data);
+	Config_Array SetArray(const char* name);
+	Config SetNode(const char* name);
+	//Endof append attributes------
 
-	int Size() const;
-	Config GetSection(const char* section_name) const;
-	Config AddSection(const char* section_name);
-
-	bool GetBool(const char * field, bool default = false, int index = -1) const;
-	int GetInt(const char* field, int default = 0, int index = -1) const;
-	uint GetUInt(const char* field, uint default = 0, int index = -1) const;
-	UID GetUID(const char* field, UID default = 0, int index = -1) const;
-	double GetDouble(const char * field, double default = 0.0, int index = -1) const;
-	float GetFloat(const char* field, float default = 0.f, int index = -1) const;
-	const char* GetString(const char* field, const char* default = nullptr, int index = -1) const;
-
-	int GetArrayCount(const char * field) const;
-	Config GetArray(const char* field, int index) const;
-
-	bool AddBool(const char* field, bool value);
-	bool AddInt(const char* field, int value);
-	bool AddUInt(const char* field, uint value);
-	bool AddUID(const char* field, UID value);
-	bool AddDouble(const char * field, double value);
-	bool AddFloat(const char* field, float value);
-	bool AddString(const char* field, const char* string);
-	bool AddArray(const char* array_name);
-	bool AddArrayEntry(const Config& config);
-
-	bool AddArrayBool(const char* field, const bool* values, int size);
-	bool AddArrayInt(const char* field, const int* values, int size);
-	bool AddArrayUInt(const char* field, const uint* values, int size);
-	bool AddArrayUID(const char* field, const UID* values, int size);
-	bool AddArrayFloat(const char* field, const float* values, int size);
-	bool AddArrayString(const char* field, const char** values, int size);
+	//Get attributes --------------
+	double GetNumber(const char* name, double default = 0) const;
+	std::string GetString(const char* name, const char* default = "") const;
+	bool GetBool(const char* name, bool default = true) const;
+	Config_Array GetArray(const char* name);
+	Config GetNode(const char* name) const;
+	//Endof Get attributes---------
 
 private:
-	JSON_Value* FindValue(const char* field, int index) const;
-
-private:
-	JSON_Value* vroot = nullptr;
-	JSON_Object* root = nullptr;
-	JSON_Array* array = nullptr;
-	bool needs_removal = false;
+	JSON_Value* root_value = nullptr; //Only used for file root
+	JSON_Object* node = nullptr;
 };
 
-#endif // __CONFIG_H__
+class Config_Array
+{
+public:
+	//Contructor only to be called from Config, it would cause mem leak
+	Config_Array();
+	Config_Array(JSON_Array* arr);
+
+	//Append attributes ------------
+	void AddNumber(int number);
+	void AddString(char* string);
+	void AddBool(bool boolean);
+	void AddFloat3(const float3& data);
+	void AddQuat(const Quat& data);
+	Config AddNode();
+	//Endof append attributes-------
+
+	//Get attributes ---------------
+	double GetNumber(uint index, double default = 0) const;
+	const char* GetString(uint index, const char* default = "") const;
+	bool GetBool(uint index, bool default = true) const;
+	float3 GetFloat3(uint index, float3 default = float3::zero) const; //Index is based on float3 not on single data!
+	Quat GetQuat(uint index, Quat  default = Quat::identity) const;
+	void FillVectorNumber(std::vector<double>& vector) const;
+	void FillVectorString(std::vector<char*>& vector) const;
+	void FillVectorBoool(std::vector<bool>& vector) const;
+	Config GetNode(uint index) const;
+	uint GetSize() const;
+	//Endof Get attributes----------
+
+private:
+	JSON_Array* arr;
+	uint size = 0;
+};
+
+#endif //__CONFIG_H__

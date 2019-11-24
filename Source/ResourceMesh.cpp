@@ -90,7 +90,7 @@ bool ResourceMesh::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
 
-	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MESH_FOLDER, "mesh", "dvs_mesh"); //save
+	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MESH_FOLDER, std::to_string(GetID()).c_str(), "dvs_mesh"); //save
 }
 
 bool ResourceMesh::LoadtoScene()

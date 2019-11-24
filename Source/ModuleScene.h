@@ -56,8 +56,8 @@ public:
 	void UnSelectAll(GameObject * keep_selected = nullptr);
 
 public:
-	char scene_name[NAME_LENGTH];
-	void SetSceneName(const char* name)	{strcpy_s(scene_name, name);}
+	std::string scene_name;
+	void SetSceneName(const char* name) { scene_name = name; }
 
 	bool is_creating = false;
 	bool is_selecting = false;
