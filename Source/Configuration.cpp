@@ -408,6 +408,10 @@ void Configuration::DrawModuleFileSystem(ModuleFileSystem* module)
 
 void Configuration::DrawScene()
 {
+	ImGui::Checkbox("Camera culling", &App->scene_base->camera_culling);
+
+	ImGui::Separator();
+
 	ImGui::Checkbox("Show all wireframe", &App->scene_base->show_all_wireframe);
 	ImGui::ColorEdit3("Wireframe color", (float*)&App->scene_base->wireframe_color);
 	ImGui::DragFloat("Wireframe width", &App->scene_base->wireframe_width, 0.1f, 0.1f, 5.0f);
@@ -434,7 +438,7 @@ void Configuration::DrawScene()
 
 void Configuration::DrawMainCamera()
 {
-	if (ImGui::CollapsingHeader("Main camera"))
+	if (ImGui::CollapsingHeader("Viewport"))
 	{
 
 		ImGui::ColorEdit3("Background", (float*)&viewport_camera->background);

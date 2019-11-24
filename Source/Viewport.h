@@ -41,6 +41,8 @@ public:
 
 	FrameBuffer frame_buffer;
 
+	ComponentCamera* current_camera = viewport_camera;
+
 	ImVec2 window_avail_size = { default_width, default_height };
 
 };

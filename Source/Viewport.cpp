@@ -35,14 +35,14 @@ bool Viewport::PreUpdate()
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
-	glClearColor(viewport_camera->background.r,viewport_camera->background.g,viewport_camera->background.b,viewport_camera->background.a);
+	glClearColor(current_camera->background.r, current_camera->background.g, current_camera->background.b, current_camera->background.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
-	if (viewport_camera->update_projection)
+	if (current_camera->update_projection)
 	{
 		OnCameraUpdate();
-		viewport_camera->update_projection = false;
+		current_camera->update_projection = false;
 	}
 
 	return true;
@@ -132,16 +132,18 @@ void Viewport::OnResize(float width, float height)
 {
 	glViewport(0, 0, width, height);
 
-	viewport_camera->SetAspectRatio(width/height);
+	current_camera->SetAspectRatio(width/height);
 }
 
 void Viewport::OnCameraUpdate()
 {
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glLoadMatrixf(viewport_camera->GetProjectionMatrix());
+	glLoadMatrixf(current_camera->GetProjectionMatrix());
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glLoadMatrixf(viewport_camera->GetViewMatrix());
+	glLoadMatrixf(current_camera->GetViewMatrix());
+
 }

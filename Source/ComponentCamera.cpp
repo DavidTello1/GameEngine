@@ -32,7 +32,7 @@ ComponentCamera::~ComponentCamera()
 
 void ComponentCamera::DrawInspector()
 {
-	if (ImGui::CollapsingHeader("Main camera", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 
 		ImGui::ColorEdit3("Background", (float*)&background);
@@ -193,6 +193,7 @@ void ComponentCamera::UpdatePlanes()
 	frustum.GetPlanes(planes);
 }
 
+// Moved to Frustum::
 //bool ComponentCamera::ContainsAABB(const AABB& refBox) const
 //{
 //	float3 corners[8];
@@ -231,8 +232,8 @@ void ComponentCamera::UpdatePlanes()
 void ComponentCamera::DrawFrustum()
 {
 	glBegin(GL_LINES);
-	glLineWidth(2.0f);
-	glColor4f(Red.r, Red.g, Red.b, Red.a);
+	glLineWidth(1.0f);
+	glColor4f(White.r, White.g, White.b, White.a);
 
 	for (int i = 0; i < frustum.NumEdges(); i++)
 	{

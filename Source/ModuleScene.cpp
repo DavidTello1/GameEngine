@@ -6,12 +6,14 @@
 #include "ComponentCamera.h"
 #include "ComponentMesh.h"
 #include "ResourceModel.h"
+#include "Viewport.h"
 #include "Quadtree.h"
 
 
 #include "mmgr/mmgr.h"
 
 GameObject* ModuleScene::root_object;
+SceneState ModuleScene::state = EDIT;
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 {}
@@ -60,9 +62,9 @@ bool ModuleScene::Start(Config* config)
 	//gameObjects[2+i*3]->SetLocalPosition({ 5.0f*i,0.0f,-5.0f* i });
 	//}
 
-	App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/Street/Street environment_V01.fbx");
+	//App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/Street/Street environment_V01.fbx");
 
-	//App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/BakerHouse.fbx");
+	App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/BakerHouse.fbx");
 
 	//gameObjects[2]->SetLocalPosition({ 0.0f,0.0f,20.0f });
 
@@ -122,6 +124,37 @@ bool ModuleScene::PostUpdate(float dt)
 		}
 	}
 
+	switch (state)
+	{
+	case EDIT:
+		//Do edit things
+		break;
+	case START:
+		//SaveScene
+		state = PLAY;
+		App->editor->tab_viewport->current_camera = test_camera;
+		App->editor->tab_viewport->OnCameraUpdate();
+		break;
+	case PLAY:
+		//App->Unpause();
+		//Enjoy your game
+		break;
+	case PAUSE:
+		//App->Pause();
+		break;
+	case STOP:
+		//App->Unpause();
+		//LoadScene
+		state = EDIT;
+		App->editor->tab_viewport->current_camera = viewport_camera;
+		App->editor->tab_viewport->OnCameraUpdate();
+
+		break;
+	default:
+		state = EDIT;
+		break;
+	}
+
 	return true;
 }
 
@@ -151,7 +184,7 @@ bool ModuleScene::CleanUp()
 bool ModuleScene::Draw()
 {
 	// ALL this need a big rework
-	quadtree->ResetCullingState();
+	//quadtree->ResetCullingState();
 
 	// Cheap fix
 	glColor3ub(255, 255, 255);

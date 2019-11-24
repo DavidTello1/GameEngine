@@ -40,6 +40,19 @@ void Hierarchy::Draw()
 	ImGui::Text(App->scene->GetName());
 	ImGui::Separator();
 
+	if (ImGui::Button("PLAY") && (ModuleScene::state == EDIT || ModuleScene::state == PAUSE))
+		ModuleScene::state = START;
+	ImGui::SameLine();
+
+	if (ImGui::Button("PAUSE") && ModuleScene::state == PLAY)
+		ModuleScene::state = PAUSE;
+	ImGui::SameLine();
+
+	if (ImGui::Button("STOP")
+		&& (ModuleScene::state == PLAY || ModuleScene::state == PAUSE))
+		ModuleScene::state = STOP;
+
+	ImGui::Separator();
 	// Drawing scene gameobjects as nodes
 	DrawNodes(ModuleScene::root_object->childs);
 }

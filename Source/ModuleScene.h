@@ -12,6 +12,13 @@ class ComponentMesh;
 class ComponentCamera;
 class Quadtree;
 
+enum SceneState {
+	EDIT,
+	START,
+	PLAY,
+	PAUSE,
+	STOP
+};
 
 class ModuleScene :	public Module
 {
@@ -57,7 +64,7 @@ public:
 	std::vector<GameObject*> gameObjects;
 	   
 	static GameObject* root_object;
-
+	static SceneState state;
 	ComponentCamera* test_camera = nullptr;
 	GameObject* test_camera_obj = nullptr;
 
