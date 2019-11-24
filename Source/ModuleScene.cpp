@@ -50,6 +50,8 @@ bool ModuleScene::Start(Config* config)
 	test_camera_obj->AddComponent(Component::Type::Camera);
 
 	test_camera = test_camera_obj->GetComponent<ComponentCamera>();
+
+	//App->resources->ImportFromOutside("/Assets/Street/Street environment_V01.FBX");
 	
 	quadtree = new Quadtree(AABB(Quadtree::min_point,Quadtree::max_point));
 
