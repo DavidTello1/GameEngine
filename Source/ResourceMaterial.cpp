@@ -26,7 +26,7 @@ ResourceMaterial::~ResourceMaterial()
 	UnLoad();
 }
 
-UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_material)
+UID ResourceMaterial::Import(const char* source_file, std::string& output, const aiMaterial* ai_material)
 {
 	ResourceMaterial* material = static_cast<ResourceMaterial*>(App->resources->CreateResource(Resource::material)); //create new material
 
@@ -36,7 +36,6 @@ UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_mater
 		LOG("Error Importing texture from '%s'", source_file, 'e');
 
 	// Saving to own format
-	std::string output;
 	if (material->SaveOwnFormat(output))
 	{
 		material->original_file = source_file; //get file

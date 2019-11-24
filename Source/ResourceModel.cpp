@@ -57,7 +57,8 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 		materials.reserve(scene->mNumMaterials); //reserve capacity for num of materials
 		for (unsigned i = 0; i < scene->mNumMaterials; ++i)
 		{
-			materials.push_back(ResourceMaterial::Import(full_path, scene->mMaterials[i])); //import material
+			std::string output2;
+			materials.push_back(ResourceMaterial::Import(full_path, output2, scene->mMaterials[i])); //import material
 
 			assert(materials.back() != 0); //asssert if vector materials is empty
 		}

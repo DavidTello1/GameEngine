@@ -128,7 +128,7 @@ bool ModuleResources::ImportResource(const char* final_path, UID uid)
 		break;
 	}
 	case Resource::material:
-		import_ok = ResourceMaterial::Import(final_path);
+		import_ok = ResourceMaterial::Import(final_path, written_file);
 		break;
 	case Resource::scene:
 		import_ok = ResourceScene::Import(final_path, written_file);
