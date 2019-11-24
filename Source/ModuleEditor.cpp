@@ -463,23 +463,45 @@ void ModuleEditor::DrawPanels()
 		{
 			ImGui::SetNextWindowPos(ImVec2((float)(*it)->pos_x, (float)(*it)->pos_y), ImGuiCond_FirstUseEver);
 			ImGui::SetNextWindowSize(ImVec2((float)(*it)->width, (float)(*it)->height), ImGuiCond_FirstUseEver);
+			ImVec2 p;
 
 			if ((*it)->has_menubar) //panel has a menu bar
 			{
 				if (ImGui::Begin((*it)->GetName(), &(*it)->active, ImGuiWindowFlags_MenuBar))
+				{
 					(*it)->Draw();
+					p = ImGui::GetWindowPos();
+					(*it)->pos_x = p.x;
+					(*it)->pos_y = p.y;
+
+					if (ImGui::IsWindowHovered()) 
+						focused_panel = *it;
+				}
 			}
 			else
 			{
 				if (ImGui::Begin((*it)->GetName(), &(*it)->active))
+				{
 					(*it)->Draw();
+					p = ImGui::GetWindowPos();
+					(*it)->pos_x = p.x;
+					(*it)->pos_y = p.y;
+
+					if (ImGui::IsWindowHovered()) 
+						focused_panel = *it;
+				}
 			}
 						
 			if ((*it)->GetName() == "Inspector" && (App->scene->is_creating || App->scene->is_selecting)) //show inspector when a gameobject is created/selected
 			{
 				ImGui::SetWindowFocus();
+				p = ImGui::GetWindowPos();
+				(*it)->pos_x = p.x;
+				(*it)->pos_y = p.y;
+
 				App->scene->is_creating = false;
 				App->scene->is_selecting = false;
+				focused_panel = *it;
 			}
 			ImGui::End();
 		}

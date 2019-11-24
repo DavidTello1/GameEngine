@@ -20,8 +20,6 @@ public:
 	bool PostUpdate(float dt);
 	bool CleanUp();
 
-	void UpdateMainCamera(float dt);
-
 	void CameraZoom(float dt);
 	void CameraFreeMove(float dt);
 	void CameraFocusTo();

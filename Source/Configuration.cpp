@@ -324,6 +324,18 @@ void Configuration::DrawModuleInput(ModuleInput* module)
 	ImGui::SameLine();
 	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_y);
 
+	if (App->editor->focused_panel)
+	{
+		ImGui::Text("Mouse relative to %s:",App->editor->focused_panel->GetName());
+		ImGui::SameLine();
+		ImGui::Text("x");
+		ImGui::SameLine();
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_x - App->editor->focused_panel->pos_x);
+		ImGui::SameLine();
+		ImGui::Text("y");
+		ImGui::SameLine();
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", mouse_y - App->editor->focused_panel->pos_y);
+	}
 
 	module->GetMouseMotion(mouse_x, mouse_y);
 	ImGui::Text("Mouse Motion:");

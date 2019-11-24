@@ -27,7 +27,17 @@ bool ModuleSceneBase::Start(Config* config)
 
 bool ModuleSceneBase::Update(float dt)
 {
-	UpdateMainCamera(dt);
+	if (viewport_camera == nullptr || App->editor->focused_panel != App->editor->tab_viewport) return true;
+
+	CameraZoom(dt);
+
+	CameraFocusTo();
+
+	CameraFreeMove(dt);
+
+	CameraOrbit(dt);
+
+	CameraMousePicking();
 
 	return true;
 }
@@ -44,21 +54,6 @@ bool ModuleSceneBase::CleanUp()
 	return true;
 }
 
-
-void ModuleSceneBase::UpdateMainCamera(float dt)
-{
-	if (viewport_camera == nullptr || viewport_camera->viewport_focus == false) return;
-
-	CameraZoom(dt);
-
-	CameraFocusTo();
-
-	CameraFreeMove(dt);
-
-	CameraOrbit(dt);
-
-	CameraMousePicking();
-}
 
 void ModuleSceneBase::CameraOrbit(float dt)
 {
@@ -202,15 +197,17 @@ void ModuleSceneBase::CameraMousePicking()
 
 	float3 end = print_ray.pos + print_ray.dir.Normalized() * viewport_camera->GetFarPlane();
 
+
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 	{
 		float2 pos = App->input->GetMousePosition();
 
-		pos.x = (((float)(( pos.x - (float)App->editor->tab_viewport->pos_x ) / (float)App->editor->tab_viewport->width   )) -0.5f) * 2.0f;	
-		pos.y = (((float)(( pos.y - (float)App->editor->tab_viewport->pos_y ) / -(float)App->editor->tab_viewport->height )) +0.5f) * 2.0f;
+		pos.x = (((float)(( pos.x - (float)App->editor->tab_viewport->pos_x - 7.0f) / (float)App->editor->tab_viewport->width   )) -0.5f) * 2.0f;	
+		pos.y = (((float)(( pos.y - (float)App->editor->tab_viewport->pos_y - 26.0f ) / -(float)App->editor->tab_viewport->height )) +0.5f) * 2.0f;
 
 		pos = pos.Clamp(-1.0f, 1.0f);
 
+		
 		Ray ray = viewport_camera->frustum.UnProjectFromNearPlane(pos.x, pos.y);
 		print_ray = ray;
 

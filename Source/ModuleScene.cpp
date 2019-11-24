@@ -4,8 +4,10 @@
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
+#include "ComponentMesh.h"
 #include "ResourceModel.h"
 #include "Quadtree.h"
+
 
 #include "mmgr/mmgr.h"
 
@@ -51,6 +53,12 @@ bool ModuleScene::Start(Config* config)
 	//
 	//gameObjects[2+i*3]->SetLocalPosition({ 5.0f*i,0.0f,-5.0f* i });
 	//}
+
+	App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/Tank/tank.fbx");
+
+	App->resources->ImportFromOutside("D:/Users/William/Desktop/Assets/BakerHouse.fbx");
+
+	gameObjects[2]->SetLocalPosition({ 0.0f,0.0f,20.0f });
 
 	quadtree = new Quadtree(AABB({ -20,-20,-20 }, { 20,20,20 }));
 
@@ -323,6 +331,42 @@ void ModuleScene::DeleteSelected()
 			DeleteGameObject(gameObjects[i]);
 		
 	}
+}
+
+GameObject * ModuleScene::PickFromRay(Ray ray)
+{
+	quadtree->CollectCandidates(pick_candidates, ray);
+	std::map<float, GameObject*>::iterator it = pick_candidates.begin();
+
+	// candidates are in order, first to be picked will be the closest one
+	for (;it != pick_candidates.end(); it++)
+	{
+		ComponentMesh* c_mesh = it->second->GetComponent<ComponentMesh>();
+		if (!c_mesh) continue;
+
+		ResourceMesh* mesh = c_mesh->GetMesh();
+		if (!mesh) continue;
+		
+		Ray tmpRay = ray;
+		tmpRay.Transform(it->second->GetGlobalTransform().Inverted());
+
+		for (uint i = 0; i < mesh->num_indices; i += 3)
+		{
+			float3 one	 = mesh->vertices[mesh->indices[i]];
+			float3 two	 = mesh->vertices[mesh->indices[i+1]];
+			float3 three = mesh->vertices[mesh->indices[i+2]];
+
+			if (tmpRay.Intersects(Triangle(one,two,three), nullptr, nullptr))
+			{
+				UnSelectAll();
+				it->second->Select();
+				return it->second;
+			}
+		}
+		
+	}
+
+	return nullptr;
 }
 
 void ModuleScene::UnSelectAll(GameObject* keep_selected)

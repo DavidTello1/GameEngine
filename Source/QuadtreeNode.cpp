@@ -29,7 +29,7 @@ void QuadtreeNode::ResetCullingState()
 		b->is_drawn = true;
 	}
 
-	is_culling = false;
+	//is_culling = false;
 }
 
 void QuadtreeNode::GetAllBuckets(std::vector<GameObject*>& all_bucket)

@@ -51,13 +51,6 @@ bool Viewport::PreUpdate()
 
 void Viewport::Draw() 
 {
-	ImVec2 p = ImGui::GetWindowPos();
-
-	pos_x = p.x;
-	pos_y = p.y;
-
-	//LOG("POS VIEWPORT %d,%d", pos_x, pos_y,'d');
-
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
@@ -151,7 +144,4 @@ void Viewport::OnCameraUpdate()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glLoadMatrixf(viewport_camera->GetViewMatrix());
-
-	//glPopMatrix();
-
 }
