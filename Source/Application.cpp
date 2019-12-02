@@ -5,6 +5,13 @@
 #include "ModuleInput.h"
 #include "ModuleScene.h"
 #include "ModuleSceneBase.h"
+#include "ModuleRenderer3D.h"
+#include "ModuleEditor.h"
+#include "ModuleFileSystem.h"
+#include "ModuleResources.h"
+
+
+
 
 #include "mmgr/mmgr.h"
 

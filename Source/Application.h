@@ -1,22 +1,24 @@
 #pragma once
-
 #include "Globals.h"
-#include "Timer.h"
-#include "ModuleRenderer3D.h"
-#include "ModuleEditor.h"
-#include "ModuleFileSystem.h"
-#include "ModuleResources.h"
-
-#include "Config.h"
-
-#include "MathGeoLib/include/Algorithm/Random/LCG.h"
-
 #include <list>
+#include <string>
+#include "Config.h"
+#include "MathGeoLib/include/Algorithm/Random/LCG.h"
+#include "Timer.h"
 
+class Module;
 class ModuleWindow;
 class ModuleScene;
 class ModuleInput;
 class ModuleSceneBase;
+class ModuleRenderer3D;
+class ModuleEditor;
+class ModuleFileSystem;
+class ModuleResources;
+
+//class Timer;
+//class Config;
+//class LCG;
 
 class Application
 {
@@ -42,7 +44,7 @@ public:
 	void LoadPrefs();
 	void SavePrefs() const;
 
-	LCG& Random() { return *random; }
+	math::LCG& Random() { return *random; }
 
 private:
 	void PrepareUpdate();
@@ -50,7 +52,7 @@ private:
 
 
 public:
-	LCG* random = nullptr;
+	math::LCG* random = nullptr;
 
 	ModuleWindow* window;
 	ModuleInput* input;

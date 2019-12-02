@@ -3,6 +3,7 @@
 #include "ModuleScene.h"
 #include "Viewport.h"
 #include "ModuleInput.h"
+#include "ModuleEditor.h"
 
 #include "glew/include/GL/glew.h"
 #include "mmgr/mmgr.h"
