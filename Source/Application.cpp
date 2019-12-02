@@ -1,5 +1,5 @@
 #include "Application.h"
-
+#include <windows.h>
 #include "Module.h"
 #include "ModuleWindow.h"
 #include "ModuleInput.h"

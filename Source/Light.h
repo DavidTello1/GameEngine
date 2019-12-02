@@ -1,5 +1,5 @@
-
 #pragma once
+
 #include "Color.h"
 #include "MathGeoLib/include/Math/float3.h"
 

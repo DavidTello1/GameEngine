@@ -10,9 +10,6 @@
 #endif
 #define _STATIC_CPPLIB
 
-#include <windows.h>
-#include <stdio.h>
-
 /* CHARS AT END INDICATES THE TYPE OF LOG TO ENABLE FILTERS
 * Characters must be written as string type %s
 * v - verbose

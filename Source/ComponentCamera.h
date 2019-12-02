@@ -7,10 +7,6 @@
 #include "Math.h"
 #include "Color.h"
 
-#define AABB_OUT 0
-#define AABB_IN	1
-#define INTERSECT 2
-
 class ComponentCamera : public Component
 {
 public:
