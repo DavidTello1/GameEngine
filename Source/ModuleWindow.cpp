@@ -30,8 +30,8 @@ bool ModuleWindow::Init(Config* config)
 		SDL_GetDesktopDisplayMode(0, &DM);
 
 		//Create window
-		screen_width = config->GetNumber("Width", uint(DM.w*0.75f));
-		screen_height = config->GetNumber("Height", uint(DM.h*0.75f));
+		screen_width = config->GetNumber("Width", 1024);
+		screen_height = config->GetNumber("Height", 768);
 
 		Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
@@ -39,7 +39,7 @@ bool ModuleWindow::Init(Config* config)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
-		fullscreen = config->GetBool("Fullscreen", true);
+		fullscreen = config->GetBool("Fullscreen", false);
 		resizable = config->GetBool("Resizable", true);
 		borderless = config->GetBool("Borderless", false);
 		fullscreen_desktop = config->GetBool("Fullscreen Desktop", false);
@@ -118,10 +118,10 @@ void ModuleWindow::Load(Config* config)
 {
 	//SetIcon(config->GetString("Icon", ""));
 	SetBrightness(config->GetNumber("Brightness", 1.0f));
-	SetWidth(config->GetNumber("Width", 1280));
-	SetHeigth(config->GetNumber("Height", 1024));
+	SetWidth(config->GetNumber("Width", 1024));
+	SetHeigth(config->GetNumber("Height", 768));
 	SetFullscreen(config->GetBool("Fullscreen", false));
-	SetResizable(config->GetBool("Resizable", false));
+	SetResizable(config->GetBool("Resizable", true));
 	SetBorderless(config->GetBool("Borderless", false));
 	SetFullScreenDesktop(config->GetBool("Fullscreen Desktop", false));
 }

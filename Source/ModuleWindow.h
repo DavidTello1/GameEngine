@@ -56,8 +56,8 @@ private:
 	//The surface contained by the window
 	SDL_Surface* screen_surface = nullptr;
 
-	uint screen_width = 1280;
-	uint screen_height = 1024;
+	uint screen_width = 1024;
+	uint screen_height = 768;
 	bool fullscreen = false;
 	bool resizable = false;
 	bool borderless = false;
