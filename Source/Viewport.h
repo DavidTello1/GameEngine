@@ -3,6 +3,8 @@
 #include "glew/include/GL/glew.h"
 #include "Imgui/imgui.h"
 
+class ComponentCamera;
+
 struct FrameBuffer
 {
 	unsigned int id;
@@ -41,7 +43,7 @@ public:
 
 	FrameBuffer frame_buffer;
 
-	ComponentCamera* current_camera = viewport_camera;
+	ComponentCamera* current_camera;
 
 	ImVec2 window_avail_size = { default_width, default_height };
 

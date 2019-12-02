@@ -5,6 +5,7 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 #include "ComponentMesh.h"
+#include "ModuleSceneBase.h"
 #include "ResourceModel.h"
 #include "Viewport.h"
 #include "Quadtree.h"

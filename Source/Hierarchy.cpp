@@ -2,6 +2,8 @@
 #include "Hierarchy.h"
 #include "Globals.h"
 #include "ResourceMesh.h"
+#include "ModuleInput.h"
+#include "GameObject.h"
 
 #include "ModuleScene.h"
 #include "ImGui/imgui.h"

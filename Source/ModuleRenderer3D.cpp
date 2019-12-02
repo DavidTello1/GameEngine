@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleRenderer3D.h"
 #include "Viewport.h"
+#include "ModuleWindow.h"
 
 #include "glew/include/GL/glew.h"
 #include "SDL/include/SDL_opengl.h"

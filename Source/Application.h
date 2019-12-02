@@ -2,10 +2,6 @@
 
 #include "Globals.h"
 #include "Timer.h"
-#include "Module.h"
-#include "ModuleWindow.h"
-#include "ModuleInput.h"
-#include "ModuleSceneBase.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleEditor.h"
 #include "ModuleFileSystem.h"
@@ -17,7 +13,10 @@
 
 #include <list>
 
+class ModuleWindow;
 class ModuleScene;
+class ModuleInput;
+class ModuleSceneBase;
 
 class Application
 {

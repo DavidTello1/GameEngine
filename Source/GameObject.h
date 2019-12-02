@@ -10,7 +10,6 @@
 #include <vector>
 
 class ComponentMaterial;
-class ComponentCamera;
 
 //Dealt at scene post update
 enum GameObjectFlags

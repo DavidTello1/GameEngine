@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Viewport.h"
 #include "ModuleScene.h"
+#include "ModuleSceneBase.h"
 #include "ComponentCamera.h"
 #include "mmgr/mmgr.h"
 
@@ -15,6 +16,8 @@ Viewport::Viewport() : Panel("Viewport")
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
+
+	current_camera = viewport_camera;
 }
 
 
