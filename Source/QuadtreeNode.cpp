@@ -1,6 +1,7 @@
 #include "QuadtreeNode.h"
 #include "Quadtree.h"
 #include "GameObject.h"
+#include "Color.h"
 
 #include "ModuleResources.h"
 #include "mmgr/mmgr.h"
@@ -13,7 +14,7 @@ void QuadtreeNode::DrawEx(Color c)
 	if (!is_culling)
 		glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 	else
-		glColor3ub(culling_color.r * 255.0f, culling_color.g * 255.0f, culling_color.b * 255.0f);
+		glColor3ub(Color::LightGray.r * 255.0f, Color::LightGray.g * 255.0f, Color::LightGray.b * 255.0f);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);

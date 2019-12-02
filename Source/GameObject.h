@@ -6,7 +6,6 @@
 #include "Hierarchy.h"
 #include "ResourceMesh.h"
 
-#include "Math.h"
 #include <vector>
 
 class ComponentMaterial;
