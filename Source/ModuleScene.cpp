@@ -178,7 +178,7 @@ bool ModuleScene::Draw()
 	for ( GameObject* obj : candidates)
 	{
 
-		c = (!obj->HasChilds()) ? App->scene_base->aabb_color : Cyan;
+		c = (!obj->HasChilds()) ? App->scene_base->aabb_color : Color::cyan1;
 		// Just boxes colors things
 		//obj->is_drawn = true;
 
@@ -219,7 +219,7 @@ bool ModuleScene::Draw()
 		// AABB
 		if ((obj->show_aabb || App->scene_base->show_all_aabb) && obj->aabb_VBO != 0)
 		{
-			c = (obj->is_drawn) ? App->scene_base->aabb_color : LightGrey;
+			c = (obj->is_drawn) ? App->scene_base->aabb_color : Color::LightGray;
 
 			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->aabb_width);
@@ -237,7 +237,7 @@ bool ModuleScene::Draw()
 		// OBB
 		if ((obj->show_obb || App->scene_base->show_all_obb) && obj->obb_VBO != 0)
 		{
-			c = (obj->is_drawn) ? App->scene_base->obb_color : DarkGrey;
+			c = (obj->is_drawn) ? App->scene_base->obb_color : Color::DarkSlateGray;
 
 			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->obb_width);

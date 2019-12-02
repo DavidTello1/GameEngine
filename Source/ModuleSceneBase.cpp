@@ -221,7 +221,7 @@ void ModuleSceneBase::CameraMousePicking()
 	}
 
 	// Drawiinggg
-	Color c = (intersects) ? Yellow : Cyan;
+	Color c = (intersects) ? Color::yellow1 : Color::cyan1;
 	
 
 	glLineWidth(1.0f);

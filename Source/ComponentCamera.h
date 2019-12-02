@@ -58,5 +58,5 @@ public:
 
 	Frustum frustum;
 	Plane planes[6];
-	Color background = DarkGrey;
+	Color background = Color::gray42;
 };

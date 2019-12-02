@@ -199,7 +199,7 @@ void ComponentCamera::DrawFrustum()
 {
 	glBegin(GL_LINES);
 	glLineWidth(1.0f);
-	glColor4f(White.r, White.g, White.b, White.a);
+	glColor4f(Color::white.r, Color::white.g, Color::white.b, Color::white.a);
 
 	for (int i = 0; i < frustum.NumEdges(); i++)
 	{

@@ -1,8 +1,8 @@
 #pragma once
-#include "Globals.h"
 #include <list>
 #include <string>
 
+#include "Globals.h"
 #include "Timer.h"
 
 #include "MathGeoLib/include/MathGeoLibFwd.h"

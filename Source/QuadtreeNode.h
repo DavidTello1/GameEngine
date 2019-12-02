@@ -68,7 +68,7 @@ private:
 	std::vector<GameObject*> bucket;
 
 	float3 corners[8];
-	Color culling_color = LightGrey;
+	Color culling_color = Color::LightGray;
 	bool is_culling = false;
 };
 
