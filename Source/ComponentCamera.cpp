@@ -1,6 +1,7 @@
 #include "ComponentCamera.h"
 #include "Globals.h"
 #include "Application.h"
+#include "ModuleEditor.h"
 #include "Imgui/imgui.h"
 #include "Component.h"
 #include "ComponentMesh.h"
@@ -34,7 +35,10 @@ void ComponentCamera::DrawInspector()
 {
 	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-
+		if (ImGui::Button("Promote to viewport"))
+		{
+			App->editor->AddViewport(this);
+		}
 		ImGui::ColorEdit3("Background", (float*)&background);
 
 		// Dummy floats

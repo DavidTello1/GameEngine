@@ -267,6 +267,10 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void ModuleEditor::AddViewport(ComponentCamera * camera)
+{
+}
+
 void ModuleEditor::DrawMenu()
 {
 	bool ret = true;

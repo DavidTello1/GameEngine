@@ -13,6 +13,7 @@ class Console;
 class Inspector;
 class Assets;
 class Viewport;
+class ComponentCamera;
 
 enum Style {
 	NEW,
@@ -53,6 +54,8 @@ public:
 	int GetPanelPosY(Panel* panel) const { return panel->pos_y; }
 	bool GetPanelActive(Panel* panel) const { return panel->active; }
 	Panel* GetPanelFocused() { return focused_panel; }
+
+	void AddViewport(ComponentCamera* camera);
 
 private:
 	void DrawMenu();
