@@ -1,5 +1,7 @@
 #include "Application.h"
 #include "Viewport.h"
+#include "ModuleScene.h"
+#include "ComponentCamera.h"
 #include "mmgr/mmgr.h"
 
 const int Viewport::default_width = 600;
@@ -13,8 +15,6 @@ Viewport::Viewport() : Panel("Viewport")
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
-
-	has_menubar = false;
 }
 
 
@@ -35,17 +35,15 @@ bool Viewport::PreUpdate()
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClearColor(current_camera->background.r, current_camera->background.g, current_camera->background.b, current_camera->background.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
-	glLoadIdentity();
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(App->camera->GetViewMatrix());
-
-	App->scene_base->Draw();
-	App->scene->Draw();
+	if (current_camera->update_projection)
+	{
+		OnCameraUpdate();
+		current_camera->update_projection = false;
+	}
 
 	return true;
 }
@@ -53,8 +51,6 @@ bool Viewport::PreUpdate()
 
 void Viewport::Draw() 
 {
-	App->camera->viewport_focus = ImGui::IsWindowFocused();
-
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
@@ -63,7 +59,10 @@ void Viewport::Draw()
 // Is not automatically called
 bool Viewport::PostUpdate()
 {
+	App->scene_base->Draw();
+	App->scene->Draw();
 
+	// Background color of the editor (ImGui)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -81,6 +80,7 @@ bool Viewport::CleanUp()
 bool Viewport::GenerateFBO(ImVec2 size)
 {
 	RemoveBuffer(frame_buffer);
+
 	//Generate the FBO and bind it, continue if FBO is complete
 	glGenFramebuffers(1, &frame_buffer.id);
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
@@ -128,15 +128,22 @@ void Viewport::RemoveBuffer(FrameBuffer& buffer)
 	}
 }
 
-void Viewport::OnResize(int width, int height)
+void Viewport::OnResize(float width, float height)
 {
 	glViewport(0, 0, width, height);
 
+	current_camera->SetAspectRatio(width/height);
+}
+
+void Viewport::OnCameraUpdate()
+{
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	projection_matrix = perspective(60.0f, (float)width / (float)height, 0.125f, 512.0f);
-	glLoadMatrixf(&projection_matrix);
+	glLoadMatrixf(current_camera->GetProjectionMatrix());
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	glLoadMatrixf(current_camera->GetViewMatrix());
+
 }

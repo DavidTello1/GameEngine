@@ -1,64 +1,77 @@
 #pragma once
-
 #include "Module.h"
-#include <vector>
 #include "Globals.h"
 #include "GameObject.h"
 #include "Hierarchy.h"
 #include "ModuleResources.h"
+#include "Math.h" //AGDGSDGMSKGSDK
+#include <vector>
 
 class ComponentRenderer;
 class ComponentMesh;
+class ComponentCamera;
+class Quadtree;
+
+enum SceneState {
+	EDIT,
+	START,
+	PLAY,
+	PAUSE,
+	STOP
+
+};
 
 class ModuleScene :	public Module
 {
-
 public:
 
 	ModuleScene(bool start_enabled = true);
 	~ModuleScene();
 
-
+	bool Init(Config * config);
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
 	bool PostUpdate(float dt);
+	void RedoQuatree();
 	bool CleanUp();
 
 	bool Draw();
 
-	
 public:
 	GameObject * FindById(uint id);
-	// GameObjects-----------
-	GameObject* CreateGameObj(const char* name = "GameObject",const uint parent_id = 0, bool visible = false);
-	void DeleteGameobj(GameObject* obj);
-	GameObject* GetSelectedGameobj() { return selected_gameobj; }
-	void SetSelectedGameobj(GameObject* obj) { selected_gameobj = obj; }
+	GameObject* CreateGameObject(const char* name = "GameObject", GameObject* parent = nullptr, bool visible = false);
+	void DeleteGameObject(GameObject* obj);
+	void DeleteSelected();
 
-	bool IsMaterialLoaded(const char* path);
-	ComponentMaterial* GetMaterial(const char* path) const;
-	bool DeleteMaterial(ComponentMaterial* material);
+	std::map<float, GameObject*> pick_candidates;
+	GameObject* PickFromRay(Ray ray);
 
-	//void CreateShape(shape_type type, int slices, int stacks, float x = 0, float y = 0, float z = 0);
+	GameObject* GetSelectedGameObject() { 
+		for (uint i=0;i<gameObjects.size();i++)
+			if (gameObjects[i]->is_selected)
+				return gameObjects[i];
+		return nullptr;
+	}
+
+	void UnSelectAll(GameObject * keep_selected = nullptr);
 
 public:
-	bool create_gameobj = false;
+	std::string scene_name;
+	void SetSceneName(const char* name) { scene_name = name; }
 
-	void EraseFromSelected(GameObject* go);
-	std::vector<GameObject*> selected_go;
-	std::vector<ComponentMaterial*> materials;
-	std::vector<GameObject*> gameobjs;
+	bool is_creating = false;
+	bool is_selecting = false;
 
-
-	// Misc
-	float wireframe_color[3] = { 1.0f, 1.0f, 1.0f };
-	float wireframe_width = 1.0f;
-	bool show_all_wireframe = false;
-
-	float bounding_box_color[3] = { 1.0f, 0.0f, 0.0f };
-	float bounding_box_width = 1.0f;
-	bool show_all_bounding_box = false;
+	std::vector<GameObject*> gameObjects;
 	   
+	static GameObject* root_object;
+	static SceneState state;
+	static const char* state_to_string[STOP+1];
+	ComponentCamera* test_camera = nullptr;
+	GameObject* test_camera_obj = nullptr;
+
+	Quadtree* quadtree;
 private:
 	GameObject* selected_gameobj = nullptr;
+
 };

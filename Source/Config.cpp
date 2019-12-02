@@ -1,306 +1,267 @@
 #include "Config.h"
-#include "parson/parson.h"
-#include "string.h"
-#include "stdio.h"
 
-#include "mmgr/mmgr.h"
-
-// C++ wrapper for JSON parser library "Parson"
-
+//Contructor used for data append
 Config::Config()
 {
-	vroot = json_value_init_object();
-	root = json_value_get_object(vroot);
-	needs_removal = true;
+	root_value = json_value_init_object();
+	node = json_value_get_object(root_value);
 }
 
-Config::Config(const char * string)
+//Constructor used for data read
+Config::Config(const char* buffer)
 {
-	if (string != nullptr)
+	root_value = json_parse_string(buffer);
+	if (root_value)
 	{
-		vroot = json_parse_string(string);
-		if (vroot != nullptr) {
-			root = json_value_get_object(vroot);
-			needs_removal = true;
-		}
+		node = json_value_get_object(root_value);
 	}
 }
 
-Config::Config(JSON_Object* section) : root(section)
-{}
+Config::Config(JSON_Object* obj) : node(obj)
+{
+
+}
 
 Config::~Config()
 {
-	if (needs_removal == true)
-		json_value_free(vroot);
+	Release();
 }
 
-bool Config::IsValid() const
+//Fills a buffer, returns its size
+uint Config::Serialize(char** buffer)
 {
-	return root != nullptr;
+	size_t size = json_serialization_size_pretty(root_value);
+	*buffer = new char[size];
+	json_serialize_to_buffer_pretty(root_value, *buffer, size);
+	return size;
 }
 
-size_t Config::Save(char** buf, const char* title_comment) const
+bool Config::NodeExists()
 {
-	size_t written = json_serialization_size(vroot);
-	*buf = new char[written];
-	json_serialize_to_buffer(vroot, *buf, written);
-	return written;
+	//Casting (bool)root_value could cause problems
+	return root_value != nullptr;
 }
 
-int Config::Size() const
+void Config::Release()
 {
-	return (root) ? json_object_get_count(root) : 0;
+	if (root_value)
+	{
+		json_value_free(root_value);
+	}
 }
 
-Config Config::GetSection(const char * section_name) const
+void Config::SetNumber(const char* name, double data)
 {
-	return Config(json_object_get_object(root, section_name));
+	json_object_set_number(node, name, data);
 }
 
-Config Config::AddSection(const char * section_name)
+void Config::SetString(const char* name, const char* data)
 {
-	json_object_set_value(root, section_name, json_value_init_object());
-	return GetSection(section_name);
+	json_object_set_string(node, name, data);
 }
 
-
-JSON_Value * Config::FindValue(const char * field, int index) const
+void Config::SetBool(const char* name, bool data)
 {
-	if (index < 0)
-		return json_object_get_value(root, field);
-
-	JSON_Array* array = json_object_get_array(root, field);
-	if (array != nullptr)
-		return json_array_get_value(array, index);
-
-	return nullptr;
+	json_object_set_boolean(node, name, data);
 }
 
-bool Config::GetBool(const char * field, bool default, int index) const
+Config_Array Config::SetArray(const char* name)
 {
-	JSON_Value* value = FindValue(field, index);
+	json_object_set_value(node, name, json_value_init_array());
+	return Config_Array(json_object_get_array(node, name));
+}
 
-	if (value && json_value_get_type(value) == JSONBoolean)
-		return json_value_get_boolean(value) != 0;
+Config Config::SetNode(const char* name)
+{
+	json_object_set_value(node, name, json_value_init_object());
+	return Config(json_object_get_object(node, name));
+}
 
+//Get attributes --------------
+double Config::GetNumber(const char* name, double default) const
+{
+	if (json_object_has_value_of_type(node, name, JSONNumber))
+		return json_object_get_number(node, name);
 	return default;
 }
 
-int Config::GetInt(const char * field, int default, int index) const
+std::string Config::GetString(const char* name, const char* default) const
 {
-	JSON_Value* value = FindValue(field, index);
-
-	if (value && json_value_get_type(value) == JSONNumber)
-		return (int)json_value_get_number(value);
-
+	if (json_object_has_value_of_type(node, name, JSONString))
+		return json_object_get_string(node, name);
 	return default;
 }
 
-uint Config::GetUInt(const char * field, uint default, int index) const
+bool Config::GetBool(const char* name, bool default) const
 {
-	JSON_Value* value = FindValue(field, index);
-
-	if (value && json_value_get_type(value) == JSONNumber)
-		return (uint)json_value_get_number(value);
-
+	if (json_object_has_value_of_type(node, name, JSONBoolean))
+		return json_object_get_boolean(node, name);
 	return default;
 }
 
-UID Config::GetUID(const char * field, UID default, int index) const
+Config_Array Config::GetArray(const char* name)
 {
-	JSON_Value* value = FindValue(field, index);
-
-	if (value && json_value_get_type(value) == JSONNumber)
-		return (UID)json_value_get_number(value);
-
-	return default;
+	if (json_object_has_value_of_type(node, name, JSONArray))
+		return Config_Array(json_object_get_array(node, name));
+	else
+	{
+		//Careful, if this else is entered we cause a memory leak, but at least
+		//program doesn't break and we can see the error
+		LOG("[error] Array '%s' not found when loading scene", name);
+		return Config_Array();
+	}
 }
 
-double Config::GetDouble(const char * field, double default, int index) const
+Config Config::GetNode(const char* name) const
 {
-	JSON_Value* value = FindValue(field, index);
+	return Config(json_object_get_object(node, name));
+}
+//Endof Get attributes---------
 
-	if (value && json_value_get_type(value) == JSONNumber)
-		return json_value_get_number(value);
-
-	return default;
+Config_Array::Config_Array()
+{
+	arr = json_value_get_array(json_value_init_array());
 }
 
-float Config::GetFloat(const char * field, float default, int index) const
+Config_Array::Config_Array(JSON_Array* arr) : arr(arr)
 {
-	JSON_Value* value = FindValue(field, index);
-
-	if (value && json_value_get_type(value) == JSONNumber)
-		return (float)json_value_get_number(value);
-
-	return default;
+	size = json_array_get_count(arr);
 }
 
-const char* Config::GetString(const char * field, const char* default, int index) const
+//Append attributes ------------
+void Config_Array::AddNumber(int number)
 {
-	JSON_Value* value = FindValue(field, index);
-
-	if (value && json_value_get_type(value) == JSONString)
-		return json_value_get_string(value);
-
-	return default;
+	json_array_append_number(arr, number);
+	size++;
 }
 
-Config Config::GetArray(const char * field, int index) const
+void Config_Array::AddString(char* string)
 {
-	JSON_Array* array = json_object_get_array(root, field);
-	if (array != nullptr)
-		return Config(json_array_get_object(array, index));
-	return Config((JSON_Object*) nullptr);
+	json_array_append_string(arr, string);
+	size++;
 }
 
-int Config::GetArrayCount(const char * field) const
+void Config_Array::AddBool(bool boolean)
 {
-	int ret = 0;
-	JSON_Array* array = json_object_get_array(root, field);
-	if (array != nullptr)
-		ret = json_array_get_count(array);
+	json_array_append_boolean(arr, boolean);
+	size++;
+}
+
+void Config_Array::AddFloat3(const float3& data)
+{
+	json_array_append_number(arr, data.x);
+	json_array_append_number(arr, data.y);
+	json_array_append_number(arr, data.z);
+	size += 3;
+}
+
+void Config_Array::AddQuat(const Quat& data)
+{
+	json_array_append_number(arr, data.x);
+	json_array_append_number(arr, data.y);
+	json_array_append_number(arr, data.z);
+	json_array_append_number(arr, data.w);
+	size += 4;
+}
+
+Config Config_Array::AddNode()
+{
+	json_array_append_value(arr, json_value_init_object());
+	size++;
+	return Config(json_array_get_object(arr, size - 1));
+}
+//Endof append attributes-------
+
+//Get attributes ---------------
+double Config_Array::GetNumber(uint index, double default) const
+{
+	if (index < size)
+		return json_array_get_number(arr, index);
+	else
+	{
+		LOG("[Warning] JSON Array: Index out of size");
+		return 0;
+	}
+}
+
+const char* Config_Array::GetString(uint index, const char* default) const
+{
+	if (index < size)
+		return json_array_get_string(arr, index);
+	else
+	{
+		LOG("[Warning] JSON Array: Index out of size");
+		return default;
+	}
+}
+
+float3 Config_Array::GetFloat3(uint index, float3 default) const
+{
+	index *= 3;
+	float3 ret = default;
+
+	ret.x = GetNumber(index + 0, ret.x);
+	ret.y = GetNumber(index + 1, ret.y);
+	ret.z = GetNumber(index + 2, ret.z);
+
 	return ret;
 }
 
-bool Config::AddBool(const char * field, bool value)
+Quat Config_Array::GetQuat(uint index, Quat  default) const
 {
-	return json_object_set_boolean(root, field, (value) ? 1 : 0) == JSONSuccess;
+	index *= 4;
+	Quat ret = default;
+
+	ret.x = GetNumber(index + 0, ret.x);
+	ret.y = GetNumber(index + 1, ret.y);
+	ret.z = GetNumber(index + 2, ret.z);
+	ret.w = GetNumber(index + 3, ret.w);
+
+	return ret;
 }
 
-bool Config::AddInt(const char * field, int value)
+bool Config_Array::GetBool(uint index, bool default) const
 {
-	return json_object_set_number(root, field, (double)value) == JSONSuccess;
-}
-
-bool Config::AddUInt(const char * field, uint value)
-{
-	return json_object_set_number(root, field, (double)value) == JSONSuccess;
-}
-
-bool Config::AddUID(const char * field, UID value)
-{
-	return json_object_set_number(root, field, (double)value) == JSONSuccess;
-}
-
-bool Config::AddDouble(const char * field, double value)
-{
-	return json_object_set_number(root, field, value) == JSONSuccess;
-}
-
-bool Config::AddFloat(const char * field, float value)
-{
-	return json_object_set_number(root, field, (float)value) == JSONSuccess;
-}
-
-bool Config::AddString(const char * field, const char * string)
-{
-	return json_object_set_string(root, field, string) == JSONSuccess;
-}
-
-bool Config::AddArray(const char* array_name)
-{
-	JSON_Value* va = json_value_init_array();
-	array = json_value_get_array(va);
-
-	return json_object_set_value(root, array_name, va) == JSONSuccess;
-}
-
-bool Config::AddArrayEntry(const Config & config)
-{
-	if (array != nullptr)
-		return json_array_append_value(array, json_value_deep_copy(config.vroot)) == JSONSuccess;
-
-	return false;
-}
-
-bool Config::AddArrayBool(const char * field, const bool * values, int size)
-{
-	if (values != nullptr && size > 0)
+	if (index < size)
+		return json_array_get_boolean(arr, index);
+	else
 	{
-		JSON_Value* va = json_value_init_array();
-		array = json_value_get_array(va);
-		json_object_set_value(root, field, va);
-
-		for (int i = 0; i < size; ++i)
-			json_array_append_boolean(array, values[i]);
-		return true;
+		LOG("[Warning] JSON Array: Index out of size");
+		return default;
 	}
-	return false;
 }
 
-bool Config::AddArrayInt(const char * field, const int * values, int size)
+void Config_Array::FillVectorNumber(std::vector<double>& vector) const
 {
-	if (values != nullptr && size > 0)
+	for (uint i = 0; i < size; i++)
 	{
-		JSON_Value* va = json_value_init_array();
-		array = json_value_get_array(va);
-		json_object_set_value(root, field, va);
-
-		for (int i = 0; i < size; ++i)
-			json_array_append_number(array, values[i]);
-		return true;
+		vector.push_back(GetNumber(i));
 	}
-	return false;
 }
 
-bool Config::AddArrayUInt(const char * field, const uint * values, int size)
+void Config_Array::FillVectorString(std::vector<char*>& vector) const
 {
-	if (values != nullptr && size > 0)
+	for (uint i = 0; i < size; i++)
 	{
-		JSON_Value* va = json_value_init_array();
-		array = json_value_get_array(va);
-		json_object_set_value(root, field, va);
-
-		for (int i = 0; i < size; ++i)
-			json_array_append_number(array, values[i]);
-		return true;
+		vector.push_back((char*)GetString(i));
 	}
-	return false;
 }
 
-bool Config::AddArrayUID(const char * field, const UID * values, int size)
+void Config_Array::FillVectorBoool(std::vector<bool>& vector) const
 {
-	if (values != nullptr && size > 0)
+	for (uint i = 0; i < size; i++)
 	{
-		JSON_Value* va = json_value_init_array();
-		array = json_value_get_array(va);
-		json_object_set_value(root, field, va);
-
-		for (int i = 0; i < size; ++i)
-			json_array_append_number(array, (double)values[i]);
-		return true;
+		vector.push_back(GetBool(i));
 	}
-	return false;
 }
 
-bool Config::AddArrayFloat(const char * field, const float * values, int size)
+Config Config_Array::GetNode(uint index) const
 {
-	if (values != nullptr && size > 0)
-	{
-		JSON_Value* va = json_value_init_array();
-		array = json_value_get_array(va);
-		json_object_set_value(root, field, va);
-
-		for (int i = 0; i < size; ++i)
-			json_array_append_number(array, values[i]);
-		return true;
-	}
-	return false;
+	return Config(json_array_get_object(arr, index));
 }
 
-bool Config::AddArrayString(const char * field, const char ** values, int size)
+uint Config_Array::GetSize() const
 {
-	if (values != nullptr && size > 0)
-	{
-		JSON_Value* va = json_value_init_array();
-		array = json_value_get_array(va);
-		json_object_set_value(root, field, va);
-
-		for (int i = 0; i < size; ++i)
-			json_array_append_string(array, values[i]);
-		return true;
-	}
-	return false;
+	return size;
 }
+//Endof Get attributes----------

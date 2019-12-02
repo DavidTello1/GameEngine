@@ -5,12 +5,14 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleInput.h"
 #include "ModuleEditor.h"
+#include "ModuleScene.h"
 #include "Console.h"
 #include "Hierarchy.h"
 #include "Inspector.h"
 #include "Configuration.h"
 #include "Assets.h"
 #include "Viewport.h"
+#include "ResourceScene.h"
 
 #include <string.h>
 #include <algorithm>
@@ -24,6 +26,23 @@
 
 using namespace std;
 
+static void ShowExampleAppDockSpace(bool* p_open);
+// Editor booleans
+bool ModuleEditor::is_draw_menu				= true;
+bool ModuleEditor::is_show_main_dockspace	= true;
+bool ModuleEditor::is_show_demo				= false;
+bool ModuleEditor::is_auto_select			= false;
+bool ModuleEditor::is_about					= false;
+bool ModuleEditor::is_new					= false;
+bool ModuleEditor::is_open					= false;
+bool ModuleEditor::is_save					= false;
+bool ModuleEditor::is_import				= false;
+bool ModuleEditor::is_plane					= true;
+bool ModuleEditor::is_axis					= true;
+bool ModuleEditor::is_wireframe				= false;
+bool ModuleEditor::is_show_plane			= true;
+bool ModuleEditor::is_show_axis				= true;
+
 ModuleEditor::ModuleEditor(bool start_enabled) : Module("ModuleEditor", start_enabled)
 {
 }
@@ -33,7 +52,7 @@ ModuleEditor::~ModuleEditor()
 {
 }
 
-static void ShowExampleAppDockSpace(bool* p_open);
+
 void ShowExampleAppDockSpace(bool* p_open)
 {
 	static bool opt_fullscreen_persistant = true;
@@ -178,12 +197,12 @@ bool ModuleEditor::CleanUp()
 
 void ModuleEditor::Save(Config* config) const
 {
-	config->AddInt("Style", style);
+	config->SetNumber("Style", style);
 }
 
 void ModuleEditor::Load(Config* config)
 {
-	style = config->GetInt("Style", Style::NEW);
+	style = config->GetNumber("Style", Style::NEW);
 }
 
 // Drawing of the FULL gui
@@ -196,26 +215,12 @@ void ModuleEditor::Draw()
 	ImGui_ImplSDL2_NewFrame(App->window->GetWindow());
 	ImGui::NewFrame();
 
-	// Bools
-	static bool is_draw_menu = true;
-	static bool is_show_main_dockspace = true;
-	static bool is_show_demo = false;
-	static bool is_auto_select = true;
-	static bool is_about = false;
-	static bool is_new = false;
-	static bool is_open = false;
-	static bool is_save = false;
-	static bool is_import = false;
-	static bool is_plane = true;
-	static bool is_axis = true;
-	static bool is_wireframe = false;
-
 	// Draw functions
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
-	DrawMenu(is_draw_menu, is_new, is_open, is_save, is_show_demo, is_about, is_import, is_auto_select, is_plane, is_axis, is_wireframe);
-	DrawDemo(is_show_demo);
-	DrawAbout(is_about);
-	DrawPanels(is_auto_select);
+	DrawMenu();
+	DrawDemo();
+	DrawAbout();
+	DrawPanels();
 
 	// Menu Functionalities
 	if (is_new)
@@ -230,8 +235,13 @@ void ModuleEditor::Draw()
 	}
 	if (is_save) //save
 	{
-		App->file_system->Save(SETTINGS_FOLDER "Engine.log", App->GetLog().c_str(), App->GetLog().size());
-		App->SavePrefs();
+		//uint id = 0;
+		//std::string path = App->scene->scene_name;
+		//path = ASSETS_FOLDER + path;
+		//std::string written_file;
+
+		//ResourceScene* scene = (ResourceScene*)App->resources->CreateInitResource(Resource::Type::scene, id, path.c_str(), written_file);
+		//scene->SaveOwnFormat(written_file);
 		is_save = false;
 	}
 	if (is_import)
@@ -241,7 +251,7 @@ void ModuleEditor::Draw()
 	}
 
 	// Shortcuts
-	Shortcuts(is_new, is_open, is_save);
+	Shortcuts();
 
 	// Are you sure you want to Quit
 	if (App->input->quit == true)
@@ -257,7 +267,7 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool &is_save, bool &is_show_demo, bool &is_about, bool &is_import, bool &is_auto_select, bool &is_plane, bool &is_axis, bool &is_wireframe)
+void ModuleEditor::DrawMenu()
 {
 	bool ret = true;
 
@@ -273,7 +283,7 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				if (ImGui::MenuItem("Open", "Ctrl+O", false, false))
 					is_open = true;
 
-				if (ImGui::MenuItem("Save", "Ctrl+S", false, false))
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
 					is_save = true;
 
 				ImGui::Separator();
@@ -318,47 +328,19 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("GameObjects")) //gameobject
-			{
-				DrawCreateMenu();
-				ImGui::EndMenu();
-			}
-
 			if (ImGui::BeginMenu("View")) //view
 			{
 				if (ImGui::MenuItem("Show Plane", NULL, &is_plane))
-					show_plane = !show_plane;
+					is_show_plane = !is_show_plane;
 
 				if (ImGui::MenuItem("Show Axis", NULL, &is_axis))
-					show_axis = !show_axis;
-
-				ImGui::Separator();
-
-				//if (ImGui::MenuItem("Top"))
-				//	//top
-
-				//if (ImGui::MenuItem("Bottom"))
-				//	//bottom
-
-				//if (ImGui::MenuItem("Front"))
-				//	//front
-
-				//if (ImGui::MenuItem("Back"))
-				//	//back
-
-				//if (ImGui::MenuItem("Left"))
-				//	//left
-
-				//if (ImGui::MenuItem("Right"))
-				//	//right
+					is_show_axis = !is_show_axis;
 
 				ImGui::EndMenu();
 			}
 
 			if (ImGui::BeginMenu("Options")) //options
 			{
-				ImGui::MenuItem("Autoselect windows", NULL, &is_auto_select);
-
 				if (ImGui::BeginMenu("Style"))
 				{
 					if (ImGui::MenuItem("New", NULL, style == Style::NEW))
@@ -384,7 +366,6 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 						ImGui::StyleColorsLight();
 						style = Style::LIGHT;
 					}
-
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();
@@ -424,13 +405,12 @@ void ModuleEditor::DrawMenu(bool is_draw_menu, bool &is_new, bool &is_open, bool
 
 				ImGui::EndMenu();
 			}
-
 			ImGui::EndMainMenuBar();
 		}
 	}
 }
 
-void ModuleEditor::DrawDemo(bool &is_show_demo)
+void ModuleEditor::DrawDemo()
 {
 	if (is_show_demo) //show demo
 	{
@@ -439,18 +419,15 @@ void ModuleEditor::DrawDemo(bool &is_show_demo)
 	}
 }
 
-void ModuleEditor::DrawAbout(bool &is_about)
+void ModuleEditor::DrawAbout()
 {
 	if (is_about) //about
 	{
 		ImGui::OpenPopup("About");
 		if (ImGui::BeginPopupModal("About"))
 		{
-			//ImGui::Text("Davos Game Engine");
 			CreateLink("Davos Game Engine", "https://github.com/ponspack9/GameEngine");
 			ImGui::Text("Davos is a game engine developed by two students of CITM:");
-			//ImGui::Text("By");
-			//ImGui::SameLine();
 			CreateLink("Oscar Pons", "https://github.com/ponspack9");
 			ImGui::SameLine();
 			ImGui::Text("&");
@@ -484,7 +461,7 @@ void ModuleEditor::DrawAbout(bool &is_about)
 	}
 }
 
-void ModuleEditor::DrawPanels(bool &is_auto_select)
+void ModuleEditor::DrawPanels()
 {
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
@@ -492,25 +469,45 @@ void ModuleEditor::DrawPanels(bool &is_auto_select)
 		{
 			ImGui::SetNextWindowPos(ImVec2((float)(*it)->pos_x, (float)(*it)->pos_y), ImGuiCond_FirstUseEver);
 			ImGui::SetNextWindowSize(ImVec2((float)(*it)->width, (float)(*it)->height), ImGuiCond_FirstUseEver);
+			ImVec2 p;
 
 			if ((*it)->has_menubar) //panel has a menu bar
 			{
 				if (ImGui::Begin((*it)->GetName(), &(*it)->active, ImGuiWindowFlags_MenuBar))
+				{
 					(*it)->Draw();
+					p = ImGui::GetWindowPos();
+					(*it)->pos_x = p.x;
+					(*it)->pos_y = p.y;
+
+					if (ImGui::IsWindowHovered()) 
+						focused_panel = *it;
+				}
 			}
 			else
 			{
 				if (ImGui::Begin((*it)->GetName(), &(*it)->active))
+				{
 					(*it)->Draw();
-			}
-			
-			if (is_auto_select == true && ImGui::IsWindowHovered() == true && (*it)->in_menu == false) // auto-select
-				ImGui::SetWindowFocus();
+					p = ImGui::GetWindowPos();
+					(*it)->pos_x = p.x;
+					(*it)->pos_y = p.y;
 
-			if (App->scene->create_gameobj == true && (*it)->GetName() == "Inspector") //show inspector when a gameobject is created
+					if (ImGui::IsWindowHovered()) 
+						focused_panel = *it;
+				}
+			}
+						
+			if ((*it)->GetName() == "Inspector" && (App->scene->is_creating || App->scene->is_selecting)) //show inspector when a gameobject is created/selected
 			{
 				ImGui::SetWindowFocus();
-				App->scene->create_gameobj = false;
+				p = ImGui::GetWindowPos();
+				(*it)->pos_x = p.x;
+				(*it)->pos_y = p.y;
+
+				App->scene->is_creating = false;
+				App->scene->is_selecting = false;
+				focused_panel = *it;
 			}
 			ImGui::End();
 		}
@@ -522,7 +519,7 @@ void ModuleEditor::ConfirmExit()
 	static ImVec2 size = ImVec2(0, 0);
 	static float pos = 0.0f;
 
-	if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)
+	if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN || App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 		close = true;
 
 	ImGui::OpenPopup("Quit");
@@ -566,7 +563,7 @@ void ModuleEditor::ConfirmExit()
 	}
 }
 
-void ModuleEditor::Shortcuts(bool &is_new, bool &is_open, bool &is_save)
+void ModuleEditor::Shortcuts()
 {
 	if ((App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN) ||
 		(App->input->GetKey(SDL_SCANCODE_RCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_N) == KEY_DOWN))
@@ -624,68 +621,6 @@ void ModuleEditor::CreateLink(const char* text, const char* url, bool bullet)
 	if (ImGui::InvisibleButton(text, ImVec2(size)))
 	{
 		ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
-	}
-}
-
-void ModuleEditor::DrawCreateMenu()
-{
-	if (ImGui::MenuItem("Empty"))
-		App->scene->CreateGameObj();
-
-	GameObject* go = App->scene->GetSelectedGameobj();
-	uint parent = (go != nullptr) ? go->GetUID() : 0;
-
-	ImGui::Separator();
-	if (ImGui::BeginMenu("Basic shapes"))
-	{
-		if (ImGui::MenuItem("Cylinder"))
-			App->resources->CreateShape(CYLINDER, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Cone"))
-			App->resources->CreateShape(CONE, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Sphere"))
-			App->resources->CreateShape(SPHERE, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Plane"))
-			App->resources->CreateShape(PLANE, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Cube"))
-			App->resources->CreateShape(CUBE, 9, 9,0,0,0,0.5f, parent);
-
-		ImGui::EndMenu();
-	}
-
-	if (ImGui::BeginMenu("Extended shapes"))
-	{
-		if (ImGui::MenuItem("Torus"))
-			App->resources->CreateShape(TORUS, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Bottle"))
-			App->resources->CreateShape(BOTTLE, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Knot"))
-			App->resources->CreateShape(KNOT, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Hemisphere"))
-			App->resources->CreateShape(HEMISPHERE, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Icosahedron"))
-			App->resources->CreateShape(ICOSAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Dodecahedron"))
-			App->resources->CreateShape(DODECAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Octahedron"))
-			App->resources->CreateShape(OCTAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Tetrahedron"))
-			App->resources->CreateShape(TETRAHEDRON, 9, 9,0,0,0,0.5f, parent);
-
-		if (ImGui::MenuItem("Rock"))
-			App->resources->CreateShape(ROCK, 9, 9,0,0,0,0.5f, parent);
-
-		ImGui::EndMenu();
 	}
 }
 

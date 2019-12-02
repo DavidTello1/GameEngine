@@ -1,23 +1,99 @@
 #include "Application.h"
+#include "ModuleEditor.h"
 #include "GameObject.h"
+#include "ModuleScene.h"
 #include "ComponentMesh.h"
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
+#include "ComponentCamera.h"
 
 #include "mmgr/mmgr.h"
 
-GameObject::GameObject(const char* name)
+
+GameObject::GameObject(const char* name, GameObject* Parent)
 {
 	uid = App->random->Int();
 	strcpy_s(this->name, name);
+
+	is_selected = false;
+	is_rename = false;
+
+	// Leaf flags
+	hierarchy_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+	LogAction("Created object");
+
+	parent = Parent;
+	if (parent != nullptr)
+	{
+		parent->childs.push_back(this);
+		parent->hierarchy_flags &= ~ImGuiTreeNodeFlags_Leaf;
+		parent->flags |= ProcessNewChild;
+		parent->LogAction("To parent");
+	}
+
+	aabb.SetNegativeInfinity();
+	aabb.padding = 0;
+	aabb.padding2 = 0;
+
+	obb.SetNegativeInfinity();
 }
 
 GameObject::~GameObject()
 {
+	DeleteBoundingBox();
+
+	// Delete from parent
+	if (parent)
+	{
+		for (uint i = 0; i < parent->childs.size(); i++)
+		{
+			if (parent->childs[i] == this)
+			{
+				parent->childs.erase(parent->childs.begin() + i);
+				break;
+			}
+		}
+		if (!parent->HasChilds())
+			parent->hierarchy_flags |= ImGuiTreeNodeFlags_Leaf;
+
+		parent->flags |= ProcessDeletedChild;
+	}
+
 	for (uint i = 0; i < components.size(); ++i)
 		delete components[i];
 
 	components.clear();
+
+	LogAction("Deleted");
+}
+
+
+void GameObject::Select()
+{
+	hierarchy_flags |= ImGuiTreeNodeFlags_Selected;
+	is_selected = true;
+	App->scene->is_selecting = true;
+}
+
+void GameObject::UnSelect()
+{
+	hierarchy_flags &= ~ImGuiTreeNodeFlags_Selected;
+	is_selected = false;
+	App->scene->is_selecting = false;
+}
+
+bool GameObject::ToggleSelection() // Toggles the state of the node, returns current state after toggled
+{
+	if (!is_selected) // not selected
+	{
+		Select();
+	}
+	else // selected
+	{
+		UnSelect();
+	}
+
+	return is_selected;
 }
 
 Component* GameObject::GetComponent(Component::Type type)
@@ -26,7 +102,7 @@ Component* GameObject::GetComponent(Component::Type type)
 	{
 		for (uint i = 0; i < components.size(); i++)
 		{
-			if (components[i]->GetType() == type)
+			if (components[i]->type == type)
 				return components[i];
 		}
 	}
@@ -38,11 +114,6 @@ Component* GameObject::AddComponent(Component::Type type)
 {
 	Component* new_component;
 
-	//if (GetComponent(type) != nullptr)
-	//{
-	//	LOG("GameObject already has component", 'e');
-	//	return nullptr;
-	//}
 	if (type == Component::Type::Unknown)
 	{
 		LOG("Unknown Component", 'e');
@@ -66,6 +137,13 @@ Component* GameObject::AddComponent(Component::Type type)
 		components.push_back(new_component);
 		return new_component;
 	}
+	else if (type == Component::Type::Camera)
+	{
+		new_component = new ComponentCamera(this);
+		components.push_back(new_component);
+		//App->resources->LoadResource("Assets/camera_mesh.fbx", Component::Type::Mesh, true, this);
+		return new_component;
+	}
 	return nullptr;
 }
 
@@ -73,7 +151,7 @@ bool GameObject::HasComponent(Component::Type type)
 {
 	for (uint i = 0; i < components.size(); i++)
 	{
-		if (components[i]->GetType() == type)
+		if (components[i]->type == type)
 			return true;
 	}
 	return false;
@@ -83,7 +161,7 @@ void GameObject::DeleteComponent(Component::Type type)
 {
 	for (uint i = 0; i < components.size(); i++)
 	{
-		if (components[i]->GetType() == type)
+		if (components[i]->type == type)
 		{
 			RELEASE(components[i]);
 			components.erase(components.begin() + i);
@@ -92,20 +170,65 @@ void GameObject::DeleteComponent(Component::Type type)
 	}
 }
 
+void GameObject::UpdateTransform()
+{
+	if (flags & ProcessTransformUpdate)
+		local_transform = float4x4::FromTRS(translation, rotation_quat, scale);
+
+	if (parent && parent->GetUID() != 0)
+	{
+		// If things goes strange change order of multiplication
+		global_transform = parent->GetGlobalTransform() * local_transform;
+	}
+	else
+	{
+		global_transform = local_transform;
+	}
+
+	for (GameObject* child : childs)
+	{
+		child->UpdateTransform();
+	}
+
+	// Too slow, needs better structure
+	ComponentCamera* cam = GetComponent<ComponentCamera>();
+	if (cam)
+	{
+		cam->SetPosition(translation);
+		cam->frustum.front = GetGlobalTransform().WorldZ();
+		cam->frustum.up = GetGlobalTransform().WorldY();
+		cam->update_projection = true;
+	}
+
+	UpdateBoundingBox();
+}
+
+void GameObject::UpdateParentBoundingBox()
+{
+	if (GetUID() == 0) return;
+
+	UpdateBoundingBox();
+	if (parent)
+		parent->UpdateParentBoundingBox();
+}
 
 // ---------------------
 void GameObject::SetRotation(const float3& XYZ_euler_rotation)
 {
-	float3 diff = XYZ_euler_rotation - rotation;
+	float3 diff = (XYZ_euler_rotation - rotation);
 	Quat mod = Quat::FromEulerXYZ(diff.x, diff.y, diff.z);
 	rotation_quat = rotation_quat * mod;
 	rotation = XYZ_euler_rotation;
+
+	//rotation_quat = rotation_quat *Quat::FromEulerXYZ(XYZ_euler_rotation.x, XYZ_euler_rotation.y, XYZ_euler_rotation.z);
+	flags |= ProcessTransformUpdate;
 }
 
 void GameObject::SetRotation(const Quat& rotation_quat)
 {
 	this->rotation_quat = rotation_quat;
 	rotation = rotation_quat.ToEulerXYZ().Abs();
+	flags |= ProcessTransformUpdate;
 }
 
 
@@ -113,91 +236,163 @@ void GameObject::SetTransform(const float4x4 & transform)
 {
 	transform.Decompose(translation, rotation_quat, scale);
 	rotation = rotation_quat.ToEulerXYZ().Abs();
+	flags |= ProcessTransformUpdate;
 }
 
-void GameObject::ChildAdded(GameObject* child)
+void GameObject::ResetTransform()
+{
+	SetTransform(float4x4::identity);
+}
+
+void GameObject::GetMinMaxVertex(GameObject* obj, float3* abs_max, float3* abs_min)
+{
+	if (!obj->HasChilds())
+	{
+		if (!obj->aabb.IsFinite()) return;
+		if (obj->aabb.minPoint.x < abs_min->x) abs_min->x = obj->aabb.minPoint.x;
+		if (obj->aabb.minPoint.y < abs_min->y) abs_min->y = obj->aabb.minPoint.y;
+		if (obj->aabb.minPoint.z < abs_min->z) abs_min->z = obj->aabb.minPoint.z;
+
+		if (obj->aabb.maxPoint.x > abs_max->x) abs_max->x = obj->aabb.maxPoint.x;
+		if (obj->aabb.maxPoint.y > abs_max->y) abs_max->y = obj->aabb.maxPoint.y;
+		if (obj->aabb.maxPoint.z > abs_max->z) abs_max->z = obj->aabb.maxPoint.z;
+	}
+	else {
+		for (GameObject* child : obj->childs)
+		{
+			GetMinMaxVertex(child, abs_max, abs_min);
+		}
+	}
+}
+
+void GameObject::SetLocalPosition(const float3 & position)
+{
+	translation = position; 
+	flags |= ProcessTransformUpdate;
+}
+
+void GameObject::SetLocalScale(const float3 & Scale)
+{
+	scale = Scale;
+	flags |= ProcessTransformUpdate;
+}
+
+void GameObject::Move(const float3 & velocity)
+{
+	translation += velocity;
+	flags |= ProcessTransformUpdate;
+}
+
+void GameObject::Rotate(float angular_velocity)
+{
+	rotation_quat = rotation_quat * Quat::RotateY(angular_velocity);
+	flags |= ProcessTransformUpdate;
+}
+
+void GameObject::ChildAdded()
 {
 	// Checking if new child node is not an empty node and parent not root node
-	if (uid == 0 || !child->is_valid_dimensions) return;
+	if (childs.back()->uid == 0) {
+		LOG("Child is root node", 'e');
+		return;
+	}
+	if (uid == 0 || !childs.back()->aabb.IsFinite()) return;
 
-	min_vertex = child->min_vertex;
-	max_vertex = child->max_vertex;
+	aabb.minPoint = childs.back()->aabb.minPoint;
+	aabb.maxPoint = childs.back()->aabb.maxPoint;
 
-	App->editor->tab_hierarchy->GetMinMaxVertex(App->editor->tab_hierarchy->SearchById(uid), &min_vertex, &max_vertex);
+	GetMinMaxVertex(this, &aabb.minPoint, &aabb.maxPoint);
 
-	GenBoundingBox();
-
+	UpdateBoundingBox();
 }
 
-void GameObject::GenBoundingBox()
+void GameObject::ChildDeleted()
 {
-	//Bounding box
-	float3 min = min_vertex;
-	float3 max = max_vertex;
+	if (uid == 0) return;
 
-	bounding_box[0] = { min.x,min.y,min.z };
-	bounding_box[1] = { min.x,min.y,max.z };
-	bounding_box[2] = { max.x,min.y,max.z };
-	bounding_box[3] = { max.x,min.y,min.z };
-
-	bounding_box[4] = { min.x,max.y,min.z };
-	bounding_box[5] = { min.x,max.y,max.z };
-	bounding_box[6] = { max.x,max.y,max.z };
-	bounding_box[7] = { max.x,max.y,min.z };
-
-	float3 c = (min_vertex + max_vertex) / 2;
-	center = c;
-	bounding_box[8] = center;
-
-	bounding_box[9] = { c.x,c.y,min.z };  //Face 0437 center
-	bounding_box[10] = { min.x,c.y,c.z };  //Face 0415 center
-	bounding_box[11] = { max.x,c.y,c.z }; //Face 3726 center
-	bounding_box[12] = { c.x,c.y,max.z }; //Face 1256 center
-	//mesh_component->bounding_box[13] = { 0,0,0 }; // camera
-	//mesh_component->bounding_box[11] = { c.x,max.y,c.z }; //Face 4567 center (top face)
-	//mesh_component->bounding_box[14] = { c.x,min.y,c.z }; //Face 0123 center (bot face)
-
-
-
-	size = max_vertex - min_vertex;
-
-
-	//Deleting buffers if any
-	if (bb_VBO == 0)
+	if (HasChilds()) 
 	{
-		glGenBuffers(1, &bb_VBO);
-		//glDeleteFramebuffers(1, &bb_VBO);
-		//bb_VBO = 0;
+		aabb.minPoint = childs.back()->aabb.minPoint;
+		aabb.maxPoint = childs.back()->aabb.maxPoint;
+
+		GetMinMaxVertex(this, &aabb.minPoint, &aabb.maxPoint);
+
+		UpdateBoundingBox();
 	}
-	if (bb_IBO == 0)
+	else 
 	{
-		glGenBuffers(1, &bb_IBO);
-		//glDeleteBuffers(1, &bb_IBO);
-		//bb_IBO = 0;
+		DeleteBoundingBox();
+	}
+}
+
+void GameObject::GenerateBoundingBox()
+{
+	const ComponentMesh* mesh = (ComponentMesh*)GetComponent(Component::Type::Mesh);
+
+
+	if (mesh)
+	{
+		obb.SetFrom(mesh->GetMesh()->GetAABB());
+		obb.Transform(GetGlobalTransform());
+
+		aabb.SetFrom(obb);
+	}
+	else if (HasChilds())
+	{
+		aabb.minPoint = childs.back()->aabb.minPoint;
+		aabb.maxPoint = childs.back()->aabb.maxPoint;
+
+		GetMinMaxVertex(this, &aabb.minPoint, &aabb.maxPoint);
+
+		if (obb_VBO != 0)
+		{
+			glDeleteFramebuffers(1, &obb_VBO);
+			obb_VBO = 0;
+		}
+		obb.SetNegativeInfinity();
+
+		//obb.SetFrom(aabb);
+		//obb.Transform(GetGlobalTransform());
 	}
 
-	// VBO
-	
-	glBindBuffer(GL_ARRAY_BUFFER, bb_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(bounding_box), bounding_box, GL_STATIC_DRAW);
+	//AABB
+	if (aabb_VBO == 0) glGenBuffers(1, &aabb_VBO);
+
+	aabb.GetCornerPoints(corners);
+
+	glBindBuffer(GL_ARRAY_BUFFER, aabb_VBO);
+	glBufferData(GL_ARRAY_BUFFER, aabb.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
+
+	//OBB
+	if (obb_VBO == 0) glGenBuffers(1, &obb_VBO);
+
+	obb.GetCornerPoints(corners);
+
+	glBindBuffer(GL_ARRAY_BUFFER, obb_VBO);
+	glBufferData(GL_ARRAY_BUFFER, obb.NumVertices() * sizeof(float3), corners, GL_STATIC_DRAW);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//IBO
 	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bb_IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(App->resources->bbox_indices), App->resources->bbox_indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-	LOG("BoundingBox vertices", 'd');
-
-	for (int i = 0; i < 8; i++)
-	{
-		LOG("{ %f , %f , %f }", bounding_box[i].x, bounding_box[i].y, bounding_box[i].z, 'd');
-	}
 }
 
-bool GameObject::HasChilds()
+void GameObject::DeleteBoundingBox()
 {
-	return !App->editor->tab_hierarchy->SearchById(uid)->childs.empty();
+	if (aabb_VBO != 0)
+	{
+		glDeleteFramebuffers(1, &aabb_VBO);
+		aabb_VBO = 0;
+	}
+	aabb.SetNegativeInfinity();
+
+	if (obb_VBO != 0)
+	{
+		glDeleteFramebuffers(1, &obb_VBO);
+		obb_VBO = 0;
+	}
+	obb.SetNegativeInfinity();
+}
+
+void GameObject::UpdateBoundingBox()
+{
+	GenerateBoundingBox();
 }

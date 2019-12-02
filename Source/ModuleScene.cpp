@@ -3,201 +3,385 @@
 #include "ModuleEditor.h"
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
+#include "ComponentCamera.h"
+#include "ComponentMesh.h"
+#include "ResourceModel.h"
+#include "Viewport.h"
+#include "Quadtree.h"
+
+
+#include "mmgr/mmgr.h"
+
+GameObject* ModuleScene::root_object;
+SceneState ModuleScene::state = EDIT;
+const char* ModuleScene::state_to_string[STOP+1] = { "EDIT","START","PLAY","PAUSE","STOP" };
 
 ModuleScene::ModuleScene(bool start_enabled) : Module("Scene", start_enabled)
 {}
 
 
 ModuleScene::~ModuleScene()
-{}
+{
+	delete root_object;
+}
 
+bool ModuleScene::Init(Config* config)
+{
+	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
+	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
+
+	viewport_camera->Move({ 0, 1.95f, -35.0f });
+	viewport_camera->SetFarPlane(500.0f);
+
+	root_object = new GameObject("Root", nullptr);
+	root_object->uid = 0;
+	// Create game objects after this ^^^^^^^^^^^^	
+
+	return true;
+}
 // Load assets
 bool ModuleScene::Start(Config* config)
 {
-	LOG("Loading Intro assets", 'v');
-	bool ret = true;
-
-	App->camera->Move(vec3(0, 7.5f, 7.5f));
-	App->camera->LookAt(vec3(0, 0, 0));
+	LOG("Loading main scene", 'v');
 	
-	GameObject* bparent = CreateGameObj("BakerHouse");
+	scene_name = "Default_Scene";
 
-	App->resources->LoadResource("Assets/BakerHouse.fbx", Component::Type::Mesh, true, bparent->GetUID());
-	App->resources->LoadResource("Assets/Baker_house.png", Component::Type::Material, true);
+	test_camera_obj = CreateGameObject("Main camera");
+	test_camera_obj->AddComponent(Component::Type::Camera);
 
-	/*GameObject* pparent = CreateGameObj("ParShapes");
-	for (int i = 0; i < shape_type::UNKNOWN; i++)
-	{
-		App->resources->CreateShape((shape_type)i, 9, 9, i * 7.5 - 50, 2.5f, -10, 0.5f, pparent->GetUID());
-	}*/
+	test_camera = test_camera_obj->GetComponent<ComponentCamera>();
 
-	App->editor->tab_hierarchy->UnSelectAll();
+	//App->resources->ImportFromOutside("/Assets/Street/Street environment_V01.FBX");
+	
+	quadtree = new Quadtree(AABB(Quadtree::min_point,Quadtree::max_point));
 
-	return ret;
+	RedoQuatree();
+
+	return true;
 }
 
 bool ModuleScene::Update(float dt)
 {
+	if (test_camera)
+		test_camera->DrawFrustum();
+
+	if (quadtree->debug)
+		quadtree->Draw();
+	
+
 	return true;
 }
 
+
+
 bool ModuleScene::PostUpdate(float dt)
 {
+	// Do all remaining actions activated by flags
+	for (uint i = 0; i < gameObjects.size(); i++)
+	{
+		GameObject* obj = gameObjects[i];
+
+		if (obj->flags & ProcessNewChild)
+		{
+			obj->ChildAdded();
+			obj->flags &= ~ProcessNewChild;
+		}
+		if (obj->flags & ProcessDeletedChild)
+		{
+			obj->ChildDeleted();
+			obj->flags &= ~ProcessDeletedChild;
+		}
+		if (obj->flags & ProcessTransformUpdate)
+		{
+			obj->UpdateTransform();
+			obj->parent->UpdateBoundingBox();
+
+			if (quadtree->experimental && test_camera_obj != obj)
+			{
+				RedoQuatree();
+			}
+
+			obj->flags &= ~ProcessTransformUpdate;
+		}
+	}
+
+	switch (state)
+	{
+	case EDIT:
+		//Do edit things
+		break;
+	case START:
+		//SaveScene
+		state = PLAY;
+		App->editor->tab_viewport->current_camera = test_camera;
+		App->editor->tab_viewport->OnCameraUpdate();
+		break;
+	case PLAY:
+		//App->Unpause();
+		//Enjoy your game
+		break;
+	case PAUSE:
+		//App->Pause();
+		break;
+	case STOP:
+		//App->Unpause();
+		//LoadScene
+		state = EDIT;
+		App->editor->tab_viewport->current_camera = viewport_camera;
+		App->editor->tab_viewport->OnCameraUpdate();
+
+		break;
+	default:
+		state = EDIT;
+		break;
+	}
+
 	return true;
+}
+
+void ModuleScene::RedoQuatree()
+{
+	quadtree->Clear();
+
+	for (GameObject* obj : gameObjects)
+	{
+		quadtree->AddGameObject(obj);
+	}
 }
 
 bool ModuleScene::CleanUp()
 {
 	LOG("Unloading Main scene");
 
-	for (uint i = 0; i < gameobjs.size(); ++i)
+	for (uint i = 0; i < gameObjects.size(); ++i)
 	{
-		RELEASE(gameobjs[i]);
+		RELEASE(gameObjects[i]);
 	}
-	gameobjs.clear();
-
-	for (uint i = 0; i < materials.size(); ++i)
-	{
-		if (!DeleteMaterial(materials[i]))
-			RELEASE(materials[i]);
-	}
-	materials.clear();
+	gameObjects.clear();
 
 	return true;
 }
 
 bool ModuleScene::Draw()
 {
-	// Draw GameObjects
-	for (uint i = 0; i < gameobjs.size(); ++i)
+	// ALL this need a big rework
+	//quadtree->ResetCullingState();
+
+	// Cheap fix
+	glColor3ub(255, 255, 255);
+
+	Color c;
+	std::vector< GameObject*> candidates;
+	quadtree->CollectCandidates(candidates, test_camera->frustum);
+
+	for ( GameObject* obj : candidates)
 	{
-		glPushMatrix();
-		glMultMatrixf(gameobjs[i]->GetLocalTransform().ptr());
 
-		ComponentRenderer* renderer = (ComponentRenderer*)gameobjs[i]->GetComponent(Component::Type::Renderer);
-		if (renderer != nullptr && renderer->IsActive())
+		c = (!obj->HasChilds()) ? App->scene_base->aabb_color : Cyan;
+		// Just boxes colors things
+		//obj->is_drawn = true;
+
+		// Draw GameObjects
+		if (!App->scene_base->camera_culling || test_camera->frustum.DO_Intersects(obj->aabb))
 		{
-			if (renderer->show_wireframe || show_all_wireframe) //wireframe
+			//test_camera->frustum.Intersects()
+			glPushMatrix();
+			glMultMatrixf(obj->GetGlobalTransform().Transposed().ptr());
+
+			ComponentRenderer* renderer = obj->GetComponent<ComponentRenderer>();
+			if (renderer != nullptr && renderer->IsActive())
 			{
-				glColor3ub(wireframe_color[0]*255.0f, wireframe_color[1] * 255.0f, wireframe_color[2] * 255.0f);
-				glLineWidth(wireframe_width);
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				if (renderer->show_wireframe || App->scene_base->show_all_wireframe) //wireframe
+				{
+					glColor3ub(App->scene_base->wireframe_color.r*255.0f, App->scene_base->wireframe_color.g * 255.0f, App->scene_base->wireframe_color.b * 255.0f);
+					glLineWidth(App->scene_base->wireframe_width);
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					glColor3ub(255, 255, 255);
+				}
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				
+				renderer->Draw();
 			}
-			else
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-			renderer->Draw();
+			glPopMatrix();
 		}
-
-		// Bounding boxes
-		GameObject* obj = gameobjs[i];
-		glEnableClientState(GL_VERTEX_ARRAY);
-		if ((obj->show_bounding_box || App->scene->show_all_bounding_box) && obj->bb_VBO != 0)
+		else
 		{
-			glColor3ub(App->scene->bounding_box_color[0] * 255.0f, App->scene->bounding_box_color[1] * 255.0f, App->scene->bounding_box_color[2] * 255.0f);
-			glLineWidth(App->scene->bounding_box_width);
+			obj->is_drawn = false;
+		}
+	}
 
-			glBindBuffer(GL_ARRAY_BUFFER, obj->bb_VBO);
+	for (GameObject* obj : gameObjects)
+	{		
+		glEnableClientState(GL_VERTEX_ARRAY);
+
+		// AABB
+		if ((obj->show_aabb || App->scene_base->show_all_aabb) && obj->aabb_VBO != 0)
+		{
+			c = (obj->is_drawn) ? App->scene_base->aabb_color : LightGrey;
+
+			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
+			glLineWidth(App->scene_base->aabb_width);
+
+			glBindBuffer(GL_ARRAY_BUFFER, obj->aabb_VBO);
 			glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->bb_IBO);
-			glDrawElements(GL_LINES, sizeof(App->resources->bbox_indices), GL_UNSIGNED_INT, nullptr);
-
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aabb_IBO);
+			glDrawElements(GL_LINES, sizeof(aabb_indices), GL_UNSIGNED_INT, nullptr);
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glColor3ub(255, 255, 255);
 		}
+		// OBB
+		if ((obj->show_obb || App->scene_base->show_all_obb) && obj->obb_VBO != 0)
+		{
+			c = (obj->is_drawn) ? App->scene_base->obb_color : DarkGrey;
+
+			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
+			glLineWidth(App->scene_base->obb_width);
+
+			glBindBuffer(GL_ARRAY_BUFFER, obj->obb_VBO);
+			glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aabb_IBO);
+			glDrawElements(GL_LINES, sizeof(aabb_indices), GL_UNSIGNED_INT, nullptr);
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glColor3ub(255, 255, 255);
+		}
+
 		glDisableClientState(GL_VERTEX_ARRAY);
 
-		glPopMatrix();
+		//obj->is_drawn = true;
 	}
 	return true;
 }
 
 GameObject* ModuleScene::FindById(uint id)
 {
-	for (int i = 0; i < gameobjs.size(); i++)
-		if (gameobjs[i]->GetUID() == id) return gameobjs[i];
+	for (uint i = 0; i < gameObjects.size(); i++)
+		if (gameObjects[i]->GetUID() == id) return gameObjects[i];
 
 	return nullptr;
 }
-GameObject* ModuleScene::CreateGameObj(const char* name, const uint parent_id, bool visible)
-{
-	create_gameobj = true;
 
-	GameObject* obj = new GameObject(name);
+GameObject* ModuleScene::CreateGameObject(const char* name, GameObject* parent, bool visible)
+{
+	is_creating = true;
+
+	if (parent == nullptr) parent = root_object;
+
+	GameObject* obj = new GameObject(name, parent);
+
 	if (visible)
 		obj->AddComponent(Component::Type::Renderer);
 
-	gameobjs.push_back(obj);
-
-
-	App->editor->tab_hierarchy->AddNode(obj, App->editor->tab_hierarchy->SearchById(parent_id)); // add node to hierarchy
-	selected_gameobj = obj; // new obj is selected_gameobj
+	gameObjects.push_back(obj);
 
 	return obj;
 }
 
-void ModuleScene::DeleteGameobj(GameObject* obj)
+
+void ModuleScene::DeleteGameObject(GameObject* obj)
 {
+	// If any child of the game object is the selected -> unselect
 	if (selected_gameobj == obj)
 		selected_gameobj = nullptr;
 
-	for (uint i = 0; i < gameobjs.size(); i++)
+	// Actual deletion of gameobject
+	if (!obj->HasChilds())
 	{
-		if (gameobjs[i] == obj)
+		// Delete from scene gameobjects
+		for (uint i = 0; i < gameObjects.size(); i++)
 		{
-			RELEASE( gameobjs[i]);
-			gameobjs.erase(gameobjs.begin() + i);
-			break;
+			if (gameObjects[i] == obj)
+			{
+				gameObjects.erase(gameObjects.begin() + i);
+				break;
+			}
 		}
+		// Deleted from parent inside destructor
+		RELEASE(obj);
+
+	}
+	// Delete childs
+	else
+	{
+		for (int i = obj->childs.size() - 1; i >= 0; i--)
+		{
+			DeleteGameObject(obj->childs[i]);
+		}
+			
+		obj->childs.clear();
+		DeleteGameObject(obj);
 	}
 }
 
-bool ModuleScene::IsMaterialLoaded(const char* path)
+void ModuleScene::DeleteSelected()
 {
-	for (uint i = 0; i < materials.size(); i++)
+	for (int i = gameObjects.size()-1; i >= 0; i--)
 	{
-		if (strcmp(materials[i]->path, path) == 0)
-			return true;
+		if (gameObjects[i]->is_selected) 
+			DeleteGameObject(gameObjects[i]);
+		
 	}
-	return false;
 }
 
-ComponentMaterial* ModuleScene::GetMaterial(const char* path) const
+GameObject * ModuleScene::PickFromRay(Ray ray)
 {
-	for (uint i = 0; i < materials.size(); ++i)
+	quadtree->CollectCandidates(pick_candidates, ray);
+	std::map<float, GameObject*>::iterator it = pick_candidates.begin();
+
+	// candidates are in order, first to be picked will be the closest one
+	for (;it != pick_candidates.end(); it++)
 	{
-		if (strcmp(materials[i]->path, path) == 0)
-			return materials[i];
+		ComponentMesh* c_mesh = it->second->GetComponent<ComponentMesh>();
+		if (!c_mesh) continue;
+
+		ResourceMesh* mesh = c_mesh->GetMesh();
+		if (!mesh) continue;
+		
+		Ray tmpRay = ray;
+		tmpRay.Transform(it->second->GetGlobalTransform().Inverted());
+
+		for (uint i = 0; i < mesh->num_indices; i += 3)
+		{
+			float3 one	 = mesh->vertices[mesh->indices[i]];
+			float3 two	 = mesh->vertices[mesh->indices[i+1]];
+			float3 three = mesh->vertices[mesh->indices[i+2]];
+
+			if (tmpRay.Intersects(Triangle(one,two,three), nullptr, nullptr))
+			{
+				UnSelectAll();
+				it->second->Select();
+				return it->second;
+			}
+		}
+		
 	}
+
 	return nullptr;
 }
 
-bool ModuleScene::DeleteMaterial(ComponentMaterial* material)
+void ModuleScene::UnSelectAll(GameObject* keep_selected)
 {
-	for (uint i = 0; i < materials.size(); i++)
-	{
-		if (materials[i] == material)
+	if (keep_selected == nullptr) {
+
+		for (GameObject* i : gameObjects)
 		{
-			materials.erase(materials.begin() + i);
-			return true;
+			i->UnSelect();
 		}
 	}
-	return false;
-}
+	else {
 
-void ModuleScene::EraseFromSelected(GameObject * go)
-{
-	if (go == nullptr) return;
-
-	for (uint i = 0; i < selected_go.size(); i++)
-	{
-		if (selected_go[i] != nullptr && selected_go[i]->GetUID() == go->GetUID())
+		for (GameObject* i : gameObjects)
 		{
-			selected_go.erase(selected_go.begin() + i);
-			return;
+			if (i->GetUID() == keep_selected->GetUID())
+				continue;
+			i->UnSelect();
 		}
 	}
+
 }

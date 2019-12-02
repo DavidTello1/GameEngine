@@ -4,10 +4,12 @@
 #include "Math.h"
 #include "GameObject.h"
 #include "Component.h"
+#include "Resource.h"
 
 class ComponentMesh;
 class ComponentMaterial;
 class ComponentRenderer;
+class ComponentCamera;
 
 class Inspector : public Panel
 {
@@ -29,13 +31,23 @@ public:
 	//void GetTriangles();
 
 private:
+	void DrawComponents(GameObject* obj, bool res);
+	void DrawResource(Resource* res);
+
+private:
 	GameObject* obj = nullptr;
+	Resource* res = nullptr;
 	float3 position, rotation, scale;
+	float precision = 0.15f;
+	const char* precision_char = "%.2f";
+
+	bool lock_scale = false;
 
 	Component* selected_component;
 
 	ComponentMesh* mesh;
 	ComponentMaterial* material;
 	ComponentRenderer* renderer;
+	ComponentCamera* camera;
 
 };

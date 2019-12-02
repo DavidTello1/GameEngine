@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleScene.h"
 #include "GameObject.h"
+#include "ComponentRenderer.h"
 
 #include "mmgr/mmgr.h"
 
@@ -11,19 +12,51 @@ ComponentMaterial::ComponentMaterial(GameObject* gameobj) : Component(Component:
 
 ComponentMaterial::~ComponentMaterial()
 {
-	bool erase = true;
-	for (uint i = 0; i < App->scene->gameobjs.size(); i++)
+}
+
+void ComponentMaterial::DrawInspector()
+{
+	bool active = IsActive();
+	if (ImGui::Checkbox("##check2", &active))
+		SwitchActive();
+
+	ImGui::SameLine();
+	if (ImGui::CollapsingHeader("Material"))
 	{
-		ComponentMaterial* material = (ComponentMaterial*)App->scene->gameobjs[i]->GetComponent(Component::Type::Material);
-		if (material != nullptr && material != this && material->tex_id == tex_id)
+		if (GetMaterial() == nullptr)
 		{
-			erase = false;
-			break;
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.25f, 0.25f, 1.0f));
+			ImGui::TextWrapped("Material not loaded");
+			ImGui::PopStyleColor();
 		}
-	}
-	if (erase)
-	{
-		App->scene->DeleteMaterial(this);
-		glDeleteTextures(1, (GLuint*)&tex_id);
+		else
+		{
+			ImGui::Text("Path: ");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", GetMaterial()->GetFile());
+
+			ImGui::Text("Size: ");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", GetMaterial()->tex_width);
+			ImGui::SameLine();
+			ImGui::Text("x");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", GetMaterial()->tex_width);
+
+			if (ImGui::TreeNode("Image"))
+			{
+				ImGui::Image((ImTextureID)GetMaterial()->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+				ImGui::TreePop();
+			}
+
+			ComponentRenderer* renderer = (ComponentRenderer*)object->GetComponent(Component::Type::Renderer);
+			if (renderer != nullptr)
+			{
+				ImGui::NewLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
+				ImGui::Checkbox("Checkers Material", &renderer->show_checkers);
+			}
+		}
+		ImGui::Separator();
 	}
 }

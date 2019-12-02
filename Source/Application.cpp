@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include "ModuleScene.h"
+
 #include "mmgr/mmgr.h"
 
 using namespace std;
@@ -17,16 +19,10 @@ Application::Application()
 	modules.push_back(window = new ModuleWindow());
 	modules.push_back(resources = new ModuleResources());
 	//modules.push_back(tex = new ModuleTextures());
-	modules.push_back(camera = new ModuleCamera3D());
 	modules.push_back(scene_base = new ModuleSceneBase());
 	modules.push_back(scene = new ModuleScene());
 	modules.push_back(editor = new ModuleEditor());
 	modules.push_back(input = new ModuleInput());
-	//modules.push_back(audio = new ModuleAudio(true));
-	//modules.push_back(ai = new ModuleAI());
-	//modules.push_back(level = new ModuleLevelManager());
-	//modules.push_back(programs = new ModulePrograms(true));
-	//modules.push_back(renderer = new ModuleRenderer());
 	modules.push_back(renderer3D = new ModuleRenderer3D());
 }
 
@@ -48,12 +44,12 @@ bool Application::Init()
 	file_system->Load(SETTINGS_FOLDER "config.json", &buffer);
 
 	Config config((const char*)buffer);
-	ReadConfiguration(config.GetSection("App"));
+	ReadConfiguration(config.GetNode("App"));
 
 	// We init everything, even if not enabled
 	for (list<Module*>::iterator it = modules.begin(); it != modules.end() && ret; ++it)
 	{
-		ret = (*it)->Init(&(config.GetSection((*it)->GetName())));
+		ret = (*it)->Init(&(config.GetNode((*it)->GetName())));
 	}
 
 	// Another round, just before starting the Updates. Only called for "active" modules
@@ -61,7 +57,7 @@ bool Application::Init()
 	for (list<Module*>::iterator it = modules.begin(); it != modules.end() && ret; ++it)
 	{
 		if ((*it)->IsActive() == true)
-			ret = (*it)->Start(&(config.GetSection((*it)->GetName())));
+			ret = (*it)->Start(&(config.GetNode((*it)->GetName())));
 	}
 
 	RELEASE_ARRAY(buffer);
@@ -188,14 +184,14 @@ void Application::ReadConfiguration(const Config& config)
 {
 	app_name = config.GetString("Name", "Davos Game Engine");
 	organization_name = config.GetString("Organization", "");
-	SetFramerateLimit(config.GetInt("MaxFramerate", 0));
+	SetFramerateLimit(config.GetNumber("MaxFramerate", 0));
 }
 
 void Application::SaveConfiguration(Config& config) const
 {
-	config.AddString("Name", app_name.c_str());
-	config.AddString("Organization", organization_name.c_str());
-	config.AddInt("MaxFramerate", GetFramerateLimit());
+	config.SetString("Name", app_name.c_str());
+	config.SetString("Organization", organization_name.c_str());
+	config.SetNumber("MaxFramerate", GetFramerateLimit());
 }
 
 string Application::GetLog()
@@ -206,28 +202,17 @@ string Application::GetLog()
 void Application::LoadPrefs()
 {
 	char* buffer = nullptr;
-	file_system->Load(SETTINGS_FOLDER "config.json", &buffer);
+	uint size = file_system->Load(SETTINGS_FOLDER "config.json", &buffer);
 
-	if (buffer != nullptr)
+	if (size > 0)
 	{
 		Config config((const char*)buffer);
 
-		if (config.IsValid() == true)
+		ReadConfiguration(config.GetNode("App"));
+		for (list<Module*>::iterator it = modules.begin(); it != modules.end(); ++it)
 		{
-			//LOG("Loading Engine Preferences")
-
-			ReadConfiguration(config.GetSection("App"));
-
-			Config section;
-			for (list<Module*>::iterator it = modules.begin(); it != modules.end(); ++it)
-			{
-				section = config.GetSection((*it)->GetName());
-				//if (section.IsValid())
-				(*it)->Load(&section);
-			}
+			(*it)->Load(&config.GetNode((*it)->GetName()));
 		}
-		//else
-		//	LOG("Cannot load Engine Preferences: Invalid format")
 
 		RELEASE_ARRAY(buffer);
 	}
@@ -238,14 +223,14 @@ void Application::SavePrefs() const
 {
 	Config config;
 
-	SaveConfiguration(config.AddSection("App"));
+	SaveConfiguration(config.SetNode("App"));
 
 	for (list<Module*>::const_iterator it = modules.begin(); it != modules.end(); ++it)
-		(*it)->Save(&config.AddSection((*it)->GetName()));
+		(*it)->Save(&config.SetNode((*it)->GetName()));
 
 	char *buf;
-	uint size = config.Save(&buf, "Saved preferences for Davos Game Engine");
-	if (App->file_system->Save(SETTINGS_FOLDER "config.json", buf, size) > 0) {}
+	uint size = config.Serialize(&buf);
+	if (file_system->Save(SETTINGS_FOLDER "config.json", buf, size) > 0) {}
 		//LOG("Saved Engine Preferences")
 	RELEASE_ARRAY(buf);
 }

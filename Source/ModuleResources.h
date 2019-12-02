@@ -2,38 +2,32 @@
 #define __MODULE_RESOURCES_H__
 
 #include "Module.h"
-#include "GameObject.h"
-#include "Component.h"
+#include "Resource.h"
+
 #include <vector>
+#include <map>
+#include <string>
 
 #include "glew\include\GL\glew.h"
 
-#include "MathGeoLib/include/MathBuildConfig.h"
-#include "MathGeoLib/include/MathGeoLib.h"
+class Resource;
+class ResourceMesh;
+class ResourceMaterial;
+struct PathNode;
 
-enum shape_type {
-	CYLINDER,
-	CONE,
-	TORUS,
-	SPHERE,
-	BOTTLE,
-	KNOT,
-	HEMISPHERE,
-	PLANE,
-	ICOSAHEDRON,
-	DODECAHEDRON,
-	OCTAHEDRON,
-	TETRAHEDRON,
-	CUBE,
-	ROCK,
+struct MetaFile
+{
+	Resource::Type type = Resource::unknown;
+	std::string original_file = "";
+	std::string resource_name = "";
+	uint id = 0;
 
-	UNKNOWN
+	bool Compare(const char* file, const char* name, Resource::Type type)
+	{
+		return (original_file == file && resource_name == name && type == this->type);
+	}
+
 };
-
-struct aiMesh;
-struct aiScene;
-class ComponentMesh;
-class ComponentMaterial;
 
 class ModuleResources : public Module
 {
@@ -45,43 +39,62 @@ public:
 	bool Start(Config* config = nullptr);
 	bool CleanUp();
 
-	Component::Type GetType(const char* path);
+	// Importing
+	UID GenerateUID();
+	bool ImportFromOutside(const char* path, UID uid = 0);
+	bool ImportResource(const char* path, UID uid = 0);
+	bool CheckLoaded(std::string path, UID uid);
 
-	void LogImageInfo();
-	void LoadResource(const char* path, Component::Type type = Component::Type::Unknown, bool use = false, uint parent_id = 0);
-	void UnLoadResource();
+	// Resources
+	Resource* CreateResource(Resource::Type type, UID uid = 0);
+	Resource* CreateInitResource(Resource::Type type, UID uid, const char* path, std::string& written_file);
+	void RemoveResource(UID uid);
+	const Resource* GetResource(UID uid) const;
+	Resource * GetResource(UID uid);
+	Resource::Type GetResourceType(const char* path) const;
 
-	void ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component);
-	void GenVBO(ComponentMesh * mesh_component);
-	void GenIBO(ComponentMesh * mesh_component);
-	void GenTexture(ComponentMesh * mesh_component);
-	GLuint ImportTexture(int width, int height, int internal_format, int format, unsigned char * image);
-	//void ImportModel(aiMesh* mesh, ComponentMesh* mesh_component, aiScene* material, ComponentMaterial* material_component);
+	uint GetResourcesSize() { return resources.size(); }
+	std::vector<Resource*> GetAllResourcesOfType(Resource::Type type);
 
-	void CreateShape(const shape_type & type, int slices, int stacks, float x = 0.0f, float y = 0.0f, float z = 0.0f, float radius = 0.5f, uint parent_id = 0);
+	// Meta files
+	void SaveMeta(const Resource* resource);
+	bool LoadMeta(const char* file);
+	bool LoadSceneMeta(const char* file, const char* source_file);
 
-public:
-	GLuint checker_texture;
-
-	const char* GetShapeName(shape_type type) { return shape_to_string[type];}
+	// Utilities
+	const char* GetDirectory(Resource::Type type) const;
+	uint64 GetIDFromMeta(const char* path);
 
 private:
-	const char* shape_to_string[shape_type::UNKNOWN] =
-	{ "Cylinder","Cone", "Torus", "Sphere", "Bottle", "Knot",
-		"Hemisphere", "Plane", "Icosahedron", "Dodecahedron",
-		"Octahedron", "Tetrahedron", "Cube", "Rock" };
+	void LoadUID();
+	void SaveUID() const;
 
-	uint tex_height, tex_width;
+	void LoadCheckersTexture();
 
-	void MakeCheckersTexture();
+	void LoadAssetsIcons();
+	void UpdateAssets();
+	void UpdateAssetsFolder(const PathNode& node);
 
 public:
+	ResourceMaterial* checkers_texture = nullptr;
+
 	GLuint bbox_indices[24] =
 	{
-		0,1,2,3,0,3,1,2,
-		4,5,6,7,4,7,5,6,
+		0,1,2,3,0,2,1,3,
+		4,5,6,7,4,6,5,7,
 		0,4,1,5,2,6,3,7
 	};
+
+private:
+	std::map<UID, Resource*> resources;
+	std::vector<Resource*> removed;
+
+	std::map<uint64, MetaFile> existing_res;
+
+	UID last_uid = -1;
 };
+
+extern GLuint aabb_indices[24];
+extern GLuint aabb_IBO;
 
 #endif

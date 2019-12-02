@@ -4,6 +4,7 @@
 #include "Panel.h"
 #include "Imgui/imgui.h"
 #include <vector>
+#include "MathGeoLib/include/Math/float3.h"
 
 #define FPS_LOG_SIZE 100
 
@@ -61,12 +62,18 @@ public:
 
 	void DrawScene();
 
+	void DrawMainCamera();
+
+	void DrawQuadtree();
+
+	void PrintPosColored(const float3 & pos);
+
 	bool InitModuleDraw(Module* module);
 	void DrawApplication();
 	void DrawHardware();
 	void DrawModuleWindow(ModuleWindow * module);
 	void DrawModuleInput(ModuleInput * module);
-	void DrawTextures();
+	void DrawResources();
 	void DrawModuleFileSystem(ModuleFileSystem * module);
 
 	void AddFPS(float fps, float ms);
@@ -81,6 +88,7 @@ private:
 	std::vector<float> ms_log;
 
 	mutable hardware_info info_hw;
+
 };
 
 #endif// __CONFIGURATION_H__

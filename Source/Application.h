@@ -7,16 +7,17 @@
 #include "ModuleInput.h"
 #include "ModuleSceneBase.h"
 #include "ModuleRenderer3D.h"
-#include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
-#include "ModuleScene.h"
+
 #include "Config.h"
 
 #include "MathGeoLib/include/Algorithm/Random/LCG.h"
 
 #include <list>
+
+class ModuleScene;
 
 class Application
 {
@@ -57,7 +58,6 @@ public:
 	ModuleSceneBase* scene_base;
 	ModuleScene* scene;
 	ModuleRenderer3D* renderer3D;
-	ModuleCamera3D* camera;
 	ModuleEditor* editor;
 	ModuleFileSystem* file_system;
 	ModuleResources* resources;

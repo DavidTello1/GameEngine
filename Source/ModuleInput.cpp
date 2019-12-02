@@ -119,8 +119,7 @@ bool ModuleInput::PreUpdate(float dt)
 
 		case SDL_DROPFILE:
 			dir = e.drop.file;
-			App->resources->LoadResource(dir, Component::Type::Unknown, true
-				,(App->scene->GetSelectedGameobj() != nullptr)? App->scene->GetSelectedGameobj()->GetUID():0);
+			App->resources->ImportFromOutside(dir);
 			SDL_free(e.drop.file);
 			break;
 

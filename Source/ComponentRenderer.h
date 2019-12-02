@@ -2,6 +2,7 @@
 #include "Component.h"
 
 class ComponentMesh;
+class ComponentMaterial;
 class ComponentRenderer : public Component
 {
 public:
@@ -9,10 +10,13 @@ public:
 	ComponentRenderer(GameObject* obj);
 	virtual ~ComponentRenderer();
 
+	void DrawInspector();
+	static inline Component::Type GetType() { return Component::Type::Renderer; }
+
 	void Draw();
 
 private:
-	void DrawMesh(ComponentMesh& mesh) const;
+	void Render(ComponentMesh& mesh, ComponentMaterial* material) const;
 	void DrawFaceNormals();
 	void DrawVertexNormals();
 

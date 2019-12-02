@@ -1,28 +1,31 @@
 #include "Globals.h"
 #include "Application.h"
-#include "ModuleSceneBase.h"
 #include "ModuleResources.h"
-//#include "ModuleFileSystem.h"
-#include "GameObject.h"
-#include "ComponentMesh.h"
-#include "ComponentMaterial.h"
+#include "ModuleFileSystem.h"
+#include "ModuleEditor.h"
+#include "Assets.h"
+#include "ResourceModel.h"
+#include "ResourceMesh.h"
+#include "ResourceMaterial.h"
+#include "ResourceScene.h"
 #include "Config.h"
-#include <string>
-
-#include "Devil/include/IL/il.h"
-#pragma comment (lib, "Devil/lib/x86/DevIL.lib")
-#pragma comment (lib, "Devil/lib/x86/ILU.lib")
-#pragma comment (lib, "Devil/lib/x86/ILUT.lib")
+#include "PathNode.h"
 
 #include "Assimp/include/cimport.h"
-#include "Assimp/include/scene.h"
-#include "Assimp/include/postprocess.h"
-#include "Assimp/include/cfileio.h"
-#pragma comment (lib, "Assimp/libx86/assimp.lib")
 
-#include "par_shapes.h"
+#include "Devil/include/IL/ilu.h"
+#include "Devil/include/IL/ilut.h"
 
 #include "mmgr/mmgr.h"
+
+GLuint aabb_indices[24]=
+{
+	0,1,2,3,0,2,1,3,
+	4,5,6,7,4,6,5,7,
+	0,4,1,5,2,6,3,7
+};
+
+GLuint aabb_IBO = 0;
 
 void AssimpLogCallback(const char *msg, char *userData) 
 {
@@ -39,11 +42,6 @@ ModuleResources::~ModuleResources()
 
 bool ModuleResources::Init(Config* config)
 {
-	return true;
-}
-
-bool ModuleResources::Start(Config* config)
-{
 	LOG("Loading DevIL", 'd');
 	ilInit();
 
@@ -53,466 +51,360 @@ bool ModuleResources::Start(Config* config)
 	stream.callback = AssimpLogCallback;
 	aiAttachLogStream(&stream);
 
-	MakeCheckersTexture();
+	return true;
+}
+
+bool ModuleResources::Start(Config* config)
+{
+	LoadCheckersTexture();
+	LoadAssetsIcons();
+
+	//LoadResourcesData();
+	UpdateAssets();
+
+	// Creation of the Index Buffer Object of the bounding boxes array, as all uses the same
+	if (aabb_IBO == 0) glGenBuffers(1, &aabb_IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aabb_IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(aabb_indices), aabb_indices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 	return true;
 }
 
 bool ModuleResources::CleanUp()
 {
+	LOG("Unloading Resource Manager");
+
+	//SaveResources();
+
+	if (aabb_IBO != 0)
+	{
+		glDeleteBuffers(1, &aabb_IBO);
+	}
+
+	for (std::map<UID, Resource*>::iterator it = resources.begin(); it != resources.end(); ++it)
+		RELEASE(it->second);
+
+	for (std::vector<Resource*>::iterator it = removed.begin(); it != removed.end(); ++it)
+		RELEASE(*it);
+
+	resources.clear();
+
 	return true;
 }
 
-//---------------------------------
-Component::Type ModuleResources::GetType(const char* path)
+bool ModuleResources::ImportFromOutside(const char* path, UID uid)
 {
-	char extension[32];
-	const char* last_dot = strrchr(path, '.');
-	strcpy_s(extension, last_dot + 1);
+	std::string final_path = App->file_system->GetFileName(path); //get file name
+	final_path = ASSETS_FOLDER + final_path;
 
-	for (int i = 0; i < strlen(extension); i++)
-	{
-		extension[i] = tolower(extension[i]);
-	}
+	App->file_system->NormalizePath(final_path);
 
-	if (strcmp("obj", extension) == 0 || strcmp("fbx",extension) == 0) // Mesh
+	if (App->file_system->CopyFromOutsideFS(path, final_path.c_str()) == true) //copy file to final_path
 	{
-		return Component::Type::Mesh;
+		return ImportResource(final_path.c_str(), uid);
 	}
-	else if (strcmp("dds", extension) == 0 || strcmp("png", extension) == 0 || strcmp("jpg", extension) == 0) // Texture
-	{
-		return Component::Type::Material;
-	}
-
-	LOG("File format not supported", 'e');
-	return Component::Type::Unknown;
+	return false;
 }
 
-void ModuleResources::LoadResource(const char* path, Component::Type type, bool use, uint parent_id)
+bool ModuleResources::ImportResource(const char* final_path, UID uid)
 {
-	GameObject* object = nullptr;
-	//name
-	const char* file_name = strrchr(path, 92) ;
-	if (file_name == nullptr) file_name = (strrchr(path, '/') != nullptr) ? strrchr(path, '/') : "GameObject";
-	file_name++;
+	bool import_ok = false;
+	std::string written_file;
+	Resource::Type type = GetResourceType(final_path); //get resource type
 
-	if (type == Component::Type::Unknown)
-		type = GetType(path);
-
-	if (type == Component::Type::Mesh) // Mesh
+	if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded and if so, init uid
 	{
-		LOG("Mesh resource type",'g');
-		const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
-
-		if (scene != nullptr && scene->HasMeshes())
-		{
-			LOG("Number of meshes: %u", scene->mNumMeshes, 'g');
-
-			for (uint i = 0; i < scene->mNumMeshes; ++i)
-			{	
-				if (use)
-				{
-					object = App->scene->CreateGameObj(file_name, parent_id);
-					ComponentMesh* mesh_component = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
-					aiMesh* mesh = scene->mMeshes[i];
-
-					ImportMesh(mesh, mesh_component);
-					object->AddComponent(Component::Type::Renderer);
-
-					if (parent_id != 0)
-					{
-						App->scene->FindById(parent_id)->ChildAdded(object);
-					}
-				}
-			}
-			aiReleaseImport(scene);
-		}
-		else
-			LOG("Error loading mesh %s", path, 'e');
-
+		Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
+		LOG("File is already loaded in memory", 'd');
+		return true;
 	}
-	else if (type == Component::Type::Material) // Texture
+
+	switch (type) //import depending on type
 	{
-		if (!App->scene->selected_go.empty())
-		{
-			ComponentMaterial* material_loaded = nullptr;
-			GLuint tex;
-
-			if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-				material_loaded = App->scene->GetMaterial(path);
-			else
-			{
-				// Devil
-				uint imageID;
-				ilGenImages(1, &imageID);
-				ilBindImage(imageID);
-				ilEnable(IL_ORIGIN_SET);
-				ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-
-				bool loaded = ilLoadImage(path);
-				if (!loaded) LOG("IMAGE '%s' COULD NOT BE LOADED PROPERLY", path, 'e');
-
-				LogImageInfo();
-
-				tex = ImportTexture(ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_FORMAT), ilGetData());
-				ilDeleteImages(1, &imageID);
-			}
-
-			if (use)
-			{
-				for (GameObject* object : App->scene->selected_go)
-				{
-					if (object->HasComponent(Component::Type::Mesh))
-					{
-						ComponentMesh* mesh = (ComponentMesh*)object->GetComponent(Component::Type::Mesh);
-						if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-						{
-							material_loaded = App->scene->GetMaterial(path);
-							mesh->TEX = material_loaded->tex_id;
-						}
-						else
-							mesh->TEX = tex;
-					}
-
-					if (App->editor->tab_hierarchy->SearchById(object->GetUID())->childs.empty()) //if object is parent
-					{
-						if (!object->HasComponent(Component::Type::Material)) //if object has not got material add one
-							object->AddComponent(Component::Type::Material);
-
-						ComponentMaterial* material = (ComponentMaterial*)object->GetComponent(Component::Type::Material);
-						if (App->scene->IsMaterialLoaded(path)) //if material is already loaded
-						{
-							material_loaded = App->scene->GetMaterial(path);
-							strcpy_s(material->path, 256, material_loaded->path);
-							material->tex_id = material_loaded->tex_id;
-							material->width = material_loaded->width;
-							material->height = material_loaded->height;
-						}
-						else
-						{
-							strcpy_s(material->path, 256, path);
-							material->tex_id = tex;
-							material->width = tex_width;
-							material->height = tex_height;
-
-							App->scene->materials.push_back(material);
-
-							LOG("Texture %s loaded", file_name, 'd');
-							LOG("Texture %s applied to object %s %u", file_name, object->GetName(), object->GetUID(), 'd');
-						}
-					}
-				}
-			}
-		}
-		else
-		{
-			LOG("Cannot load texture without GameObject", 'e');
-		}
+	case Resource::model:
+	{
+		import_ok = ResourceModel::Import(final_path, written_file);
+		break;
 	}
+	case Resource::material:
+		import_ok = ResourceMaterial::Import(final_path, written_file);
+		break;
+	case Resource::scene:
+		import_ok = ResourceScene::Import(final_path, written_file);
+	}
+
+	if (import_ok == true)
+	{
+		Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
+		SaveMeta(res);
+	}
+	else
+	{
+		LOG("Importing of [%s] FAILED", final_path);
+		return false;
+	}
+	return true;
 }
 
-void ModuleResources::ImportMesh(aiMesh* mesh, ComponentMesh* mesh_component)
+Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 {
-	LOG("Importing mesh '%s'", (mesh->mName.C_Str()), 'g');
-	GameObject* go = mesh_component->GetGameobj();
+	Resource* ret = nullptr;
+	UID uid;
 
-	// Vertices -----------------------
-	mesh_component->num_vertices = mesh->mNumVertices;
-	mesh_component->vertices = new float3[mesh->mNumVertices];
-
-	if (mesh_component->num_vertices > 0)
-	{
-		go->min_vertex.x = mesh->mVertices[0].x;
-		go->min_vertex.y = mesh->mVertices[0].y;
-		go->min_vertex.z = mesh->mVertices[0].z;
-
-		go->max_vertex.x = mesh->mVertices[0].x;
-		go->max_vertex.y = mesh->mVertices[0].y;
-		go->max_vertex.z = mesh->mVertices[0].z;
-	}
-	else {
-		LOG("Mesh has no vertices", 'e');
-		return;
-	}
-
-	LOG("Importing vertices %u", mesh->mNumVertices, 'g');
-	for (uint i = 0; i < mesh->mNumVertices; ++i)
-	{
-		float x = mesh->mVertices[i].x;
-		float y = mesh->mVertices[i].y;
-		float z = mesh->mVertices[i].z;
-
-		mesh_component->vertices[i].x = x;
-		mesh_component->vertices[i].y = y;
-		mesh_component->vertices[i].z = z;
-
-		// Bounding box setting up
-		if (x < go->min_vertex.x) go->min_vertex.x = x;
-		if (y < go->min_vertex.y) go->min_vertex.y = y;
-		if (z < go->min_vertex.z) go->min_vertex.z = z;
-
-		if (x > go->max_vertex.x) go->max_vertex.x = x;
-		if (y > go->max_vertex.y) go->max_vertex.y = y;
-		if (z > go->max_vertex.z) go->max_vertex.z = z;
-		
-	}
-
-	GenVBO(mesh_component);
-
-
-	// Indices -----------------------
-	mesh_component->num_indices = mesh->mNumFaces * 3;
-	mesh_component->indices = new GLuint[mesh_component->num_indices];
-
-	for (uint i = 0; i < mesh->mNumFaces; ++i)
-	{
-		assert(mesh->mFaces[i].mNumIndices == 3); // assert if face is not a triangle
-		memcpy(&mesh_component->indices[i * 3], mesh->mFaces[i].mIndices, 3 * sizeof(GLuint));
-	}
-
-	GenIBO(mesh_component);
-
-	// Texture Coordinates -----------------------
-	if (mesh->HasTextureCoords(0))
-	{
-		mesh_component->num_tex_coords = mesh->mNumVertices;
-		mesh_component->tex_coords = new float2[mesh_component->num_tex_coords * 2];
-
-		for (uint i = 0; i < mesh->mNumVertices; ++i)
-		{
-			mesh_component->tex_coords[i].x = mesh->mTextureCoords[0][i].x;
-			mesh_component->tex_coords[i].y = mesh->mTextureCoords[0][i].y;
-		}
-	}
-
-	GenTexture(mesh_component);
-
-	// Normals -----------------------
-	if (mesh->HasNormals())
-	{
-		LOG("Importing normals %u",mesh->mNumVertices , 'g');
-		mesh_component->num_normals = mesh->mNumVertices;
-		mesh_component->normals = new float3[mesh_component->num_normals];
-
-		for (uint i = 0; i < mesh->mNumVertices; ++i)
-		{
-			mesh_component->normals[i].x = mesh->mNormals[i].x;
-			mesh_component->normals[i].y = mesh->mNormals[i].y;
-			mesh_component->normals[i].z = mesh->mNormals[i].z;
-		}
-	}
-	go->GenBoundingBox();
-	go->is_valid_dimensions = true;
-	
-}
-
-GLuint ModuleResources::ImportTexture(int width, int height,int internal_format, int format, unsigned char* image)
-{
-	//LOG("Importing texture [%d,%d] data size: %u", width, height, sizeof(image)*sizeof(unsigned char), 'g');
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	tex_height = height;
-	tex_width = width;
-	return texture;
-}
-
-void ModuleResources::UnLoadResource()
-{
-
-}
-
-void ModuleResources::CreateShape(const shape_type &type, int slices, int stacks, float x, float y, float z, float radius, uint parent_id)
-{
-	par_shapes_mesh* m;
-
-	if (slices < 3)
-	{
-		slices = 3;
-		LOG("Slices less than 3, setting to 3", 'w');
-	}
-	if (stacks < 3)
-	{
-		stacks = 3;
-		LOG("Stacks less than 3, setting to 3", 'w');
-	}
+	if (force_uid != 0 && GetResource(force_uid) == nullptr)
+		uid = force_uid;
+	else
+		uid = GenerateUID();
 
 	switch (type)
 	{
-	case CYLINDER:
-		m = par_shapes_create_cylinder(slices, stacks);
+	case Resource::unknown:
 		break;
-	case CONE:
-		m = par_shapes_create_cone(slices, stacks);
+	case Resource::model:
+		ret = new ResourceModel(uid);
 		break;
-	case TORUS:
-		m = par_shapes_create_torus(slices, stacks, radius);
+	case Resource::mesh:
+		ret = (Resource*) new ResourceMesh(uid);
 		break;
-	case SPHERE:
-		m = par_shapes_create_parametric_sphere(slices, stacks);
+	case Resource::material:
+		ret = (Resource*) new ResourceMaterial(uid);
 		break;
-	case BOTTLE:
-		m = par_shapes_create_klein_bottle(slices, stacks);
-		break;
-	case KNOT:
-		m = par_shapes_create_trefoil_knot(slices, stacks, radius);
-		break;
-	case HEMISPHERE:
-		m = par_shapes_create_hemisphere(slices, stacks);
-		break;
-	case PLANE:
-		m = par_shapes_create_plane(slices, stacks);
-		break;
-	case ICOSAHEDRON:
-		m = par_shapes_create_icosahedron();
-		break;
-	case DODECAHEDRON:
-		m = par_shapes_create_dodecahedron();
-		break;
-	case OCTAHEDRON:
-		m = par_shapes_create_octahedron();
-		break;
-	case TETRAHEDRON:
-		m = par_shapes_create_tetrahedron();
-		break;
-	case CUBE:
-		m = par_shapes_create_cube();
-		break;
-	case ROCK:
-		m = par_shapes_create_rock(slices*stacks, 2);
-		break;
-
-	default:
+	case Resource::scene:
+		ret = (Resource*) new ResourceScene(uid);
 		break;
 	}
 
-	par_shapes_translate(m, x, y, z);
-
-	LOG("Creating primitive '%s'", GetShapeName(type), 'v');
-
-	GameObject* object = App->scene->CreateGameObj(GetShapeName(type), parent_id, true);
-	ComponentMesh* mesh = (ComponentMesh*)object->AddComponent(Component::Type::Mesh);
-	object->AddComponent(Component::Type::Material);
-
-	// Vertices ------------------
-	mesh->num_vertices = m->npoints;
-	mesh->vertices = new float3[mesh->num_vertices];
-	if (mesh->num_vertices >= 3)
+	if (ret != nullptr)
 	{
-		object->min_vertex.x = m->points[0];
-		object->min_vertex.y = m->points[1];
-		object->min_vertex.z = m->points[2];
-		object->max_vertex.x = m->points[0];
-		object->max_vertex.y = m->points[1];
-		object->max_vertex.z = m->points[2];
+		resources[uid] = ret;
 	}
-	else {
-		LOG("Mesh has no vertices", 'e');
-		return;
-	}
-	for (uint i = 0; i < mesh->num_vertices; ++i)
+
+	return ret;
+}
+
+Resource* ModuleResources::CreateInitResource(Resource::Type type, UID uid, const char* final_path, std::string& written_file)
+{
+	Resource* res = CreateResource(type); //create new resource
+	uid = res->uid; //fill uid
+
+	res->original_file = final_path; //get file
+	std::string exported_file = App->file_system->GetFileName(written_file.c_str()); //get exported file
+
+	if (exported_file.c_str() != NULL) //check for errors
 	{
-		int k = i * 3;
-		float x = m->points[k];
-		float y = m->points[k + 1];
-		float z = m->points[k + 2];
-
-		mesh->vertices[i].x = x; 
-		mesh->vertices[i].y = y; 
-		mesh->vertices[i].z = z; 
-
-		// Bounding box setting up
-		if (x < object->min_vertex.x) object->min_vertex.x = x;
-		if (y < object->min_vertex.y) object->min_vertex.y = y;
-		if (z < object->min_vertex.z) object->min_vertex.z = z;
-
-		if (x > object->max_vertex.x) object->max_vertex.x = x;
-		if (y > object->max_vertex.y) object->max_vertex.y = y;
-		if (z > object->max_vertex.z) object->max_vertex.z = z;
+		res->exported_file = exported_file.c_str();
+		LOG("Imported successful from [%s] to [%s]", res->GetFile(), res->GetExportedFile(), 'd');
 	}
-
-	GenVBO(mesh);
-
-
-	// Indices ---------------------
-	mesh->num_indices = m->ntriangles * 3;
-	mesh->indices = new GLuint[mesh->num_indices];
-
-	for (uint i = 0; i < mesh->num_indices; ++i)
+	else
 	{
-		mesh->indices[i] = (GLuint)m->triangles[i];
+		LOG("Unable to export file [%s]", res->GetFile(), 'e');
+		return false;
 	}
 
-	GenIBO(mesh);
+	res->name = App->file_system->GetFileName(res->original_file.c_str()); //fill resource name
 
-	// Texture -----------------------
-	if (m->tcoords != nullptr) {
+	if (res->name.empty()) //if empty, name = exported file
+		res->name = res->exported_file;
 
-		mesh->num_tex_coords = m->npoints;
-		mesh->tex_coords = new float2[mesh->num_tex_coords];
+	size_t pos_dot = res->name.find_last_of("."); //get last dot position
+	if (pos_dot != std::string::npos)
+		res->name.erase(res->name.begin() + pos_dot, res->name.end()); //erase extension from name
 
-		for (unsigned i = 0; i < mesh->num_tex_coords; ++i)
+	return res;
+}
+
+void ModuleResources::RemoveResource(UID uid)
+{
+	std::map<UID, Resource*>::iterator it = resources.find(uid);
+	if (it != resources.end())
+	{
+		App->file_system->Remove(it->second->GetExportedFile());
+
+		char tmp[256];
+		sprintf_s(tmp, 255, "%s%s", GetDirectory(it->second->GetType()), it->second->GetExportedFile());
+		App->file_system->Remove(tmp);
+
+		removed.push_back(it->second);
+
+		resources.erase(it);
+	}
+}
+
+const Resource* ModuleResources::GetResource(UID uid) const
+{
+	if (resources.find(uid) != resources.end())
+		return resources.at(uid);
+	return nullptr;
+}
+
+Resource* ModuleResources::GetResource(UID uid)
+{
+	std::map<UID, Resource*>::iterator it = resources.find(uid);
+	if (it != resources.end())
+		return it->second;
+	return nullptr;
+}
+
+UID ModuleResources::GenerateUID()
+{
+	++last_uid;
+	SaveUID();
+	return last_uid;
+}
+
+void ModuleResources::LoadUID()
+{
+	std::string file(SETTINGS_FOLDER);
+	file += "Last UID";
+
+	char *buf = nullptr;
+	uint size = App->file_system->Load(file.c_str(), &buf);
+
+	if (size == sizeof(last_uid))
+	{
+		last_uid = *((UID*)buf);
+		RELEASE_ARRAY(buf);
+	}
+	else
+	{
+		LOG("WARNING! Cannot read resource UID from file [%s] - Generating a new one", file.c_str());
+		SaveUID();
+	}
+}
+
+void ModuleResources::SaveUID() const
+{
+	std::string file(SETTINGS_FOLDER);
+	file += "Last UID";
+
+	uint size = App->file_system->Save(file.c_str(), (const char*)&last_uid, sizeof(last_uid));
+
+	if (size != sizeof(last_uid))
+		LOG("WARNING! Cannot write resource UID into file [%s]", file.c_str());
+}
+
+const char* ModuleResources::GetDirectory(Resource::Type type) const
+{
+	static_assert(Resource::Type::unknown == 0, "String list needs update");
+
+	static const char* dirs_by_type[] = {
+		LIBRARY_MODEL_FOLDER, LIBRARY_MATERIAL_FOLDER,
+		LIBRARY_MESH_FOLDER, LIBRARY_SCENE_FOLDER
+	};
+
+	return dirs_by_type[type];
+}
+
+Resource::Type ModuleResources::GetResourceType(const char* path) const
+{
+	Resource::Type type;
+	std::string extension = App->file_system->GetExtension(path);
+	App->file_system->ToLower(extension);
+
+	if (strcmp("obj", extension.c_str()) == 0 || strcmp("fbx", extension.c_str()) == 0)
+	{
+		type = Resource::Type::model;
+		LOG("Importing resource model from %s", path, 'd');
+	}
+	else if (strcmp("dds", extension.c_str()) == 0 || strcmp("png", extension.c_str()) == 0 || strcmp("jpg", extension.c_str()) == 0)
+	{
+		type = Resource::Type::material;
+		LOG("Importing resource material from %s", path, 'd');
+	}
+	else if (strcmp("dvs", extension.c_str()) == 0)
+	{
+		type = Resource::Type::scene;
+		LOG("Importing resource scene from %s", path, 'd');
+	}
+	else
+	{
+		type = Resource::Type::unknown;
+		LOG("File format not supported from %s", path, 'e');
+	}
+
+	return type;
+}
+
+std::vector<Resource*> ModuleResources::GetAllResourcesOfType(Resource::Type type)
+{
+	std::vector<Resource*> ret;
+
+	for (uint i = 0; i < resources.size(); ++i)
+	{
+		if (resources[i] != nullptr && resources[i]->type == type)
+			ret.push_back(resources[i]);
+	}
+
+	return ret;
+}
+
+bool ModuleResources::CheckLoaded(std::string path, UID uid)
+{
+	for (std::map<UID, Resource*>::const_iterator it = resources.begin(); it != resources.end(); ++it)
+	{
+		if (it->second->original_file.compare(path) == 0)
 		{
-			int k = i * 2;
-			mesh->tex_coords[i].x = m->tcoords[k];
-			mesh->tex_coords[i].y = m->tcoords[k + 1];
+			uid = it->first;
+			return true;
 		}
 	}
-	par_shapes_free_mesh(m);
+	return false;
+}
 
-	GenTexture(mesh);
+void ModuleResources::UpdateAssets()
+{
+	std::vector<std::string> ignore_extensions;
+	ignore_extensions.push_back("meta");
+	PathNode assets = App->file_system->GetAllFiles("Assets", nullptr, &ignore_extensions);
+	UpdateAssetsFolder(assets);
+}
 
-	if (type < 8) //idk but has to be like this for now, otherwise ImGui crashes
+void ModuleResources::UpdateAssetsFolder(const PathNode& node)
+{
+	//If node is a file
+	if (node.file == true)
 	{
-		object->GenBoundingBox();
-		object->is_valid_dimensions = true;
+		ImportResource(node.path.c_str());
 	}
-	if (parent_id != 0)
+
+	//If node folder has something inside
+	else if (node.leaf == false)
 	{
-		App->scene->FindById(parent_id)->ChildAdded(object);
+		for (uint i = 0; i < node.children.size(); i++)
+		{
+			UpdateAssetsFolder(node.children[i]);
+		}
 	}
 }
-void ModuleResources::GenVBO(ComponentMesh * mesh_component)
+
+void ModuleResources::LoadAssetsIcons()
 {
-	// Generate VBO
-	LOG("Generating VBO", 'v');
-	glGenBuffers(1, &mesh_component->VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float3)* mesh_component->num_vertices, mesh_component->vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	ResourceMaterial* resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
+	App->editor->tab_assets->folder_icon = resource->LoadTexture("Settings/Icons/folder_icon.png");
+
+	resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
+	App->editor->tab_assets->file_icon = resource->LoadTexture("Settings/Icons/file_icon.png");
+
+	resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
+	App->editor->tab_assets->model_icon = resource->LoadTexture("Settings/Icons/model_icon.png");
+
+	resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
+	App->editor->tab_assets->material_icon = resource->LoadTexture("Settings/Icons/material_icon.png");
+
+	resource = (ResourceMaterial*)CreateResource(Resource::Type::material);
+	App->editor->tab_assets->scene_icon = resource->LoadTexture("Settings/Icons/scene_icon.png");
 }
 
-void ModuleResources::GenIBO(ComponentMesh * mesh_component)
-{
-	// Generate IBO
-	LOG("Generating IBO", 'v');
-	glGenBuffers(1, &mesh_component->IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_component->IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * mesh_component->num_indices, mesh_component->indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void ModuleResources::GenTexture(ComponentMesh * mesh_component)
-{
-	// Generate Textures
-	LOG("Generating Texture", 'v');
-	glGenBuffers(1, &mesh_component->tex_coords_id);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh_component->tex_coords_id);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float2) * mesh_component->num_tex_coords, mesh_component->tex_coords, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-void ModuleResources::MakeCheckersTexture()
+void ModuleResources::LoadCheckersTexture()
 {
 	const int checkImageWidth = 256;
 	const int checkImageHeight = 256;
+
+	checkers_texture = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	checkers_texture->tex_width = checkImageWidth;
+	checkers_texture->tex_height = checkImageHeight;
+
 	static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
 
 	int c;
@@ -530,8 +422,8 @@ void ModuleResources::MakeCheckersTexture()
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	glGenTextures(1, &checker_texture);
-	glBindTexture(GL_TEXTURE_2D, checker_texture);
+	glGenTextures(1, &checkers_texture->tex_id);
+	glBindTexture(GL_TEXTURE_2D, checkers_texture->tex_id);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -544,35 +436,96 @@ void ModuleResources::MakeCheckersTexture()
 		checkImage);
 }
 
-void ModuleResources::LogImageInfo()
+uint64 ModuleResources::GetIDFromMeta(const char* path)
 {
-	char* s;
-	char* c;
-	switch (ilGetInteger(IL_IMAGE_FORMAT)) {
-	case IL_COLOR_INDEX: s = "IL_COLOR_INDEX"; break;
-	case IL_ALPHA: s = "IL_ALPHA"; break;
-	case IL_RGB: s = "IL_RGB"; break;
-	case IL_RGBA: s = "IL_RGBA"; break;
-	case IL_BGR: s = "IL_BGR"; break;
-	case IL_BGRA: s = "IL_BGRA"; break;
-	case IL_LUMINANCE: s = "IL_LUMINANCE"; break;
-	case  IL_LUMINANCE_ALPHA: s = "IL_LUMINANCE_ALPHA"; break;
-	}
-	switch (ilGetInteger(IL_IMAGE_TYPE)) {
-	case IL_BYTE: c = "IL_BYTE"; break;
-	case IL_UNSIGNED_BYTE: c = "IL_UNSIGNED_BYTE"; break;
-	case IL_SHORT: c = "IL_SHORT"; break;
-	case IL_UNSIGNED_SHORT: c = "IL_UNSIGNED_SHORT"; break;
-	case IL_INT: c = "IL_INT"; break;
-	case IL_UNSIGNED_INT: c = "IL_UNSIGNED_INT"; break;
-	case IL_FLOAT: c = "IL_FLOAT"; break;
-	case IL_DOUBLE: c = "IL_DOUBLE"; break;
-	case IL_HALF: c = "IL_HALF"; break;
-	}
+	uint64 ret = 0;
 
-	LOG("Width: %d, Height %d, Bytes per Pixel %d",
-		ilGetInteger(IL_IMAGE_WIDTH),
-		ilGetInteger(IL_IMAGE_HEIGHT),
-		ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL), 'g');
-	LOG("Original image format: %s, data type: %s", s, c, 'g');
+	char* buffer = nullptr;
+	uint size = App->file_system->Load(path, &buffer);
+
+	if (size > 0)
+		ret = Config(buffer).GetNumber("ID");
+
+	delete[] buffer;
+
+	return ret;
+}
+
+void ModuleResources::SaveMeta(const Resource* resource)
+{
+	Config config;
+
+	config.SetNumber("ID", resource->uid);
+	config.SetString("Name", resource->name.c_str());
+	config.SetNumber("Type", static_cast<int>(resource->GetType()));
+
+	char* buffer = nullptr;
+	uint size = config.Serialize(&buffer);
+	if (size > 0)
+	{
+		std::string path = resource->original_file + ".meta";
+		App->file_system->Save(path.c_str(), buffer, size);
+	}
+}
+
+bool ModuleResources::LoadMeta(const char* file)
+{
+	char* buffer = nullptr;
+	uint size = App->file_system->Load(file, &buffer);
+	MetaFile meta;
+	if (size > 0)
+	{
+		Config config(buffer);
+
+		std::string sourceFile = file;
+		sourceFile = std::string(file).substr(0, sourceFile.size() - 5);
+
+		meta.original_file = sourceFile;
+		meta.resource_name = config.GetString("Name");
+		meta.id = config.GetNumber("ID");
+		meta.type = static_cast<Resource::Type>((int)(config.GetNumber("Type")));
+		existing_res[meta.id] = meta;
+
+		if (meta.type == Resource::model)
+		{
+			std::string resFile = "/Library/GameObjects/";
+			resFile.append(std::to_string(meta.id));
+
+			LoadSceneMeta(resFile.c_str(), sourceFile.c_str());
+		}
+		return true;
+	}
+	return false;
+}
+
+bool ModuleResources::LoadSceneMeta(const char* file, const char* source_file)
+{
+	char* buffer = nullptr;
+	uint size = App->file_system->Load(file, &buffer);
+	if (size > 0)
+	{
+		Config config(buffer);
+		Config_Array GameObjects = config.GetArray("GameObjects");
+
+		for (uint i = 0; i < GameObjects.GetSize(); i++)
+		{
+			Config_Array components = GameObjects.GetNode(i).GetArray("Components");
+
+			for (uint i = 0; i < components.GetSize(); i++)
+			{
+				Config resource = components.GetNode(i);
+				if (resource.GetBool("HasResource"))
+				{
+					MetaFile meta;
+					meta.id = resource.GetNumber("ID");
+					meta.type = static_cast<Resource::Type>((int)resource.GetNumber("Type"));
+					meta.resource_name = resource.GetString("ResourceName");
+					meta.original_file = source_file;
+					existing_res[meta.id] = meta;
+				}
+			}
+		}
+		return true;
+	}
+	return false;
 }

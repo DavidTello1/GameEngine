@@ -2,8 +2,12 @@
 #define __ASSETS_H__
 
 #include "Panel.h"
+#include "PathNode.h"
+#include "Timer.h"
 #include "Imgui/imgui.h"
 #include <vector>
+
+#define REFRESH_RATE 3
 
 class Assets : public Panel
 {
@@ -18,7 +22,45 @@ public:
 	virtual ~Assets();
 
 	void Draw();
-	void ImportAsset();
+	void ImportAsset(const PathNode& node);
+
+	Resource* GetSelectedResource();
+
+private:
+	void UpdateAssets();
+	void UpdateFilters(PathNode& node);
+	void DrawHierarchy(const PathNode& node);
+	void DrawIcons(const PathNode& node);
+	uint GetIcon(const PathNode& node);
+
+	void FilterFolders(PathNode& node, PathNode& parent);
+
+public:
+	uint folder_icon;
+	uint file_icon;
+	uint model_icon;
+	uint material_icon;
+	uint scene_icon;
+
+private:
+	std::vector<uint> selected_assets;
+
+	PathNode assets;
+	PathNode models;
+	PathNode materials;
+	PathNode scenes;
+
+	PathNode current_node;
+	PathNode next_node;
+	PathNode selected_node;
+
+	Timer timer;
+
+	ImVec4 border_color;
+
+	bool filter_scenes = false;
+	bool filter_models = false;
+	bool filter_materials = false;
 };
 
 #endif// __ASSETS_H__
