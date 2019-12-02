@@ -1,5 +1,7 @@
 #pragma once
 #include "Resource.h"
+#include "MathGeoLib/include/Math/float4x4.h"
+
 
 struct aiScene;
 struct aiNode;
@@ -11,7 +13,7 @@ public:
 	{
 		std::string name;
 		uint parent = 0;
-		float4x4 transform = float4x4::identity;
+		math::float4x4 transform = math::float4x4::identity;
 		UID mesh = 0;
 		UID material = 0;
 	};

@@ -9,8 +9,7 @@
 #include "ModuleEditor.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
-
-
+#include "Config.h"
 
 
 #include "mmgr/mmgr.h"
@@ -19,7 +18,6 @@ using namespace std;
 
 Application::Application()
 {
-	frames = 0;
 	last_frame_ms = -1;
 	last_fps = -1;
 	capped_ms = 1000 / 60;
@@ -108,7 +106,6 @@ bool Application::Update()
 void Application::FinishUpdate()
 {
 	// Recap on framecount and fps
-	++frames;
 	++fps_counter;
 
 	if (fps_timer.Read() >= 1000)

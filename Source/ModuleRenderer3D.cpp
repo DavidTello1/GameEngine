@@ -4,6 +4,7 @@
 #include "Viewport.h"
 #include "ModuleWindow.h"
 #include "ModuleEditor.h"
+#include "Config.h"
 
 
 #include "glew/include/GL/glew.h"

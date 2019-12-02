@@ -4,7 +4,6 @@
 #include "glew\include\GL\glew.h"
 
 #include "Globals.h"
-#include "glmath.h"
 #include "Math.h"
 #include "Color.h"
 

@@ -1,9 +1,10 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
-#include "glmath.h"
 
 #define MAX_LIGHTS 8
+
+typedef void *SDL_GLContext;
 
 class ModuleRenderer3D : public Module
 {

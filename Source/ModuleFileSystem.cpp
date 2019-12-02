@@ -9,6 +9,7 @@
 
 #include "Assimp/include/cfileio.h"
 #include "Assimp/include/types.h"
+#include "SDL/include/SDL.h"
 
 #pragma comment( lib, "PhysFS/libx86/physfs.lib" )
 

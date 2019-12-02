@@ -2,9 +2,10 @@
 #include "Globals.h"
 #include <list>
 #include <string>
-#include "Config.h"
-#include "MathGeoLib/include/Algorithm/Random/LCG.h"
+
 #include "Timer.h"
+
+#include "MathGeoLib/include/MathGeoLibFwd.h"
 
 class Module;
 class ModuleWindow;
@@ -16,9 +17,8 @@ class ModuleEditor;
 class ModuleFileSystem;
 class ModuleResources;
 
-//class Timer;
-//class Config;
-//class LCG;
+class Config;
+class LCG;
 
 class Application
 {
@@ -66,7 +66,6 @@ public:
 private:
 	Timer	ms_timer;
 	Timer	fps_timer;
-	Uint32	frames;
 	float	dt;
 	int		fps_counter;
 	int		last_frame_ms;
