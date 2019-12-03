@@ -56,6 +56,8 @@ public:
 	Panel* GetPanelFocused() { return focused_panel; }
 
 	void AddViewport(ComponentCamera* camera);
+	ComponentCamera* pending_camera = nullptr;
+	bool new_viewport = false;
 
 private:
 	void DrawMenu();

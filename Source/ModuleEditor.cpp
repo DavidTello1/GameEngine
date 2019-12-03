@@ -13,7 +13,7 @@
 #include "Assets.h"
 #include "Viewport.h"
 #include "ResourceScene.h"
-
+#include "ComponentCamera.h"
 #include <string.h>
 #include <algorithm>
 
@@ -138,13 +138,14 @@ bool ModuleEditor::Init(Config* config)
 	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_console = new Console());
 	panels.push_back(tab_assets = new Assets());
-	panels.push_back(tab_viewport = new Viewport());
+	panels.push_back(tab_viewport = new Viewport("Viewport"));
 
 	return true;
 }
 
 bool ModuleEditor::Start(Config* config)
 {
+	//AddViewport(App->scene->test_camera);
 	tab_viewport->GenerateFBO();
 
 	return true;
@@ -154,7 +155,7 @@ bool ModuleEditor::PreUpdate(float dt)
 {
 	// Start the frame
 	// Call preupdate viewport
-	tab_viewport->PreUpdate();
+	//tab_viewport->PreUpdate();
 
 	return true;
 }
@@ -168,8 +169,16 @@ bool ModuleEditor::PostUpdate(float dt)
 {
 	// end the frame
 	// Call postupdate viewport
-	tab_viewport->PostUpdate();
+	//tab_viewport->PostUpdate();
+	if (new_viewport)
+	{
+		Viewport* viewport = new Viewport(pending_camera->GetGameobj()->GetName());
+		viewport->current_camera = pending_camera;
 
+		panels.push_back(viewport);
+		new_viewport = false;
+
+	}
 	if (close)
 		return false;
 
@@ -269,6 +278,8 @@ void ModuleEditor::Draw()
 
 void ModuleEditor::AddViewport(ComponentCamera * camera)
 {
+	new_viewport = true;
+	pending_camera = camera;
 }
 
 void ModuleEditor::DrawMenu()
@@ -467,6 +478,7 @@ void ModuleEditor::DrawAbout()
 
 void ModuleEditor::DrawPanels()
 {
+
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
 		if ((*it)->IsActive())
@@ -516,6 +528,9 @@ void ModuleEditor::DrawPanels()
 			ImGui::End();
 		}
 	}
+
+	//if (App->scene->test_camera)
+	//	App->scene->test_camera->DrawFrustum();
 }
 
 void ModuleEditor::ConfirmExit()

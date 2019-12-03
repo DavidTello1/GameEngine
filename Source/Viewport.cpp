@@ -10,7 +10,7 @@ const int Viewport::default_height = 600;
 const int Viewport::default_pos_x = 300;
 const int Viewport::default_pos_y = 250;
 
-Viewport::Viewport() : Panel("Viewport")
+Viewport::Viewport(const char* name) : Panel(name)
 {
 	width = default_width;
 	height = default_height;
@@ -54,17 +54,25 @@ bool Viewport::PreUpdate()
 
 void Viewport::Draw() 
 {
+	PreUpdate();
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
+
+	//current_camera->DrawFrustum();
+
+	//if (current_camera == viewport_camera)
+	//{
+		App->scene_base->Draw();
+		App->scene->Draw();
+	//}
+
+	PostUpdate();
 }
 
 // Is not automatically called
 bool Viewport::PostUpdate()
 {
-	App->scene_base->Draw();
-	App->scene->Draw();
-
 	// Background color of the editor (ImGui)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

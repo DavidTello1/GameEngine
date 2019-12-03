@@ -22,7 +22,7 @@ public:
 	static const int default_pos_x;
 	static const int default_pos_y;
 
-	Viewport();
+	Viewport(const char* name);
 	~Viewport();
 
 	bool GenerateFBO(ImVec2 size = { static_cast<float>(default_width), static_cast<float>(default_height )});
