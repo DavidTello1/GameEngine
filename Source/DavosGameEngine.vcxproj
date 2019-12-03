@@ -120,6 +120,7 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Console.h" />
+    <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="gpudetect\DeviceId.h" />
@@ -238,6 +239,7 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="gpudetect\DeviceId.cpp" />
     <ClCompile Include="Hierarchy.cpp" />

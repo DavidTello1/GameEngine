@@ -145,18 +145,11 @@ bool ModuleEditor::Init(Config* config)
 
 bool ModuleEditor::Start(Config* config)
 {
-	//AddViewport(App->scene->test_camera);
-	tab_viewport->GenerateFBO();
-
 	return true;
 }
 
 bool ModuleEditor::PreUpdate(float dt)
 {
-	// Start the frame
-	// Call preupdate viewport
-	//tab_viewport->PreUpdate();
-
 	return true;
 }
 
@@ -167,18 +160,18 @@ bool ModuleEditor::Update(float dt)
 
 bool ModuleEditor::PostUpdate(float dt)
 {
-	// end the frame
-	// Call postupdate viewport
-	//tab_viewport->PostUpdate();
-	if (new_viewport)
+	if (is_want_new_viewport)
 	{
-		Viewport* viewport = new Viewport(pending_camera->GetGameobj()->GetName());
-		viewport->current_camera = pending_camera;
+		Viewport* viewport = new Viewport(new_viewport_camera->GetGameobj()->GetName());
+		viewport->current_camera = new_viewport_camera;
 
 		panels.push_back(viewport);
-		new_viewport = false;
+
+		is_want_new_viewport = false;
+		new_viewport_camera = nullptr;
 
 	}
+
 	if (close)
 		return false;
 
@@ -278,8 +271,8 @@ void ModuleEditor::Draw()
 
 void ModuleEditor::AddViewport(ComponentCamera * camera)
 {
-	new_viewport = true;
-	pending_camera = camera;
+	is_want_new_viewport = true;
+	new_viewport_camera = camera;
 }
 
 void ModuleEditor::DrawMenu()
