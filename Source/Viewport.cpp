@@ -28,7 +28,7 @@ Viewport::~Viewport()
 // Is not automatically called
 bool Viewport::PreUpdate()
 {
-	if (width != window_avail_size.x || height != window_avail_size.y)
+	if (/*width != window_avail_size.x || height != window_avail_size.y*/true)
 	{
 		width = window_avail_size.x;
 		height = window_avail_size.y;
@@ -42,11 +42,13 @@ bool Viewport::PreUpdate()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
-	if (current_camera->update_projection)
+	OnCameraUpdate();
+
+	/*if (current_camera->update_projection)
 	{
 		OnCameraUpdate();
 		current_camera->update_projection = false;
-	}
+	}*/
 
 	return true;
 }
