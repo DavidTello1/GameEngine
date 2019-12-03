@@ -3,6 +3,7 @@
 #include "ModuleScene.h"
 #include "ModuleSceneBase.h"
 #include "ComponentCamera.h"
+
 #include "mmgr/mmgr.h"
 
 const int Viewport::default_width = 600;
@@ -28,16 +29,7 @@ Viewport::~Viewport()
 // Is not automatically called
 bool Viewport::PreUpdate()
 {
-	if (true)
-	{
-		width = window_avail_size.x;
-		height = window_avail_size.y;
-
-		frame_buffer.GenerateFBO(width, height);
-		OnResize(width, height);
-
-	}
-	else if (width != window_avail_size.x || height != window_avail_size.y)
+	if (width != window_avail_size.x || height != window_avail_size.y)
 	{
 		width = window_avail_size.x;
 		height = window_avail_size.y;
@@ -46,34 +38,22 @@ bool Viewport::PreUpdate()
 		OnResize(width, height);
 	}
 
+	glViewport(0, 0, width, height);
+
+	// Binding camera buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
 	glClearColor(camera->background.r, camera->background.g, camera->background.b, camera->background.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
+	// Loading camera matrices
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glLoadTransposeMatrixf(camera->projection_matrix/*4x4.Transposed().ptr()*/);
+	glLoadTransposeMatrixf(camera->projection_matrix);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glLoadTransposeMatrixf(camera->view_matrix);
-
-
-
-
-
-	//OnCameraUpdate();
-	/*if (true)
-	{
-		OnCameraUpdate();
-		camera->update_projection = false;
-	}
-	else if (camera->update_projection)
-	{
-		OnCameraUpdate();
-		camera->update_projection = false;
-	}*/
 
 	return true;
 }
@@ -82,15 +62,17 @@ bool Viewport::PreUpdate()
 void Viewport::Draw() 
 {
 	PreUpdate();
+
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
 
-	//if (camera == viewport_camera)
-	//{
+	// Scene drawing
+	App->scene->Draw();
+	if (camera == viewport_camera)
+	{
 		App->scene_base->Draw();
-		App->scene->Draw();
-	//}
+	}
 
 	PostUpdate();
 }
@@ -115,20 +97,5 @@ bool Viewport::CleanUp()
 
 void Viewport::OnResize(float width, float height)
 {
-	glViewport(0, 0, width, height);
-
 	camera->SetAspectRatio(width/height);
 }
-
-//void Viewport::OnCameraUpdate()
-//{
-//
-//	glMatrixMode(GL_PROJECTION);
-//	glLoadIdentity();
-//	glLoadMatrixf(camera->GetProjectionMatrix());
-//
-//	glMatrixMode(GL_MODELVIEW);
-//	glLoadIdentity();
-//	glLoadMatrixf(camera->GetViewMatrix());
-//
-//}
