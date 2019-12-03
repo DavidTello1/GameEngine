@@ -26,8 +26,9 @@ public:
 	float GetHorizontalFOV(bool in_degree = true) const;
 	float GetAspectRatio() const;
 
-	float* GetViewMatrix();
-	float* GetProjectionMatrix();
+	void UpdateMatrices();
+	void UpdateViewMatrix();
+	void UpdateProjectionMatrix();
 
 	//  -------------------------------------- Setters
 	void SetNearPlane(float distance);
@@ -41,8 +42,6 @@ public:
 
 	void Look(const float3 & position);
 
-	void UpdatePlanes();
-
 	void DrawFrustum();
 
 	//  -------------------------------------- Consultors
@@ -52,11 +51,19 @@ public:
 
 	bool viewport_focus = true;
 	bool perspective = true;
-	bool update_projection = false;
 
 	float aspect_ratio = 0.0f;
 
 	Frustum frustum;
-	Plane planes[6];
-	Color background = Color::gray42;
+
+	Color background = Color::gray24;
+
+	// frustum matrices NOT trasposed
+	math::float4x4 view_matrix4x4 = math::float4x4::identity;
+	math::float4x4 projection_matrix4x4 = math::float4x4::identity;
+
+	// OpenGL ready matrix -> NOT trasposed and pointer
+	float* view_matrix = nullptr;
+	float* projection_matrix = nullptr;
+
 };

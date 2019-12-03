@@ -21,7 +21,7 @@ public:
 
 	void OnResize(float width, float height);
 
-	void OnCameraUpdate();
+	//void OnCameraUpdate();
 
 	bool PreUpdate();
 
@@ -33,7 +33,7 @@ public:
 
 	FrameBuffer frame_buffer;
 
-	ComponentCamera* current_camera;
+	ComponentCamera* camera;
 
 	ImVec2 window_avail_size = { default_width, default_height };
 

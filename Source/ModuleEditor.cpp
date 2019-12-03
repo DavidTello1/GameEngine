@@ -163,7 +163,7 @@ bool ModuleEditor::PostUpdate(float dt)
 	if (is_want_new_viewport)
 	{
 		Viewport* viewport = new Viewport(new_viewport_camera->GetGameobj()->GetName());
-		viewport->current_camera = new_viewport_camera;
+		viewport->camera = new_viewport_camera;
 
 		panels.push_back(viewport);
 

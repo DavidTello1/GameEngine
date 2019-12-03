@@ -197,7 +197,7 @@ void GameObject::UpdateTransform()
 		cam->SetPosition(translation);
 		cam->frustum.front = GetGlobalTransform().WorldZ();
 		cam->frustum.up = GetGlobalTransform().WorldY();
-		cam->update_projection = true;
+		cam->UpdateMatrices();
 	}
 
 	UpdateBoundingBox();

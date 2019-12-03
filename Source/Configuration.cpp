@@ -456,7 +456,7 @@ void Configuration::DrawMainCamera()
 			else
 				viewport_camera->frustum.type = FrustumType::OrthographicFrustum;
 
-			viewport_camera->update_projection = true;
+			viewport_camera->UpdateMatrices();
 		}
 
 		ImGui::Text("Aspect ratio: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", viewport_camera->GetAspectRatio());

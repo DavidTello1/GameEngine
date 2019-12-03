@@ -17,7 +17,6 @@ void FrameBuffer::GenerateFBO(int width, int height)
 {
 	Remove();
 
-	//Generate the FBO and bind it, continue if FBO is complete
 	glGenFramebuffers(1, &id);
 	glBindFramebuffer(GL_FRAMEBUFFER, id);
 

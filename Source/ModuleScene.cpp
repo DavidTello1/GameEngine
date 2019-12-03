@@ -114,8 +114,8 @@ bool ModuleScene::PostUpdate(float dt)
 	case START:
 		//SaveScene
 		state = PLAY;
-		App->editor->tab_viewport->current_camera = test_camera;
-		App->editor->tab_viewport->OnCameraUpdate();
+		App->editor->tab_viewport->camera = test_camera;
+		//App->editor->tab_viewport->OnCameraUpdate();
 		break;
 	case PLAY:
 		//App->Unpause();
@@ -128,8 +128,8 @@ bool ModuleScene::PostUpdate(float dt)
 		//App->Unpause();
 		//LoadScene
 		state = EDIT;
-		App->editor->tab_viewport->current_camera = viewport_camera;
-		App->editor->tab_viewport->OnCameraUpdate();
+		App->editor->tab_viewport->camera = viewport_camera;
+		//App->editor->tab_viewport->OnCameraUpdate();
 
 		break;
 	default:

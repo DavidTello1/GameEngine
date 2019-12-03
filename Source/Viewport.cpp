@@ -17,7 +17,7 @@ Viewport::Viewport(const char* name) : Panel(name)
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
 
-	current_camera = viewport_camera;
+	camera = viewport_camera;
 }
 
 
@@ -28,7 +28,16 @@ Viewport::~Viewport()
 // Is not automatically called
 bool Viewport::PreUpdate()
 {
-	if (/*width != window_avail_size.x || height != window_avail_size.y*/true)
+	if (true)
+	{
+		width = window_avail_size.x;
+		height = window_avail_size.y;
+
+		frame_buffer.GenerateFBO(width, height);
+		OnResize(width, height);
+
+	}
+	else if (width != window_avail_size.x || height != window_avail_size.y)
 	{
 		width = window_avail_size.x;
 		height = window_avail_size.y;
@@ -38,16 +47,32 @@ bool Viewport::PreUpdate()
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
-	glClearColor(current_camera->background.r, current_camera->background.g, current_camera->background.b, current_camera->background.a);
+	glClearColor(camera->background.r, camera->background.g, camera->background.b, camera->background.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
-	OnCameraUpdate();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glLoadTransposeMatrixf(camera->projection_matrix/*4x4.Transposed().ptr()*/);
 
-	/*if (current_camera->update_projection)
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLoadTransposeMatrixf(camera->view_matrix);
+
+
+
+
+
+	//OnCameraUpdate();
+	/*if (true)
 	{
 		OnCameraUpdate();
-		current_camera->update_projection = false;
+		camera->update_projection = false;
+	}
+	else if (camera->update_projection)
+	{
+		OnCameraUpdate();
+		camera->update_projection = false;
 	}*/
 
 	return true;
@@ -61,9 +86,7 @@ void Viewport::Draw()
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
 
-	//current_camera->DrawFrustum();
-
-	//if (current_camera == viewport_camera)
+	//if (camera == viewport_camera)
 	//{
 		App->scene_base->Draw();
 		App->scene->Draw();
@@ -94,18 +117,18 @@ void Viewport::OnResize(float width, float height)
 {
 	glViewport(0, 0, width, height);
 
-	current_camera->SetAspectRatio(width/height);
+	camera->SetAspectRatio(width/height);
 }
 
-void Viewport::OnCameraUpdate()
-{
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glLoadMatrixf(current_camera->GetProjectionMatrix());
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glLoadMatrixf(current_camera->GetViewMatrix());
-
-}
+//void Viewport::OnCameraUpdate()
+//{
+//
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
+//	glLoadMatrixf(camera->GetProjectionMatrix());
+//
+//	glMatrixMode(GL_MODELVIEW);
+//	glLoadIdentity();
+//	glLoadMatrixf(camera->GetViewMatrix());
+//
+//}
