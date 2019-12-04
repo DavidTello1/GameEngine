@@ -5,6 +5,7 @@
 #include "ModuleWindow.h"
 #include "ModuleEditor.h"
 #include "Config.h"
+#include "Color.h"
 
 
 #include "glew/include/GL/glew.h"
@@ -104,3 +105,15 @@ void ModuleRenderer3D::SetVSync(bool vsync)
 			LOG("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 	}
 }
+
+void glColorColorU(const Color &c)
+{
+	glColor3ub(c.r * 255, c.g * 255, c.b * 255);
+}
+
+void glColorColorF(const Color &c)
+{
+	glColor3f(c.r, c.g, c.b );
+
+}
+

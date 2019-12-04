@@ -269,6 +269,9 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+// This mid step function is needed because the call is made inside the panel drawing, 
+// more concretly inside the inspector of the camera, so it breaks if the panels.size
+// changes in mid loop execution
 void ModuleEditor::AddViewport(ComponentCamera * camera)
 {
 	is_want_new_viewport = true;

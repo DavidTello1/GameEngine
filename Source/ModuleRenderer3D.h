@@ -1,8 +1,9 @@
 #pragma once
 #include "Module.h"
-#include "Globals.h"
 
 #define MAX_LIGHTS 8
+
+class Color;
 
 typedef void *SDL_GLContext;
 
@@ -29,3 +30,5 @@ public:
 	bool vsync = false;
 	bool in_game = false;
 };
+	extern void glColorColorU(const Color & c);
+	extern void glColorColorF(const Color & c);
