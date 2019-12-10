@@ -226,7 +226,7 @@ void Assets::DrawHierarchy(const PathNode& node)
 
 	if (node.file == false) //if folder is not empty
 	{
-		bool open = ImGui::TreeNodeEx(node.localPath.c_str(), nodeFlags, node.localPath.c_str());
+		bool open = ImGui::TreeNodeEx(node.file_name.c_str(), nodeFlags, node.file_name.c_str());
 
 		if (ImGui::IsItemClicked()) //current_node update
 		{
@@ -265,7 +265,7 @@ void Assets::DrawIcons(const PathNode& node)
 		ImGui::Image((ImTextureID)GetIcon(node.children[i]), ImVec2(size, size), ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), border_color);
 
 		// Text size
-		std::string text = node.children[i].localPath;
+		std::string text = node.children[i].file_name;
 		std::string dots = "...";
 		
 		uint text_size = ImGui::CalcTextSize(text.c_str()).x;
@@ -310,17 +310,19 @@ uint Assets::GetIcon(const PathNode& node)
 		uint64 resourceID = App->resources->GetIDFromMeta(metaFile.c_str());
 		Resource* resource = App->resources->GetResource(resourceID);
 
-		if (resource->GetType() == Resource::Type::model) //if model
-			return model_icon;
+		if (resource != nullptr)
+		{
+			if (resource->GetType() == Resource::Type::model) //if model
+				return model_icon;
 
-		else if (resource->GetType() == Resource::Type::material) //if material
-			return material_icon;
+			else if (resource->GetType() == Resource::Type::material) //if material
+				return material_icon;
 
-		else if (resource->GetType() == Resource::Type::scene) //if scene
-			return scene_icon;
-
-		else
-			return file_icon;
+			else if (resource->GetType() == Resource::Type::scene) //if scene
+				return scene_icon;
+		}
+		
+		return file_icon;
 	}
 }
 

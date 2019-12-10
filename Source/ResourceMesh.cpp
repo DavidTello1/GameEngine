@@ -25,12 +25,11 @@ UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 	ResourceMesh* mesh = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh)); //create new mesh
 
 	// Load Mesh info
-	mesh->name = ai_mesh->mName.C_Str();
-	LOG("Importing mesh '%s'", (mesh->name.c_str()), 'g');
+	LOG("Importing mesh '%s'", ai_mesh->mName.C_Str(), 'g');
 
 	bool ret = mesh->LoadMesh(ai_mesh);
 	if (!ret)
-		LOG("Error Importing info from mesh '%s'", (mesh->name.c_str()), 'e');
+		LOG("Error Importing info from mesh '%s'", ai_mesh->mName.C_Str(), 'e');
 
 	// Saving to own format
 	std::string output;
@@ -39,10 +38,7 @@ UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 		mesh->original_file = source_file; //get file
 		App->file_system->NormalizePath(mesh->original_file);
 
-		std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
-		mesh->exported_file = file_name;
-
-		LOG("Imported aiMesh from [%s] to [%s]", mesh->GetFile(), mesh->GetExportedFile());
+		LOG("Imported aiMesh from [%s]", mesh->GetFile());
 	}
 	else
 	{
@@ -90,7 +86,11 @@ bool ResourceMesh::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
 
-	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MESH_FOLDER, std::to_string(GetID()).c_str(), "dvs_mesh"); //save
+	output = LIBRARY_MESH_FOLDER + std::to_string(uid) + ".dvs_mesh";
+	if (App->file_system->Save(output.c_str(), &data[0], data.size()) > 0) //save file
+		return true;
+
+	return false;
 }
 
 bool ResourceMesh::LoadtoScene()
@@ -98,7 +98,8 @@ bool ResourceMesh::LoadtoScene()
 	if (GetExportedFile() != nullptr)
 	{
 		char* buffer = nullptr;
-		uint size = App->file_system->LoadFromPath(LIBRARY_MESH_FOLDER, GetExportedFile(), &buffer);
+		std::string file = LIBRARY_MESH_FOLDER + std::to_string(uid) + ".dvs_mesh";
+		uint size = App->file_system->Load(file.c_str(), &buffer); //get total size
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 

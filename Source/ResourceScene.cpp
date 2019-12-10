@@ -17,21 +17,18 @@ ResourceScene::~ResourceScene()
 {
 }
 
-bool ResourceScene::Import(const char* full_path, std::string& output)
+bool ResourceScene::Import(const char* full_path, std::string& asset_file)
 {
 	ResourceScene scene(0);
 
-	bool ret = scene.SaveOwnFormat(output);
+	bool ret = scene.SaveOwnFormat(asset_file);
 
 	if (ret)
 	{
 		scene.original_file = full_path; //get file
 		App->file_system->NormalizePath(scene.original_file);
 
-		std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
-		scene.exported_file = file_name;
-
-		LOG("Imported scene from [%s] to [%s]", scene.GetFile(), scene.GetExportedFile());
+		LOG("Imported scene from [%s] to [%s]", scene.GetFile());
 	}
 	else
 	{
@@ -89,7 +86,11 @@ bool ResourceScene::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get stream vector
 
-	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_SCENE_FOLDER, std::to_string(GetID()).c_str(), "dvs"); //save file
+	output = LIBRARY_SCENE_FOLDER + std::to_string(uid) + ".dvs_scene";
+	if (App->file_system->Save(output.c_str(), &data[0], data.size()) > 0) //save file
+		return true;
+
+	return false;
 }
 
 bool ResourceScene::LoadtoScene()
@@ -97,7 +98,8 @@ bool ResourceScene::LoadtoScene()
 	if (GetExportedFile() != nullptr)
 	{
 		char* buffer = nullptr;
-		uint size = App->file_system->LoadFromPath(LIBRARY_SCENE_FOLDER, GetExportedFile(), &buffer); //get total size
+		std::string file = LIBRARY_SCENE_FOLDER + std::to_string(uid) + ".dvs_scene";
+		uint size = App->file_system->Load(file.c_str(), &buffer); //get total size
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 
@@ -171,7 +173,7 @@ bool ResourceScene::LoadtoScene()
 
 void ResourceScene::UnLoad()
 {
-	LOG("UnLoading Scene %s with uid %d", name.c_str(), uid, 'd');
+	LOG("UnLoading Scene with uid %d", uid, 'd');
 	for (uint i = 0; i < gameobjs.size(); ++i)
 	{
 		RELEASE(gameobjs[i]);

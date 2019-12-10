@@ -37,7 +37,7 @@ ResourceModel::~ResourceModel()
 //	Resource::Load(config);
 //}
 
-bool ResourceModel::Import(const char* full_path, std::string& output)
+bool ResourceModel::Import(const char* full_path, std::string& asset_file)
 {
 	Timer timer;
 	timer.Start();
@@ -45,13 +45,9 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 	const aiScene* scene = aiImportFileEx(full_path, aiProcessPreset_TargetRealtime_MaxQuality, nullptr);
 	if (scene)
 	{
+		LOG("Importing model from '%s'", full_path, 'g');
 		ResourceModel model(0);
 		std::vector<UID> materials, meshes;
-
-		model.name = App->file_system->GetFileName(full_path);
-		model.name = model.name.substr(0, model.name.size() - 4);
-		LOG("Importing model '%s'", (model.name.c_str()), 'g');
-
 
 		// Generate Materials
 		materials.reserve(scene->mNumMaterials); //reserve capacity for num of materials
@@ -77,7 +73,8 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 
 		aiReleaseImport(scene);
 
-		bool ret = model.SaveOwnFormat(output);
+		// Save to Own Format
+		bool ret = model.SaveOwnFormat(asset_file);
 		model.nodes.clear(); //clear nodes data
 
 		if (ret)
@@ -85,10 +82,7 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 			model.original_file = full_path; //get file
 			App->file_system->NormalizePath(model.original_file);
 
-			std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
-			model.exported_file = file_name;
-
-			LOG("Imported aiScene from [%s] to [%s]", model.GetFile(), model.GetExportedFile());
+			LOG("Imported aiScene from [%s]", model.GetFile());
 		}
 		else
 		{
@@ -119,7 +113,11 @@ bool ResourceModel::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get stream vector
 
-	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MODEL_FOLDER, name.c_str(), "dvs_model"); //save file
+	output = LIBRARY_MODEL_FOLDER + std::to_string(uid) + ".dvs_model";
+	if (App->file_system->Save(output.c_str(), &data[0], data.size()) > 0) //save file
+		return true;
+
+	return false;
 }
 
 bool ResourceModel::LoadtoScene()
@@ -129,7 +127,8 @@ bool ResourceModel::LoadtoScene()
 		Timer timer;
 		timer.Start();
 		char* buffer = nullptr;
-		uint size = App->file_system->LoadFromPath(LIBRARY_MODEL_FOLDER, GetExportedFile(), &buffer); //get total size
+		std::string file = LIBRARY_MODEL_FOLDER + std::to_string(uid) + ".dvs_model";
+		uint size = App->file_system->Load(file.c_str(), &buffer); //get total size
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 
@@ -155,7 +154,7 @@ bool ResourceModel::LoadtoScene()
 			nodes.push_back(node); //add node to vector nodes
 		}
 
-		LOG("[%s] loaded in %d ms", GetExportedFile(), timer.Read(), 'd');
+		LOG("[%s] loaded in %d ms", GetExportedFile(), 'd');
 		timer.Stop();
 		return true;
 	}
@@ -164,7 +163,7 @@ bool ResourceModel::LoadtoScene()
 
 void ResourceModel::UnLoad()
 {
-	LOG("UnLoading Model %s with uid %d", name.c_str(), uid, 'd');
+	LOG("UnLoading Model with uid %d", uid, 'd');
 	for (uint i = 0; i < nodes.size(); ++i)
 	{
 		if (nodes[i].mesh != 0)

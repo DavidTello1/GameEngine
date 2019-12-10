@@ -24,16 +24,12 @@ public:
 
 	Resource::Type GetType() const { return type; }
 	UID GetID() const { return uid; }
-
-	const char* GetName() const { return name.c_str(); }
-	void SetName(std::string n) { name = n; }
+	const char* GetFile() const { return original_file.c_str(); }
+	const char* GetExportedFile() const;
 
 	//virtual void Save(Config& config) const;
 	//virtual void Load(const Config& config);
 	
-	const char* GetFile() const { return original_file.c_str(); }
-	const char* GetExportedFile() const { return exported_file.c_str(); }
-
 	bool LoadToMemory();
 	void ReleaseFromMemory();
 	bool IsLoadedToMemory() const { return times_loaded > 0; }
@@ -47,10 +43,7 @@ protected:
 protected:
 	UID uid = 0;
 	Type type = unknown;
-	std::string name;
-
-	std::string original_file;
-	std::string exported_file;
+	std::string original_file; //bakerhouse.fbx
 
 	uint times_loaded = 0;
 

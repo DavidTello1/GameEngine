@@ -364,7 +364,7 @@ void Configuration::DrawResources()
 {
 	ImGui::Text("Total Resources Loaded:");
 	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", App->resources->GetResourcesSize());
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", App->resources->GetNumResources());
 
 	ImGui::Text("Default Resources:");
 	ImGui::SameLine();

@@ -26,3 +26,28 @@ void Resource::ReleaseFromMemory()
 	if (--times_loaded == 0)
 		UnLoad();
 }
+
+const char* Resource::GetExportedFile() const
+{
+	std::string file(std::to_string(uid));
+
+	switch (type)
+	{
+	case unknown:
+		break;
+	case model:
+		file += ".dvs_model";
+		break;
+	case mesh:
+		file += ".dvs_mesh";
+		break;
+	case material:
+		file += ".dvs_material";
+		break;
+	case scene:
+		file += ".dvs_scene";
+		break;
+	}
+
+	return file.c_str();
+}

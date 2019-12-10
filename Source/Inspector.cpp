@@ -47,9 +47,9 @@ void Inspector::DrawResource(Resource* res)
 		ImGui::EndMenuBar();
 	}
 
-	ImGui::Text("Name: ");
-	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), res->GetName());
+	//ImGui::Text("Name: ");
+	//ImGui::SameLine();
+	//ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), res->GetName());
 
 	ImGui::Text("ID: ");
 	ImGui::SameLine();

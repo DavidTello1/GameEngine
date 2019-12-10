@@ -182,7 +182,7 @@ void Application::SetFramerateLimit(uint max_framerate)
 
 void Application::ReadConfiguration(const Config& config)
 {
-	app_name = config.GetString("Name", "Davos Game Engine");
+	SetAppName(config.GetString("Name", "Davos Game Engine").c_str());
 	organization_name = config.GetString("Organization", "");
 	SetFramerateLimit(config.GetNumber("MaxFramerate", 0));
 }

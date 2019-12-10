@@ -93,50 +93,49 @@ bool ModuleResources::CleanUp()
 	return true;
 }
 
-bool ModuleResources::ImportFromOutside(const char* path, UID uid)
+bool ModuleResources::ImportFromPath(const char* path, UID uid)
 {
 	std::string final_path = App->file_system->GetFileName(path); //get file name
 	final_path = ASSETS_FOLDER + final_path;
 
 	App->file_system->NormalizePath(final_path);
 
-	if (App->file_system->CopyFromOutsideFS(path, final_path.c_str()) == true) //copy file to final_path
-	{
+	if (App->file_system->CopyFromOutside(path, final_path.c_str()) == true) //copy file to final_path
 		return ImportResource(final_path.c_str(), uid);
-	}
+
 	return false;
 }
 
 bool ModuleResources::ImportResource(const char* final_path, UID uid)
 {
-	bool import_ok = false;
-	std::string written_file;
-	Resource::Type type = GetResourceType(final_path); //get resource type
-
-	if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded and if so, init uid
+	if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded
 	{
-		Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
+		// ***if last mod date not equal reimport
 		LOG("File is already loaded in memory", 'd');
 		return true;
 	}
+
+	bool import_ok = false;
+	std::string asset_file;
+	Resource::Type type = GetResourceType(final_path); //get resource type
 
 	switch (type) //import depending on type
 	{
 	case Resource::model:
 	{
-		import_ok = ResourceModel::Import(final_path, written_file);
+		import_ok = ResourceModel::Import(final_path, asset_file);
 		break;
 	}
 	case Resource::material:
-		import_ok = ResourceMaterial::Import(final_path, written_file);
+		import_ok = ResourceMaterial::Import(final_path, asset_file);
 		break;
 	case Resource::scene:
-		import_ok = ResourceScene::Import(final_path, written_file);
+		import_ok = ResourceScene::Import(final_path, asset_file);
 	}
 
 	if (import_ok == true)
 	{
-		Resource* res = CreateInitResource(type, uid, final_path, written_file); //create and init resource
+		Resource* res = CreateResource(type, final_path, uid);
 		SaveMeta(res);
 	}
 	else
@@ -147,7 +146,7 @@ bool ModuleResources::ImportResource(const char* final_path, UID uid)
 	return true;
 }
 
-Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
+Resource* ModuleResources::CreateResource(Resource::Type type, const char* path, UID force_uid)
 {
 	Resource* ret = nullptr;
 	UID uid;
@@ -155,7 +154,7 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 	if (force_uid != 0 && GetResource(force_uid) == nullptr)
 		uid = force_uid;
 	else
-		uid = GenerateUID();
+		uid = App->random->Int();
 
 	switch (type)
 	{
@@ -165,53 +164,25 @@ Resource* ModuleResources::CreateResource(Resource::Type type, UID force_uid)
 		ret = new ResourceModel(uid);
 		break;
 	case Resource::mesh:
-		ret = (Resource*) new ResourceMesh(uid);
+		ret = new ResourceMesh(uid);
 		break;
 	case Resource::material:
-		ret = (Resource*) new ResourceMaterial(uid);
+		ret = new ResourceMaterial(uid);
 		break;
 	case Resource::scene:
-		ret = (Resource*) new ResourceScene(uid);
+		ret = new ResourceScene(uid);
 		break;
 	}
 
 	if (ret != nullptr)
 	{
+		if (path != nullptr)
+			ret->original_file = path;
+
 		resources[uid] = ret;
 	}
 
 	return ret;
-}
-
-Resource* ModuleResources::CreateInitResource(Resource::Type type, UID uid, const char* final_path, std::string& written_file)
-{
-	Resource* res = CreateResource(type); //create new resource
-	uid = res->uid; //fill uid
-
-	res->original_file = final_path; //get file
-	std::string exported_file = App->file_system->GetFileName(written_file.c_str()); //get exported file
-
-	if (exported_file.c_str() != NULL) //check for errors
-	{
-		res->exported_file = exported_file.c_str();
-		LOG("Imported successful from [%s] to [%s]", res->GetFile(), res->GetExportedFile(), 'd');
-	}
-	else
-	{
-		LOG("Unable to export file [%s]", res->GetFile(), 'e');
-		return false;
-	}
-
-	res->name = App->file_system->GetFileName(res->original_file.c_str()); //fill resource name
-
-	if (res->name.empty()) //if empty, name = exported file
-		res->name = res->exported_file;
-
-	size_t pos_dot = res->name.find_last_of("."); //get last dot position
-	if (pos_dot != std::string::npos)
-		res->name.erase(res->name.begin() + pos_dot, res->name.end()); //erase extension from name
-
-	return res;
 }
 
 void ModuleResources::RemoveResource(UID uid)
@@ -246,44 +217,6 @@ Resource* ModuleResources::GetResource(UID uid)
 	return nullptr;
 }
 
-UID ModuleResources::GenerateUID()
-{
-	++last_uid;
-	SaveUID();
-	return last_uid;
-}
-
-void ModuleResources::LoadUID()
-{
-	std::string file(SETTINGS_FOLDER);
-	file += "Last UID";
-
-	char *buf = nullptr;
-	uint size = App->file_system->Load(file.c_str(), &buf);
-
-	if (size == sizeof(last_uid))
-	{
-		last_uid = *((UID*)buf);
-		RELEASE_ARRAY(buf);
-	}
-	else
-	{
-		LOG("WARNING! Cannot read resource UID from file [%s] - Generating a new one", file.c_str());
-		SaveUID();
-	}
-}
-
-void ModuleResources::SaveUID() const
-{
-	std::string file(SETTINGS_FOLDER);
-	file += "Last UID";
-
-	uint size = App->file_system->Save(file.c_str(), (const char*)&last_uid, sizeof(last_uid));
-
-	if (size != sizeof(last_uid))
-		LOG("WARNING! Cannot write resource UID into file [%s]", file.c_str());
-}
-
 const char* ModuleResources::GetDirectory(Resource::Type type) const
 {
 	static_assert(Resource::Type::unknown == 0, "String list needs update");
@@ -307,7 +240,8 @@ Resource::Type ModuleResources::GetResourceType(const char* path) const
 		type = Resource::Type::model;
 		LOG("Importing resource model from %s", path, 'd');
 	}
-	else if (strcmp("dds", extension.c_str()) == 0 || strcmp("png", extension.c_str()) == 0 || strcmp("jpg", extension.c_str()) == 0)
+	else if (strcmp("dds", extension.c_str()) == 0 || strcmp("png", extension.c_str()) == 0 || 
+			 strcmp("jpg", extension.c_str()) == 0 || strcmp("tga", extension.c_str()) == 0)
 	{
 		type = Resource::Type::material;
 		LOG("Importing resource material from %s", path, 'd');
@@ -320,7 +254,7 @@ Resource::Type ModuleResources::GetResourceType(const char* path) const
 	else
 	{
 		type = Resource::Type::unknown;
-		LOG("File format not supported from %s", path, 'e');
+		LOG("%s format not supported from %s", extension.c_str(), path, 'e');
 	}
 
 	return type;
@@ -362,19 +296,13 @@ void ModuleResources::UpdateAssets()
 
 void ModuleResources::UpdateAssetsFolder(const PathNode& node)
 {
-	//If node is a file
-	if (node.file == true)
-	{
+	if (node.file == true) //If node is a file
 		ImportResource(node.path.c_str());
-	}
 
-	//If node folder has something inside
-	else if (node.leaf == false)
+	else if (node.leaf == false) //If node folder has something inside
 	{
 		for (uint i = 0; i < node.children.size(); i++)
-		{
 			UpdateAssetsFolder(node.children[i]);
-		}
 	}
 }
 
@@ -436,9 +364,9 @@ void ModuleResources::LoadCheckersTexture()
 		checkImage);
 }
 
-uint64 ModuleResources::GetIDFromMeta(const char* path)
+UID ModuleResources::GetIDFromMeta(const char* path)
 {
-	uint64 ret = 0;
+	UID ret = 0;
 
 	char* buffer = nullptr;
 	uint size = App->file_system->Load(path, &buffer);
@@ -456,7 +384,7 @@ void ModuleResources::SaveMeta(const Resource* resource)
 	Config config;
 
 	config.SetNumber("ID", resource->uid);
-	config.SetString("Name", resource->name.c_str());
+	config.SetString("File", resource->original_file.c_str());
 	config.SetNumber("Type", static_cast<int>(resource->GetType()));
 
 	char* buffer = nullptr;
@@ -481,18 +409,17 @@ bool ModuleResources::LoadMeta(const char* file)
 		sourceFile = std::string(file).substr(0, sourceFile.size() - 5);
 
 		meta.original_file = sourceFile;
-		meta.resource_name = config.GetString("Name");
-		meta.id = config.GetNumber("ID");
+		meta.uid = config.GetNumber("ID");
 		meta.type = static_cast<Resource::Type>((int)(config.GetNumber("Type")));
-		existing_res[meta.id] = meta;
+		existing_res[meta.uid] = meta;
 
-		if (meta.type == Resource::model)
-		{
-			std::string resFile = "/Library/GameObjects/";
-			resFile.append(std::to_string(meta.id));
+		//if (meta.type == Resource::model)
+		//{
+		//	std::string resFile = "/Library/GameObjects/";
+		//	resFile.append(std::to_string(meta.uid));
 
-			LoadSceneMeta(resFile.c_str(), sourceFile.c_str());
-		}
+		//	LoadSceneMeta(resFile.c_str(), sourceFile.c_str());
+		//}
 		return true;
 	}
 	return false;
@@ -500,32 +427,32 @@ bool ModuleResources::LoadMeta(const char* file)
 
 bool ModuleResources::LoadSceneMeta(const char* file, const char* source_file)
 {
-	char* buffer = nullptr;
-	uint size = App->file_system->Load(file, &buffer);
-	if (size > 0)
-	{
-		Config config(buffer);
-		Config_Array GameObjects = config.GetArray("GameObjects");
+	//char* buffer = nullptr;
+	//uint size = App->file_system->Load(file, &buffer);
+	//if (size > 0)
+	//{
+	//	Config config(buffer);
+	//	Config_Array GameObjects = config.GetArray("GameObjects");
 
-		for (uint i = 0; i < GameObjects.GetSize(); i++)
-		{
-			Config_Array components = GameObjects.GetNode(i).GetArray("Components");
+	//	for (uint i = 0; i < GameObjects.GetSize(); i++)
+	//	{
+	//		Config_Array components = GameObjects.GetNode(i).GetArray("Components");
 
-			for (uint i = 0; i < components.GetSize(); i++)
-			{
-				Config resource = components.GetNode(i);
-				if (resource.GetBool("HasResource"))
-				{
-					MetaFile meta;
-					meta.id = resource.GetNumber("ID");
-					meta.type = static_cast<Resource::Type>((int)resource.GetNumber("Type"));
-					meta.resource_name = resource.GetString("ResourceName");
-					meta.original_file = source_file;
-					existing_res[meta.id] = meta;
-				}
-			}
-		}
+	//		for (uint i = 0; i < components.GetSize(); i++)
+	//		{
+	//			Config resource = components.GetNode(i);
+	//			if (resource.GetBool("HasResource"))
+	//			{
+	//				MetaFile meta;
+	//				meta.id = resource.GetNumber("ID");
+	//				meta.type = static_cast<Resource::Type>((int)resource.GetNumber("Type"));
+	//				meta.resource_name = resource.GetString("ResourceName");
+	//				meta.original_file = source_file;
+	//				existing_res[meta.id] = meta;
+	//			}
+	//		}
+	//	}
 		return true;
-	}
-	return false;
+	//}
+	//return false;
 }
