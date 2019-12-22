@@ -114,10 +114,13 @@ void Assets::Draw()
 		
 		else if (filter_scenes)
 			ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.0f, 1.0f), "Showing All Scenes");
+		
+		else if (selected_node.path != "")
+			ImGui::Text(selected_node.path.c_str());
 
 		else
 			ImGui::Text(current_node.path.c_str());
-		
+
 		ImGui::EndMenuBar();
 	}
 	DrawIcons(current_node); // Draw Icons
@@ -288,7 +291,6 @@ void Assets::DrawIcons(const PathNode& node)
 		if (ImGui::IsItemClicked())
 		{
 			selected_node = node.children[i];
-			//App->editor.t
 		}
 
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0) && selected_node.file == false) //open folder
