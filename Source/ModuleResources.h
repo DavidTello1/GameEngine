@@ -46,7 +46,7 @@ public:
 	Resource* CreateResource(Resource::Type type, const char* path = nullptr, UID uid = 0);
 	void RemoveResource(UID uid);
 	const Resource* GetResource(UID uid) const;
-	Resource * GetResource(UID uid);
+	Resource* GetResource(UID uid);
 	Resource::Type GetResourceType(const char* path) const;
 
 	uint GetNumResources() { return resources.size(); }
@@ -79,10 +79,10 @@ public:
 	};
 
 private:
-	std::map<UID, Resource*> resources;
+	std::vector<Resource*> loaded;
 	std::vector<Resource*> removed;
 
-	std::map<uint64, MetaFile> existing_res;
+	std::map<UID, Resource*> resources;
 };
 
 extern GLuint aabb_indices[24];

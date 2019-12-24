@@ -53,8 +53,8 @@ bool ResourceModel::Import(const char* full_path, std::string& asset_file)
 		materials.reserve(scene->mNumMaterials); //reserve capacity for num of materials
 		for (unsigned i = 0; i < scene->mNumMaterials; ++i)
 		{
-			std::string output2;
-			materials.push_back(ResourceMaterial::Import(full_path, output2, scene->mMaterials[i])); //import material
+			std::string asset_file2;
+			materials.push_back(ResourceMaterial::Import(full_path, asset_file2, scene->mMaterials[i])); //import material
 
 			assert(materials.back() != 0); //asssert if vector materials is empty
 		}
@@ -96,9 +96,9 @@ bool ResourceModel::Import(const char* full_path, std::string& asset_file)
 	return false;
 }
 
-bool ResourceModel::SaveOwnFormat(std::string& output) const
+bool ResourceModel::SaveOwnFormat(std::string& asset_file) const
 {
-	simple::mem_ostream<std::true_type> write_stream; //create output stream
+	simple::mem_ostream<std::true_type> write_stream; //create asset_file stream
 
 	write_stream << uint(nodes.size()); // save nodes size
 
@@ -113,8 +113,8 @@ bool ResourceModel::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get stream vector
 
-	output = LIBRARY_MODEL_FOLDER + std::to_string(uid) + ".dvs_model";
-	if (App->file_system->Save(output.c_str(), &data[0], data.size()) > 0) //save file
+	asset_file = LIBRARY_MODEL_FOLDER + std::to_string(uid) + ".dvs_model";
+	if (App->file_system->Save(asset_file.c_str(), &data[0], data.size()) > 0) //save file
 		return true;
 
 	return false;

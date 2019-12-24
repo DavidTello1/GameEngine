@@ -42,7 +42,7 @@ UID ResourceMaterial::Import(const char* source_file, std::string& asset_file, c
 		material->original_file = source_file; //get file
 		App->file_system->NormalizePath(material->original_file);
 
-		LOG("Imported aiMaterial from [%s] to [%s]", material->GetFile());
+		LOG("Imported aiMaterial from [%s]", material->GetFile());
 	}
 	else
 	{
@@ -75,7 +75,7 @@ bool ResourceMaterial::ImportTexture(const char* path)
 
 bool ResourceMaterial::SaveOwnFormat(std::string& asset_file) const
 {
-	simple::mem_ostream<std::true_type> write_stream; //create output stream
+	simple::mem_ostream<std::true_type> write_stream; //create asset_file stream
 
 	write_stream << tex_id;
 	write_stream << tex_height;
@@ -83,8 +83,7 @@ bool ResourceMaterial::SaveOwnFormat(std::string& asset_file) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
 
-	asset_file = LIBRARY_MATERIAL_FOLDER + std::to_string(uid);
-
+	asset_file = LIBRARY_MATERIAL_FOLDER + std::to_string(uid) + ".dvs_material";
 	if (App->file_system->Save(asset_file.c_str(), &data[0], data.size()) > 0) //save file
 		return true;
 

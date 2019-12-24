@@ -36,7 +36,7 @@ public:
 	uint CountReferences() const { return times_loaded; }
 
 protected:
-	virtual bool SaveOwnFormat(std::string& output) const = 0;
+	virtual bool SaveOwnFormat(std::string& asset_file) const = 0;
 	virtual bool LoadtoScene() = 0;
 	virtual void UnLoad() = 0;
 

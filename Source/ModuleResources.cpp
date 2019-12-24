@@ -59,7 +59,6 @@ bool ModuleResources::Start(Config* config)
 	LoadCheckersTexture();
 	LoadAssetsIcons();
 
-	//LoadResourcesData();
 	UpdateAssets();
 
 	// Creation of the Index Buffer Object of the bounding boxes array, as all uses the same
@@ -122,15 +121,16 @@ bool ModuleResources::ImportResource(const char* final_path, UID uid)
 	switch (type) //import depending on type
 	{
 	case Resource::model:
-	{
 		import_ok = ResourceModel::Import(final_path, asset_file);
 		break;
-	}
+
 	case Resource::material:
 		import_ok = ResourceMaterial::Import(final_path, asset_file);
 		break;
+
 	case Resource::scene:
 		import_ok = ResourceScene::Import(final_path, asset_file);
+		break;
 	}
 
 	if (import_ok == true)
@@ -290,6 +290,7 @@ void ModuleResources::UpdateAssets()
 {
 	std::vector<std::string> ignore_extensions;
 	ignore_extensions.push_back("meta");
+
 	PathNode assets = App->file_system->GetAllFiles("Assets", nullptr, &ignore_extensions);
 	UpdateAssetsFolder(assets);
 }
@@ -297,8 +298,10 @@ void ModuleResources::UpdateAssets()
 void ModuleResources::UpdateAssetsFolder(const PathNode& node)
 {
 	if (node.file == true) //If node is a file
+	{
+		//UID id = GetIDFromMeta(node.path.c_str()); // check if meta exists
 		ImportResource(node.path.c_str());
-
+	}
 	else if (node.leaf == false) //If node folder has something inside
 	{
 		for (uint i = 0; i < node.children.size(); i++)
@@ -366,17 +369,18 @@ void ModuleResources::LoadCheckersTexture()
 
 UID ModuleResources::GetIDFromMeta(const char* path)
 {
-	UID ret = 0;
-
 	char* buffer = nullptr;
 	uint size = App->file_system->Load(path, &buffer);
 
 	if (size > 0)
-		ret = Config(buffer).GetNumber("ID");
+	{
+		UID ret = Config(buffer).GetNumber("ID");
+		delete[] buffer;
+		return ret;
+	}
 
 	delete[] buffer;
-
-	return ret;
+	return 0;
 }
 
 void ModuleResources::SaveMeta(const Resource* resource)
@@ -398,20 +402,20 @@ void ModuleResources::SaveMeta(const Resource* resource)
 
 bool ModuleResources::LoadMeta(const char* file)
 {
-	char* buffer = nullptr;
-	uint size = App->file_system->Load(file, &buffer);
-	MetaFile meta;
-	if (size > 0)
-	{
-		Config config(buffer);
+	//char* buffer = nullptr;
+	//uint size = App->file_system->Load(file, &buffer);
+	//MetaFile meta;
+	//if (size > 0)
+	//{
+	//	Config config(buffer);
 
-		std::string sourceFile = file;
-		sourceFile = std::string(file).substr(0, sourceFile.size() - 5);
+	//	std::string sourceFile = file;
+	//	sourceFile = std::string(file).substr(0, sourceFile.size() - 5);
 
-		meta.original_file = sourceFile;
-		meta.uid = config.GetNumber("ID");
-		meta.type = static_cast<Resource::Type>((int)(config.GetNumber("Type")));
-		existing_res[meta.uid] = meta;
+	//	meta.original_file = sourceFile;
+	//	meta.uid = config.GetNumber("ID");
+	//	meta.type = static_cast<Resource::Type>((int)(config.GetNumber("Type")));
+	//	existing_res[meta.uid] = meta;
 
 		//if (meta.type == Resource::model)
 		//{
@@ -421,8 +425,8 @@ bool ModuleResources::LoadMeta(const char* file)
 		//	LoadSceneMeta(resFile.c_str(), sourceFile.c_str());
 		//}
 		return true;
-	}
-	return false;
+	//}
+	//return false;
 }
 
 bool ModuleResources::LoadSceneMeta(const char* file, const char* source_file)

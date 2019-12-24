@@ -40,9 +40,9 @@ bool ResourceScene::Import(const char* full_path, std::string& asset_file)
 	return ret;
 }
 
-bool ResourceScene::SaveOwnFormat(std::string& output) const
+bool ResourceScene::SaveOwnFormat(std::string& asset_file) const
 {
-	simple::mem_ostream<std::true_type> write_stream; //create output stream
+	simple::mem_ostream<std::true_type> write_stream; //create asset_file stream
 
 	write_stream << uint(App->scene->gameObjects.size()); // save gameobjects size
 
@@ -86,8 +86,8 @@ bool ResourceScene::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get stream vector
 
-	output = LIBRARY_SCENE_FOLDER + std::to_string(uid) + ".dvs_scene";
-	if (App->file_system->Save(output.c_str(), &data[0], data.size()) > 0) //save file
+	asset_file = LIBRARY_SCENE_FOLDER + std::to_string(uid) + ".dvs_scene";
+	if (App->file_system->Save(asset_file.c_str(), &data[0], data.size()) > 0) //save file
 		return true;
 
 	return false;

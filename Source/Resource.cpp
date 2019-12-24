@@ -23,7 +23,10 @@ bool Resource::LoadToMemory()
 
 void Resource::ReleaseFromMemory()
 {
-	if (--times_loaded == 0)
+	if (times_loaded > 0)
+		times_loaded--;
+
+	if (times_loaded == 0)
 		UnLoad();
 }
 

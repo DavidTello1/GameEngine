@@ -32,8 +32,8 @@ UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 		LOG("Error Importing info from mesh '%s'", ai_mesh->mName.C_Str(), 'e');
 
 	// Saving to own format
-	std::string output;
-	if (mesh->SaveOwnFormat(output))
+	std::string asset_file;
+	if (mesh->SaveOwnFormat(asset_file))
 	{
 		mesh->original_file = source_file; //get file
 		App->file_system->NormalizePath(mesh->original_file);
@@ -50,9 +50,9 @@ UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 	return mesh->uid;
 }
 
-bool ResourceMesh::SaveOwnFormat(std::string& output) const
+bool ResourceMesh::SaveOwnFormat(std::string& asset_file) const
 {
-	simple::mem_ostream<std::true_type> write_stream; //create output stream
+	simple::mem_ostream<std::true_type> write_stream; //create asset_file stream
 
 	// Store num of vertices, indices, tex_coords, normals
 	write_stream << num_vertices;
@@ -86,8 +86,8 @@ bool ResourceMesh::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
 
-	output = LIBRARY_MESH_FOLDER + std::to_string(uid) + ".dvs_mesh";
-	if (App->file_system->Save(output.c_str(), &data[0], data.size()) > 0) //save file
+	asset_file = LIBRARY_MESH_FOLDER + std::to_string(uid) + ".dvs_mesh";
+	if (App->file_system->Save(asset_file.c_str(), &data[0], data.size()) > 0) //save file
 		return true;
 
 	return false;
