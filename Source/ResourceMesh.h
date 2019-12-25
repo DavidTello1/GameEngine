@@ -40,8 +40,8 @@ public:
 	ResourceMesh(UID id);
 	virtual ~ResourceMesh();
 
-	static UID Import(const aiMesh* mesh, const char* source_file);
-	bool SaveOwnFormat(std::string& asset_file) const;
+	UID Import(const aiMesh* mesh, const char* source_file);
+	bool SaveOwnFormat() const;
 	bool LoadtoScene();
 	void UnLoad();
 

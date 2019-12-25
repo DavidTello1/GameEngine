@@ -22,35 +22,32 @@ ResourceMesh::~ResourceMesh()
 
 UID ResourceMesh::Import(const aiMesh* ai_mesh, const char* source_file)
 {
-	ResourceMesh* mesh = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh)); //create new mesh
-
 	// Load Mesh info
 	LOG("Importing mesh '%s'", ai_mesh->mName.C_Str(), 'g');
 
-	bool ret = mesh->LoadMesh(ai_mesh);
+	bool ret = LoadMesh(ai_mesh);
 	if (!ret)
 		LOG("Error Importing info from mesh '%s'", ai_mesh->mName.C_Str(), 'e');
 
 	// Saving to own format
-	std::string asset_file;
-	if (mesh->SaveOwnFormat(asset_file))
+	if (SaveOwnFormat())
 	{
-		mesh->original_file = source_file; //get file
-		App->file_system->NormalizePath(mesh->original_file);
+		original_file = source_file; //get file
+		App->file_system->NormalizePath(original_file);
 
-		LOG("Imported aiMesh from [%s]", mesh->GetFile());
+		LOG("Imported aiMesh from [%s]", GetFile());
 	}
 	else
 	{
 		LOG("Importing aiMesh %s FAILED", source_file);
 	}
 
-	mesh->UnLoad(); //release memory
+	UnLoad(); //release memory
 
-	return mesh->uid;
+	return uid;
 }
 
-bool ResourceMesh::SaveOwnFormat(std::string& asset_file) const
+bool ResourceMesh::SaveOwnFormat() const
 {
 	simple::mem_ostream<std::true_type> write_stream; //create asset_file stream
 
@@ -86,7 +83,7 @@ bool ResourceMesh::SaveOwnFormat(std::string& asset_file) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
 
-	asset_file = LIBRARY_MESH_FOLDER + std::to_string(uid) + ".dvs_mesh";
+	std::string asset_file = LIBRARY_MESH_FOLDER + GetExportedFile();
 	if (App->file_system->Save(asset_file.c_str(), &data[0], data.size()) > 0) //save file
 		return true;
 
@@ -95,10 +92,10 @@ bool ResourceMesh::SaveOwnFormat(std::string& asset_file) const
 
 bool ResourceMesh::LoadtoScene()
 {
-	if (GetExportedFile() != nullptr)
+	if (GetExportedFile().c_str() != nullptr)
 	{
 		char* buffer = nullptr;
-		std::string file = LIBRARY_MESH_FOLDER + std::to_string(uid) + ".dvs_mesh";
+		std::string file = LIBRARY_MESH_FOLDER + GetExportedFile();
 		uint size = App->file_system->Load(file.c_str(), &buffer); //get total size
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream

@@ -17,30 +17,28 @@ ResourceScene::~ResourceScene()
 {
 }
 
-bool ResourceScene::Import(const char* full_path, std::string& asset_file)
+bool ResourceScene::Import(const char* full_path)
 {
-	ResourceScene scene(0);
-
-	bool ret = scene.SaveOwnFormat(asset_file);
+	bool ret = SaveOwnFormat();
 
 	if (ret)
 	{
-		scene.original_file = full_path; //get file
-		App->file_system->NormalizePath(scene.original_file);
+		original_file = full_path; //get file
+		App->file_system->NormalizePath(original_file);
 
-		LOG("Imported scene from [%s] to [%s]", scene.GetFile());
+		LOG("Imported scene from [%s] to [%s]", GetFile());
 	}
 	else
 	{
 		LOG("Importing scene %s FAILED", full_path);
 	}
 
-	scene.LoadToMemory(); // HARDCODED : should be called when loading after importing (just for testing)
+	LoadToMemory(); // HARDCODED : should be called when loading after importing (just for testing)
 
 	return ret;
 }
 
-bool ResourceScene::SaveOwnFormat(std::string& asset_file) const
+bool ResourceScene::SaveOwnFormat() const
 {
 	simple::mem_ostream<std::true_type> write_stream; //create asset_file stream
 
@@ -86,7 +84,7 @@ bool ResourceScene::SaveOwnFormat(std::string& asset_file) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get stream vector
 
-	asset_file = LIBRARY_SCENE_FOLDER + std::to_string(uid) + ".dvs_scene";
+	std::string asset_file = LIBRARY_SCENE_FOLDER + GetExportedFile();
 	if (App->file_system->Save(asset_file.c_str(), &data[0], data.size()) > 0) //save file
 		return true;
 
@@ -95,10 +93,10 @@ bool ResourceScene::SaveOwnFormat(std::string& asset_file) const
 
 bool ResourceScene::LoadtoScene()
 {
-	if (GetExportedFile() != nullptr)
+	if (GetExportedFile().c_str() != nullptr)
 	{
 		char* buffer = nullptr;
-		std::string file = LIBRARY_SCENE_FOLDER + std::to_string(uid) + ".dvs_scene";
+		std::string file = LIBRARY_SCENE_FOLDER + GetExportedFile();
 		uint size = App->file_system->Load(file.c_str(), &buffer); //get total size
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream

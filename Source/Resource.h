@@ -25,7 +25,7 @@ public:
 	Resource::Type GetType() const { return type; }
 	UID GetID() const { return uid; }
 	const char* GetFile() const { return original_file.c_str(); }
-	const char* GetExportedFile() const;
+	std::string GetExportedFile() const;
 
 	//virtual void Save(Config& config) const;
 	//virtual void Load(const Config& config);
@@ -36,7 +36,7 @@ public:
 	uint CountReferences() const { return times_loaded; }
 
 protected:
-	virtual bool SaveOwnFormat(std::string& asset_file) const = 0;
+	virtual bool SaveOwnFormat() const = 0;
 	virtual bool LoadtoScene() = 0;
 	virtual void UnLoad() = 0;
 

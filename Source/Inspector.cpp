@@ -61,7 +61,7 @@ void Inspector::DrawResource(Resource* res)
 
 	ImGui::Text("Exported File: ");
 	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), res->GetExportedFile());
+	ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), res->GetExportedFile().c_str());
 
 	ImGui::Text("Times Loaded: ");
 	ImGui::SameLine();

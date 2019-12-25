@@ -11,8 +11,8 @@ public:
 	ResourceMaterial(UID id);
 	virtual ~ResourceMaterial();
 
-	static UID Import(const char* source_file, std::string& asset_file, const aiMaterial* material = nullptr);
-	bool SaveOwnFormat(std::string& asset_file) const;
+	UID Import(const char* source_file, const aiMaterial* material = nullptr);
+	bool SaveOwnFormat() const;
 	bool LoadtoScene();
 	void UnLoad();
 

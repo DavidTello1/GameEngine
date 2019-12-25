@@ -30,7 +30,7 @@ void Resource::ReleaseFromMemory()
 		UnLoad();
 }
 
-const char* Resource::GetExportedFile() const
+std::string Resource::GetExportedFile() const
 {
 	std::string file(std::to_string(uid));
 
@@ -52,5 +52,5 @@ const char* Resource::GetExportedFile() const
 		break;
 	}
 
-	return file.c_str();
+	return file;
 }

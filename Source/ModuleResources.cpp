@@ -58,7 +58,6 @@ bool ModuleResources::Start(Config* config)
 {
 	LoadCheckersTexture();
 	LoadAssetsIcons();
-
 	UpdateAssets();
 
 	// Creation of the Index Buffer Object of the bounding boxes array, as all uses the same
@@ -94,7 +93,9 @@ bool ModuleResources::CleanUp()
 
 bool ModuleResources::ImportFromPath(const char* path, UID uid)
 {
-	std::string final_path = App->file_system->GetFileName(path); //get file name
+	std::string full_path = path;
+	App->file_system->NormalizePath(full_path);
+	std::string final_path = App->file_system->GetFileName(full_path.c_str()); //get file name
 	final_path = ASSETS_FOLDER + final_path;
 
 	App->file_system->NormalizePath(final_path);
@@ -107,43 +108,48 @@ bool ModuleResources::ImportFromPath(const char* path, UID uid)
 
 bool ModuleResources::ImportResource(const char* final_path, UID uid)
 {
+	Resource::Type type = GetResourceType(final_path); //get resource type
+
 	if (CheckLoaded(final_path, uid) == true) // Check if file has already been loaded
 	{
+		CreateResource(type, final_path, uid);
+
 		// ***if last mod date not equal reimport
-		LOG("File is already loaded in memory", 'd');
+		LOG("File has already been imported", 'd');
 		return true;
 	}
 
-	bool import_ok = false;
-	std::string asset_file;
-	Resource::Type type = GetResourceType(final_path); //get resource type
 
-	switch (type) //import depending on type
+	if (type == Resource::Type::model)
 	{
-	case Resource::model:
-		import_ok = ResourceModel::Import(final_path, asset_file);
-		break;
-
-	case Resource::material:
-		import_ok = ResourceMaterial::Import(final_path, asset_file);
-		break;
-
-	case Resource::scene:
-		import_ok = ResourceScene::Import(final_path, asset_file);
-		break;
+		ResourceModel* model = (ResourceModel*)CreateResource(type, final_path, uid);
+		if (model->Import(final_path))
+		{
+			SaveMeta((Resource*)model);
+			return true;
+		}
+	}
+	else if (type == Resource::Type::material)
+	{
+		ResourceMaterial* material = (ResourceMaterial*)CreateResource(type, final_path, uid);
+		if (material->Import(final_path))
+		{
+			SaveMeta((Resource*)material);
+			return true;
+		}
+	}
+	else if (type == Resource::Type::mesh)
+	{
+		ResourceScene* scene = (ResourceScene*)CreateResource(type, final_path, uid);
+		if (scene->Import(final_path))
+		{
+			SaveMeta((Resource*)scene);
+			return true;
+		}
 	}
 
-	if (import_ok == true)
-	{
-		Resource* res = CreateResource(type, final_path, uid);
-		SaveMeta(res);
-	}
-	else
-	{
-		LOG("Importing of [%s] FAILED", final_path);
-		return false;
-	}
-	return true;
+	LOG("Importing of [%s] FAILED", final_path);
+	return false;
 }
 
 Resource* ModuleResources::CreateResource(Resource::Type type, const char* path, UID force_uid)
@@ -190,7 +196,7 @@ void ModuleResources::RemoveResource(UID uid)
 	std::map<UID, Resource*>::iterator it = resources.find(uid);
 	if (it != resources.end())
 	{
-		App->file_system->Remove(it->second->GetExportedFile());
+		App->file_system->Remove(it->second->GetExportedFile().c_str());
 
 		char tmp[256];
 		sprintf_s(tmp, 255, "%s%s", GetDirectory(it->second->GetType()), it->second->GetExportedFile());
@@ -275,13 +281,30 @@ std::vector<Resource*> ModuleResources::GetAllResourcesOfType(Resource::Type typ
 
 bool ModuleResources::CheckLoaded(std::string path, UID uid)
 {
-	for (std::map<UID, Resource*>::const_iterator it = resources.begin(); it != resources.end(); ++it)
+	Resource::Type type = GetResourceType(path.c_str());
+	std::string file;
+
+	switch (type)
 	{
-		if (it->second->original_file.compare(path) == 0)
-		{
-			uid = it->first;
-			return true;
-		}
+	case Resource::unknown:
+		break;
+	case Resource::model:
+		file = LIBRARY_MODEL_FOLDER + std::to_string(uid) + ".dvs_model";
+		break;
+	case Resource::mesh:
+		file = LIBRARY_MESH_FOLDER + std::to_string(uid) + ".dvs_mesh";
+		break;
+	case Resource::material:
+		file = LIBRARY_MATERIAL_FOLDER + std::to_string(uid) + ".dvs_material";
+		break;
+	case Resource::scene:
+		file = LIBRARY_SCENE_FOLDER + std::to_string(uid) + ".dvs_scene";
+		break;
+	}
+
+	if (App->file_system->Exists(file.c_str()))
+	{
+		return true;
 	}
 	return false;
 }
@@ -299,8 +322,13 @@ void ModuleResources::UpdateAssetsFolder(const PathNode& node)
 {
 	if (node.file == true) //If node is a file
 	{
-		//UID id = GetIDFromMeta(node.path.c_str()); // check if meta exists
-		ImportResource(node.path.c_str());
+		UID id = 0;
+		std::string meta(node.path + (".meta"));
+
+		if (App->file_system->Exists(meta.c_str())) //check if meta file has already been created and init UID if so
+			id = App->resources->GetIDFromMeta(meta.c_str());
+
+		ImportResource(node.path.c_str(), id);
 	}
 	else if (node.leaf == false) //If node folder has something inside
 	{
