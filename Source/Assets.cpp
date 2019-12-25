@@ -129,11 +129,10 @@ void Assets::Draw()
 
 void Assets::ImportAsset(const PathNode& node)
 {
-	std::string metaFile = node.path + (".meta");
-	uint64 resourceID = App->resources->GetIDFromMeta(metaFile.c_str());
-	Resource* resource = App->resources->GetResource(resourceID);
+	UID id = App->resources->GetIDFromMeta(std::string(node.path + (".meta")).c_str());
+	Resource* resource = App->resources->GetResource(id);
 
-	if (resource && resource->GetType() == Resource::material)
+	if (resource && resource->GetType() == Resource::material) // ***ERROR IMPORTING WHEN FILE EXISTS IN LIBRARY_FOLDER
 	{
 		GameObject* obj = App->scene->GetSelectedGameObject();
 		if (obj != nullptr)

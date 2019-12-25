@@ -51,14 +51,10 @@ public:
 
 	uint GetNumResources() { return resources.size(); }
 	std::vector<Resource*> GetAllResourcesOfType(Resource::Type type);
+	const char* GetDirectory(Resource::Type type) const;
 
 	// Meta files
 	void SaveMeta(const Resource* resource);
-	bool LoadMeta(const char* file);
-	bool LoadSceneMeta(const char* file, const char* source_file);
-
-	// Utilities
-	const char* GetDirectory(Resource::Type type) const;
 	UID GetIDFromMeta(const char* path);
 
 private:
@@ -79,10 +75,8 @@ public:
 	};
 
 private:
-	std::vector<Resource*> loaded;
-	std::vector<Resource*> removed;
-
 	std::map<UID, Resource*> resources;
+
 };
 
 extern GLuint aabb_indices[24];

@@ -82,10 +82,6 @@ bool ModuleResources::CleanUp()
 
 	for (std::map<UID, Resource*>::iterator it = resources.begin(); it != resources.end(); ++it)
 		RELEASE(it->second);
-
-	for (std::vector<Resource*>::iterator it = removed.begin(); it != removed.end(); ++it)
-		RELEASE(*it);
-
 	resources.clear();
 
 	return true;
@@ -201,8 +197,6 @@ void ModuleResources::RemoveResource(UID uid)
 		char tmp[256];
 		sprintf_s(tmp, 255, "%s%s", GetDirectory(it->second->GetType()), it->second->GetExportedFile());
 		App->file_system->Remove(tmp);
-
-		removed.push_back(it->second);
 
 		resources.erase(it);
 	}
@@ -426,65 +420,4 @@ void ModuleResources::SaveMeta(const Resource* resource)
 		std::string path = resource->original_file + ".meta";
 		App->file_system->Save(path.c_str(), buffer, size);
 	}
-}
-
-bool ModuleResources::LoadMeta(const char* file)
-{
-	//char* buffer = nullptr;
-	//uint size = App->file_system->Load(file, &buffer);
-	//MetaFile meta;
-	//if (size > 0)
-	//{
-	//	Config config(buffer);
-
-	//	std::string sourceFile = file;
-	//	sourceFile = std::string(file).substr(0, sourceFile.size() - 5);
-
-	//	meta.original_file = sourceFile;
-	//	meta.uid = config.GetNumber("ID");
-	//	meta.type = static_cast<Resource::Type>((int)(config.GetNumber("Type")));
-	//	existing_res[meta.uid] = meta;
-
-		//if (meta.type == Resource::model)
-		//{
-		//	std::string resFile = "/Library/GameObjects/";
-		//	resFile.append(std::to_string(meta.uid));
-
-		//	LoadSceneMeta(resFile.c_str(), sourceFile.c_str());
-		//}
-		return true;
-	//}
-	//return false;
-}
-
-bool ModuleResources::LoadSceneMeta(const char* file, const char* source_file)
-{
-	//char* buffer = nullptr;
-	//uint size = App->file_system->Load(file, &buffer);
-	//if (size > 0)
-	//{
-	//	Config config(buffer);
-	//	Config_Array GameObjects = config.GetArray("GameObjects");
-
-	//	for (uint i = 0; i < GameObjects.GetSize(); i++)
-	//	{
-	//		Config_Array components = GameObjects.GetNode(i).GetArray("Components");
-
-	//		for (uint i = 0; i < components.GetSize(); i++)
-	//		{
-	//			Config resource = components.GetNode(i);
-	//			if (resource.GetBool("HasResource"))
-	//			{
-	//				MetaFile meta;
-	//				meta.id = resource.GetNumber("ID");
-	//				meta.type = static_cast<Resource::Type>((int)resource.GetNumber("Type"));
-	//				meta.resource_name = resource.GetString("ResourceName");
-	//				meta.original_file = source_file;
-	//				existing_res[meta.id] = meta;
-	//			}
-	//		}
-	//	}
-		return true;
-	//}
-	//return false;
 }
