@@ -11,6 +11,9 @@
     <Filter Include="docs\js">
       <UniqueIdentifier>{3b4fa8ef-20c8-47f1-a5f0-f66116c58415}</UniqueIdentifier>
     </Filter>
+    <Filter Include="docs\about">
+      <UniqueIdentifier>{eb54ea2c-6372-4a55-b887-e0423acc7945}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\docs\background1.jpg">
@@ -53,6 +56,9 @@
     </None>
     <None Include="..\docs\js\materialize.min.js">
       <Filter>docs\js</Filter>
+    </None>
+    <None Include="..\docs\about\index.html">
+      <Filter>docs\about</Filter>
     </None>
   </ItemGroup>
 </Project>

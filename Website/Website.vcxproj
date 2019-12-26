@@ -122,6 +122,7 @@
     <Image Include="..\docs\background5.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\docs\about\index.html" />
     <None Include="..\docs\css\materialize.css" />
     <None Include="..\docs\css\materialize.min.css" />
     <None Include="..\docs\css\style.css" />
