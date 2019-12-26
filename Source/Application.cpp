@@ -18,7 +18,7 @@ Application::Application()
 	modules.push_back(file_system = new ModuleFileSystem(ASSETS_FOLDER));
 	modules.push_back(window = new ModuleWindow());
 	modules.push_back(resources = new ModuleResources());
-	//modules.push_back(tex = new ModuleTextures());
+	modules.push_back(gui = new ModuleGUI());
 	modules.push_back(scene_base = new ModuleSceneBase());
 	modules.push_back(scene = new ModuleScene());
 	modules.push_back(editor = new ModuleEditor());

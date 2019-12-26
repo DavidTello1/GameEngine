@@ -67,6 +67,9 @@
     <Filter Include="Sources\Resources">
       <UniqueIdentifier>{a84cad31-bd31-4edd-b76a-23e4fb3de339}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\UI">
+      <UniqueIdentifier>{b2beb587-1274-4353-b7e3-7f669f0b668e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -504,10 +507,10 @@
     <ClInclude Include="PathNode.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Quadtree.h" >
+    <ClInclude Include="Quadtree.h">
       <Filter>Sources\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="QuadtreeNode.h" >
+    <ClInclude Include="QuadtreeNode.h">
       <Filter>Sources\Containers</Filter>
     </ClInclude>
     <ClInclude Include="ResourceScene.h">
@@ -516,6 +519,7 @@
     <ClInclude Include="ModuleResources.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleGUI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -743,15 +747,16 @@
     <ClCompile Include="ComponentCamera.cpp">
       <Filter>Sources\GameObjects\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Quadtree.cpp" >
+    <ClCompile Include="Quadtree.cpp">
       <Filter>Sources\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="QuadtreeNode.cpp" >
+    <ClCompile Include="QuadtreeNode.cpp">
       <Filter>Sources\Containers</Filter>
     </ClCompile>
     <ClCompile Include="ResourceScene.cpp">
       <Filter>Sources\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleGUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

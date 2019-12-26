@@ -10,6 +10,7 @@
 #include "ModuleEditor.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
+#include "ModuleGUI.h"
 
 #include "Config.h"
 
@@ -61,6 +62,7 @@ public:
 	ModuleEditor* editor;
 	ModuleFileSystem* file_system;
 	ModuleResources* resources;
+	ModuleGUI* gui;
 
 private:
 	Timer	ms_timer;
