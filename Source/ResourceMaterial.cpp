@@ -97,9 +97,11 @@ bool ResourceMaterial::LoadtoScene()
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 
-		read_stream >> tex_id;
-		read_stream >> tex_height;
-		read_stream >> tex_width;
+		//read_stream >> tex_id;
+		//read_stream >> tex_height;
+		//read_stream >> tex_width;
+
+		LoadTexture(original_file.c_str());
 
 		delete[] buffer;
 		return true;
