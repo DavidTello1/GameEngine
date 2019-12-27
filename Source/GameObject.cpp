@@ -110,7 +110,7 @@ Component* GameObject::GetComponent(Component::Type type)
 	return nullptr;
 }
 
-Component* GameObject::AddComponent(Component::Type type)
+Component* GameObject::AddComponent(Component::Type type, UI_Element::Type UI_type)
 {
 	Component* new_component;
 
@@ -142,6 +142,12 @@ Component* GameObject::AddComponent(Component::Type type)
 		new_component = new ComponentCamera(this);
 		components.push_back(new_component);
 		//App->resources->LoadResource("Assets/camera_mesh.fbx", Component::Type::Mesh, true, this);
+		return new_component;
+	}
+	else if (type == Component::Type::UI_Element)
+	{
+		new_component = new UI_Element(UI_type, this);
+		components.push_back(new_component);
 		return new_component;
 	}
 	return nullptr;

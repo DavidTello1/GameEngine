@@ -4,7 +4,6 @@
 
 #include "mmgr/mmgr.h"
 
-
 ComponentMesh::ComponentMesh(GameObject* gameobj) : Component(Component::Type::Mesh, gameobj)
 {
 	object = gameobj;

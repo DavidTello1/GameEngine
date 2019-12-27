@@ -91,10 +91,30 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 				obj->AddComponent(Component::Type::Renderer);
 
 			if (ImGui::MenuItem("Camera", nullptr, false, !obj->GetComponent(Component::Type::Camera)))
-			{
 				obj->AddComponent(Component::Type::Camera);
-			}
 
+			if (ImGui::BeginMenu("UI Element"))
+			{
+				if (ImGui::MenuItem("Canvas"))
+					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
+
+				if (ImGui::MenuItem("Image"))
+					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+
+				if (ImGui::MenuItem("Text"))
+					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::TEXT);
+
+				if (ImGui::MenuItem("Button"))
+					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::BUTTON);
+
+				if (ImGui::MenuItem("Check Box"))
+					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+
+				if (ImGui::MenuItem("Input Text"))
+					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+
+				ImGui::EndMenu();
+			}
 			ImGui::EndMenu();
 		}
 

@@ -5,8 +5,8 @@
 #include "Component.h"
 #include "ComponentMesh.h"
 #include "ModuleScene.h"
-#include "mmgr/mmgr.h"
 
+#include "mmgr/mmgr.h"
 
 ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Type::Camera, gameobj)
 {

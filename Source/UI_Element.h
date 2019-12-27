@@ -54,7 +54,15 @@ public:
 	UI_Element::State GetState() { return state; }
 	UI_Element::Action GetAction() { return action; }
 
-	virtual void DoLogic(Action action) {};
+	void SwitchVisible() { visible = !visible; }
+	void SwitchDraggable() { draggable = !draggable; }
+	void SwitchInteractable() { interactable = !interactable; }
+	void ChangeStateTo(State State) { state = State; }
+
+	void UpdateState();
+	void DoLogic(Action action);
+
+	virtual void DrawInspector() = 0;
 
 public:
 	bool visible = false;

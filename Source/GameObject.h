@@ -2,6 +2,7 @@
 
 #include "Globals.h"
 #include "Component.h"
+#include "UI_Element.h"
 #include "glew\include\GL\glew.h"
 #include "Hierarchy.h"
 #include "ResourceMesh.h"
@@ -45,7 +46,7 @@ public:
 	ComponentType* GetComponent()  { return (ComponentType*)GetComponent(ComponentType::GetType()); }
 
 	Component* GetComponent(Component::Type type);
-	Component* AddComponent(Component::Type type);
+	Component* AddComponent(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
 	bool HasComponent(Component::Type type);
 	void DeleteComponent(Component::Type type);
 

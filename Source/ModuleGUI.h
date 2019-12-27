@@ -8,18 +8,15 @@ public:
 	ModuleGUI(bool start_enabled = true);
 	~ModuleGUI();
 
-	bool Init(Config* config = nullptr);
-	bool Start(Config* config = nullptr);
-	bool CleanUp();
-	
-	void Draw();
+	//bool Init(Config* config = nullptr);
+	//bool Start(Config* config = nullptr);
+	//bool CleanUp();
+	//
+	//void Draw();
 
-	void UpdateChildren();
-	void UpdateState(UI_Element* data);
-
-private:
-	bool CheckMousePos(UI_Element* data);
-	bool CheckClick(UI_Element* data);
+//private:
+	//bool CheckMousePos(UI_Element* data);
+	//bool CheckClick(UI_Element* data);
 
 };
 
