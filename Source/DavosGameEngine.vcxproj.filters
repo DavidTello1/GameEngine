@@ -519,6 +519,7 @@
     <ClInclude Include="FrameBuffer.h">
       <Filter>Sources\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="TextRenderer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -755,6 +756,7 @@
     <ClCompile Include="FrameBuffer.cpp">
       <Filter>Sources\Containers</Filter>
     </ClCompile>
+    <ClCompile Include="TextRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

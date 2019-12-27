@@ -11,8 +11,8 @@
 #include "glew/include/GL/glew.h"
 #include "SDL/include/SDL_opengl.h"
 #include "Imgui/imgui.h"
-//#include <gl/GL.h>
-//#include <gl/GLU.h>
+
+#pragma comment( lib, "Freetype/include/freetype.lib" )
 
 #pragma comment(lib, "glew/libx86/glew32.lib")
 #pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
@@ -52,6 +52,10 @@ bool ModuleRenderer3D::Init(Config* config)
 	glEnable(GL_COLOR_MATERIAL);*/
 	glEnable(GL_TEXTURE_2D);
 
+
+	
+	our_font.init("Library/Fonts/Wintersoul.ttf", 45 /* size */);
+
 	return ret;
 }
 
@@ -67,7 +71,12 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 	//App->viewport->DrawScene();
 
 	// Drawing of gui and panels(and viewport panel)
-	App->editor->Draw();
+	//App->editor->Draw();
+
+	glColor3f(1, 1, 1);
+
+	glfreetype::print(our_font, 50 /* xpos */, 50 /* ypos */,
+		"The quick brown fox blah blah blah");
 
 	SDL_GL_SwapWindow(App->window->GetWindow());
 

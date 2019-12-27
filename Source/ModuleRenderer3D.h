@@ -1,5 +1,7 @@
 #pragma once
 #include "Module.h"
+#include "TextRenderer.hpp"
+
 
 #define MAX_LIGHTS 8
 
@@ -25,6 +27,8 @@ public:
 	bool GetVSync() const { return vsync; }
 
 public:
+	glfreetype::font_data our_font;
+
 	SDL_GLContext context;
 
 	bool vsync = false;
