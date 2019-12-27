@@ -76,7 +76,7 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 	glColor3f(1, 1, 1);
 
 	glfreetype::print(our_font, 50 /* xpos */, 50 /* ypos */,
-		"The quick brown fox blah blah blah");
+		"The quick brown fox blah blah blah abcdefghijklmnopqrstuwvxyz");
 
 	SDL_GL_SwapWindow(App->window->GetWindow());
 
