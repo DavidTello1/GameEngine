@@ -1,8 +1,8 @@
+#include "Globals.h"
+#include "Application.h"
 #include "ModuleGUI.h"
 
-
-
-ModuleGUI::ModuleGUI()
+ModuleGUI::ModuleGUI(bool start_enabled) : Module("GUI", start_enabled)
 {
 }
 

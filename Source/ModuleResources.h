@@ -2,8 +2,6 @@
 #define __MODULE_RESOURCES_H__
 
 #include "Module.h"
-#include "Resource.h"
-
 #include <vector>
 #include <map>
 #include <string>

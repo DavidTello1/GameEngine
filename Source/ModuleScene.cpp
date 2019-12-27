@@ -39,6 +39,7 @@ bool ModuleScene::Init(Config* config)
 
 	return true;
 }
+
 // Load assets
 bool ModuleScene::Start(Config* config)
 {
@@ -67,7 +68,6 @@ bool ModuleScene::Update(float dt)
 
 	if (quadtree->debug)
 		quadtree->Draw();
-	
 
 	return true;
 }
@@ -100,7 +100,6 @@ bool ModuleScene::PostUpdate(float dt)
 			{
 				RedoQuatree();
 			}
-
 			obj->flags &= ~ProcessTransformUpdate;
 		}
 	}
@@ -129,13 +128,11 @@ bool ModuleScene::PostUpdate(float dt)
 		state = EDIT;
 		App->editor->tab_viewport->current_camera = viewport_camera;
 		App->editor->tab_viewport->OnCameraUpdate();
-
 		break;
 	default:
 		state = EDIT;
 		break;
 	}
-
 	return true;
 }
 

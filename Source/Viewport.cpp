@@ -61,6 +61,7 @@ bool Viewport::PostUpdate()
 {
 	App->scene_base->Draw();
 	App->scene->Draw();
+	App->gui->Draw();
 
 	// Background color of the editor (ImGui)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

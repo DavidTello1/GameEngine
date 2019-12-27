@@ -18,13 +18,11 @@ enum SceneState {
 	PLAY,
 	PAUSE,
 	STOP
-
 };
 
 class ModuleScene :	public Module
 {
 public:
-
 	ModuleScene(bool start_enabled = true);
 	~ModuleScene();
 
