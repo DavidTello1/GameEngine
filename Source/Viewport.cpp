@@ -3,6 +3,8 @@
 #include "ModuleScene.h"
 #include "ModuleSceneBase.h"
 #include "ComponentCamera.h"
+#include "ImGuizmo.h"
+#include <string>
 
 #include "mmgr/mmgr.h"
 
@@ -34,6 +36,8 @@ bool Viewport::PreUpdate()
 	if (our_font.textures.empty())
 		our_font.init("Library/Fonts/Wintersoul.ttf", 45 /* size */);
 
+	
+
 	if (width != window_avail_size.x || height != window_avail_size.y)
 	{
 		width = window_avail_size.x;
@@ -41,7 +45,9 @@ bool Viewport::PreUpdate()
 
 		frame_buffer.GenerateFBO(width, height);
 		OnResize(width, height);
+
 	}
+	
 
 	glViewport(0, 0, width, height);
 
@@ -68,6 +74,9 @@ void Viewport::Draw()
 {
 	PreUpdate();
 	
+	ImGuizmo::SetDrawlist();
+	ImGuizmo::SetRect(pos_x, pos_y, width, height);
+
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
@@ -79,18 +88,38 @@ void Viewport::Draw()
 		App->scene_base->Draw();
 	}
 
-	//
 	//camera->frustum.type = FrustumType::OrthographicFrustum;
+	//camera->UpdateMatrices();
+	//glViewport(0, 0, width, height);
+
+	//// Loading camera matrices
+	//glMatrixMode(GL_PROJECTION);
+	//glLoadIdentity();
+	//glLoadTransposeMatrixf(camera->projection_matrix);
+
+	//glMatrixMode(GL_MODELVIEW);
+	//glLoadIdentity();
+	//glLoadTransposeMatrixf(camera->view_matrix);
+
+	//
 	glColor3f(1, 1, 1);
 
-	glfreetype::print(camera, our_font, 0 /* xpos */, 0+1 /* ypos */,
-		"The quick brown fox blah blah blah abcdefghijklmnopqrstuwvxyz");
+	glfreetype::print(camera, our_font, 0 /* xpos */, 0 /* ypos */,
+		"This text is at (0,0) abcdefghijklmnopqrstuwvxyz");
 
 	glColor3f(1, 1, 0);
 
+	std::string s = "This text is at (";
+	s.append("%i",pos_x);
+	s.append("%i", pos_y); 
+	s.append(") abcdefghijklmnopqrstuwvxyz");
+
 	glfreetype::print(camera, our_font, pos_x /* xpos */, -pos_y /* ypos */,
-		"The quick brown fox blah blah blah abcdefghijklmnopqrstuwvxyz");
+		s);
 	//camera->frustum.type = FrustumType::PerspectiveFrustum;
+
+	/*camera->frustum.type = FrustumType::PerspectiveFrustum;
+	camera->UpdateMatrices();*/
 
 	PostUpdate();
 }

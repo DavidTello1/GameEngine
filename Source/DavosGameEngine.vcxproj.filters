@@ -520,6 +520,7 @@
       <Filter>Sources\Containers</Filter>
     </ClInclude>
     <ClInclude Include="TextRenderer.hpp" />
+    <ClInclude Include="ImGuizmo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -757,6 +758,7 @@
       <Filter>Sources\Containers</Filter>
     </ClCompile>
     <ClCompile Include="TextRenderer.cpp" />
+    <ClCompile Include="ImGuizmo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

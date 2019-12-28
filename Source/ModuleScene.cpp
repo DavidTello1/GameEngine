@@ -69,11 +69,78 @@ bool ModuleScene::Update(float dt)
 	if (quadtree->debug)
 		quadtree->Draw();
 	
-
+	
 	return true;
 }
 
+void ModuleScene::UpdateTransformationGuizmos()
+{
+	
 
+	ImGuizmo::MODE mode_to_apply = curr_guizmo_mode;
+
+	if (current_guizmo_operation == ImGuizmo::OPERATION::SCALE)
+		mode_to_apply = ImGuizmo::MODE::WORLD;
+
+	for (std::vector<GameObject*>::iterator it = gameObjects.begin(); it != gameObjects.end(); ++it)
+	{
+		if (!(*it)->is_selected) continue;
+
+		float4x4 global_transform_trans = (*it)->GetGlobalTransform().Transposed();
+
+		
+
+		float t[16];
+
+		ImGuizmo::Manipulate(viewport_camera->view_matrix4x4.Transposed().ptr(),
+			viewport_camera->projection_matrix4x4.Transposed().ptr(),
+			ImGuizmo::OPERATION::TRANSLATE,
+			ImGuizmo::MODE::WORLD,
+			global_transform_trans.ptr(), t);
+
+		float4x4 moved_transformation = float4x4(
+			t[0], t[4], t[8], t[12],
+			t[1], t[5], t[9], t[13],
+			t[2], t[6], t[10], t[14],
+			t[3], t[7], t[11], t[15]);
+
+		if (ImGuizmo::IsUsing())
+		{
+			switch (current_guizmo_operation)
+			{
+			case ImGuizmo::OPERATION::TRANSLATE:
+			{
+				float4x4 new_trans = moved_transformation * (*it)->GetGlobalTransform();
+				(*it)->SetTransform(new_trans);
+			}
+			break;
+
+			case ImGuizmo::OPERATION::ROTATE:
+			{
+				float4x4 new_trans = moved_transformation * (*it)->GetGlobalTransform();
+				(*it)->SetTransform(new_trans);
+			}
+			break;
+			case ImGuizmo::OPERATION::SCALE:
+			{
+				float4x4 save_trans = moved_transformation;
+				moved_transformation = moved_transformation * last_moved_transformation.Inverted();
+
+				float4x4 new_trans = moved_transformation * (*it)->GetGlobalTransform();
+				(*it)->SetTransform(new_trans);
+
+				last_moved_transformation = save_trans;
+			}
+			break;
+			}
+		}
+		else
+		{
+			last_moved_transformation = float4x4::identity;
+		}
+	}
+
+}
 
 bool ModuleScene::PostUpdate(float dt)
 {
@@ -136,6 +203,8 @@ bool ModuleScene::PostUpdate(float dt)
 		state = EDIT;
 		break;
 	}
+
+	//UpdateTransformationGuizmos();
 
 	return true;
 }

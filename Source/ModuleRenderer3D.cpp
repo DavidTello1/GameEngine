@@ -6,6 +6,7 @@
 #include "ModuleEditor.h"
 #include "Config.h"
 #include "Color.h"
+#include "ModuleScene.h"
 
 
 #include "glew/include/GL/glew.h"
@@ -77,6 +78,8 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 
 	//glfreetype::print(our_font, 50 /* xpos */, 50 /* ypos */,
 	//	"The quick brown fox blah blah blah abcdefghijklmnopqrstuwvxyz");
+
+	App->scene->UpdateTransformationGuizmos();
 
 	SDL_GL_SwapWindow(App->window->GetWindow());
 

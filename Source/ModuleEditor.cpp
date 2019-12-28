@@ -22,6 +22,8 @@
 #include "imgui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "ImGuizmo.h"
+
 #include "mmgr/mmgr.h"
 
 using namespace std;
@@ -140,11 +142,14 @@ bool ModuleEditor::Init(Config* config)
 	panels.push_back(tab_assets = new Assets());
 	panels.push_back(tab_viewport = new Viewport("Viewport"));
 
+	
+
 	return true;
 }
 
 bool ModuleEditor::Start(Config* config)
 {
+	ImGuizmo::Enable(true);
 	return true;
 }
 
@@ -216,6 +221,8 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->window->GetWindow());
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
+
 
 	// Draw functions
 	ShowExampleAppDockSpace(&is_show_main_dockspace);

@@ -193,20 +193,43 @@ namespace glfreetype {
     // A Projection Matrix That Will Make Object World
     // Coordinates Identical To Window Coordinates.
     inline void pushScreenCoordinateMatrix(ComponentCamera* camera) {
-        glPushAttrib(GL_TRANSFORM_BIT);
-        GLint viewport[4];
-        glGetIntegerv(GL_VIEWPORT, viewport);
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
+
+		glPushAttrib(GL_TRANSFORM_BIT);
+		GLint viewport[4];
+		glGetIntegerv(GL_VIEWPORT, viewport);
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+
+		camera->frustum.type = FrustumType::OrthographicFrustum;
+		//camera->UpdateMatrices();
+
+		glLoadTransposeMatrixf(camera->frustum.ViewProjMatrix().ptr());
+		//glOrtho(camera->frustum.NearPlaneWidth(), camera->frustum.NearPlaneHeight(), 0, 0, 1, -1);
+		//glOrtho(-1, 1, -1, 1, -1, 1);
+		glOrtho(-viewport[0]/2, viewport[2]/2, viewport[3]/2, viewport[1]/2, 1, -1);
+
+		glPopAttrib();
+
+		camera->frustum.type = FrustumType::PerspectiveFrustum;
+		//camera->UpdateMatrices();
+
+  //      glPushAttrib(GL_TRANSFORM_BIT);
+  //      GLint viewport[4];
+  //      glGetIntegerv(GL_VIEWPORT, viewport);
+  //      glMatrixMode(GL_PROJECTION);
+  //      glPushMatrix();
+  //      glLoadIdentity();
 		//camera->frustum.type = FrustumType::OrthographicFrustum;
-		//camera->UpdateMatrices();
-		glLoadTransposeMatrixf(camera->projection_matrix);
-		glOrtho(viewport[0], viewport[2], viewport[3], viewport[1], 1, -1);
-		//glOrtho(0,camera->frustum.horizontalFov,camera->frustum.verticalFov,0,1,-1);
-        glPopAttrib();
+		////camera->UpdateMatrices();
+		//float4x4 view = float4x4::identity;
+		//view.Translate(camera->projection_matrix4x4.TranslatePart());
+		//glOrtho(viewport[0], viewport[2], viewport[3], viewport[1], 1, -1);
+		//glLoadTransposeMatrixf(camera->projection_matrix);
+		////glOrtho(0,camera->frustum.horizontalFov,camera->frustum.verticalFov,0,1,-1);
+  //      glPopAttrib();
 		//camera->frustum.type = FrustumType::PerspectiveFrustum;
-		//camera->UpdateMatrices();
+		////camera->UpdateMatrices();
 
 
     }
@@ -224,62 +247,71 @@ namespace glfreetype {
     // With FreeType Fonts.
     void print(ComponentCamera* camera, const font_data &ft_font, float x, float y, std::string const & text)  {
              
-        // We Want A Coordinate System Where Distance Is Measured In Window Pixels.
-        pushScreenCoordinateMatrix(camera);                                  
-             
-        GLuint font=ft_font.list_base;
-        // We Make The Height A Little Bigger.  There Will Be Some Space Between Lines.
-        float h=ft_font.h/.63f;                                                
-     
-        // Split text into lines
-        std::stringstream ss(text);
-        std::string to;
-        std::vector<std::string> lines;
-        while(std::getline(ss,to,'\n')){
-            lines.push_back(to);
-        }
-  
-        glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
-        glMatrixMode(GL_MODELVIEW);
-        glDisable(GL_LIGHTING);
-        glEnable(GL_TEXTURE_2D);
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);     
-     
-        glListBase(font);
+		// We Want A Coordinate System Where Distance Is Measured In Window Pixels.
+		glPushAttrib(GL_TRANSFORM_BIT);
+		GLint viewport[4];
+		glGetIntegerv(GL_VIEWPORT, viewport);
+		//glMatrixMode(GL_PROJECTION);
+		//glPushMatrix();
+		//glLoadIdentity();
+		//glLoadTransposeMatrixf(camera->frustum.ViewProjMatrix().ptr());
 
-        float modelview_matrix[16];    
-        glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
-     
-        // This Is Where The Text Display Actually Happens.
-        // For Each Line Of Text We Reset The Modelview Matrix
-        // So That The Line's Text Will Start In The Correct Position.
-        // Notice That We Need To Reset The Matrix, Rather Than Just Translating
-        // Down By h. This Is Because When Each Character Is
-        // Drawn It Modifies The Current Matrix So That The Next Character
-        // Will Be Drawn Immediately After It. 
-        for(int i=0;i<lines.size();i++) {
-            glPushMatrix();
-            glLoadIdentity();
-            glTranslatef(x,y-h*i,0);
-            glMultMatrixf(modelview_matrix);
-     
-            // The Commented Out Raster Position Stuff Can Be Useful If You Need To
-            // Know The Length Of The Text That You Are Creating.
-            // If You Decide To Use It Make Sure To Also Uncomment The glBitmap Command
-            // In make_dlist().
-            // glRasterPos2f(0,0);
-            glCallLists(lines[i].length(), GL_UNSIGNED_BYTE, lines[i].c_str());
-            // float rpos[4];
-            // glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
-            // float len=x-rpos[0]; (Assuming No Rotations Have Happend)
-            glPopMatrix();
-        }
-     
-        glPopAttrib();         
-     
-        pop_projection_matrix();
+		glOrtho(viewport[0], viewport[2], viewport[3], viewport[1], -1, 1);
+		glPopAttrib();
+
+		GLuint font = ft_font.list_base;
+		// We Make The Height A Little Bigger.  There Will Be Some Space Between Lines.
+		float h = ft_font.h / .63f;
+
+		// Split text into lines
+		std::stringstream ss(text);
+		std::string to;
+		std::vector<std::string> lines;
+		while (std::getline(ss, to, '\n')) {
+			lines.push_back(to);
+		}
+
+		glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
+		glMatrixMode(GL_MODELVIEW);
+		glDisable(GL_LIGHTING);
+		glEnable(GL_TEXTURE_2D);
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glListBase(font);
+
+		float modelview_matrix[16];
+		glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+
+		// This Is Where The Text Display Actually Happens.
+		// For Each Line Of Text We Reset The Modelview Matrix
+		// So That The Line's Text Will Start In The Correct Position.
+		// Notice That We Need To Reset The Matrix, Rather Than Just Translating
+		// Down By h. This Is Because When Each Character Is
+		// Drawn It Modifies The Current Matrix So That The Next Character
+		// Will Be Drawn Immediately After It. 
+		for (int i = 0; i < lines.size(); i++) {
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslatef(0,0,20);
+			glMultMatrixf(modelview_matrix);
+
+			// The Commented Out Raster Position Stuff Can Be Useful If You Need To
+			// Know The Length Of The Text That You Are Creating.
+			// If You Decide To Use It Make Sure To Also Uncomment The glBitmap Command
+			// In make_dlist().
+			// glRasterPos2f(0,0);
+			glCallLists(lines[i].length(), GL_UNSIGNED_BYTE, lines[i].c_str());
+			// float rpos[4];
+			// glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
+			// float len=x-rpos[0]; (Assuming No Rotations Have Happend)
+			glPopMatrix();
+		}
+
+		glPopAttrib();
+
+		pop_projection_matrix();
     }
 
 	void print(const font_data &ft_font, float x, float y, std::string const & text) {
@@ -350,3 +382,64 @@ namespace glfreetype {
 	}
 
 }
+//
+//void print(ComponentCamera* camera, const font_data &ft_font, float x, float y, std::string const & text)  {
+//             
+//        // We Want A Coordinate System Where Distance Is Measured In Window Pixels.
+//        pushScreenCoordinateMatrix(camera);                                  
+//             
+//        GLuint font=ft_font.list_base;
+//        // We Make The Height A Little Bigger.  There Will Be Some Space Between Lines.
+//        float h=ft_font.h/.63f;                                                
+//     
+//        // Split text into lines
+//        std::stringstream ss(text);
+//        std::string to;
+//        std::vector<std::string> lines;
+//        while(std::getline(ss,to,'\n')){
+//            lines.push_back(to);
+//        }
+//  
+//        glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
+//        glMatrixMode(GL_MODELVIEW);
+//        glDisable(GL_LIGHTING);
+//        glEnable(GL_TEXTURE_2D);
+//        glDisable(GL_DEPTH_TEST);
+//        glEnable(GL_BLEND);
+//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);     
+//     
+//        glListBase(font);
+//
+//        /*float modelview_matrix[16];    
+//        glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);*/
+//     
+//        // This Is Where The Text Display Actually Happens.
+//        // For Each Line Of Text We Reset The Modelview Matrix
+//        // So That The Line's Text Will Start In The Correct Position.
+//        // Notice That We Need To Reset The Matrix, Rather Than Just Translating
+//        // Down By h. This Is Because When Each Character Is
+//        // Drawn It Modifies The Current Matrix So That The Next Character
+//        // Will Be Drawn Immediately After It. 
+//        for(int i=0;i<lines.size();i++) {
+//            glPushMatrix();
+//            glLoadIdentity();
+//            glMultTransposeMatrixf(camera->view_matrix);
+//			//glTranslatef(x,y - h * i,0);
+//			//glTranslatef(0,0,0);
+//     
+//            // The Commented Out Raster Position Stuff Can Be Useful If You Need To
+//            // Know The Length Of The Text That You Are Creating.
+//            // If You Decide To Use It Make Sure To Also Uncomment The glBitmap Command
+//            // In make_dlist().
+//            // glRasterPos2f(0,0);
+//            glCallLists(lines[i].length(), GL_UNSIGNED_BYTE, lines[i].c_str());
+//            // float rpos[4];
+//            // glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
+//            // float len=x-rpos[0]; (Assuming No Rotations Have Happend)
+//            glPopMatrix();
+//        }
+//     
+//        glPopAttrib();         
+//     
+//        pop_projection_matrix();
+//    }
