@@ -1,5 +1,7 @@
 #pragma once
 #include "glew/include/GL/glew.h"
+#include "ComponentCamera.h"
+
 #include <string>
 #include <vector>
 namespace glfreetype {
@@ -24,7 +26,10 @@ namespace glfreetype {
     // The Flagship Function Of The Library - This Thing Will Print
     // Out Text At Window Coordinates X, Y, Using The Font ft_font.
     // The Current Modelview Matrix Will Also Be Applied To The Text.
-    void print(font_data const & ft_font, float x, float y,  
+    void print(ComponentCamera* camera, font_data const & ft_font, float x, float y,  
                std::string const & text);
+
+	void print(font_data const & ft_font, float x, float y,
+		std::string const & text);
 
 }

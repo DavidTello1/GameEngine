@@ -54,7 +54,7 @@ bool ModuleRenderer3D::Init(Config* config)
 
 
 	
-	our_font.init("Library/Fonts/Wintersoul.ttf", 45 /* size */);
+	//our_font.init("Library/Fonts/Wintersoul.ttf", 45 /* size */);
 
 	return ret;
 }
@@ -71,12 +71,12 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 	//App->viewport->DrawScene();
 
 	// Drawing of gui and panels(and viewport panel)
-	//App->editor->Draw();
+	App->editor->Draw();
 
-	glColor3f(1, 1, 1);
+	//glColor3f(1, 1, 1);
 
-	glfreetype::print(our_font, 50 /* xpos */, 50 /* ypos */,
-		"The quick brown fox blah blah blah abcdefghijklmnopqrstuwvxyz");
+	//glfreetype::print(our_font, 50 /* xpos */, 50 /* ypos */,
+	//	"The quick brown fox blah blah blah abcdefghijklmnopqrstuwvxyz");
 
 	SDL_GL_SwapWindow(App->window->GetWindow());
 

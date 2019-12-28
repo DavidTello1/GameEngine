@@ -2,7 +2,7 @@
 #include "Panel.h"
 #include "Imgui/imgui.h"
 #include "FrameBuffer.h"
-
+#include "TextRenderer.hpp"
 class ComponentCamera;
 
 class Viewport : public Panel
@@ -18,6 +18,7 @@ public:
 	Viewport(const char* name);
 	~Viewport();
 
+	glfreetype::font_data our_font;
 
 	void OnResize(float width, float height);
 

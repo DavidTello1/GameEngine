@@ -19,6 +19,8 @@ Viewport::Viewport(const char* name) : Panel(name)
 	pos_y = default_pos_y;
 
 	camera = viewport_camera;
+	
+
 }
 
 
@@ -29,6 +31,9 @@ Viewport::~Viewport()
 // Is not automatically called
 bool Viewport::PreUpdate()
 {
+	if (our_font.textures.empty())
+		our_font.init("Library/Fonts/Wintersoul.ttf", 45 /* size */);
+
 	if (width != window_avail_size.x || height != window_avail_size.y)
 	{
 		width = window_avail_size.x;
@@ -62,7 +67,7 @@ bool Viewport::PreUpdate()
 void Viewport::Draw() 
 {
 	PreUpdate();
-
+	
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
@@ -73,6 +78,19 @@ void Viewport::Draw()
 	{
 		App->scene_base->Draw();
 	}
+
+	//
+	//camera->frustum.type = FrustumType::OrthographicFrustum;
+	glColor3f(1, 1, 1);
+
+	glfreetype::print(camera, our_font, 0 /* xpos */, 0+1 /* ypos */,
+		"The quick brown fox blah blah blah abcdefghijklmnopqrstuwvxyz");
+
+	glColor3f(1, 1, 0);
+
+	glfreetype::print(camera, our_font, pos_x /* xpos */, -pos_y /* ypos */,
+		"The quick brown fox blah blah blah abcdefghijklmnopqrstuwvxyz");
+	//camera->frustum.type = FrustumType::PerspectiveFrustum;
 
 	PostUpdate();
 }
