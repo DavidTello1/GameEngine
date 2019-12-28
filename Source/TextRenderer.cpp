@@ -299,7 +299,7 @@ namespace glfreetype {
 		for (int i = 0; i < lines.size(); i++) {
 			//glPushMatrix();
 			//glLoadIdentity();
-			glTranslatef(x,y-h*i,0);
+			glTranslatef(x,y-h*i,camera->frustum.pos.z);
 			//glMultMatrixf(modelview_matrix);
 
 			// The Commented Out Raster Position Stuff Can Be Useful If You Need To
