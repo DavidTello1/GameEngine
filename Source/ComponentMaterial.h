@@ -21,10 +21,6 @@ private:
 	ResourceMaterial* material = nullptr;
 	static inline Component::Type GetType() { return Component::Type::Material; }
 
-public:
-	uint  tex_id = 0;
 	char path[256];
-	uint width = 0;
-	uint height = 0;
 
 };

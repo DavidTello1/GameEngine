@@ -6,6 +6,7 @@
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
+#include "Image.h"
 
 #include "mmgr/mmgr.h"
 
@@ -96,15 +97,28 @@ bool GameObject::ToggleSelection() // Toggles the state of the node, returns cur
 	return is_selected;
 }
 
-Component* GameObject::GetComponent(Component::Type type)
+Component* GameObject::GetComponent(Component::Type type, UI_Element::Type UI_type)
 {
 	if (active)
 	{
 		for (uint i = 0; i < components.size(); i++)
 		{
 			if (components[i]->type == type)
-				return components[i];
+			{
+				if (type == Component::Type::UI_Element && UI_type != UI_Element::Type::UNKNOWN)
+				{
+					UI_Element* ui_comp = (UI_Element*)components[i];
+					if (ui_comp->GetType() == UI_type)
+						return components[i];
+				}
+				else
+					return components[i];
+			}
 		}
+	}
+	else
+	{
+		LOG("GameObject not active - cannot Get Component", 'd');
 	}
 
 	return nullptr;
@@ -146,29 +160,47 @@ Component* GameObject::AddComponent(Component::Type type, UI_Element::Type UI_ty
 	}
 	else if (type == Component::Type::UI_Element)
 	{
-		new_component = new UI_Element(UI_type, this);
-		components.push_back(new_component);
-		return new_component;
+		if (UI_type == UI_Element::Type::IMAGE)
+		{
+			new_component = new Image(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
+		}
 	}
 	return nullptr;
 }
 
-bool GameObject::HasComponent(Component::Type type)
-{
-	for (uint i = 0; i < components.size(); i++)
-	{
-		if (components[i]->type == type)
-			return true;
-	}
-	return false;
-}
-
-void GameObject::DeleteComponent(Component::Type type)
+bool GameObject::HasComponent(Component::Type type, UI_Element::Type UI_type)
 {
 	for (uint i = 0; i < components.size(); i++)
 	{
 		if (components[i]->type == type)
 		{
+			if (type == Component::Type::UI_Element && UI_type != UI_Element::Type::UNKNOWN)
+			{
+				UI_Element* ui_comp = (UI_Element*)components[i];
+				if (ui_comp->GetType() == UI_type)
+					return true;
+			}
+			else
+				return true;
+		}
+	}
+	return false;
+}
+
+void GameObject::DeleteComponent(Component::Type type, UI_Element::Type UI_type)
+{
+	for (uint i = 0; i < components.size(); i++)
+	{
+		if (components[i]->type == type)
+		{
+			if (type == Component::Type::UI_Element && UI_type != UI_Element::Type::UNKNOWN)
+			{
+				UI_Element* ui_comp = (UI_Element*)components[i];
+				if (ui_comp->GetType() != UI_type)
+					continue;
+			}
 			RELEASE(components[i]);
 			components.erase(components.begin() + i);
 			break;

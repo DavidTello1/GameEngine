@@ -81,36 +81,36 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 	{
 		if (ImGui::BeginMenu("Add"))
 		{
-			if (ImGui::MenuItem("Mesh", nullptr, false, !obj->GetComponent(Component::Type::Mesh)))
+			if (ImGui::MenuItem("Mesh", nullptr, false, !obj->HasComponent(Component::Type::Mesh)))
 				obj->AddComponent(Component::Type::Mesh);
 
-			if (ImGui::MenuItem("Material", nullptr, false, !obj->GetComponent(Component::Type::Material)))
+			if (ImGui::MenuItem("Material", nullptr, false, !obj->HasComponent(Component::Type::Material)))
 				obj->AddComponent(Component::Type::Material);
 
-			if (ImGui::MenuItem("Renderer", nullptr, false, !obj->GetComponent(Component::Type::Renderer)))
+			if (ImGui::MenuItem("Renderer", nullptr, false, !obj->HasComponent(Component::Type::Renderer)))
 				obj->AddComponent(Component::Type::Renderer);
 
-			if (ImGui::MenuItem("Camera", nullptr, false, !obj->GetComponent(Component::Type::Camera)))
+			if (ImGui::MenuItem("Camera", nullptr, false, !obj->HasComponent(Component::Type::Camera)))
 				obj->AddComponent(Component::Type::Camera);
 
-			if (ImGui::BeginMenu("UI Element"))
+			if (ImGui::BeginMenu("UI Element", !obj->HasComponent(Component::Type::UI_Element)))
 			{
-				if (ImGui::MenuItem("Canvas"))
+				if (ImGui::MenuItem("Canvas", nullptr, false, !obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS)))
 					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
 
-				if (ImGui::MenuItem("Image"))
+				if (ImGui::MenuItem("Image", nullptr, false, !obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE)))
 					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
 
-				if (ImGui::MenuItem("Text"))
+				if (ImGui::MenuItem("Text", nullptr, false, !obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::TEXT)))
 					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::TEXT);
 
-				if (ImGui::MenuItem("Button"))
+				if (ImGui::MenuItem("Button", nullptr, false, !obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::BUTTON)))
 					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::BUTTON);
 
-				if (ImGui::MenuItem("Check Box"))
+				if (ImGui::MenuItem("Check Box", nullptr, false, !obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX)))
 					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
 
-				if (ImGui::MenuItem("Input Text"))
+				if (ImGui::MenuItem("Input Text", nullptr, false, !obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::INPUTTEXT)))
 					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
 
 				ImGui::EndMenu();
@@ -120,27 +120,40 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 
 		if (ImGui::BeginMenu("Remove", !obj->components.empty()))
 		{
-			if (obj->GetComponent(Component::Type::Mesh))
-			{
-				if (ImGui::MenuItem("Mesh"))
-					obj->DeleteComponent(Component::Type::Mesh);
-			}
-			if (obj->GetComponent(Component::Type::Material))
-			{
-				if (ImGui::MenuItem("Material"))
-					obj->DeleteComponent(Component::Type::Material);
-			}
-			if (obj->GetComponent(Component::Type::Renderer))
-			{
-				if (ImGui::MenuItem("Renderer"))
-					obj->DeleteComponent(Component::Type::Renderer);
-			}
-			if (obj->GetComponent(Component::Type::Camera))
-			{
-				if (ImGui::MenuItem("Camera"))
-					obj->DeleteComponent(Component::Type::Camera);
-			}
+			if (ImGui::MenuItem("Mesh", nullptr, false, obj->HasComponent(Component::Type::Mesh)))
+				obj->DeleteComponent(Component::Type::Mesh);
 
+			if (ImGui::MenuItem("Material", nullptr, false, obj->HasComponent(Component::Type::Material)))
+				obj->DeleteComponent(Component::Type::Material);
+
+			if (ImGui::MenuItem("Renderer", nullptr, false, obj->HasComponent(Component::Type::Renderer)))
+				obj->DeleteComponent(Component::Type::Renderer);
+
+			if (ImGui::MenuItem("Camera", nullptr, false, obj->HasComponent(Component::Type::Camera)))
+				obj->DeleteComponent(Component::Type::Camera);
+
+			if (ImGui::BeginMenu("UI Element", obj->HasComponent(Component::Type::UI_Element)))
+			{
+				if (ImGui::MenuItem("Canvas", nullptr, false, obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS)))
+					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
+
+				if (ImGui::MenuItem("Image", nullptr, false, obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE)))
+					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+
+				if (ImGui::MenuItem("Text", nullptr, false, obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::TEXT)))
+					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::TEXT);
+
+				if (ImGui::MenuItem("Button", nullptr, false, obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::BUTTON)))
+					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::BUTTON);
+
+				if (ImGui::MenuItem("Check Box", nullptr, false, obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX)))
+					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+
+				if (ImGui::MenuItem("Input Text", nullptr, false, obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::INPUTTEXT)))
+					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+
+				ImGui::EndMenu();
+			}
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
@@ -194,19 +207,19 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 		ImGui::Text("Position");
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("x##1", &position.x, precision, -inf, inf, precision_char))
+		if (ImGui::DragFloat("x##position", &position.x, precision, -inf, inf, precision_char))
 			if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("y##1", &position.y, precision, -inf, inf, precision_char))
+		if (ImGui::DragFloat("y##position", &position.y, precision, -inf, inf, precision_char))
 			if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("z##1", &position.z, precision, -inf, inf, precision_char))
+		if (ImGui::DragFloat("z##position", &position.z, precision, -inf, inf, precision_char))
 			if (!obj->is_static) SetPosition(obj, position);
 
 		ImGui::Separator();
@@ -215,19 +228,19 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 		ImGui::Text("Rotation");
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("x##2", &rotation.x, precision, -inf, inf, precision_char))
+		if (ImGui::DragFloat("x##rotation", &rotation.x, precision, -inf, inf, precision_char))
 			if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("y##2", &rotation.y, precision, -inf, inf, precision_char))
+		if (ImGui::DragFloat("y##rotation", &rotation.y, precision, -inf, inf, precision_char))
 			if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("z##2", &rotation.z, precision, -inf, inf, precision_char))
+		if (ImGui::DragFloat("z##rotation", &rotation.z, precision, -inf, inf, precision_char))
 			if (!obj->is_static) SetRotation(obj, rotation*DEGTORAD);
 
 		ImGui::Separator();
@@ -236,7 +249,7 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 		ImGui::Text("Scale");
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("x##3", &scale.x, precision, -inf, inf, precision_char))
+		if (ImGui::DragFloat("x##scale", &scale.x, precision, -inf, inf, precision_char))
 		{
 			if (!obj->is_static) {
 				if (lock_scale)
@@ -252,7 +265,7 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("y##3", &scale.y, precision, -inf, inf, precision_char))
+		if (ImGui::DragFloat("y##scale", &scale.y, precision, -inf, inf, precision_char))
 		{
 			if (!obj->is_static) {
 				if (lock_scale)
@@ -268,7 +281,7 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
 
-		if (ImGui::DragFloat("z##3", &scale.z, precision, -inf, inf, precision_char))
+		if (ImGui::DragFloat("z##scale", &scale.z, precision, -inf, inf, precision_char))
 		{
 			if (!obj->is_static) {
 				if (lock_scale)

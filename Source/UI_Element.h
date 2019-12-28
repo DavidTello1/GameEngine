@@ -3,18 +3,6 @@
 #include "Math.h"
 #include <vector>
 
-struct Anchor
-{
-	float2 position;
-	float4 corner_distance;
-};
-
-struct Pivot
-{
-	float2 position;
-	float rotation;
-};
-
 class UI_Element : public Component
 {
 	friend class ModuleGUI;
@@ -54,27 +42,33 @@ public:
 	UI_Element::State GetState() { return state; }
 	UI_Element::Action GetAction() { return action; }
 
-	void SwitchVisible() { visible = !visible; }
-	void SwitchDraggable() { draggable = !draggable; }
-	void SwitchInteractable() { interactable = !interactable; }
-	void ChangeStateTo(State State) { state = State; }
+	//void ChangePosition();
+	//void ChangeAnchorPos();
+	//void ChangeRotation();
+	//void ChangePivotPos();
+	//void ChangeScale();
+	//void ChangeSize();
 
+	void ChangeStateTo(State new_state) { state = new_state; }
 	void UpdateState();
 	void DoLogic(Action action);
 
-	virtual void DrawInspector() = 0;
+	void DrawInspector() {};
 
 public:
-	bool visible = false;
-	bool draggable = false;
-	bool interactable = false;
+	bool visible = true;
+	bool draggable = true;
+	bool interactable = true;
 
-	float2 position;
-	float2 size;
+	float2 position2D = float2::zero;
+	float2 anchor = float2::zero;
 
-	Anchor anchor;
-	Pivot pivot;
-	float3 scale;
+	float rotation2D = 0.0f;
+	float2 pivot = float2::zero;
+	
+	float2 scale2D = float2::zero;
+	float2 size2D = float2::zero;
+
 
 protected:
 	Type type = UNKNOWN;

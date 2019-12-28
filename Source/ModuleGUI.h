@@ -10,6 +10,9 @@ public:
 
 	//bool Init(Config* config = nullptr);
 	//bool Start(Config* config = nullptr);
+	//bool PreUpdate(float dt);
+	//bool Update(float dt);
+	//bool PostUpdate(float dt);
 	//bool CleanUp();
 	//
 	//void Draw();

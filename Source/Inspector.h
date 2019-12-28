@@ -1,15 +1,9 @@
 #pragma once
-
 #include "Panel.h"
 #include "Math.h"
 #include "GameObject.h"
 #include "Component.h"
 #include "Resource.h"
-
-class ComponentMesh;
-class ComponentMaterial;
-class ComponentRenderer;
-class ComponentCamera;
 
 class Inspector : public Panel
 {
@@ -44,10 +38,4 @@ private:
 	bool lock_scale = false;
 
 	Component* selected_component;
-
-	ComponentMesh* mesh;
-	ComponentMaterial* material;
-	ComponentRenderer* renderer;
-	ComponentCamera* camera;
-
 };

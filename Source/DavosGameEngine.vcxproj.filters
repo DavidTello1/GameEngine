@@ -540,15 +540,6 @@
     <ClInclude Include="Text.h">
       <Filter>Sources\UI\Components</Filter>
     </ClInclude>
-    <ClInclude Include="UI_Image.h">
-      <Filter>Sources\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UI_Text.h">
-      <Filter>Sources\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UI_Window.h">
-      <Filter>Sources\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Canvas.h">
       <Filter>Sources\UI\Components</Filter>
     </ClInclude>
@@ -808,15 +799,6 @@
     </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Sources\UI\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="UI_Image.cpp">
-      <Filter>Sources\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="UI_Text.cpp">
-      <Filter>Sources\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="UI_Window.cpp">
-      <Filter>Sources\UI</Filter>
     </ClCompile>
     <ClCompile Include="Canvas.cpp">
       <Filter>Sources\UI\Components</Filter>
