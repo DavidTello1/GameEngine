@@ -135,8 +135,8 @@ void ModuleSceneBase::CameraFreeMove(float dt)
 		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= viewport_camera->frustum.WorldRight() * speed;
 		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += viewport_camera->frustum.WorldRight() * speed;
 
-		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= viewport_camera->frustum.up * speed;
-		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += viewport_camera->frustum.up * speed;
+		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT) newPos -= viewport_camera->frustum.up * speed;
+		if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT) newPos += viewport_camera->frustum.up * speed;
 
 		viewport_camera->Move(newPos);
 

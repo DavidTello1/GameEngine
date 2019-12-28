@@ -102,20 +102,15 @@ void Viewport::Draw()
 	//glLoadTransposeMatrixf(camera->view_matrix);
 
 	//
-	glColor3f(1, 1, 1);
+	glColor3f(1, 0, 0);
 
-	glfreetype::print(camera, our_font, 0 /* xpos */, 0 /* ypos */,
+	glfreetype::print(camera, our_font, 0 /* xpos */, 80 /* ypos */,
 		"This text is at (0,0) abcdefghijklmnopqrstuwvxyz");
 
-	glColor3f(1, 1, 0);
+	glColor3f(1, 1, 1);
 
-	std::string s = "This text is at (";
-	s.append("%i",pos_x);
-	s.append("%i", pos_y); 
-	s.append(") abcdefghijklmnopqrstuwvxyz");
-
-	glfreetype::print(camera, our_font, pos_x /* xpos */, -pos_y /* ypos */,
-		s);
+	glfreetype::print(camera, our_font, -10 /* xpos */, -10 /* ypos */,
+		"This text is at (25,25) abcdefghijklmnopqrstuwvxyz");
 	//camera->frustum.type = FrustumType::PerspectiveFrustum;
 
 	/*camera->frustum.type = FrustumType::PerspectiveFrustum;

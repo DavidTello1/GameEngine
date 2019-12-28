@@ -248,16 +248,21 @@ namespace glfreetype {
     void print(ComponentCamera* camera, const font_data &ft_font, float x, float y, std::string const & text)  {
              
 		// We Want A Coordinate System Where Distance Is Measured In Window Pixels.
-		glPushAttrib(GL_TRANSFORM_BIT);
+		//glPushAttrib(GL_TRANSFORM_BIT);
 		GLint viewport[4];
 		glGetIntegerv(GL_VIEWPORT, viewport);
-		//glMatrixMode(GL_PROJECTION);
+		glMatrixMode(GL_PROJECTION);
 		//glPushMatrix();
-		//glLoadIdentity();
+		glLoadIdentity();
 		//glLoadTransposeMatrixf(camera->frustum.ViewProjMatrix().ptr());
 
-		glOrtho(viewport[0], viewport[2], viewport[3], viewport[1], -1, 1);
-		glPopAttrib();
+		/*float l = camera->frustum.NearPlanePos(-1, -1).x;
+		float r = camera->frustum.NearPlanePos(1, 1).x;
+		float b = camera->frustum.NearPlanePos(-1, -1).y;
+		float t = camera->frustum.NearPlanePos(1, 1).y;*/
+		glOrtho(viewport[0], viewport[2], viewport[1], viewport[3], 1, -1);
+
+		//glPopAttrib();
 
 		GLuint font = ft_font.list_base;
 		// We Make The Height A Little Bigger.  There Will Be Some Space Between Lines.
@@ -281,8 +286,8 @@ namespace glfreetype {
 
 		glListBase(font);
 
-		float modelview_matrix[16];
-		glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+		//float modelview_matrix[16];
+		//glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
 
 		// This Is Where The Text Display Actually Happens.
 		// For Each Line Of Text We Reset The Modelview Matrix
@@ -292,10 +297,10 @@ namespace glfreetype {
 		// Drawn It Modifies The Current Matrix So That The Next Character
 		// Will Be Drawn Immediately After It. 
 		for (int i = 0; i < lines.size(); i++) {
-			glPushMatrix();
-			glLoadIdentity();
-			glTranslatef(0,0,20);
-			glMultMatrixf(modelview_matrix);
+			//glPushMatrix();
+			//glLoadIdentity();
+			glTranslatef(x,y-h*i,0);
+			//glMultMatrixf(modelview_matrix);
 
 			// The Commented Out Raster Position Stuff Can Be Useful If You Need To
 			// Know The Length Of The Text That You Are Creating.
@@ -306,12 +311,12 @@ namespace glfreetype {
 			// float rpos[4];
 			// glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
 			// float len=x-rpos[0]; (Assuming No Rotations Have Happend)
-			glPopMatrix();
+			//glPopMatrix();
 		}
 
 		glPopAttrib();
 
-		pop_projection_matrix();
+		//pop_projection_matrix();
     }
 
 	void print(const font_data &ft_font, float x, float y, std::string const & text) {
