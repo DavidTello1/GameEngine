@@ -93,7 +93,7 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 			if (ImGui::MenuItem("Camera", nullptr, false, !obj->HasComponent(Component::Type::Camera)))
 				obj->AddComponent(Component::Type::Camera);
 
-			if (ImGui::BeginMenu("UI Element", !obj->HasComponent(Component::Type::UI_Element)))
+			if (ImGui::BeginMenu("UI Element"))
 			{
 				if (ImGui::MenuItem("Canvas", nullptr, false, !obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS)))
 					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
@@ -300,6 +300,7 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip("Lock scale");
 
+		ImGui::Separator();
 		ImGui::Separator();
 
 		if (obj->is_static)

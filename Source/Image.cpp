@@ -1,5 +1,7 @@
 #include "Image.h"
 #include "GameObject.h"
+#include "Application.h"
+#include "ModuleResources.h"
 
 #include "mmgr/mmgr.h"
 
@@ -13,6 +15,8 @@ Image::Image(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Elem
 		canvas = (Canvas*)gameObject->AddComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
 	else
 		canvas = (Canvas*)gameObject->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
+
+	material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 }
 
 Image::~Image()
@@ -38,97 +42,64 @@ void Image::DrawInspector()
 		ImGui::Checkbox("Draggable", &draggable);
 		ImGui::Separator();
 
+		// Size
+		ImGui::Text("Size:    ");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("x##size", &size2D.x);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("y##size", &size2D.y);
+
 		// Position
-		if (ImGui::TreeNode("Position"))
-		{
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("x##position2D", &position2D.x))
-			{
-			}
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("y##position2D", &position2D.y))
-			{
-			}
-
-			// Anchor
-			ImGui::Text("Anchor: ");
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("x##anchor", &anchor.x))
-			{
-			}
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("y##anchor", &anchor.y))
-			{
-			}
-
-			ImGui::Separator();
-			ImGui::TreePop();
-		}
+		ImGui::Text("Position:");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("x##position2D", &position2D.x);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("y##position2D", &position2D.y);
 
 		// Rotation
-		if (ImGui::TreeNode("Rotation"))
-		{
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("##rotation2D", &rotation2D))
-			{
-			}
-
-			// Pivot
-			ImGui::Text("Pivot: ");
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("x##pivot", &pivot.x))
-			{
-			}
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("y##pivot", &pivot.y))
-			{
-			}
-
-			ImGui::Separator();
-			ImGui::TreePop();
-		}
+		ImGui::Text("Rotation:");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("##rotation2D", &rotation2D);
 
 		// Scale
-		if (ImGui::TreeNode("Scale"))
-		{
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("x##scale2D", &scale2D.x))
-			{
-			}
-
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("y##scale2D", &scale2D.y))
-			{
-			}
-
-			// Size
-			ImGui::Text("Size: ");
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("x##size", &size2D.x))
-			{
-			}
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(60);
-			if (ImGui::DragFloat("y##size", &size2D.y))
-			{
-			}
-
-			ImGui::Separator();
-			ImGui::TreePop();
-		}
+		ImGui::Text("Scale:   ");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("x##scale2D", &scale2D.x);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("y##scale2D", &scale2D.y);
 
 		// Image
 		ImGui::Separator();
 		ImGui::Text("Image");
-		if (material != nullptr)
-			ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::SameLine();
 
+		if (ImGui::Button("Load..."))
+			ImGui::OpenPopup("Load Image");
+
+		if (ImGui::BeginPopup("Load Image"))
+		{
+			std::vector<Resource*> images = App->resources->GetAllResourcesOfType(Resource::Type::material);
+			for (int i = 0; i < images.size(); i++)
+			{
+				if (ImGui::Selectable(images[i]->GetName().c_str()))
+					material->LoadTexture(images[i]->GetFile());
+			}
+			ImGui::EndPopup();
+		}
+
+		if (material->tex_id != 0)
+			ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		else
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "*Image not loaded*");
+
+		ImGui::Separator();
+		ImGui::Separator();
 	}
 }

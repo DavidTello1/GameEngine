@@ -34,7 +34,6 @@ void ComponentCamera::DrawInspector()
 {
 	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-
 		ImGui::ColorEdit3("Background", (float*)&background);
 
 		// Dummy floats
@@ -69,6 +68,9 @@ void ComponentCamera::DrawInspector()
 		{
 			SetFarPlane(_far);
 		}
+
+		ImGui::Separator();
+		ImGui::Separator();
 	}
 }
 

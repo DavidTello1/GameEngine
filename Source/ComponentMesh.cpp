@@ -58,5 +58,6 @@ void ComponentMesh::DrawInspector()
 			}
 		}
 		ImGui::Separator();
+		ImGui::Separator();
 	}
 }

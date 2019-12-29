@@ -54,3 +54,8 @@ std::string Resource::GetExportedFile() const
 
 	return file;
 }
+
+std::string Resource::GetName() const
+{
+	return App->file_system->GetFileName(GetFile());
+}

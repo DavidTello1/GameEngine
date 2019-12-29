@@ -116,30 +116,30 @@ void Hierarchy::DrawCreateMenu()
 
 	if (ImGui::MenuItem("Empty"))
 		App->scene->CreateGameObject();
-	ImGui::Separator();
 
-	if (ImGui::BeginMenu("UI"))
-	{
-		if (ImGui::MenuItem("Canvas"))
-		{
-		}
-		if (ImGui::MenuItem("Image"))
-		{
-		}
-		if (ImGui::MenuItem("Text"))
-		{
-		}
-		if (ImGui::MenuItem("Button"))
-		{
-		}
-		if (ImGui::MenuItem("CheckBox"))
-		{
-		}
-		if (ImGui::MenuItem("InputText"))
-		{
-		}
-		ImGui::EndMenu();
-	}
+	//ImGui::Separator();
+	//if (ImGui::BeginMenu("UI"))
+	//{
+	//	if (ImGui::MenuItem("Canvas"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("Image"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("Text"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("Button"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("CheckBox"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("InputText"))
+	//	{
+	//	}
+	//	ImGui::EndMenu();
+	//}
 
 	ImGui::Separator();
 	if (ImGui::BeginMenu("Basic shapes"))

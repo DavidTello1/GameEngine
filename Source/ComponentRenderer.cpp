@@ -40,6 +40,7 @@ void ComponentRenderer::DrawInspector()
 			ImGui::Checkbox("Wireframe", &show_wireframe);
 		}
 		ImGui::Separator();
+		ImGui::Separator();
 	}
 }
 

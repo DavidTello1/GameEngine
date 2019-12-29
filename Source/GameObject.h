@@ -49,6 +49,7 @@ public:
 	Component* AddComponent(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
 	bool HasComponent(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
 	void DeleteComponent(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
+	std::vector<Component*> GetAllComponentsOfType(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
 
 	float3 GetPosition() const { return translation; }
 	float3 GetRotation() const { return rotation; }

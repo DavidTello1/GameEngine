@@ -264,12 +264,12 @@ std::vector<Resource*> ModuleResources::GetAllResourcesOfType(Resource::Type typ
 {
 	std::vector<Resource*> ret;
 
-	for (uint i = 0; i < resources.size(); ++i)
+	std::map<UID, Resource*>::iterator it = resources.begin();
+	for (; it != resources.end(); it++)
 	{
-		if (resources[i] != nullptr && resources[i]->type == type)
-			ret.push_back(resources[i]);
+		if (it->second->GetType() == type)
+			ret.push_back(it->second);
 	}
-
 	return ret;
 }
 

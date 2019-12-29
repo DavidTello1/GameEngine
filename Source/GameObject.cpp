@@ -208,6 +208,28 @@ void GameObject::DeleteComponent(Component::Type type, UI_Element::Type UI_type)
 	}
 }
 
+std::vector<Component*> GameObject::GetAllComponentsOfType(Component::Type type, UI_Element::Type UI_type)
+{
+	std::vector<Component*> comps;
+
+	for (uint i = 0; i < components.size(); i++)
+	{
+		if (components[i]->type == type)
+		{
+			if (type == Component::Type::UI_Element && UI_type != UI_Element::Type::UNKNOWN)
+			{
+				UI_Element* ui_comp = (UI_Element*)components[i];
+				if (ui_comp->GetType() == UI_type)
+					comps.push_back(components[i]);
+			}
+			else
+				comps.push_back(components[i]);
+		}
+	}
+
+	return comps;
+}
+
 void GameObject::UpdateTransform()
 {
 	if (flags & ProcessTransformUpdate)

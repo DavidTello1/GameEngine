@@ -2,6 +2,7 @@
 #include "Component.h"
 #include "Math.h"
 #include <vector>
+#include "SDL/include/SDL_rect.h"
 
 class UI_Element : public Component
 {
@@ -42,37 +43,41 @@ public:
 	UI_Element::State GetState() { return state; }
 	UI_Element::Action GetAction() { return action; }
 
-	//void ChangePosition();
-	//void ChangeAnchorPos();
-	//void ChangeRotation();
-	//void ChangePivotPos();
-	//void ChangeScale();
-	//void ChangeSize();
+	void ChangeSize(float2 size) { size2D = size; }
+	void ChangePosition(float2 pos) { position2D = pos; }
+	void ChangeRotation(float rot) { rotation2D = rot; }
+	void ChangeScale(float2 scale) { scale2D = scale; }
 
+	void UpdateCollider();
 	void ChangeStateTo(State new_state) { state = new_state; }
 	void UpdateState();
 	void DoLogic(Action action);
 
 	void DrawInspector() {};
 
+private:
+	bool CheckMousePos();
+	bool CheckClick();
+
 public:
 	bool visible = true;
 	bool draggable = true;
 	bool interactable = true;
 
-	float2 position2D = float2::zero;
-	float2 anchor = float2::zero;
-
-	float rotation2D = 0.0f;
-	float2 pivot = float2::zero;
-	
-	float2 scale2D = float2::zero;
 	float2 size2D = float2::zero;
-
+	float2 position2D = float2::zero;
+	float rotation2D = 0.0f;
+	float2 scale2D = float2::zero;
 
 protected:
 	Type type = UNKNOWN;
 	State state = NOTHING;
 	Action action = NONE;
+
+private:
+	float2 drag_start = float2::zero;
+	float2 mouse_pos = float2::zero;
+
+	SDL_Rect collider;
 };
 

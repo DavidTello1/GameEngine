@@ -26,6 +26,7 @@ public:
 	UID GetID() const { return uid; }
 	const char* GetFile() const { return original_file.c_str(); }
 	std::string GetExportedFile() const;
+	std::string GetName() const;
 
 	//virtual void Save(Config& config) const;
 	//virtual void Load(const Config& config);
@@ -43,7 +44,7 @@ protected:
 protected:
 	UID uid = 0;
 	Type type = unknown;
-	std::string original_file; //bakerhouse.fbx
+	std::string original_file; //Assets/bakerhouse.fbx
 
 	uint times_loaded = 0;
 
