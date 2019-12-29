@@ -53,6 +53,7 @@ public:
 	void UpdateState();
 	void DoLogic(Action action);
 
+	virtual void Draw() {};
 	void DrawInspector() {};
 
 private:

@@ -142,6 +142,7 @@ void ModuleScene::UpdateTransformationGuizmos()
 	}
 
 }
+#include "Canvas.h"
 
 bool ModuleScene::PostUpdate(float dt)
 {
@@ -170,6 +171,12 @@ bool ModuleScene::PostUpdate(float dt)
 				RedoQuatree();
 			}
 			obj->flags &= ~ProcessTransformUpdate;
+		}
+
+		Canvas* canvas = (Canvas*)obj->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
+		if (canvas != nullptr)
+		{
+			canvas->Draw();
 		}
 	}
 

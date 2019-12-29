@@ -7,6 +7,8 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 #include "Image.h"
+#include "Text.h"
+#include "Canvas.h"
 
 #include "mmgr/mmgr.h"
 
@@ -160,12 +162,25 @@ Component* GameObject::AddComponent(Component::Type type, UI_Element::Type UI_ty
 	}
 	else if (type == Component::Type::UI_Element)
 	{
+		if (UI_type == UI_Element::Type::CANVAS)
+		{
+			new_component = new Canvas(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
+		}
 		if (UI_type == UI_Element::Type::IMAGE)
 		{
 			new_component = new Image(this, UI_type);
 			components.push_back(new_component);
 			return new_component;
 		}
+		if (UI_type == UI_Element::Type::TEXT)
+		{
+			new_component = new Text(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
+		}
+
 	}
 	return nullptr;
 }
