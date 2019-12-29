@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="docs">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="docs\css">
+      <UniqueIdentifier>{01206a2c-2dd0-4d67-81cb-5ff6c398b344}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="docs\js">
+      <UniqueIdentifier>{3b4fa8ef-20c8-47f1-a5f0-f66116c58415}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="docs\about">
+      <UniqueIdentifier>{eb54ea2c-6372-4a55-b887-e0423acc7945}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\docs\background1.jpg">
+      <Filter>docs</Filter>
+    </Image>
+    <Image Include="..\docs\background2.jpg">
+      <Filter>docs</Filter>
+    </Image>
+    <Image Include="..\docs\background3.jpg">
+      <Filter>docs</Filter>
+    </Image>
+    <Image Include="..\docs\background4.jpg">
+      <Filter>docs</Filter>
+    </Image>
+    <Image Include="..\docs\background5.jpg">
+      <Filter>docs</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\docs\index.html">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\docs\LICENSE">
+      <Filter>docs</Filter>
+    </None>
+    <None Include="..\docs\css\materialize.css">
+      <Filter>docs\css</Filter>
+    </None>
+    <None Include="..\docs\css\materialize.min.css">
+      <Filter>docs\css</Filter>
+    </None>
+    <None Include="..\docs\css\style.css">
+      <Filter>docs\css</Filter>
+    </None>
+    <None Include="..\docs\js\init.js">
+      <Filter>docs\js</Filter>
+    </None>
+    <None Include="..\docs\js\materialize.js">
+      <Filter>docs\js</Filter>
+    </None>
+    <None Include="..\docs\js\materialize.min.js">
+      <Filter>docs\js</Filter>
+    </None>
+    <None Include="..\docs\about\index.html">
+      <Filter>docs\about</Filter>
+    </None>
+  </ItemGroup>
+</Project>
