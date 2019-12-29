@@ -254,7 +254,7 @@ namespace glfreetype {
 		glMatrixMode(GL_PROJECTION);
 		//glPushMatrix();
 		glLoadIdentity();
-		//glLoadTransposeMatrixf(camera->frustum.ViewProjMatrix().ptr());
+		//glMultTransposeMatrixf(camera->origin_projection_matrix);
 
 		/*float l = camera->frustum.NearPlanePos(-1, -1).x;
 		float r = camera->frustum.NearPlanePos(1, 1).x;
@@ -296,11 +296,20 @@ namespace glfreetype {
 		// Down By h. This Is Because When Each Character Is
 		// Drawn It Modifies The Current Matrix So That The Next Character
 		// Will Be Drawn Immediately After It. 
+		
+
+		float3 pos = camera->frustum.pos;
+		float3 cross = math::Cross(pos, { x,y,pos.z }).Normalized();
+
 		for (int i = 0; i < lines.size(); i++) {
-			//glPushMatrix();
-			//glLoadIdentity();
-			glTranslatef(x,y-h*i,camera->frustum.pos.z);
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslatef(pos.x + x, pos.y + y -h*i, pos.z);
+			//glLoadTransposeMatrixf(camera->view_matrix);
+			//glRotatef(math::Dot(pos, { x,y,pos.z }),cross.x,cross.y,cross.z);
+			//gluLookAt( 0,0,0,pos.x,pos.y,pos.z, 0, 1, 0);
 			//glMultMatrixf(modelview_matrix);
+			glMultTransposeMatrixf(camera->origin_view_matrix);
 
 			// The Commented Out Raster Position Stuff Can Be Useful If You Need To
 			// Know The Length Of The Text That You Are Creating.
@@ -311,11 +320,12 @@ namespace glfreetype {
 			// float rpos[4];
 			// glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
 			// float len=x-rpos[0]; (Assuming No Rotations Have Happend)
-			//glPopMatrix();
+			glPopMatrix();
 		}
 
 		glPopAttrib();
 
+		
 		//pop_projection_matrix();
     }
 

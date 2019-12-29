@@ -42,6 +42,8 @@ public:
 
 	void Look(const float3 & position);
 
+	void LookNoUpdate(const float3 & position);
+
 	void DrawFrustum();
 
 	//  -------------------------------------- Consultors
@@ -65,5 +67,8 @@ public:
 	// OpenGL ready matrix -> NOT trasposed and pointer
 	float* view_matrix = nullptr;
 	float* projection_matrix = nullptr;
+
+	float* origin_view_matrix = nullptr;
+	float* origin_projection_matrix = nullptr;
 
 };

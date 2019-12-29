@@ -31,7 +31,7 @@ bool ModuleScene::Init(Config* config)
 	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
 	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
 
-	viewport_camera->Move({ 0, 1.95f, 25.0f });
+	viewport_camera->Move({ 0, 0, 25.0f });
 	viewport_camera->Look({ 0, 0, 0 });
 	viewport_camera->SetFarPlane(500.0f);
 
