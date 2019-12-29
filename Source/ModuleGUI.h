@@ -1,6 +1,8 @@
 #pragma once
 #include "Module.h"
 #include "UI_Element.h"
+#include "Canvas.h"
+#include <vector>
 
 class ModuleGUI : public Module
 {
@@ -14,6 +16,10 @@ public:
 	bool PostUpdate(float dt);
 	bool CleanUp();
 	
-	//void Draw();
+	void Draw(ComponentCamera * camera);
+	void AddCanvas(Canvas* c) { canvas.push_back(c); }
+	
+public:
+	std::vector<Canvas*> canvas;
 };
 

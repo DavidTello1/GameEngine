@@ -1,9 +1,13 @@
 #pragma once
 #include "Module.h"
-#include "Globals.h"
-#include "glmath.h"
+#include "TextRenderer.hpp"
+
 
 #define MAX_LIGHTS 8
+
+class Color;
+
+typedef void *SDL_GLContext;
 
 class ModuleRenderer3D : public Module
 {
@@ -23,8 +27,12 @@ public:
 	bool GetVSync() const { return vsync; }
 
 public:
+	glfreetype::font_data our_font;
+
 	SDL_GLContext context;
 
 	bool vsync = false;
 	bool in_game = false;
 };
+	extern void glColorColorU(const Color & c);
+	extern void glColorColorF(const Color & c);

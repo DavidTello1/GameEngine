@@ -1,6 +1,7 @@
 #include "ComponentCamera.h"
 #include "Globals.h"
 #include "Application.h"
+#include "ModuleEditor.h"
 #include "Imgui/imgui.h"
 #include "Component.h"
 #include "ComponentMesh.h"
@@ -23,7 +24,10 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 	aspect_ratio = 1.4f;
 	SetAspectRatio(aspect_ratio);
 
-	update_projection = true;
+	Move({ 0,0,1 });
+	Look({ 0,0,0 });
+
+	origin_view_matrix = view_matrix;
 }
 
 ComponentCamera::~ComponentCamera()
@@ -34,6 +38,10 @@ void ComponentCamera::DrawInspector()
 {
 	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		if (ImGui::Button("Promote to viewport"))
+		{
+			App->editor->AddViewport(this);
+		}
 		ImGui::ColorEdit3("Background", (float*)&background);
 
 		// Dummy floats
@@ -48,7 +56,7 @@ void ComponentCamera::DrawInspector()
 			else
 				frustum.type = FrustumType::OrthographicFrustum;
 
-			update_projection = true;
+			UpdateMatrices();
 		}
 
 		ImGui::Text("Aspect ratio: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", GetAspectRatio());
@@ -107,16 +115,22 @@ float ComponentCamera::GetAspectRatio() const
 	return frustum.AspectRatio();
 }
 
-float* ComponentCamera::GetViewMatrix()
+
+void ComponentCamera::UpdateMatrices()
 {
-	math::float4x4 matrix = frustum.ViewMatrix();
-	return matrix.Transposed().ptr();
+	UpdateViewMatrix();
+	UpdateProjectionMatrix();
+}
+void ComponentCamera::UpdateViewMatrix()
+{
+	view_matrix4x4 = frustum.ViewMatrix();
+	view_matrix = view_matrix4x4.ptr();
 }
 
-float* ComponentCamera::GetProjectionMatrix()
+void ComponentCamera::UpdateProjectionMatrix()
 {
-	math::float4x4 matrix = frustum.ProjectionMatrix();
-	return matrix.Transposed().ptr();
+	projection_matrix4x4 = frustum.ProjectionMatrix();
+	projection_matrix = projection_matrix4x4.ptr();
 }
 
 // Setters -----------------------------------------------------------------
@@ -126,8 +140,7 @@ void ComponentCamera::SetNearPlane(float distance)
 	if (distance > 0 && distance < frustum.farPlaneDistance)
 	{
 		frustum.nearPlaneDistance = distance;
-		UpdatePlanes();
-		update_projection = true;
+		UpdateMatrices();
 	}
 
 }
@@ -137,8 +150,7 @@ void ComponentCamera::SetFarPlane(float distance)
 	if (distance > 0 && distance > frustum.nearPlaneDistance)
 	{
 		frustum.farPlaneDistance = distance;
-		UpdatePlanes();
-		update_projection = true;
+		UpdateMatrices();
 	}
 }
 
@@ -151,14 +163,12 @@ void ComponentCamera::SetFov(float fov, bool in_degree)
 	
 	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov / 2) * aspect_ratio);
 
-	UpdatePlanes();
-	update_projection = true;
+	UpdateMatrices();
 }
 
 void ComponentCamera::SetAspectRatio(float ratio)
 {
 	aspect_ratio = ratio;
-	UpdatePlanes();
 	SetFov(frustum.verticalFov, false);	
 }
 
@@ -166,15 +176,13 @@ void ComponentCamera::SetAspectRatio(float ratio)
 void ComponentCamera::SetPosition(const float3& position)
 {
 	frustum.pos = position;
-	UpdatePlanes();
-	update_projection = true;
+	UpdateMatrices();
 }
 
 void ComponentCamera::Move(const float3 & distance)
 {
 	frustum.Translate(distance);
-	UpdatePlanes();
-	update_projection = true;
+	UpdateMatrices();
 }
 
 void ComponentCamera::Look(const float3 & position)
@@ -186,13 +194,17 @@ void ComponentCamera::Look(const float3 & position)
 	frustum.front = matrix.MulDir(frustum.front).Normalized();
 	frustum.up = matrix.MulDir(frustum.up).Normalized();
 	
-	UpdatePlanes();
-	update_projection = true;
+	UpdateMatrices();
 }
 
-void ComponentCamera::UpdatePlanes()
+void ComponentCamera::LookNoUpdate(const float3 & position)
 {
-	frustum.GetPlanes(planes);
+	float3 vector = position - frustum.pos;
+
+	float3x3 matrix = float3x3::LookAt(frustum.front, vector.Normalized(), frustum.up, float3::unitY);
+
+	frustum.front = matrix.MulDir(frustum.front).Normalized();
+	frustum.up = matrix.MulDir(frustum.up).Normalized();
 }
 
 // Debug -----------------------------------------------------
@@ -201,7 +213,7 @@ void ComponentCamera::DrawFrustum()
 {
 	glBegin(GL_LINES);
 	glLineWidth(1.0f);
-	glColor4f(White.r, White.g, White.b, White.a);
+	glColor4f(Color::white.r, Color::white.g, Color::white.b, Color::white.a);
 
 	for (int i = 0; i < frustum.NumEdges(); i++)
 	{

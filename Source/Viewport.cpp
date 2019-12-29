@@ -1,7 +1,11 @@
 #include "Application.h"
 #include "Viewport.h"
 #include "ModuleScene.h"
+#include "ModuleSceneBase.h"
 #include "ComponentCamera.h"
+#include "ImGuizmo.h"
+#include <string>
+
 #include "mmgr/mmgr.h"
 
 const int Viewport::default_width = 600;
@@ -9,12 +13,16 @@ const int Viewport::default_height = 600;
 const int Viewport::default_pos_x = 300;
 const int Viewport::default_pos_y = 250;
 
-Viewport::Viewport() : Panel("Viewport")
+Viewport::Viewport(const char* name) : Panel(name)
 {
 	width = default_width;
 	height = default_height;
 	pos_x = default_pos_x;
 	pos_y = default_pos_y;
+
+	camera = viewport_camera;
+	
+
 }
 
 
@@ -25,25 +33,40 @@ Viewport::~Viewport()
 // Is not automatically called
 bool Viewport::PreUpdate()
 {
+	if (our_font.textures.empty())
+		our_font.init("Assets/Fonts/Dukas.ttf", 45 /* size */);
+
+	ImGuizmo::SetDrawlist();
+
+
 	if (width != window_avail_size.x || height != window_avail_size.y)
 	{
 		width = window_avail_size.x;
 		height = window_avail_size.y;
 
-		GenerateFBO(ImVec2(width, height));
+		frame_buffer.GenerateFBO(width, height);
 		OnResize(width, height);
-	}
 
+		ImGuizmo::SetRect(pos_x, pos_y, width, height);
+	}
+	
+
+	glViewport(0, 0, width, height);
+
+	// Binding camera buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
-	glClearColor(current_camera->background.r, current_camera->background.g, current_camera->background.b, current_camera->background.a);
+	glClearColor(camera->background.r, camera->background.g, camera->background.b, camera->background.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glEnable(GL_DEPTH_TEST);
 
-	if (current_camera->update_projection)
-	{
-		OnCameraUpdate();
-		current_camera->update_projection = false;
-	}
+	// Loading camera matrices
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glLoadTransposeMatrixf(camera->projection_matrix);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLoadTransposeMatrixf(camera->view_matrix);
 
 	return true;
 }
@@ -51,18 +74,70 @@ bool Viewport::PreUpdate()
 
 void Viewport::Draw() 
 {
+	PreUpdate();
+	
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
+
+	// Scene drawing
+	App->scene->Draw();
+	if (camera == viewport_camera)
+	{
+		App->scene_base->Draw();
+	}
+
+	float3 pos = camera->frustum.pos;
+	float3 up = camera->frustum.up;
+	float3 front = camera->frustum.front;
+
+	camera->SetPosition({ 0,0,1});
+	camera->Look({ 0, 0, 0 });
+
+	/////////////////////////////////////
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	//glOrtho(Configuration::viewport[Configuration::l], Configuration::viewport[Configuration::r], Configuration::viewport[Configuration::b], -Configuration::viewport[Configuration::t], Configuration::n, Configuration::f);
+	glOrtho(viewport[0], viewport[2], viewport[1], viewport[3], 1, -1);
+
+	glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	/////////////////////////////////////
+	App->gui->Draw(camera);
+
+	//glColor3f(1, 0, 0);
+
+	//glfreetype::print(camera, our_font, 0 /* xpos */, 80 /* ypos */,
+	//	"This text is at (0,80) abcdefghijklmnopqrstuwvxyz");
+
+	//glColor3f(1, 1, 1);
+
+	//glfreetype::print(camera, our_font, 0 /* xpos */, 0 /* ypos */,
+	//	"This text is at (0,0) abcdefghijklmnopqrstuwvxyz");
+
+	glPopAttrib();
+
+	glPopMatrix();
+
+	camera->frustum.up = up;
+	camera->frustum.front = front;
+	camera->SetPosition(pos);
+
+	PostUpdate();
 }
 
 // Is not automatically called
 bool Viewport::PostUpdate()
 {
-	App->scene_base->Draw();
-	App->scene->Draw();
-	//App->gui->Draw();
-
 	// Background color of the editor (ImGui)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -73,78 +148,12 @@ bool Viewport::PostUpdate()
 
 bool Viewport::CleanUp()
 {
-	RemoveBuffer(frame_buffer);
+	frame_buffer.Remove();
 
 	return true;
-}
-
-bool Viewport::GenerateFBO(ImVec2 size)
-{
-	RemoveBuffer(frame_buffer);
-
-	//Generate the FBO and bind it, continue if FBO is complete
-	glGenFramebuffers(1, &frame_buffer.id);
-	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.id);
-
-	glGenTextures(1, &frame_buffer.tex);
-	glBindTexture(GL_TEXTURE_2D, frame_buffer.tex);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frame_buffer.tex, 0);
-
-	//Generate RenderBufferObject
-	glGenRenderbuffers(1, &frame_buffer.depth);
-	glBindRenderbuffer(GL_RENDERBUFFER, frame_buffer.depth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.x, size.y);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, frame_buffer.depth);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	//OnResize(pos_x, pos_y, width, height);
-	return true;
-}
-
-void Viewport::RemoveBuffer(FrameBuffer& buffer)
-{
-	if (buffer.id != 0)
-	{
-		glDeleteFramebuffers(1, &buffer.id);
-		buffer.id = 0;
-	}
-
-	if (buffer.depth != 0)
-	{
-		glDeleteRenderbuffers(1, &buffer.depth);
-		buffer.depth = 0;
-	}
-
-	if (buffer.tex != 0)
-	{
-		glDeleteTextures(1, &buffer.tex);
-		buffer.tex = 0;
-	}
 }
 
 void Viewport::OnResize(float width, float height)
 {
-	glViewport(0, 0, width, height);
-
-	current_camera->SetAspectRatio(width/height);
-}
-
-void Viewport::OnCameraUpdate()
-{
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glLoadMatrixf(current_camera->GetProjectionMatrix());
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glLoadMatrixf(current_camera->GetViewMatrix());
-
+	camera->SetAspectRatio(width/height);
 }

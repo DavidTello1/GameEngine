@@ -10,11 +10,20 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# Davos meta files
+Game/Library/
+Game\Library\
+
+# Doxygen
+Source/Doxygen/html/
+Source/Doxygen/latex/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
 # [Rr]elease/
 [Rr]eleases/
+[Rr]elease/
 # [Xx]64/
 # [Xx]86/
 #[Bb]uild/

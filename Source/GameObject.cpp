@@ -167,9 +167,10 @@ Component* GameObject::AddComponent(Component::Type type, UI_Element::Type UI_ty
 	{
 		if (UI_type == UI_Element::Type::CANVAS)
 		{
-			//new_component = new Canvas(this, UI_type);
-			//components.push_back(new_component);
-			//return new_component;
+			new_component = new Canvas(this, UI_type);
+			App->gui->AddCanvas((Canvas*)new_component);
+			components.push_back(new_component);
+			return new_component;
 		}
 		else if (UI_type == UI_Element::Type::IMAGE)
 		{
@@ -179,9 +180,9 @@ Component* GameObject::AddComponent(Component::Type type, UI_Element::Type UI_ty
 		}
 		else if (UI_type == UI_Element::Type::TEXT)
 		{
-			//new_component = new Text(this, UI_type);
-			//components.push_back(new_component);
-			//return new_component;
+			new_component = new Text(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
 		}
 		else if (UI_type == UI_Element::Type::BUTTON)
 		{
@@ -292,7 +293,7 @@ void GameObject::UpdateTransform()
 		cam->SetPosition(translation);
 		cam->frustum.front = GetGlobalTransform().WorldZ();
 		cam->frustum.up = GetGlobalTransform().WorldY();
-		cam->update_projection = true;
+		cam->UpdateMatrices();
 	}
 
 	UpdateBoundingBox();

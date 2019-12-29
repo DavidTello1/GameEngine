@@ -17,10 +17,55 @@ Image::Image(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Elem
 		canvas = (Canvas*)gameObject->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
 
 	material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+
+	canvas->AddElement(this);
 }
 
 Image::~Image()
 {
+}
+
+void Image::Draw(ComponentCamera* camera)
+{
+	glPushMatrix();
+	glLoadIdentity();
+
+	glTranslatef(position2D.x, position2D.y, 1);
+	glMultTransposeMatrixf(camera->origin_view_matrix);
+
+	glColorColorF(color);
+
+	glBindTexture(GL_TEXTURE_2D, material->tex_id);
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);   
+	// Draw A Quad
+	glTexCoord2i(0, 0); glVertex2f(-size2D.x, -size2D.y);    // Top Left		glVertex2i(100, 100);
+	glTexCoord2i(0, 1); glVertex2f(-size2D.x, size2D.y);    // Top Right		glVertex2i(100, 500);
+	glTexCoord2i(1, 1); glVertex2f(size2D.x, size2D.y);    // Bottom Right	glVertex2i(500, 500);
+	glTexCoord2i(1, 0); glVertex2f(size2D.x, -size2D.y);    // Bottom Left	glVertex2i(500, 100);
+
+	//glDisable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glColorColorF(Color::white);
+
+	glEnd();
+
+
+
+	// THIS https://stackoverflow.com/questions/24262264/drawing-a-2d-texture-in-opengl/24266568
+	// https://stackoverflow.com/questions/30488155/opengl-fastest-way-to-draw-2d-image
+	glPopMatrix();
+
+	//ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+
+	/*glPushMatrix();
+	glLoadIdentity();
+
+	glTranslatef(position2D.x, position2D.y, pos.z);
+	glMultTransposeMatrixf(camera->origin_view_matrix);
+
+	glPopMatrix();*/
 }
 
 void Image::DrawInspector()
@@ -43,37 +88,44 @@ void Image::DrawInspector()
 		ImGui::Text("Size:    ");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##size", &size2D.x);
+		ImGui::DragFloat("x##imagesize", &size2D.x);
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##size", &size2D.y);
+		ImGui::DragFloat("y##imagesize", &size2D.y);
 
 		// Position
 		ImGui::Text("Position:");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##position2D", &position2D.x);
+		ImGui::DragFloat("x##imageposition", &position2D.x);
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##position2D", &position2D.y);
+		ImGui::DragFloat("y##imageposition", &position2D.y);
 
 		// Rotation
 		ImGui::Text("Rotation:");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("##rotation2D", &rotation2D);
+		ImGui::DragFloat("##imagerotation", &rotation2D);
 
 		// Scale
 		ImGui::Text("Scale:   ");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##scale2D", &scale2D.x);
+		ImGui::DragFloat("x##imagescale", &scale2D.x);
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##scale2D", &scale2D.y);
+		ImGui::DragFloat("y##imagescale", &scale2D.y);
 
 		// ------------------------------------------
+
+		// Image
 		ImGui::Separator();
+		ImGui::ColorEdit3("Color", (float*)&color);
+
+		ImGui::Text("Image");
+		ImGui::SameLine();
+
 		if (ImGui::Button("Load..."))
 			ImGui::OpenPopup("Load Image");
 

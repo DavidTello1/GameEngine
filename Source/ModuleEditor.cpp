@@ -13,7 +13,7 @@
 #include "Assets.h"
 #include "Viewport.h"
 #include "ResourceScene.h"
-
+#include "ComponentCamera.h"
 #include <string.h>
 #include <algorithm>
 
@@ -21,6 +21,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_opengl3.h"
+
+#include "ImGuizmo.h"
 
 #include "mmgr/mmgr.h"
 
@@ -138,24 +140,21 @@ bool ModuleEditor::Init(Config* config)
 	panels.push_back(tab_configuration = new Configuration());
 	panels.push_back(tab_console = new Console());
 	panels.push_back(tab_assets = new Assets());
-	panels.push_back(tab_viewport = new Viewport());
+	panels.push_back(tab_viewport = new Viewport("Viewport"));
+
+	
 
 	return true;
 }
 
 bool ModuleEditor::Start(Config* config)
 {
-	tab_viewport->GenerateFBO();
-
+	ImGuizmo::Enable(true);
 	return true;
 }
 
 bool ModuleEditor::PreUpdate(float dt)
 {
-	// Start the frame
-	// Call preupdate viewport
-	tab_viewport->PreUpdate();
-
 	return true;
 }
 
@@ -166,9 +165,17 @@ bool ModuleEditor::Update(float dt)
 
 bool ModuleEditor::PostUpdate(float dt)
 {
-	// end the frame
-	// Call postupdate viewport
-	tab_viewport->PostUpdate();
+	if (is_want_new_viewport)
+	{
+		Viewport* viewport = new Viewport(new_viewport_camera->GetGameobj()->GetName());
+		viewport->camera = new_viewport_camera;
+
+		panels.push_back(viewport);
+
+		is_want_new_viewport = false;
+		new_viewport_camera = nullptr;
+
+	}
 
 	if (close)
 		return false;
@@ -214,6 +221,8 @@ void ModuleEditor::Draw()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->window->GetWindow());
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
+
 
 	// Draw functions
 	ShowExampleAppDockSpace(&is_show_main_dockspace);
@@ -265,6 +274,15 @@ void ModuleEditor::Draw()
 	// Render
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+// This mid step function is needed because the call is made inside the panel drawing, 
+// more concretly inside the inspector of the camera, so it breaks if the panels.size
+// changes in mid loop execution
+void ModuleEditor::AddViewport(ComponentCamera * camera)
+{
+	is_want_new_viewport = true;
+	new_viewport_camera = camera;
 }
 
 void ModuleEditor::DrawMenu()
@@ -463,6 +481,7 @@ void ModuleEditor::DrawAbout()
 
 void ModuleEditor::DrawPanels()
 {
+
 	for (vector<Panel*>::const_iterator it = panels.begin(); it != panels.end(); ++it)
 	{
 		if ((*it)->IsActive())
@@ -512,6 +531,9 @@ void ModuleEditor::DrawPanels()
 			ImGui::End();
 		}
 	}
+
+	//if (App->scene->test_camera)
+	//	App->scene->test_camera->DrawFrustum();
 }
 
 void ModuleEditor::ConfirmExit()

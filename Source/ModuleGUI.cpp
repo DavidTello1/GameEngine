@@ -54,3 +54,12 @@ bool ModuleGUI::CleanUp()
 {
 	return true;
 }
+
+void ModuleGUI::Draw(ComponentCamera* camera)
+{
+	for (int i = 0; i < canvas.size(); i++)
+	{
+		if (canvas[i]->visible)
+			canvas[i]->Draw(camera);
+	}
+}

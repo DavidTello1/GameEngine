@@ -2,7 +2,10 @@
 #include "ModuleSceneBase.h"
 #include "ModuleScene.h"
 #include "Viewport.h"
+#include "ModuleInput.h"
+#include "ModuleEditor.h"
 
+#include "SDL/include/SDL.h"
 #include "glew/include/GL/glew.h"
 #include "mmgr/mmgr.h"
 
@@ -132,8 +135,8 @@ void ModuleSceneBase::CameraFreeMove(float dt)
 		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) newPos -= viewport_camera->frustum.WorldRight() * speed;
 		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) newPos += viewport_camera->frustum.WorldRight() * speed;
 
-		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) newPos -= viewport_camera->frustum.up * speed;
-		else if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) newPos += viewport_camera->frustum.up * speed;
+		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT) newPos -= viewport_camera->frustum.up * speed;
+		if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT) newPos += viewport_camera->frustum.up * speed;
 
 		viewport_camera->Move(newPos);
 
@@ -218,7 +221,7 @@ void ModuleSceneBase::CameraMousePicking()
 	}
 
 	// Drawiinggg
-	Color c = (intersects) ? Yellow : Cyan;
+	Color c = (intersects) ? Color::yellow1 : Color::cyan1;
 	
 
 	glLineWidth(1.0f);

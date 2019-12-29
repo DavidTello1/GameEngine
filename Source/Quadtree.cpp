@@ -1,6 +1,7 @@
 #include "Quadtree.h"
 #include "ComponentMesh.h"
 #include "Application.h"
+#include "ComponentCamera.h"
 
 int Quadtree::depth = 0;
 bool Quadtree::bucket_depth = true;

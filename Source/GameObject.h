@@ -7,11 +7,9 @@
 #include "Hierarchy.h"
 #include "ResourceMesh.h"
 
-#include "Math.h"
 #include <vector>
 
 class ComponentMaterial;
-class ComponentCamera;
 
 //Dealt at scene post update
 enum GameObjectFlags

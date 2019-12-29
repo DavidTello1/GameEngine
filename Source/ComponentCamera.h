@@ -4,13 +4,8 @@
 #include "glew\include\GL\glew.h"
 
 #include "Globals.h"
-#include "glmath.h"
 #include "Math.h"
 #include "Color.h"
-
-#define AABB_OUT 0
-#define AABB_IN	1
-#define INTERSECT 2
 
 class ComponentCamera : public Component
 {
@@ -31,8 +26,9 @@ public:
 	float GetHorizontalFOV(bool in_degree = true) const;
 	float GetAspectRatio() const;
 
-	float* GetViewMatrix();
-	float* GetProjectionMatrix();
+	void UpdateMatrices();
+	void UpdateViewMatrix();
+	void UpdateProjectionMatrix();
 
 	//  -------------------------------------- Setters
 	void SetNearPlane(float distance);
@@ -46,7 +42,7 @@ public:
 
 	void Look(const float3 & position);
 
-	void UpdatePlanes();
+	void LookNoUpdate(const float3 & position);
 
 	void DrawFrustum();
 
@@ -57,11 +53,22 @@ public:
 
 	bool viewport_focus = true;
 	bool perspective = true;
-	bool update_projection = false;
 
 	float aspect_ratio = 0.0f;
 
 	Frustum frustum;
-	Plane planes[6];
-	Color background = DarkGrey;
+
+	Color background = Color::gray24;
+
+	// frustum matrices NOT trasposed
+	math::float4x4 view_matrix4x4 = math::float4x4::identity;
+	math::float4x4 projection_matrix4x4 = math::float4x4::identity;
+
+	// OpenGL ready matrix -> NOT transposed and pointer
+	float* view_matrix = nullptr;
+	// OpenGL ready matrix -> NOT transposed and pointer
+	float* projection_matrix = nullptr;
+
+	float* origin_view_matrix = nullptr;
+
 };

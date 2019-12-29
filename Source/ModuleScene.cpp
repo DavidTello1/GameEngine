@@ -5,6 +5,7 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 #include "ComponentMesh.h"
+#include "ModuleSceneBase.h"
 #include "ResourceModel.h"
 #include "Viewport.h"
 #include "Quadtree.h"
@@ -30,7 +31,8 @@ bool ModuleScene::Init(Config* config)
 	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
 	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
 
-	viewport_camera->Move({ 0, 1.95f, -35.0f });
+	viewport_camera->Move({ 0, 0, 25.0f });
+	viewport_camera->Look({ 0, 0, 0 });
 	viewport_camera->SetFarPlane(500.0f);
 
 	root_object = new GameObject("Root", nullptr);
@@ -72,7 +74,75 @@ bool ModuleScene::Update(float dt)
 	return true;
 }
 
+void ModuleScene::UpdateTransformationGuizmos()
+{
+	
 
+	ImGuizmo::MODE mode_to_apply = curr_guizmo_mode;
+
+	if (current_guizmo_operation == ImGuizmo::OPERATION::SCALE)
+		mode_to_apply = ImGuizmo::MODE::WORLD;
+
+	for (std::vector<GameObject*>::iterator it = gameObjects.begin(); it != gameObjects.end(); ++it)
+	{
+		if (!(*it)->is_selected) continue;
+
+		float4x4 global_transform_trans = (*it)->GetGlobalTransform().Transposed();
+
+		
+
+		float t[16];
+
+		ImGuizmo::Manipulate(viewport_camera->view_matrix4x4.Transposed().ptr(),
+			viewport_camera->projection_matrix4x4.Transposed().ptr(),
+			ImGuizmo::OPERATION::TRANSLATE,
+			ImGuizmo::MODE::WORLD,
+			global_transform_trans.ptr(), t);
+
+		float4x4 moved_transformation = float4x4(
+			t[0], t[4], t[8], t[12],
+			t[1], t[5], t[9], t[13],
+			t[2], t[6], t[10], t[14],
+			t[3], t[7], t[11], t[15]);
+
+		if (ImGuizmo::IsUsing())
+		{
+			switch (current_guizmo_operation)
+			{
+			case ImGuizmo::OPERATION::TRANSLATE:
+			{
+				float4x4 new_trans = moved_transformation * (*it)->GetGlobalTransform();
+				(*it)->SetTransform(new_trans);
+			}
+			break;
+
+			case ImGuizmo::OPERATION::ROTATE:
+			{
+				float4x4 new_trans = moved_transformation * (*it)->GetGlobalTransform();
+				(*it)->SetTransform(new_trans);
+			}
+			break;
+			case ImGuizmo::OPERATION::SCALE:
+			{
+				float4x4 save_trans = moved_transformation;
+				moved_transformation = moved_transformation * last_moved_transformation.Inverted();
+
+				float4x4 new_trans = moved_transformation * (*it)->GetGlobalTransform();
+				(*it)->SetTransform(new_trans);
+
+				last_moved_transformation = save_trans;
+			}
+			break;
+			}
+		}
+		else
+		{
+			last_moved_transformation = float4x4::identity;
+		}
+	}
+
+}
+#include "Canvas.h"
 
 bool ModuleScene::PostUpdate(float dt)
 {
@@ -102,6 +172,7 @@ bool ModuleScene::PostUpdate(float dt)
 			}
 			obj->flags &= ~ProcessTransformUpdate;
 		}
+
 	}
 
 	switch (state)
@@ -112,8 +183,8 @@ bool ModuleScene::PostUpdate(float dt)
 	case START:
 		//SaveScene
 		state = PLAY;
-		App->editor->tab_viewport->current_camera = test_camera;
-		App->editor->tab_viewport->OnCameraUpdate();
+		App->editor->tab_viewport->camera = test_camera;
+		//App->editor->tab_viewport->OnCameraUpdate();
 		break;
 	case PLAY:
 		//App->Unpause();
@@ -126,8 +197,8 @@ bool ModuleScene::PostUpdate(float dt)
 		//App->Unpause();
 		//LoadScene
 		state = EDIT;
-		App->editor->tab_viewport->current_camera = viewport_camera;
-		App->editor->tab_viewport->OnCameraUpdate();
+		App->editor->tab_viewport->camera = viewport_camera;
+		//App->editor->tab_viewport->OnCameraUpdate();
 		break;
 	default:
 		state = EDIT;
@@ -174,7 +245,7 @@ bool ModuleScene::Draw()
 	for ( GameObject* obj : candidates)
 	{
 
-		c = (!obj->HasChilds()) ? App->scene_base->aabb_color : Cyan;
+		c = (!obj->HasChilds()) ? App->scene_base->aabb_color : Color::cyan1;
 		// Just boxes colors things
 		//obj->is_drawn = true;
 
@@ -215,7 +286,7 @@ bool ModuleScene::Draw()
 		// AABB
 		if ((obj->show_aabb || App->scene_base->show_all_aabb) && obj->aabb_VBO != 0)
 		{
-			c = (obj->is_drawn) ? App->scene_base->aabb_color : LightGrey;
+			c = (obj->is_drawn) ? App->scene_base->aabb_color : Color::LightGray;
 
 			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->aabb_width);
@@ -233,7 +304,7 @@ bool ModuleScene::Draw()
 		// OBB
 		if ((obj->show_obb || App->scene_base->show_all_obb) && obj->obb_VBO != 0)
 		{
-			c = (obj->is_drawn) ? App->scene_base->obb_color : DarkGrey;
+			c = (obj->is_drawn) ? App->scene_base->obb_color : Color::DarkSlateGray;
 
 			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->obb_width);

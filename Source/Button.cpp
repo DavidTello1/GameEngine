@@ -46,34 +46,34 @@ void Button::DrawInspector()
 		ImGui::Text("Size:    ");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##size", &size2D.x);
+		ImGui::DragFloat("x##buttonsize", &size2D.x);
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##size", &size2D.y);
+		ImGui::DragFloat("y##buttonsize", &size2D.y);
 
 		// Position
 		ImGui::Text("Position:");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##position2D", &position2D.x);
+		ImGui::DragFloat("x##buttonposition", &position2D.x);
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##position2D", &position2D.y);
+		ImGui::DragFloat("y##buttonposition", &position2D.y);
 
 		// Rotation
 		ImGui::Text("Rotation:");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("##rotation2D", &rotation2D);
+		ImGui::DragFloat("##buttonrotation", &rotation2D);
 
 		// Scale
 		ImGui::Text("Scale:   ");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##scale2D", &scale2D.x);
+		ImGui::DragFloat("x##buttonscale", &scale2D.x);
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##scale2D", &scale2D.y);
+		ImGui::DragFloat("y##buttonscale", &scale2D.y);
 
 		// ------------------------------------------
 

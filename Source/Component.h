@@ -29,6 +29,7 @@ public:
 	GameObject* GetGameobj() { return object; }
 
 	virtual void DrawInspector() = 0;
+
 	mutable Component::Type type;
 
 protected:

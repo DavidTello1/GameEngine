@@ -3,6 +3,8 @@
 #include "Math.h"
 #include <vector>
 #include "SDL/include/SDL_rect.h"
+#include "Color.h"
+#include "ComponentCamera.h"
 
 class UI_Element : public Component
 {
@@ -53,6 +55,7 @@ public:
 	void UpdateState();
 	void DoLogic(Action action);
 
+	virtual void Draw(ComponentCamera* camera) {};
 	void DrawInspector() {};
 
 private:
@@ -64,10 +67,12 @@ public:
 	bool draggable = true;
 	bool interactable = true;
 
-	float2 size2D = float2::zero;
-	float2 position2D = float2::zero;
+	float2 size2D = { 50,50 };
+	float2 position2D = { 50,50 };
 	float rotation2D = 0.0f;
 	float2 scale2D = float2::zero;
+
+	Color color = Color::white;
 
 protected:
 	Type type = UNKNOWN;
