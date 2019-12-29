@@ -31,7 +31,7 @@ public:
 
 private:
 	Color idle_color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Color hovered_color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Color selected_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Color hovered_color = { 1.0f, 0.0f, 0.0f, 1.0f };
+	Color selected_color = { 0.0f, 1.0f, 0.0f, 1.0f };
 	Color locked_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 };

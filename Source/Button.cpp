@@ -42,22 +42,26 @@ void Button::Draw(ComponentCamera* camera)
 	glBindTexture(GL_TEXTURE_2D, material->tex_id);
 	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
-	// Draw A Quad
+	// Draw A  textured Quad
 	glTexCoord2i(0, 0); glVertex2f(-size2D.x, -size2D.y);    // Top Left		glVertex2i(100, 100);
 	glTexCoord2i(0, 1); glVertex2f(-size2D.x, size2D.y);    // Top Right		glVertex2i(100, 500);
 	glTexCoord2i(1, 1); glVertex2f(size2D.x, size2D.y);    // Bottom Right	glVertex2i(500, 500);
 	glTexCoord2i(1, 0); glVertex2f(size2D.x, -size2D.y);    // Bottom Left	glVertex2i(500, 100);
 
-	//glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	glColorColorF(Color::white);
-
 	glEnd();
+
 	glPopMatrix();
 
 	glColorColorF(text_color);
 	glfreetype::print(camera, font, position2D.x + text_pos.x, position2D.y + text_pos.y, text);
+
+	if (state == IDLE) ChangeColor(idle_color);
+	if (state == HOVERED) ChangeColor(hovered_color);
+	if (state == SELECTED || state == DRAGGING) ChangeColor(selected_color);
+	if (state == LOCKED) ChangeColor(locked_color);
 }
 
 void Button::DrawInspector()
@@ -136,22 +140,18 @@ void Button::DrawInspector()
 		ImGui::ColorEdit4("##Idle", (float*)&idle_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Idle");
-		if (state == IDLE) ChangeColor(idle_color);
 
 		ImGui::ColorEdit4("##Hovered", (float*)&hovered_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Hovered");
-		if (state == HOVERED) ChangeColor(hovered_color);
 
 		ImGui::ColorEdit4("##Selected", (float*)&selected_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Selected");
-		if (state == SELECTED || state == DRAGGING) ChangeColor(selected_color);
 
 		ImGui::ColorEdit4("##Locked", (float*)&locked_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Locked");
-		if (state == LOCKED) ChangeColor(locked_color);
 
 		// Text
 		ImGui::Separator();
@@ -162,7 +162,33 @@ void Button::DrawInspector()
 		}
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip("Use with caution, may temporary freeze the editor with large numbers. \n It is recommended to directly input the number with the keyboard");
+		if (ImGui::Button("Load font..."))
+			ImGui::OpenPopup("Load Font");
 
+		if (ImGui::BeginPopup("Load Font"))
+		{
+			if (ImGui::Selectable("Dukas")) {
+				font.clean();
+				font.init("Assets/Fonts/Dukas.ttf", font_size);
+				font.path = "Assets/Fonts/Dukas.ttf";
+			}
+			if (ImGui::Selectable("Wintersoul")) {
+				font.clean();
+				font.init("Assets/Fonts/Wintersoul.ttf", font_size);
+				font.path = "Assets/Fonts/Wintersoul.ttf";
+			}
+			if (ImGui::Selectable("EvilEmpire")) {
+				font.clean();
+				font.init("Assets/Fonts/EvilEmpire.otf", font_size);
+				font.path = "Assets/Fonts/EvilEmpire.otf";
+			}
+			if (ImGui::Selectable("Smack")) {
+				font.clean();
+				font.init("Assets/Fonts/Smack.otf", font_size);
+				font.path = "Assets/Fonts/Smack.otf";
+			}
+			ImGui::EndPopup();
+		}
 		ImGui::Text("Text");
 		ImGui::InputText("##buttontext", text, MAX_TEXT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
 		ImGui::ColorEdit3("Color", (float*)&text_color);

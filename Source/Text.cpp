@@ -134,13 +134,6 @@ void Text::DrawInspector()
 				LoadFont("Assets/Fonts/Smack.otf", DEFAULT_FONT_SIZE);
 				font.path = "Assets/Fonts/Smack.otf";
 			}
-			//std::vector<Resource*> fonts = App->resources->GetAllResourcesOfType(Resource::Type::font);
-			//for (int i = 0; i < fonts.size(); i++)
-			//{
-			//	if (ImGui::Selectable(fonts[i]->GetName().c_str()))
-			//		LoadFont(fonts[i]->GetFile(), DEFAULT_FONT_SIZE);
-			//		//material->LoadTexture(fonts[i]->GetFile());
-			//}
 			ImGui::EndPopup();
 		}
 
