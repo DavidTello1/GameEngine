@@ -1,6 +1,9 @@
 # Davos Game Engine
 [Davos Game Engine](https://github.com/ponspack9/GameEngine) is a 3D Game Engine made by [Oscar Pons](https://github.com/ponspack9) and [David Tello](https://github.com/DavidTello1) for the Video Games degree in Universitat Politècnica de Catalunya (UPC).
 
+### Website
+https://ponspack9.github.io/GameEngine/
+
 ## Camera Controls
 - While Right clicking, “WASD” fps-like movement and free look around.
 - SPACE to go upwards, LCTRL + SPACE to go downwards
@@ -13,7 +16,7 @@
 - 
 
 ## Work division
-- Óscar: quadtrees, mousepicking(option to enable/disable in Panel Configuration>Scene), camera FOV, frustum culling, time management
+- Oscar: quadtrees, mousepicking(option to enable/disable in Panel Configuration>Scene), camera FOV, frustum culling, time management
 - David: inspector properties, own file format, reference counting, resource management
 
 ## Model loading instructions
