@@ -14,7 +14,7 @@ public:
 	bool Start(Config* config = nullptr);
 	bool PreUpdate(float dt);
 	bool PostUpdate(float dt);
-	void Draw();
+	void Draw(ComponentCamera * camera);
 	bool CleanUp();
 
 

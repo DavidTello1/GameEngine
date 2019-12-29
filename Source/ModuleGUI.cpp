@@ -51,11 +51,12 @@ bool ModuleGUI::PostUpdate(float dt)
 	return true;
 }
 
-void ModuleGUI::Draw()
+void ModuleGUI::Draw(ComponentCamera* camera)
 {
 	for (int i = 0; i < canvas.size(); i++)
 	{
-		canvas[i]->Draw();
+		if (canvas[i]->visible)
+			canvas[i]->Draw(camera);
 	}
 }
 bool ModuleGUI::CleanUp()

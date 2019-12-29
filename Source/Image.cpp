@@ -17,10 +17,55 @@ Image::Image(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Elem
 		canvas = (Canvas*)gameObject->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
 
 	material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	canvas->AddElement(this);
+
 }
 
 Image::~Image()
 {
+}
+
+void Image::Draw(ComponentCamera* camera)
+{
+	glPushMatrix();
+	glLoadIdentity();
+
+	glTranslatef(position2D.x, position2D.y, 1);
+	glMultTransposeMatrixf(camera->origin_view_matrix);
+
+	glColorColorF(color);
+
+	glBindTexture(GL_TEXTURE_2D, material->tex_id);
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);   
+	// Draw A Quad
+	glTexCoord2i(0, 0); glVertex2f(-size2D.x, -size2D.y);    // Top Left		glVertex2i(100, 100);
+	glTexCoord2i(0, 1); glVertex2f(-size2D.x, size2D.y);    // Top Right		glVertex2i(100, 500);
+	glTexCoord2i(1, 1); glVertex2f(size2D.x, size2D.y);    // Bottom Right	glVertex2i(500, 500);
+	glTexCoord2i(1, 0); glVertex2f(size2D.x, -size2D.y);    // Bottom Left	glVertex2i(500, 100);
+
+	//glDisable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glColorColorF(Color::white);
+
+	glEnd();
+
+
+
+	// THIS https://stackoverflow.com/questions/24262264/drawing-a-2d-texture-in-opengl/24266568
+	// https://stackoverflow.com/questions/30488155/opengl-fastest-way-to-draw-2d-image
+	glPopMatrix();
+
+	//ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+
+	/*glPushMatrix();
+	glLoadIdentity();
+
+	glTranslatef(position2D.x, position2D.y, pos.z);
+	glMultTransposeMatrixf(camera->origin_view_matrix);
+
+	glPopMatrix();*/
 }
 
 void Image::DrawInspector()
@@ -77,6 +122,8 @@ void Image::DrawInspector()
 
 		// Image
 		ImGui::Separator();
+		ImGui::ColorEdit3("Color", (float*)&color);
+
 		ImGui::Text("Image");
 		ImGui::SameLine();
 

@@ -205,14 +205,22 @@ namespace glfreetype {
     void print(ComponentCamera* camera, const font_data &ft_font, float x, float y, std::string const & text)  {
              
 		// We Want A Coordinate System Where Distance Is Measured In Window Pixels.
+		//GLint viewport[4];
+		//glGetIntegerv(GL_VIEWPORT, viewport);
+		//glMatrixMode(GL_PROJECTION);
+		//glPushMatrix();
+		//glLoadIdentity();
+		////glOrtho(Configuration::viewport[Configuration::l], Configuration::viewport[Configuration::r], Configuration::viewport[Configuration::b], -Configuration::viewport[Configuration::t], Configuration::n, Configuration::f);
+		//glOrtho(viewport[0], viewport[2], viewport[1], viewport[3], 1, -1);
 
-		GLint viewport[4];
-		glGetIntegerv(GL_VIEWPORT, viewport);
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		//glOrtho(Configuration::viewport[Configuration::l], Configuration::viewport[Configuration::r], Configuration::viewport[Configuration::b], -Configuration::viewport[Configuration::t], Configuration::n, Configuration::f);
-		glOrtho(viewport[0], viewport[2], viewport[1], viewport[3], 1, -1);
+		//glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
+		//glMatrixMode(GL_MODELVIEW);
+		//glDisable(GL_LIGHTING);
+		//glEnable(GL_TEXTURE_2D);
+		//glDisable(GL_DEPTH_TEST);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
 
 		GLuint font = ft_font.list_base;
 		// We Make The Height A Little Bigger.  There Will Be Some Space Between Lines.
@@ -226,13 +234,7 @@ namespace glfreetype {
 			lines.push_back(to);
 		}
 
-		glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
-		glMatrixMode(GL_MODELVIEW);
-		glDisable(GL_LIGHTING);
-		glEnable(GL_TEXTURE_2D);
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
 
 		glListBase(font);
 
@@ -244,13 +246,11 @@ namespace glfreetype {
 		// Drawn It Modifies The Current Matrix So That The Next Character
 		// Will Be Drawn Immediately After It. 
 
-		float3 pos = camera->frustum.pos;
-
 		for (int i = 0; i < lines.size(); i++) {
 			glPushMatrix();
 			glLoadIdentity();
 
-			glTranslatef(pos.x + x, pos.y + y -h*i, pos.z);
+			glTranslatef(x, y -h*i, 1);
 			glMultTransposeMatrixf(camera->origin_view_matrix);
 
 			// The Commented Out Raster Position Stuff Can Be Useful If You Need To
@@ -265,9 +265,9 @@ namespace glfreetype {
 			glPopMatrix();
 		}
 
-		glPopAttrib();
+		/*glPopAttrib();
 
-		glPopMatrix();
+		glPopMatrix();*/
 
     }
 

@@ -23,11 +23,12 @@ void Canvas::AddElement(UI_Element* element)
 	elements.push_back(element);
 }
 
-void Canvas::Draw() 
+void Canvas::Draw(ComponentCamera* camera) 
 {
 	for (int i = 0; i < elements.size(); i++)
 	{
-		elements[i]->Draw();
+		if(elements[i]->visible)
+			elements[i]->Draw(camera);
 	}
 }
 

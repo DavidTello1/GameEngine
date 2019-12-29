@@ -94,18 +94,39 @@ void Viewport::Draw()
 	camera->SetPosition({ 0,0,1});
 	camera->Look({ 0, 0, 0 });
 
-	App->gui->Draw();
+	/////////////////////////////////////
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	//glOrtho(Configuration::viewport[Configuration::l], Configuration::viewport[Configuration::r], Configuration::viewport[Configuration::b], -Configuration::viewport[Configuration::t], Configuration::n, Configuration::f);
+	glOrtho(viewport[0], viewport[2], viewport[1], viewport[3], 1, -1);
 
-	glColor3f(1, 0, 0);
+	glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glfreetype::print(camera, our_font, 0 /* xpos */, 80 /* ypos */,
-		"This text is at (0,80) abcdefghijklmnopqrstuwvxyz");
+	/////////////////////////////////////
+	App->gui->Draw(camera);
 
-	glColor3f(1, 1, 1);
+	//glColor3f(1, 0, 0);
 
-	glfreetype::print(camera, our_font, 0 /* xpos */, 0 /* ypos */,
-		"This text is at (0,0) abcdefghijklmnopqrstuwvxyz");
+	//glfreetype::print(camera, our_font, 0 /* xpos */, 80 /* ypos */,
+	//	"This text is at (0,80) abcdefghijklmnopqrstuwvxyz");
 
+	//glColor3f(1, 1, 1);
+
+	//glfreetype::print(camera, our_font, 0 /* xpos */, 0 /* ypos */,
+	//	"This text is at (0,0) abcdefghijklmnopqrstuwvxyz");
+
+	glPopAttrib();
+
+	glPopMatrix();
 
 	camera->frustum.up = up;
 	camera->frustum.front = front;

@@ -12,7 +12,7 @@ public:
 
 	void AddElement(UI_Element * element);
 
-	void Draw();
+	void Draw(ComponentCamera * camera);
 
 	void DrawInspector() override;
 	static inline UI_Element::Type GetType() { return UI_Element::Type::CANVAS; }

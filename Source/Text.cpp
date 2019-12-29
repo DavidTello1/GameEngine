@@ -34,12 +34,12 @@ void Text::LoadFont(const char* path, int size)
 {
 	font.init(path, size /* size */);
 }
-void Text::Draw()
+void Text::Draw(ComponentCamera* camera)
 {
 	
 	glColorColorF(color);
 
-	glfreetype::print(viewport_camera, font, position2D.x, position2D.y, text);
+	glfreetype::print(camera, font, position2D.x, position2D.y, text);
 
 }
 void Text::DrawInspector()

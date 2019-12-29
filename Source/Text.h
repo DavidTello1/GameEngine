@@ -18,7 +18,7 @@ public:
 	void DrawInspector() override;
 	static inline UI_Element::Type GetType() { return UI_Element::Type::TEXT; }
 
-	void Draw() override;
+	void Draw(ComponentCamera* camera) override;
 
 private:
 	Canvas* canvas = nullptr;
