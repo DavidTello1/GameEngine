@@ -88,47 +88,27 @@ void Viewport::Draw()
 		App->scene_base->Draw();
 	}
 
-	//camera->frustum.type = FrustumType::OrthographicFrustum;
-	//camera->UpdateMatrices();
-	//glViewport(0, 0, width, height);
-
-	//// Loading camera matrices
-	//glMatrixMode(GL_PROJECTION);
-	//glLoadIdentity();
-	//glLoadTransposeMatrixf(camera->projection_matrix);
-
-	//glMatrixMode(GL_MODELVIEW);
-	//glLoadIdentity();
-	//glLoadTransposeMatrixf(camera->view_matrix);
-
-	//
-
 	float3 pos = camera->frustum.pos;
 	float3 up = camera->frustum.up;
 	float3 front = camera->frustum.front;
 
-	camera->SetPosition({ 0,0,pos.z });
+	camera->SetPosition({ 0,0,1});
 	camera->Look({ 0, 0, 0 });
 
 	glColor3f(1, 0, 0);
 
 	glfreetype::print(camera, our_font, 0 /* xpos */, 80 /* ypos */,
-		"This text is at (0,80) abcdefghijklmnopqrstuwvxyz");
+		"This text is at (0,80)\n abcdefghijklmnopqrstuwvxyz");
 
 	glColor3f(1, 1, 1);
 
 	glfreetype::print(camera, our_font, 0 /* xpos */, 200 /* ypos */,
 		"This text is at (0,200) abcdefghijklmnopqrstuwvxyz");
-	//camera->frustum.type = FrustumType::PerspectiveFrustum;
 
-	/*camera->frustum.type = FrustumType::PerspectiveFrustum;
-	camera->UpdateMatrices();*/
 
-	
 	camera->frustum.up = up;
 	camera->frustum.front = front;
 	camera->SetPosition(pos);
-	//camera->UpdateMatrices();
 
 	PostUpdate();
 }

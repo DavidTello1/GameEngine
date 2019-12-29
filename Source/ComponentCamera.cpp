@@ -27,17 +27,7 @@ ComponentCamera::ComponentCamera(GameObject* gameobj) : Component(Component::Typ
 	Move({ 0,0,1 });
 	Look({ 0,0,0 });
 
-	view_matrix4x4 = frustum.ViewMatrix();
-	view_matrix = view_matrix4x4.ptr();
-
 	origin_view_matrix = view_matrix;
-
-	projection_matrix4x4 = frustum.ProjectionMatrix();
-	projection_matrix = projection_matrix4x4.ptr();
-
-	origin_projection_matrix = projection_matrix;
-
-	//UpdateMatrices();
 }
 
 ComponentCamera::~ComponentCamera()

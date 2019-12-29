@@ -64,11 +64,11 @@ public:
 	math::float4x4 view_matrix4x4 = math::float4x4::identity;
 	math::float4x4 projection_matrix4x4 = math::float4x4::identity;
 
-	// OpenGL ready matrix -> NOT trasposed and pointer
+	// OpenGL ready matrix -> NOT transposed and pointer
 	float* view_matrix = nullptr;
+	// OpenGL ready matrix -> NOT transposed and pointer
 	float* projection_matrix = nullptr;
 
 	float* origin_view_matrix = nullptr;
-	float* origin_projection_matrix = nullptr;
 
 };
