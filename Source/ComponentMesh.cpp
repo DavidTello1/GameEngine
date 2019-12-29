@@ -4,7 +4,6 @@
 
 #include "mmgr/mmgr.h"
 
-
 ComponentMesh::ComponentMesh(GameObject* gameobj) : Component(Component::Type::Mesh, gameobj)
 {
 	object = gameobj;
@@ -58,6 +57,7 @@ void ComponentMesh::DrawInspector()
 				ImGui::Checkbox("Vertex Normals", &renderer->show_vertex_normals);
 			}
 		}
+		ImGui::Separator();
 		ImGui::Separator();
 	}
 }

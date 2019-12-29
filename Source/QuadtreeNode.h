@@ -2,14 +2,13 @@
 
 #include <vector>
 #include <map>
-#include "Math.h"
-#include "Color.h"
+#include "MathGeoLib/include/Geometry/AABB.h"
 
 typedef unsigned int uint;
 
 class GameObject;
-class QuadtreeNode;
 class Color;
+
 
 class QuadtreeNode
 {
@@ -68,7 +67,6 @@ private:
 	std::vector<GameObject*> bucket;
 
 	float3 corners[8];
-	Color culling_color = LightGrey;
 	bool is_culling = false;
 };
 

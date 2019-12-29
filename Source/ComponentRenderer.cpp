@@ -1,6 +1,8 @@
 #include "Application.h"
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
+#include "ModuleResources.h"
+#include "ModuleSceneBase.h"
 #include "ComponentMesh.h"
 #include "GameObject.h"
 
@@ -39,6 +41,7 @@ void ComponentRenderer::DrawInspector()
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 			ImGui::Checkbox("Wireframe", &show_wireframe);
 		}
+		ImGui::Separator();
 		ImGui::Separator();
 	}
 }

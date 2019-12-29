@@ -2,6 +2,8 @@
 #include "Hierarchy.h"
 #include "Globals.h"
 #include "ResourceMesh.h"
+#include "ModuleInput.h"
+#include "GameObject.h"
 
 #include "ModuleScene.h"
 #include "ImGui/imgui.h"
@@ -112,10 +114,34 @@ void Hierarchy::DrawNodes(std::vector<GameObject*>& v)
 
 void Hierarchy::DrawCreateMenu()
 {
-	if (ImGui::MenuItem("Empty"))
-		App->scene->CreateGameObject();
-
 	GameObject* parent = App->scene->GetSelectedGameObject();
+
+	if (ImGui::MenuItem("Empty"))
+		App->scene->CreateGameObject("GameObject", parent);
+
+	//ImGui::Separator();
+	//if (ImGui::BeginMenu("UI"))
+	//{
+	//	if (ImGui::MenuItem("Canvas"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("Image"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("Text"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("Button"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("CheckBox"))
+	//	{
+	//	}
+	//	if (ImGui::MenuItem("InputText"))
+	//	{
+	//	}
+	//	ImGui::EndMenu();
+	//}
 
 	ImGui::Separator();
 	if (ImGui::BeginMenu("Basic shapes"))
@@ -154,7 +180,7 @@ void Hierarchy::DrawCreateMenu()
 		{
 			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
 			res->CreateShape(res, TORUS, 9, 9, 0, 0, 0, 0.5f);
-		}			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));
+		}
 		if (ImGui::MenuItem("Bottle"))
 		{
 			ResourceMesh* res = static_cast<ResourceMesh*>(App->resources->CreateResource(Resource::mesh));

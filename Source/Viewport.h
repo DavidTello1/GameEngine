@@ -1,14 +1,9 @@
 #pragma once
 #include "Panel.h"
-#include "glew/include/GL/glew.h"
 #include "Imgui/imgui.h"
-
-struct FrameBuffer
-{
-	unsigned int id;
-	unsigned int tex;
-	unsigned int depth;
-};
+#include "FrameBuffer.h"
+#include "TextRenderer.hpp"
+class ComponentCamera;
 
 class Viewport : public Panel
 {
@@ -20,16 +15,14 @@ public:
 	static const int default_pos_x;
 	static const int default_pos_y;
 
-	Viewport();
+	Viewport(const char* name);
 	~Viewport();
 
-	bool GenerateFBO(ImVec2 size = { static_cast<float>(default_width), static_cast<float>(default_height )});
-
-	void RemoveBuffer(FrameBuffer & buffer);
+	glfreetype::font_data our_font;
 
 	void OnResize(float width, float height);
 
-	void OnCameraUpdate();
+	//void OnCameraUpdate();
 
 	bool PreUpdate();
 
@@ -41,7 +34,7 @@ public:
 
 	FrameBuffer frame_buffer;
 
-	ComponentCamera* current_camera = viewport_camera;
+	ComponentCamera* camera;
 
 	ImVec2 window_avail_size = { default_width, default_height };
 

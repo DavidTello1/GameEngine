@@ -6,11 +6,18 @@
 #include "ModuleResources.h"
 #include "Math.h" //AGDGSDGMSKGSDK
 #include <vector>
+#include "ImGuizmo.h"
 
 class ComponentRenderer;
 class ComponentMesh;
 class ComponentCamera;
 class Quadtree;
+class Image;
+class Text;
+class Canvas;
+class Button;
+class CheckBox;
+class InputText;
 
 enum SceneState {
 	EDIT,
@@ -18,12 +25,12 @@ enum SceneState {
 	PLAY,
 	PAUSE,
 	STOP
-
 };
 
 class ModuleScene :	public Module
 {
 public:
+	ALIGN_CLASS_TO_16
 
 	ModuleScene(bool start_enabled = true);
 	~ModuleScene();
@@ -31,6 +38,7 @@ public:
 	bool Init(Config * config);
 	bool Start(Config* config = nullptr);
 	bool Update(float dt);
+	void UpdateTransformationGuizmos();
 	bool PostUpdate(float dt);
 	void RedoQuatree();
 	bool CleanUp();
@@ -56,6 +64,12 @@ public:
 	void UnSelectAll(GameObject * keep_selected = nullptr);
 
 public:
+	ImGuizmo::OPERATION current_guizmo_operation = ImGuizmo::OPERATION::TRANSLATE;
+	ImGuizmo::MODE        curr_guizmo_mode = ImGuizmo::MODE::LOCAL;
+
+	float3 last_scale = float3::zero;
+	float4x4			  last_moved_transformation = float4x4::identity;
+
 	std::string scene_name;
 	void SetSceneName(const char* name) { scene_name = name; }
 
@@ -74,4 +88,20 @@ public:
 private:
 	GameObject* selected_gameobj = nullptr;
 
+
+	//DEMO-----------------------
+private:
+	void MainMenu();
+	void IngameWindow();
+
+	Image* ingame_image = nullptr;
+	CheckBox* ingame_checkbox = nullptr;
+
+	Image* mainmenu_image = nullptr;
+	Button* mainmenu_button = nullptr;
+	Text* mainmenu_text = nullptr;
+	InputText* mainmenu_inputtext = nullptr;
+
+public:
+	bool hide_mainmenu = false;
 };

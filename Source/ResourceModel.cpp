@@ -37,7 +37,7 @@ ResourceModel::~ResourceModel()
 //	Resource::Load(config);
 //}
 
-bool ResourceModel::Import(const char* full_path, std::string& output)
+bool ResourceModel::Import(const char* full_path)
 {
 	Timer timer;
 	timer.Start();
@@ -45,56 +45,51 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 	const aiScene* scene = aiImportFileEx(full_path, aiProcessPreset_TargetRealtime_MaxQuality, nullptr);
 	if (scene)
 	{
-		ResourceModel model(0);
+		LOG("Importing model from '%s'", full_path, 'g');
 		std::vector<UID> materials, meshes;
-
-		model.name = App->file_system->GetFileName(full_path);
-		model.name = model.name.substr(0, model.name.size() - 4);
-		LOG("Importing model '%s'", (model.name.c_str()), 'g');
-
 
 		// Generate Materials
 		materials.reserve(scene->mNumMaterials); //reserve capacity for num of materials
 		for (unsigned i = 0; i < scene->mNumMaterials; ++i)
 		{
-			std::string output2;
-			materials.push_back(ResourceMaterial::Import(full_path, output2, scene->mMaterials[i])); //import material
+			ResourceMaterial* mat = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material, full_path);
+			materials.push_back(mat->Import(full_path, scene->mMaterials[i])); //import material
 
-			assert(materials.back() != 0); //asssert if vector materials is empty
+			assert(materials.back() != 0); //assert if vector materials is empty
 		}
 
 		// Generate Meshes
 		meshes.reserve(scene->mNumMeshes);
 		for (unsigned i = 0; i < scene->mNumMeshes; ++i)
 		{
-			meshes.push_back(ResourceMesh::Import(scene->mMeshes[i], full_path));
+			ResourceMesh* mesh = (ResourceMesh*)App->resources->CreateResource(Resource::Type::mesh, full_path);
+			meshes.push_back(mesh->Import(scene->mMeshes[i], full_path));
 
 			assert(meshes.back() != 0);
 		}
 
 		// Generate GameObjects
-		model.CreateNodes(scene, scene->mRootNode, 0, meshes, materials);
+		CreateNodes(scene, scene->mRootNode, 0, meshes, materials);
 
 		aiReleaseImport(scene);
 
-		bool ret = model.SaveOwnFormat(output);
-		model.nodes.clear(); //clear nodes data
+		// Save to Own Format
+		std::string asset_file;
+		bool ret = SaveOwnFormat();
 
+		nodes.clear(); //clear nodes data
 		if (ret)
 		{
-			model.original_file = full_path; //get file
-			App->file_system->NormalizePath(model.original_file);
+			original_file = full_path; //get file
+			App->file_system->NormalizePath(original_file);
 
-			std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
-			model.exported_file = file_name;
-
-			LOG("Imported aiScene from [%s] to [%s]", model.GetFile(), model.GetExportedFile());
+			LOG("Imported aiScene from [%s]", GetFile());
 		}
 		else
 		{
 			LOG("Importing aiScene %s FAILED", full_path);
 		}
-		LOG("[%s] imported in %d ms", model.GetFile(), timer.Read(), 'd');
+		LOG("[%s] imported in %d ms", GetFile(), timer.Read(), 'd');
 		timer.Stop();
 		
 		return ret;
@@ -102,9 +97,9 @@ bool ResourceModel::Import(const char* full_path, std::string& output)
 	return false;
 }
 
-bool ResourceModel::SaveOwnFormat(std::string& output) const
+bool ResourceModel::SaveOwnFormat() const
 {
-	simple::mem_ostream<std::true_type> write_stream; //create output stream
+	simple::mem_ostream<std::true_type> write_stream; //create asset_file stream
 
 	write_stream << uint(nodes.size()); // save nodes size
 
@@ -119,17 +114,22 @@ bool ResourceModel::SaveOwnFormat(std::string& output) const
 
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get stream vector
 
-	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MODEL_FOLDER, name.c_str(), "dvs_model"); //save file
+	std::string asset_file = LIBRARY_MODEL_FOLDER + GetExportedFile();
+	if (App->file_system->Save(asset_file.c_str(), &data[0], data.size()) > 0) //save file
+		return true;
+
+	return false;
 }
 
 bool ResourceModel::LoadtoScene()
 {
-	if (GetExportedFile() != nullptr)
+	if (GetExportedFile().c_str() != nullptr)
 	{
 		Timer timer;
 		timer.Start();
 		char* buffer = nullptr;
-		uint size = App->file_system->LoadFromPath(LIBRARY_MODEL_FOLDER, GetExportedFile(), &buffer); //get total size
+		std::string file = LIBRARY_MODEL_FOLDER + GetExportedFile();
+		uint size = App->file_system->Load(file.c_str(), &buffer); //get total size
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 
@@ -155,7 +155,7 @@ bool ResourceModel::LoadtoScene()
 			nodes.push_back(node); //add node to vector nodes
 		}
 
-		LOG("[%s] loaded in %d ms", GetExportedFile(), timer.Read(), 'd');
+		LOG("[%s] loaded in %d ms", GetExportedFile(), 'd');
 		timer.Stop();
 		return true;
 	}
@@ -164,7 +164,7 @@ bool ResourceModel::LoadtoScene()
 
 void ResourceModel::UnLoad()
 {
-	LOG("UnLoading Model %s with uid %d", name.c_str(), uid, 'd');
+	LOG("UnLoading Model with uid %d", uid, 'd');
 	for (uint i = 0; i < nodes.size(); ++i)
 	{
 		if (nodes[i].mesh != 0)
@@ -285,11 +285,13 @@ void ResourceModel::CreateGameObjects(const char* name)
 		{
 			ComponentMesh* mesh = (ComponentMesh*)obj->AddComponent(Component::Type::Mesh);
 			ResourceMesh* r_mesh = (ResourceMesh*)App->resources->GetResource(nodes[i].mesh);
+			if (r_mesh == nullptr)
+				r_mesh = (ResourceMesh*)App->resources->CreateResource(Resource::Type::mesh, nullptr, nodes[i].mesh);
+
 			r_mesh->LoadToMemory(); //load mesh data
 			mesh->SetMesh(r_mesh);
 
 			obj->GenerateBoundingBox();
-
 			obj->AddComponent(Component::Type::Renderer);
 		}
 
@@ -297,6 +299,9 @@ void ResourceModel::CreateGameObjects(const char* name)
 		{
 			ComponentMaterial* material = (ComponentMaterial*)obj->AddComponent(Component::Type::Material);
 			ResourceMaterial* r_material = (ResourceMaterial*)App->resources->GetResource(nodes[i].material);
+			if (r_material == nullptr)
+				r_material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material, nullptr, nodes[i].material);
+
 			r_material->LoadToMemory(); //load material data
 			material->SetMaterial(r_material);
 		}

@@ -8,8 +8,8 @@ public:
 	ResourceScene(UID id);
 	virtual ~ResourceScene();
 
-	static bool Import(const char* full_path, std::string& output);
-	bool SaveOwnFormat(std::string& output) const;
+	bool Import(const char* full_path);
+	bool SaveOwnFormat() const;
 	bool LoadtoScene();
 	void UnLoad();
 

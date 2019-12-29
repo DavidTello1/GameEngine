@@ -364,7 +364,7 @@ void Configuration::DrawResources()
 {
 	ImGui::Text("Total Resources Loaded:");
 	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", App->resources->GetResourcesSize());
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%i", App->resources->GetNumResources());
 
 	ImGui::Text("Default Resources:");
 	ImGui::SameLine();
@@ -456,7 +456,7 @@ void Configuration::DrawMainCamera()
 			else
 				viewport_camera->frustum.type = FrustumType::OrthographicFrustum;
 
-			viewport_camera->update_projection = true;
+			viewport_camera->UpdateMatrices();
 		}
 
 		ImGui::Text("Aspect ratio: "); ImGui::SameLine(); ImGui::TextColored({ 1,1,0,1 }, "%f", viewport_camera->GetAspectRatio());

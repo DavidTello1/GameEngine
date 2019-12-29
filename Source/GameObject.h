@@ -2,15 +2,14 @@
 
 #include "Globals.h"
 #include "Component.h"
+#include "UI_Element.h"
 #include "glew\include\GL\glew.h"
 #include "Hierarchy.h"
 #include "ResourceMesh.h"
 
-#include "Math.h"
 #include <vector>
 
 class ComponentMaterial;
-class ComponentCamera;
 
 //Dealt at scene post update
 enum GameObjectFlags
@@ -44,10 +43,11 @@ public:
 	template<typename ComponentType> 
 	ComponentType* GetComponent()  { return (ComponentType*)GetComponent(ComponentType::GetType()); }
 
-	Component* GetComponent(Component::Type type);
-	Component* AddComponent(Component::Type type);
-	bool HasComponent(Component::Type type);
-	void DeleteComponent(Component::Type type);
+	Component* GetComponent(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
+	Component* AddComponent(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
+	bool HasComponent(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
+	void DeleteComponent(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
+	std::vector<Component*> GetAllComponentsOfType(Component::Type type, UI_Element::Type UI_type = UI_Element::Type::UNKNOWN);
 
 	float3 GetPosition() const { return translation; }
 	float3 GetRotation() const { return rotation; }

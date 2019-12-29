@@ -5,10 +5,16 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 #include "ComponentMesh.h"
+#include "ModuleSceneBase.h"
 #include "ResourceModel.h"
 #include "Viewport.h"
 #include "Quadtree.h"
-
+#include "Image.h"
+#include "Text.h"
+#include "Canvas.h"
+#include "Button.h"
+#include "CheckBox.h"
+#include "InputText.h"
 
 #include "mmgr/mmgr.h"
 
@@ -30,7 +36,8 @@ bool ModuleScene::Init(Config* config)
 	// Does not show up in Hierarchy because it's created before the root node is created, so it's the only true free GameObject
 	viewport_camera = (ComponentCamera*)App->scene->CreateGameObject("Viewport Camera")->AddComponent(Component::Type::Camera);
 
-	viewport_camera->Move({ 0, 1.95f, -35.0f });
+	viewport_camera->Move({ 0, 0, 25.0f });
+	viewport_camera->Look({ 0, 0, 0 });
 	viewport_camera->SetFarPlane(500.0f);
 
 	root_object = new GameObject("Root", nullptr);
@@ -39,6 +46,7 @@ bool ModuleScene::Init(Config* config)
 
 	return true;
 }
+
 // Load assets
 bool ModuleScene::Start(Config* config)
 {
@@ -51,11 +59,16 @@ bool ModuleScene::Start(Config* config)
 
 	test_camera = test_camera_obj->GetComponent<ComponentCamera>();
 
-	//App->resources->ImportFromOutside("/Assets/Street/Street environment_V01.FBX");
+	//App->resources->ImportFromPath("/Assets/Street/Street environment_V01.FBX");
 	
 	quadtree = new Quadtree(AABB(Quadtree::min_point,Quadtree::max_point));
 
 	RedoQuatree();
+
+
+	// DEMO -------------------------
+	MainMenu();
+	IngameWindow();
 
 	return true;
 }
@@ -67,12 +80,109 @@ bool ModuleScene::Update(float dt)
 
 	if (quadtree->debug)
 		quadtree->Draw();
-	
+
+	// DEMO -------------------
+	static bool show = false;
+	if ((App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN) && state == PLAY)
+	{
+		ingame_image->visible = !ingame_image->visible;
+		ingame_checkbox->visible = !ingame_checkbox->visible;
+	}
+	if ((App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) && state == PLAY)
+	{
+		mainmenu_button->DoLogic(mainmenu_button->GetAction());
+	}
+
+	if (hide_mainmenu)
+	{
+		if (state == PLAY)
+		{
+			mainmenu_image->visible = false;
+			mainmenu_button->visible = false;
+			mainmenu_text->visible = false;
+			mainmenu_inputtext->visible = false;
+		}
+		else if (state == EDIT)
+		{
+			mainmenu_image->visible = true;
+			mainmenu_button->visible = true;
+			mainmenu_text->visible = true;
+			mainmenu_inputtext->visible = true;
+		}
+	}
 
 	return true;
 }
 
+void ModuleScene::UpdateTransformationGuizmos()
+{
+	
 
+	ImGuizmo::MODE mode_to_apply = curr_guizmo_mode;
+
+	if (current_guizmo_operation == ImGuizmo::OPERATION::SCALE)
+		mode_to_apply = ImGuizmo::MODE::WORLD;
+
+	for (std::vector<GameObject*>::iterator it = gameObjects.begin(); it != gameObjects.end(); ++it)
+	{
+		if (!(*it)->is_selected) continue;
+
+		float4x4 global_transform_trans = (*it)->GetGlobalTransform().Transposed();
+
+		
+
+		float t[16];
+
+		ImGuizmo::Manipulate(viewport_camera->view_matrix4x4.Transposed().ptr(),
+			viewport_camera->projection_matrix4x4.Transposed().ptr(),
+			ImGuizmo::OPERATION::TRANSLATE,
+			ImGuizmo::MODE::WORLD,
+			global_transform_trans.ptr(), t);
+
+		float4x4 moved_transformation = float4x4(
+			t[0], t[4], t[8], t[12],
+			t[1], t[5], t[9], t[13],
+			t[2], t[6], t[10], t[14],
+			t[3], t[7], t[11], t[15]);
+
+		if (ImGuizmo::IsUsing())
+		{
+			switch (current_guizmo_operation)
+			{
+			case ImGuizmo::OPERATION::TRANSLATE:
+			{
+				float4x4 new_trans = moved_transformation * (*it)->GetGlobalTransform();
+				(*it)->SetTransform(new_trans);
+			}
+			break;
+
+			case ImGuizmo::OPERATION::ROTATE:
+			{
+				float4x4 new_trans = moved_transformation * (*it)->GetGlobalTransform();
+				(*it)->SetTransform(new_trans);
+			}
+			break;
+			case ImGuizmo::OPERATION::SCALE:
+			{
+				float4x4 save_trans = moved_transformation;
+				moved_transformation = moved_transformation * last_moved_transformation.Inverted();
+
+				float4x4 new_trans = moved_transformation * (*it)->GetGlobalTransform();
+				(*it)->SetTransform(new_trans);
+
+				last_moved_transformation = save_trans;
+			}
+			break;
+			}
+		}
+		else
+		{
+			last_moved_transformation = float4x4::identity;
+		}
+	}
+
+}
+#include "Canvas.h"
 
 bool ModuleScene::PostUpdate(float dt)
 {
@@ -100,9 +210,9 @@ bool ModuleScene::PostUpdate(float dt)
 			{
 				RedoQuatree();
 			}
-
 			obj->flags &= ~ProcessTransformUpdate;
 		}
+
 	}
 
 	switch (state)
@@ -113,8 +223,8 @@ bool ModuleScene::PostUpdate(float dt)
 	case START:
 		//SaveScene
 		state = PLAY;
-		App->editor->tab_viewport->current_camera = test_camera;
-		App->editor->tab_viewport->OnCameraUpdate();
+		App->editor->tab_viewport->camera = test_camera;
+		//App->editor->tab_viewport->OnCameraUpdate();
 		break;
 	case PLAY:
 		//App->Unpause();
@@ -127,15 +237,13 @@ bool ModuleScene::PostUpdate(float dt)
 		//App->Unpause();
 		//LoadScene
 		state = EDIT;
-		App->editor->tab_viewport->current_camera = viewport_camera;
-		App->editor->tab_viewport->OnCameraUpdate();
-
+		App->editor->tab_viewport->camera = viewport_camera;
+		//App->editor->tab_viewport->OnCameraUpdate();
 		break;
 	default:
 		state = EDIT;
 		break;
 	}
-
 	return true;
 }
 
@@ -177,7 +285,7 @@ bool ModuleScene::Draw()
 	for ( GameObject* obj : candidates)
 	{
 
-		c = (!obj->HasChilds()) ? App->scene_base->aabb_color : Cyan;
+		c = (!obj->HasChilds()) ? App->scene_base->aabb_color : Color::cyan1;
 		// Just boxes colors things
 		//obj->is_drawn = true;
 
@@ -218,7 +326,7 @@ bool ModuleScene::Draw()
 		// AABB
 		if ((obj->show_aabb || App->scene_base->show_all_aabb) && obj->aabb_VBO != 0)
 		{
-			c = (obj->is_drawn) ? App->scene_base->aabb_color : LightGrey;
+			c = (obj->is_drawn) ? App->scene_base->aabb_color : Color::LightGray;
 
 			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->aabb_width);
@@ -236,7 +344,7 @@ bool ModuleScene::Draw()
 		// OBB
 		if ((obj->show_obb || App->scene_base->show_all_obb) && obj->obb_VBO != 0)
 		{
-			c = (obj->is_drawn) ? App->scene_base->obb_color : DarkGrey;
+			c = (obj->is_drawn) ? App->scene_base->obb_color : Color::DarkSlateGray;
 
 			glColor3ub(c.r * 255.0f, c.g * 255.0f, c.b * 255.0f);
 			glLineWidth(App->scene_base->obb_width);
@@ -384,4 +492,50 @@ void ModuleScene::UnSelectAll(GameObject* keep_selected)
 		}
 	}
 
+}
+
+void ModuleScene::MainMenu()
+{
+	GameObject* window = CreateGameObject("Main Menu");
+	mainmenu_image = (Image*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+	mainmenu_image->position2D.x = App->editor->tab_viewport->pos_x/* + (App->editor->tab_viewport->width / 2)*/;
+	mainmenu_image->position2D.y = App->editor->tab_viewport->pos_y/* + (App->editor->tab_viewport->height / 2)*/;
+	mainmenu_image->size2D.x = App->editor->tab_viewport->width;
+	mainmenu_image->size2D.y = App->editor->tab_viewport->height;
+	mainmenu_image->material->LoadTexture("Assets/background.jpg");
+
+	mainmenu_button = (Button*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::BUTTON);
+	strcpy_s(mainmenu_button->text, "Start");
+	mainmenu_button->ChangeActionTo(UI_Element::Action::HIDE_MAINMENU);
+	mainmenu_button->position2D = { 335,115 };
+	mainmenu_button->size2D = { 40,20 };
+	mainmenu_button->text_pos = { -26, -12 };
+
+	mainmenu_text = (Text*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::TEXT);
+	strcpy_s(mainmenu_text->text, "Press Button or SpaceBar to Start");
+	mainmenu_text->font_size = 25;
+	mainmenu_text->position2D = { 96,150 };
+
+	mainmenu_inputtext = (InputText*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::INPUTTEXT);
+	mainmenu_inputtext->position2D = { 325,325 };
+	mainmenu_inputtext->size2D = { 210, 20 };
+}
+
+void ModuleScene::IngameWindow()
+{
+	GameObject* window = CreateGameObject("Options Window");
+	ingame_image = (Image*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+	ingame_image->material->LoadTexture("Assets/crosshair.jpg");
+	ingame_image->size2D = { 200,175 };
+	ingame_image->position2D = { 345,260 };
+	ingame_image->visible = false;
+
+	ingame_checkbox = (CheckBox*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX);
+	ingame_checkbox->position2D = { 245,45 };
+	strcpy_s(ingame_checkbox->text, "Switch VSync");
+	ingame_checkbox->font.clean();
+	ingame_checkbox->font.init("Assets/Fonts/Smack.otf", ingame_checkbox->font_size);
+	ingame_checkbox->font.path = "Assets/Fonts/Smack.otf";
+	ingame_checkbox->ChangeActionTo(UI_Element::Action::SWITCH_VSYNC);
+	ingame_checkbox->visible = false;
 }

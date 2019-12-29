@@ -1,6 +1,16 @@
 #include "Application.h"
 
+#include "Module.h"
+#include "ModuleWindow.h"
+#include "ModuleInput.h"
 #include "ModuleScene.h"
+#include "ModuleSceneBase.h"
+#include "ModuleRenderer3D.h"
+#include "ModuleEditor.h"
+#include "ModuleFileSystem.h"
+#include "ModuleResources.h"
+#include "Config.h"
+
 
 #include "mmgr/mmgr.h"
 
@@ -8,7 +18,6 @@ using namespace std;
 
 Application::Application()
 {
-	frames = 0;
 	last_frame_ms = -1;
 	last_fps = -1;
 	capped_ms = 1000 / 60;
@@ -18,7 +27,7 @@ Application::Application()
 	modules.push_back(file_system = new ModuleFileSystem(ASSETS_FOLDER));
 	modules.push_back(window = new ModuleWindow());
 	modules.push_back(resources = new ModuleResources());
-	//modules.push_back(tex = new ModuleTextures());
+	modules.push_back(gui = new ModuleGUI());
 	modules.push_back(scene_base = new ModuleSceneBase());
 	modules.push_back(scene = new ModuleScene());
 	modules.push_back(editor = new ModuleEditor());
@@ -97,7 +106,6 @@ bool Application::Update()
 void Application::FinishUpdate()
 {
 	// Recap on framecount and fps
-	++frames;
 	++fps_counter;
 
 	if (fps_timer.Read() >= 1000)
@@ -182,7 +190,7 @@ void Application::SetFramerateLimit(uint max_framerate)
 
 void Application::ReadConfiguration(const Config& config)
 {
-	app_name = config.GetString("Name", "Davos Game Engine");
+	SetAppName(config.GetString("Name", "Davos Game Engine").c_str());
 	organization_name = config.GetString("Organization", "");
 	SetFramerateLimit(config.GetNumber("MaxFramerate", 0));
 }

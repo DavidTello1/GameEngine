@@ -2,12 +2,18 @@
 #include "Application.h"
 #include "ModuleRenderer3D.h"
 #include "Viewport.h"
+#include "ModuleWindow.h"
+#include "ModuleEditor.h"
+#include "Config.h"
+#include "Color.h"
+#include "ModuleScene.h"
+
 
 #include "glew/include/GL/glew.h"
 #include "SDL/include/SDL_opengl.h"
 #include "Imgui/imgui.h"
-//#include <gl/GL.h>
-//#include <gl/GLU.h>
+
+#pragma comment( lib, "Freetype/include/freetype.lib" )
 
 #pragma comment(lib, "glew/libx86/glew32.lib")
 #pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
@@ -47,6 +53,10 @@ bool ModuleRenderer3D::Init(Config* config)
 	glEnable(GL_COLOR_MATERIAL);*/
 	glEnable(GL_TEXTURE_2D);
 
+
+	
+	//our_font.init("Library/Fonts/Wintersoul.ttf", 45 /* size */);
+
 	return ret;
 }
 
@@ -63,6 +73,13 @@ bool ModuleRenderer3D::PostUpdate(float dt)
 
 	// Drawing of gui and panels(and viewport panel)
 	App->editor->Draw();
+
+	//glColor3f(1, 1, 1);
+
+	//glfreetype::print(our_font, 50 /* xpos */, 50 /* ypos */,
+	//	"The quick brown fox blah blah blah abcdefghijklmnopqrstuwvxyz");
+
+	App->scene->UpdateTransformationGuizmos();
 
 	SDL_GL_SwapWindow(App->window->GetWindow());
 
@@ -100,3 +117,14 @@ void ModuleRenderer3D::SetVSync(bool vsync)
 			LOG("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 	}
 }
+
+void glColorColorU(const Color &c)
+{
+	glColor3ub(c.r * 255, c.g * 255, c.b * 255);
+}
+
+void glColorColorF(const Color &c)
+{
+	glColor4f(c.r, c.g, c.b, c.a );
+}
+

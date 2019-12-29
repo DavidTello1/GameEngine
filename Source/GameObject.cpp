@@ -6,6 +6,12 @@
 #include "ComponentRenderer.h"
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
+#include "Canvas.h"
+#include "Image.h"
+#include "Text.h"
+#include "Button.h"
+#include "CheckBox.h"
+#include "InputText.h"
 
 #include "mmgr/mmgr.h"
 
@@ -96,21 +102,34 @@ bool GameObject::ToggleSelection() // Toggles the state of the node, returns cur
 	return is_selected;
 }
 
-Component* GameObject::GetComponent(Component::Type type)
+Component* GameObject::GetComponent(Component::Type type, UI_Element::Type UI_type)
 {
 	if (active)
 	{
 		for (uint i = 0; i < components.size(); i++)
 		{
 			if (components[i]->type == type)
-				return components[i];
+			{
+				if (type == Component::Type::UI_Element && UI_type != UI_Element::Type::UNKNOWN)
+				{
+					UI_Element* ui_comp = (UI_Element*)components[i];
+					if (ui_comp->GetType() == UI_type)
+						return components[i];
+				}
+				else
+					return components[i];
+			}
 		}
+	}
+	else
+	{
+		LOG("GameObject not active - cannot Get Component", 'd');
 	}
 
 	return nullptr;
 }
 
-Component* GameObject::AddComponent(Component::Type type)
+Component* GameObject::AddComponent(Component::Type type, UI_Element::Type UI_type)
 {
 	Component* new_component;
 
@@ -144,30 +163,107 @@ Component* GameObject::AddComponent(Component::Type type)
 		//App->resources->LoadResource("Assets/camera_mesh.fbx", Component::Type::Mesh, true, this);
 		return new_component;
 	}
+	else if (type == Component::Type::UI_Element)
+	{
+		if (UI_type == UI_Element::Type::CANVAS)
+		{
+			new_component = new Canvas(this, UI_type);
+			App->gui->AddCanvas((Canvas*)new_component);
+			components.push_back(new_component);
+			return new_component;
+		}
+		else if (UI_type == UI_Element::Type::IMAGE)
+		{
+			new_component = new Image(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
+		}
+		else if (UI_type == UI_Element::Type::TEXT)
+		{
+			new_component = new Text(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
+		}
+		else if (UI_type == UI_Element::Type::BUTTON)
+		{
+			new_component = new Button(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
+		}
+		else if (UI_type == UI_Element::Type::CHECKBOX)
+		{
+			new_component = new CheckBox(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
+		}
+		else if (UI_type == UI_Element::Type::INPUTTEXT)
+		{
+			new_component = new InputText(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
+		}
+	}
 	return nullptr;
 }
 
-bool GameObject::HasComponent(Component::Type type)
-{
-	for (uint i = 0; i < components.size(); i++)
-	{
-		if (components[i]->type == type)
-			return true;
-	}
-	return false;
-}
-
-void GameObject::DeleteComponent(Component::Type type)
+bool GameObject::HasComponent(Component::Type type, UI_Element::Type UI_type)
 {
 	for (uint i = 0; i < components.size(); i++)
 	{
 		if (components[i]->type == type)
 		{
+			if (type == Component::Type::UI_Element && UI_type != UI_Element::Type::UNKNOWN)
+			{
+				UI_Element* ui_comp = (UI_Element*)components[i];
+				if (ui_comp->GetType() == UI_type)
+					return true;
+			}
+			else
+				return true;
+		}
+	}
+	return false;
+}
+
+void GameObject::DeleteComponent(Component::Type type, UI_Element::Type UI_type)
+{
+	for (uint i = 0; i < components.size(); i++)
+	{
+		if (components[i]->type == type)
+		{
+			if (type == Component::Type::UI_Element && UI_type != UI_Element::Type::UNKNOWN)
+			{
+				UI_Element* ui_comp = (UI_Element*)components[i];
+				if (ui_comp->GetType() != UI_type)
+					continue;
+			}
 			RELEASE(components[i]);
 			components.erase(components.begin() + i);
 			break;
 		}
 	}
+}
+
+std::vector<Component*> GameObject::GetAllComponentsOfType(Component::Type type, UI_Element::Type UI_type)
+{
+	std::vector<Component*> comps;
+
+	for (uint i = 0; i < components.size(); i++)
+	{
+		if (components[i]->type == type)
+		{
+			if (type == Component::Type::UI_Element && UI_type != UI_Element::Type::UNKNOWN)
+			{
+				UI_Element* ui_comp = (UI_Element*)components[i];
+				if (ui_comp->GetType() == UI_type)
+					comps.push_back(components[i]);
+			}
+			else
+				comps.push_back(components[i]);
+		}
+	}
+
+	return comps;
 }
 
 void GameObject::UpdateTransform()
@@ -197,7 +293,7 @@ void GameObject::UpdateTransform()
 		cam->SetPosition(translation);
 		cam->frustum.front = GetGlobalTransform().WorldZ();
 		cam->frustum.up = GetGlobalTransform().WorldY();
-		cam->update_projection = true;
+		cam->UpdateMatrices();
 	}
 
 	UpdateBoundingBox();

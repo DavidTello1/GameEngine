@@ -1,4 +1,6 @@
 #pragma once
+#include <list>
+#include <string>
 
 #include "Globals.h"
 #include "Timer.h"
@@ -10,14 +12,24 @@
 #include "ModuleEditor.h"
 #include "ModuleFileSystem.h"
 #include "ModuleResources.h"
+#include "ModuleGUI.h"
 
 #include "Config.h"
 
-#include "MathGeoLib/include/Algorithm/Random/LCG.h"
+#include "MathGeoLib/include/MathGeoLibFwd.h"
 
-#include <list>
-
+class Module;
+class ModuleWindow;
 class ModuleScene;
+class ModuleInput;
+class ModuleSceneBase;
+class ModuleRenderer3D;
+class ModuleEditor;
+class ModuleFileSystem;
+class ModuleResources;
+
+class Config;
+class LCG;
 
 class Application
 {
@@ -43,7 +55,7 @@ public:
 	void LoadPrefs();
 	void SavePrefs() const;
 
-	LCG& Random() { return *random; }
+	math::LCG& Random() { return *random; }
 
 private:
 	void PrepareUpdate();
@@ -51,7 +63,7 @@ private:
 
 
 public:
-	LCG* random = nullptr;
+	math::LCG* random = nullptr;
 
 	ModuleWindow* window;
 	ModuleInput* input;
@@ -61,11 +73,11 @@ public:
 	ModuleEditor* editor;
 	ModuleFileSystem* file_system;
 	ModuleResources* resources;
+	ModuleGUI* gui;
 
 private:
 	Timer	ms_timer;
 	Timer	fps_timer;
-	Uint32	frames;
 	float	dt;
 	int		fps_counter;
 	int		last_frame_ms;

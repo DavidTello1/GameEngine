@@ -67,6 +67,12 @@
     <Filter Include="Sources\Resources">
       <UniqueIdentifier>{a84cad31-bd31-4edd-b76a-23e4fb3de339}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\UI">
+      <UniqueIdentifier>{b2beb587-1274-4353-b7e3-7f669f0b668e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\UI\Components">
+      <UniqueIdentifier>{91ad41b6-4a28-4aae-88fe-1a7462a30f3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -80,9 +86,6 @@
     </ClInclude>
     <ClInclude Include="ModuleWindow.h">
       <Filter>Sources\Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="glmath.h">
-      <Filter>Sources\Containers</Filter>
     </ClInclude>
     <ClInclude Include="Application.h">
       <Filter>Sources</Filter>
@@ -504,10 +507,10 @@
     <ClInclude Include="PathNode.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Quadtree.h" >
+    <ClInclude Include="Quadtree.h">
       <Filter>Sources\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="QuadtreeNode.h" >
+    <ClInclude Include="QuadtreeNode.h">
       <Filter>Sources\Containers</Filter>
     </ClInclude>
     <ClInclude Include="ResourceScene.h">
@@ -515,6 +518,38 @@
     </ClInclude>
     <ClInclude Include="ModuleResources.h">
       <Filter>Sources\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="MathGeoLib\include\MathGeoLibFwd.h">
+      <Filter>Sources\Containers\MathGeoLib</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>Sources\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRenderer.hpp" />
+    <ClInclude Include="ImGuizmo.h" />
+    <ClInclude Include="ModuleGUI.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckBox.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="InputText.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Canvas.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Element.h">
+      <Filter>Sources\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -538,9 +573,6 @@
     </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="glmath.cpp">
-      <Filter>Sources\Containers</Filter>
     </ClCompile>
     <ClCompile Include="Color.cpp">
       <Filter>Sources\Containers</Filter>
@@ -743,14 +775,43 @@
     <ClCompile Include="ComponentCamera.cpp">
       <Filter>Sources\GameObjects\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Quadtree.cpp" >
+    <ClCompile Include="Quadtree.cpp">
       <Filter>Sources\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="QuadtreeNode.cpp" >
+    <ClCompile Include="QuadtreeNode.cpp">
       <Filter>Sources\Containers</Filter>
     </ClCompile>
     <ClCompile Include="ResourceScene.cpp">
       <Filter>Sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Sources\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="TextRenderer.cpp" />
+    <ClCompile Include="ImGuizmo.cpp" />
+    <ClCompile Include="ModuleGUI.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckBox.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="InputText.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Canvas.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Element.cpp">
+      <Filter>Sources\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

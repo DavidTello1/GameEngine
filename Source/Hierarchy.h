@@ -7,6 +7,8 @@
 #include <random>
 #include <vector>
 
+class GameObject;
+
 class Hierarchy : public Panel
 {
 public:

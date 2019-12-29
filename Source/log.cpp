@@ -1,6 +1,7 @@
 #pragma once
 #include "Globals.h"
 #include "Console.h"
+#include <windows.h>
 
 #define GEOMETRY_LOG_STRING "[Geometry]"
 #define DEBUG_LOG_STRING "[Debug]"

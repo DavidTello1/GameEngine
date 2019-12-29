@@ -43,14 +43,14 @@ public:
 	float plane_length = 40.0f;
 	float axis_length = 40.0f;
 
-	Color wireframe_color = White;
+	Color wireframe_color = Color::white;
 	float wireframe_width = 1.0f;
 	bool show_all_wireframe = false;
 	
-	Color aabb_color = Red;
+	Color aabb_color = Color::red1;
 	float aabb_width = 1.0f;
 
-	Color obb_color = Green;
+	Color obb_color = Color::green1;
 	float obb_width = 1.0f;
 
 	bool show_all_aabb = false;
