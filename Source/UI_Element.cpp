@@ -1,5 +1,6 @@
 #include "UI_Element.h"
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleEditor.h"
 #include "Viewport.h"
 
@@ -22,8 +23,6 @@ void UI_Element::UpdateCollider()
 bool UI_Element::CheckMousePos()
 {
 	App->input->GetMousePosition(mouse_pos);
-	mouse_pos.x -= App->editor->focused_panel->pos_x;
-	mouse_pos.y -= App->editor->tab_viewport->height;
 	SDL_Rect MouseCollider = { mouse_pos.x,mouse_pos.y,1,1 };
 	if (SDL_HasIntersection(&MouseCollider, &collider))
 		return true;
@@ -92,6 +91,10 @@ void UI_Element::DoLogic(Action action)
 
 	case SWITCH_VSYNC:
 		App->renderer3D->SetVSync(!App->renderer3D->GetVSync());
+		break;
+
+	case HIDE_MAINMENU:
+		App->scene->hide_mainmenu = true;
 		break;
 	}
 }

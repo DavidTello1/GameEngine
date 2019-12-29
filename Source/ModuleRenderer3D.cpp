@@ -125,7 +125,6 @@ void glColorColorU(const Color &c)
 
 void glColorColorF(const Color &c)
 {
-	glColor3f(c.r, c.g, c.b );
-
+	glColor4f(c.r, c.g, c.b, c.a );
 }
 

@@ -88,6 +88,28 @@ bool ModuleScene::Update(float dt)
 		ingame_image->visible = !ingame_image->visible;
 		ingame_checkbox->visible = !ingame_checkbox->visible;
 	}
+	if ((App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) && state == PLAY)
+	{
+		mainmenu_button->DoLogic(mainmenu_button->GetAction());
+	}
+
+	if (hide_mainmenu)
+	{
+		if (state == PLAY)
+		{
+			mainmenu_image->visible = false;
+			mainmenu_button->visible = false;
+			mainmenu_text->visible = false;
+			mainmenu_inputtext->visible = false;
+		}
+		else if (state == EDIT)
+		{
+			mainmenu_image->visible = true;
+			mainmenu_button->visible = true;
+			mainmenu_text->visible = true;
+			mainmenu_inputtext->visible = true;
+		}
+	}
 
 	return true;
 }
@@ -474,15 +496,46 @@ void ModuleScene::UnSelectAll(GameObject* keep_selected)
 
 void ModuleScene::MainMenu()
 {
+	GameObject* window = CreateGameObject("Main Menu");
+	mainmenu_image = (Image*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+	mainmenu_image->position2D.x = App->editor->tab_viewport->pos_x/* + (App->editor->tab_viewport->width / 2)*/;
+	mainmenu_image->position2D.y = App->editor->tab_viewport->pos_y/* + (App->editor->tab_viewport->height / 2)*/;
+	mainmenu_image->size2D.x = App->editor->tab_viewport->width;
+	mainmenu_image->size2D.y = App->editor->tab_viewport->height;
+	mainmenu_image->material->LoadTexture("Assets/background.jpg");
 
+	mainmenu_button = (Button*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::BUTTON);
+	strcpy_s(mainmenu_button->text, "Start");
+	mainmenu_button->ChangeActionTo(UI_Element::Action::HIDE_MAINMENU);
+	mainmenu_button->position2D = { 335,115 };
+	mainmenu_button->size2D = { 40,20 };
+	mainmenu_button->text_pos = { -26, -12 };
+
+	mainmenu_text = (Text*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::TEXT);
+	strcpy_s(mainmenu_text->text, "Press Button or SpaceBar to Start");
+	mainmenu_text->font_size = 25;
+	mainmenu_text->position2D = { 96,150 };
+
+	mainmenu_inputtext = (InputText*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::INPUTTEXT);
+	mainmenu_inputtext->position2D = { 325,325 };
+	mainmenu_inputtext->size2D = { 210, 20 };
 }
 
 void ModuleScene::IngameWindow()
 {
 	GameObject* window = CreateGameObject("Options Window");
 	ingame_image = (Image*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
-	ingame_checkbox = (CheckBox*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX);
+	ingame_image->material->LoadTexture("Assets/crosshair.jpg");
+	ingame_image->size2D = { 200,175 };
+	ingame_image->position2D = { 345,260 };
 	ingame_image->visible = false;
-	ingame_checkbox->visible = false;
+
+	ingame_checkbox = (CheckBox*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX);
+	ingame_checkbox->position2D = { 245,45 };
+	strcpy_s(ingame_checkbox->text, "Switch VSync");
+	ingame_checkbox->font.clean();
+	ingame_checkbox->font.init("Assets/Fonts/Smack.otf", ingame_checkbox->font_size);
+	ingame_checkbox->font.path = "Assets/Fonts/Smack.otf";
 	ingame_checkbox->ChangeActionTo(UI_Element::Action::SWITCH_VSYNC);
+	ingame_checkbox->visible = false;
 }

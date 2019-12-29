@@ -183,7 +183,7 @@ void Button::DrawInspector()
 
 		if (ImGui::BeginPopup("Load Action"))
 		{
-			for (int i = 0; i < sizeof(action_list) / sizeof(const char*); i++)
+			for (int i = 0; i < NUM_ACTIONS; i++)
 			{
 				if (ImGui::Selectable(action_list[i]))
 					action = (Action)i;
