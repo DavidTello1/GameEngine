@@ -14,15 +14,22 @@ UI_Element::~UI_Element()
 
 void UI_Element::UpdateCollider()
 {
-	collider.x =  position2D.x;
-	collider.y = position2D.y;
-	collider.w = size2D.x;
-	collider.h = size2D.y;
+	collider.x =  position2D.x-size2D.x;
+	collider.y = position2D.y -size2D.y;
+	collider.w = size2D.x*2;
+	collider.h = size2D.y*2;
 }
 
 bool UI_Element::CheckMousePos()
 {
+	UpdateCollider();
 	App->input->GetMousePosition(mouse_pos);
+	//LOG("BEFORE [%f,%f] VIEWPORT[%d,%d,%d,%d]", mouse_pos.x, mouse_pos.y, App->editor->tab_viewport->pos_x, App->editor->tab_viewport->pos_y, App->editor->tab_viewport->width, App->editor->tab_viewport->height, 'd');
+
+	mouse_pos.x -= App->editor->tab_viewport->pos_x+7;
+	mouse_pos.y = math::Abs(mouse_pos.y - (App->editor->tab_viewport->pos_y + 26 + App->editor->tab_viewport->height));// -mouse_pos.y + App->editor->focused_panel->pos_x;
+
+	//LOG("MOUSE [%f,%f] COLLIDER[%d,%d,%d,%d]", mouse_pos.x, mouse_pos.y, collider.x,collider.y,collider.w,collider.h, 'd');
 	SDL_Rect MouseCollider = { mouse_pos.x,mouse_pos.y,1,1 };
 	if (SDL_HasIntersection(&MouseCollider, &collider))
 		return true;
