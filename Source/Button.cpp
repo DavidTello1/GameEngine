@@ -7,9 +7,11 @@
 
 Button::Button(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Element::Type::BUTTON, gameObject)
 {
+	size2D = { 40,20 };
+
 	visible = true;
 	interactable = true;
-	draggable = true;
+	draggable = false;
 
 	if (!gameObject->HasComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS))
 		canvas = (Canvas*)gameObject->AddComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
@@ -101,15 +103,6 @@ void Button::DrawInspector()
 		ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("##buttonrotation", &rotation2D);
 
-		// Scale
-		ImGui::Text("Scale:   ");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##buttonscale", &scale2D.x);
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##buttonscale", &scale2D.y);
-
 		// ------------------------------------------
 
 		// Image
@@ -140,30 +133,25 @@ void Button::DrawInspector()
 
 		// States (Colors)
 		ImGui::Separator();
-		static ImVec4 idle_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Idle", (float*)&idle_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Idle");
-		if (state == IDLE) ChangeColor(Color(idle_color.w, idle_color.x, idle_color.y, idle_color.z));
+		if (state == IDLE) ChangeColor(idle_color);
 
-		static ImVec4 hovered_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Hovered", (float*)&hovered_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Hovered");
-		if (state == HOVERED) 
-			ChangeColor(Color(hovered_color.w, hovered_color.x, hovered_color.y, hovered_color.z));
+		if (state == HOVERED) ChangeColor(hovered_color);
 
-		static ImVec4 selected_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Selected", (float*)&selected_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Selected");
-		if (state == SELECTED || state == DRAGGING) ChangeColor(Color(selected_color.w, selected_color.x, selected_color.y, selected_color.z));
+		if (state == SELECTED || state == DRAGGING) ChangeColor(selected_color);
 
-		static ImVec4 locked_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Locked", (float*)&locked_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Locked");
-		if (state == LOCKED) ChangeColor(Color(locked_color.w, locked_color.x, locked_color.y, locked_color.z));
+		if (state == LOCKED) ChangeColor(locked_color);
 
 		// Text
 		ImGui::Separator();
@@ -176,7 +164,7 @@ void Button::DrawInspector()
 			ImGui::SetTooltip("Use with caution, may temporary freeze the editor with large numbers. \n It is recommended to directly input the number with the keyboard");
 
 		ImGui::Text("Text");
-		ImGui::InputText("##text", text, MAX_TEXT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
+		ImGui::InputText("##buttontext", text, MAX_TEXT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
 		ImGui::ColorEdit3("Color", (float*)&text_color);
 
 		ImGui::Text("Position:");

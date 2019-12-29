@@ -12,6 +12,12 @@ class ComponentRenderer;
 class ComponentMesh;
 class ComponentCamera;
 class Quadtree;
+class Image;
+class Text;
+class Canvas;
+class Button;
+class CheckBox;
+class InputText;
 
 enum SceneState {
 	EDIT,
@@ -85,7 +91,9 @@ private:
 
 	//DEMO-----------------------
 private:
-	//void MainMenu();
-	//void IngameWindow();
+	void MainMenu();
+	void IngameWindow();
 
+	Image* ingame_image = nullptr;
+	CheckBox* ingame_checkbox = nullptr;
 };

@@ -9,7 +9,12 @@
 #include "ResourceModel.h"
 #include "Viewport.h"
 #include "Quadtree.h"
-
+#include "Image.h"
+#include "Text.h"
+#include "Canvas.h"
+#include "Button.h"
+#include "CheckBox.h"
+#include "InputText.h"
 
 #include "mmgr/mmgr.h"
 
@@ -61,9 +66,9 @@ bool ModuleScene::Start(Config* config)
 	RedoQuatree();
 
 
-	// DEMO ------------------
-	//MainMenu();
-	//IngameWindow();
+	// DEMO -------------------------
+	MainMenu();
+	IngameWindow();
 
 	return true;
 }
@@ -75,6 +80,14 @@ bool ModuleScene::Update(float dt)
 
 	if (quadtree->debug)
 		quadtree->Draw();
+
+	// DEMO -------------------
+	static bool show = false;
+	if ((App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN) && state == PLAY)
+	{
+		ingame_image->visible = !ingame_image->visible;
+		//ingame_checkbox->visible = !ingame_checkbox->visible;
+	}
 
 	return true;
 }
@@ -457,4 +470,20 @@ void ModuleScene::UnSelectAll(GameObject* keep_selected)
 		}
 	}
 
+}
+
+void ModuleScene::MainMenu()
+{
+
+}
+
+void ModuleScene::IngameWindow()
+{
+	GameObject* window = CreateGameObject("Options Window");
+	ingame_image = (Image*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+	ingame_checkbox = (CheckBox*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX);
+	ingame_image->visible = false;
+	ingame_checkbox->visible = false;
+	ingame_checkbox->interactable = false;
+	ingame_checkbox->ChangeActionTo(UI_Element::Action::SWITCH_VSYNC);
 }

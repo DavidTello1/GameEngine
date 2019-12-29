@@ -13,15 +13,17 @@ void UI_Element::UpdateCollider()
 {
 	collider.x =  position2D.x;
 	collider.y = position2D.y;
-	collider.w = size2D.x * scale2D.x;
-	collider.h = size2D.y * scale2D.y;
+	collider.w = size2D.x;
+	collider.h = size2D.y;
 }
 
 bool UI_Element::CheckMousePos()
 {
 	App->input->GetMousePosition(mouse_pos);
-	SDL_Rect MouseCollider = { mouse_pos.x,mouse_pos.y,1,1 };
+	mouse_pos.x -= App->editor->focused_panel->pos_x;
+	mouse_pos.y -= App->editor->focused_panel->pos_y;
 
+	SDL_Rect MouseCollider = { mouse_pos.x,mouse_pos.y,1,1 };
 	if (SDL_HasIntersection(&MouseCollider, &collider))
 		return true;
 
@@ -36,15 +38,18 @@ bool UI_Element::CheckClick()
 		return true;
 	}
 
-	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
+	if (draggable && App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
 		return true;
+
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_UP)
+		return false;
 
 	return false;
 }
 
 void UI_Element::UpdateState()
 {
-	if (interactable)
+	if (interactable && visible)
 	{
 		if (state != DRAGGING)
 		{
@@ -56,7 +61,12 @@ void UI_Element::UpdateState()
 					if (draggable && (drag_start.x != mouse_pos.x || drag_start.y != mouse_pos.y))
 						ChangeStateTo(DRAGGING);
 					else
+					{
+						if (state != SELECTED)
+							DoLogic(action);
+
 						ChangeStateTo(SELECTED);
+					}
 				}
 			}
 			else
@@ -77,6 +87,10 @@ void UI_Element::DoLogic(Action action)
 	switch (action)
 	{
 	case NONE:
+		break;
+
+	case SWITCH_VSYNC:
+		App->renderer3D->SetVSync(!App->renderer3D->GetVSync());
 		break;
 	}
 }

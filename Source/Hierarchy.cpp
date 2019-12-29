@@ -117,7 +117,7 @@ void Hierarchy::DrawCreateMenu()
 	GameObject* parent = App->scene->GetSelectedGameObject();
 
 	if (ImGui::MenuItem("Empty"))
-		App->scene->CreateGameObject();
+		App->scene->CreateGameObject("GameObject", parent);
 
 	//ImGui::Separator();
 	//if (ImGui::BeginMenu("UI"))
