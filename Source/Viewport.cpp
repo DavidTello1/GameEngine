@@ -34,9 +34,10 @@ Viewport::~Viewport()
 bool Viewport::PreUpdate()
 {
 	if (our_font.textures.empty())
-		our_font.init("Library/Fonts/Wintersoul.ttf", 45 /* size */);
+		our_font.init("Library/Fonts/Dukas.ttf", 45 /* size */);
 
-	
+	ImGuizmo::SetDrawlist();
+
 
 	if (width != window_avail_size.x || height != window_avail_size.y)
 	{
@@ -46,6 +47,7 @@ bool Viewport::PreUpdate()
 		frame_buffer.GenerateFBO(width, height);
 		OnResize(width, height);
 
+		ImGuizmo::SetRect(pos_x, pos_y, width, height);
 	}
 	
 
@@ -74,9 +76,6 @@ void Viewport::Draw()
 {
 	PreUpdate();
 	
-	ImGuizmo::SetDrawlist();
-	ImGuizmo::SetRect(pos_x, pos_y, width, height);
-
 	window_avail_size = ImGui::GetContentRegionAvail();
 	
 	ImGui::Image((ImTextureID)frame_buffer.tex, ImVec2(width, height),ImVec2(0,1),ImVec2(1,0));
