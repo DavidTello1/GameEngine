@@ -88,6 +88,11 @@ void Image::DrawInspector()
 			std::vector<Resource*> images = App->resources->GetAllResourcesOfType(Resource::Type::material);
 			for (int i = 0; i < images.size(); i++)
 			{
+				if (strcmp("", images[i]->GetName().c_str()) == 0 ||
+					images[i]->GetName().substr(images[i]->GetName().size() - 3) == "fbx" ||
+					images[i]->GetName().substr(images[i]->GetName().size() - 3) == "FBX")
+					continue;
+
 				if (ImGui::Selectable(images[i]->GetName().c_str()))
 					material->LoadTexture(images[i]->GetFile());
 			}

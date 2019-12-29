@@ -175,6 +175,7 @@ void Assets::UpdateFilters(PathNode& node)
 		filter_ext.push_back("png");
 		filter_ext.push_back("dds");
 		filter_ext.push_back("jpg");
+		filter_ext.push_back("tga");
 	}
 	else if (node.children == scenes.children)
 	{

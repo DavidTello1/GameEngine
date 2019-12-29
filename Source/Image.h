@@ -14,7 +14,7 @@ public:
 	void DrawInspector() override;
 	static inline UI_Element::Type GetType() { return UI_Element::Type::IMAGE; }
 
-private:
+public:
 	Canvas* canvas = nullptr;
 	ResourceMaterial* material = nullptr;
 };
