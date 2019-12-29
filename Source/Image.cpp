@@ -110,15 +110,6 @@ void Image::DrawInspector()
 		ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("##imagerotation", &rotation2D);
 
-		// Scale
-		ImGui::Text("Scale:   ");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##imagescale", &scale2D.x);
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##imagescale", &scale2D.y);
-
 		// ------------------------------------------
 
 		// Image

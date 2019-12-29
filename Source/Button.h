@@ -22,12 +22,12 @@ public:
 	ResourceMaterial* material = nullptr;
 
 	glfreetype::font_data font;
-	float font_size = 40;
-	char text[MAX_TEXT_SIZE]   = "Text";
-	char buffer[MAX_TEXT_SIZE] = "Text";
+	float font_size = 20;
+	char text[MAX_TEXT_SIZE]   = "Button";
+	char buffer[MAX_TEXT_SIZE] = "Button";
 
 	Color text_color = Color::black;
-	float2 text_pos = { -45,-25 };
+	float2 text_pos = { -35,-11 };
 
 private:
 	Color idle_color = { 1.0f, 1.0f, 1.0f, 1.0f };

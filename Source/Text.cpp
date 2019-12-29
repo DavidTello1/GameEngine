@@ -103,15 +103,6 @@ void Text::DrawInspector()
 		ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("##textrotation", &rotation2D);
 
-		// Scale
-		ImGui::Text("Scale:   ");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##textscale", &scale2D.x);
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##textscale", &scale2D.y);
-
 		// Image
 		ImGui::Separator();
 		ImGui::Text("Font: ");

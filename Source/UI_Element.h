@@ -74,7 +74,6 @@ public:
 	float2 size2D = { 50,50 };
 	float2 position2D = { 50,50 };
 	float rotation2D = 0.0f;
-	float2 scale2D = { 1,1 };
 
 	Color color = Color::white;
 

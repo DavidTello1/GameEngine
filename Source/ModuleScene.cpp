@@ -483,7 +483,7 @@ void ModuleScene::IngameWindow()
 	ingame_image = (Image*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
 	ingame_checkbox = (CheckBox*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX);
 	ingame_image->visible = false;
-	//ingame_checkbox->visible = false;
-	//ingame_checkbox->interactable = false;
-	//ingame_checkbox->ChangeActionTo(UI_Element::Action::SWITCH_VSYNC);
+	ingame_checkbox->visible = false;
+	ingame_checkbox->interactable = false;
+	ingame_checkbox->ChangeActionTo(UI_Element::Action::SWITCH_VSYNC);
 }

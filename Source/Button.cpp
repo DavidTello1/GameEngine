@@ -7,6 +7,8 @@
 
 Button::Button(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Element::Type::BUTTON, gameObject)
 {
+	size2D = { 40,20 };
+
 	visible = true;
 	interactable = true;
 	draggable = false;
@@ -101,15 +103,6 @@ void Button::DrawInspector()
 		ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("##buttonrotation", &rotation2D);
 
-		// Scale
-		ImGui::Text("Scale:   ");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##buttonscale", &scale2D.x);
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##buttonscale", &scale2D.y);
-
 		// ------------------------------------------
 
 		// Image
@@ -171,7 +164,7 @@ void Button::DrawInspector()
 			ImGui::SetTooltip("Use with caution, may temporary freeze the editor with large numbers. \n It is recommended to directly input the number with the keyboard");
 
 		ImGui::Text("Text");
-		ImGui::InputText("##text", text, MAX_TEXT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
+		ImGui::InputText("##buttontext", text, MAX_TEXT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
 		ImGui::ColorEdit3("Color", (float*)&text_color);
 
 		ImGui::Text("Position:");

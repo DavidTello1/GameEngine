@@ -13,15 +13,17 @@ void UI_Element::UpdateCollider()
 {
 	collider.x =  position2D.x;
 	collider.y = position2D.y;
-	collider.w = size2D.x * scale2D.x;
-	collider.h = size2D.y * scale2D.y;
+	collider.w = size2D.x;
+	collider.h = size2D.y;
 }
 
 bool UI_Element::CheckMousePos()
 {
 	App->input->GetMousePosition(mouse_pos);
-	SDL_Rect MouseCollider = { mouse_pos.x,mouse_pos.y,1,1 };
+	mouse_pos.x -= App->editor->focused_panel->pos_x;
+	mouse_pos.y -= App->editor->focused_panel->pos_y;
 
+	SDL_Rect MouseCollider = { mouse_pos.x,mouse_pos.y,1,1 };
 	if (SDL_HasIntersection(&MouseCollider, &collider))
 		return true;
 
