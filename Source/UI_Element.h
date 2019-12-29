@@ -53,7 +53,6 @@ public:
 	void ChangeSize(float2 size) { size2D = size; }
 	void ChangePosition(float2 pos) { position2D = pos; }
 	void ChangeRotation(float rot) { rotation2D = rot; }
-	void ChangeScale(float2 scale) { scale2D = scale; }
 
 	void UpdateCollider();
 	void UpdateState();

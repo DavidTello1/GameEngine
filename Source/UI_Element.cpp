@@ -1,5 +1,7 @@
 #include "UI_Element.h"
 #include "Application.h"
+#include "ModuleEditor.h"
+#include "Viewport.h"
 
 UI_Element::UI_Element(UI_Element::Type Type, GameObject* gameObject) : Component(Component::Type::UI_Element, gameObject), type(Type)
 {
@@ -21,8 +23,7 @@ bool UI_Element::CheckMousePos()
 {
 	App->input->GetMousePosition(mouse_pos);
 	mouse_pos.x -= App->editor->focused_panel->pos_x;
-	mouse_pos.y -= App->editor->focused_panel->pos_y;
-
+	mouse_pos.y -= App->editor->tab_viewport->height;
 	SDL_Rect MouseCollider = { mouse_pos.x,mouse_pos.y,1,1 };
 	if (SDL_HasIntersection(&MouseCollider, &collider))
 		return true;
