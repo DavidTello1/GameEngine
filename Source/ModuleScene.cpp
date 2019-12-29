@@ -173,11 +173,11 @@ bool ModuleScene::PostUpdate(float dt)
 			obj->flags &= ~ProcessTransformUpdate;
 		}
 
-		Canvas* canvas = (Canvas*)obj->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
+		/*Canvas* canvas = (Canvas*)obj->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
 		if (canvas != nullptr)
 		{
 			canvas->Draw();
-		}
+		}*/
 	}
 
 	switch (state)

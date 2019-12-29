@@ -209,6 +209,7 @@ namespace glfreetype {
 		GLint viewport[4];
 		glGetIntegerv(GL_VIEWPORT, viewport);
 		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
 		glLoadIdentity();
 		glOrtho(viewport[0], viewport[2], viewport[1], viewport[3], 1, -1);
 
@@ -265,6 +266,8 @@ namespace glfreetype {
 		}
 
 		glPopAttrib();
+
+		glPopMatrix();
 
     }
 

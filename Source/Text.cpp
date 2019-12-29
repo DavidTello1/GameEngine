@@ -19,6 +19,8 @@ Text::Text(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Elemen
 
 	LoadFont("Assets/Fonts/Dukas.ttf", DEFAULT_FONT_SIZE);
 	canvas->AddElement(this);
+
+	position2D.y = 150;
 }
 
 
@@ -33,7 +35,11 @@ void Text::LoadFont(const char* path, int size)
 }
 void Text::Draw()
 {
-	int a = 1;
+	
+	glColor3f(1, 0, 1);
+
+	glfreetype::print(viewport_camera, font, position2D.x, position2D.y, text);
+
 }
 void Text::DrawInspector()
 {

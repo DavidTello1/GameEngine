@@ -86,7 +86,6 @@ void Viewport::Draw()
 	{
 		App->scene_base->Draw();
 	}
-	//App->gui->Draw();
 
 	float3 pos = camera->frustum.pos;
 	float3 up = camera->frustum.up;
@@ -94,6 +93,8 @@ void Viewport::Draw()
 
 	camera->SetPosition({ 0,0,1});
 	camera->Look({ 0, 0, 0 });
+
+	App->gui->Draw();
 
 	glColor3f(1, 0, 0);
 
