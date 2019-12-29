@@ -13,7 +13,7 @@ public:
 	~Button();
 
 	void DrawInspector() override;
-	static inline UI_Element::Type GetType() { return UI_Element::Type::IMAGE; }
+	static inline UI_Element::Type GetType() { return UI_Element::Type::BUTTON; }
 
 	void Draw(ComponentCamera* camera);
 

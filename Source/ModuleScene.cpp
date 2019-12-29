@@ -86,7 +86,7 @@ bool ModuleScene::Update(float dt)
 	if ((App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN) && state == PLAY)
 	{
 		ingame_image->visible = !ingame_image->visible;
-		//ingame_checkbox->visible = !ingame_checkbox->visible;
+		ingame_checkbox->visible = !ingame_checkbox->visible;
 	}
 
 	return true;
@@ -484,6 +484,5 @@ void ModuleScene::IngameWindow()
 	ingame_checkbox = (CheckBox*)window->AddComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX);
 	ingame_image->visible = false;
 	ingame_checkbox->visible = false;
-	ingame_checkbox->interactable = false;
 	ingame_checkbox->ChangeActionTo(UI_Element::Action::SWITCH_VSYNC);
 }

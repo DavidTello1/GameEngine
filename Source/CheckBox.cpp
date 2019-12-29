@@ -43,12 +43,16 @@ void CheckBox::Draw(ComponentCamera* camera)
 	glTranslatef(position2D.x, position2D.y, 1);
 	glMultTransposeMatrixf(camera->origin_view_matrix);
 
-	glColorColorF(color);
-
 	if (is_selected)
+	{
+		glColorColorF(selected_color);
 		glBindTexture(GL_TEXTURE_2D, selected->tex_id);
+	}
 	else
+	{
+		glColorColorF(color);
 		glBindTexture(GL_TEXTURE_2D, unselected->tex_id);
+	}
 
 	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
@@ -93,25 +97,25 @@ void CheckBox::DrawInspector()
 		ImGui::Text("Size:    ");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##buttonsize", &size2D.x);
+		ImGui::DragFloat("x##checkboxsize", &size2D.x);
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##buttonsize", &size2D.y);
+		ImGui::DragFloat("y##checkboxsize", &size2D.y);
 
 		// Position
 		ImGui::Text("Position:");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("x##buttonposition", &position2D.x);
+		ImGui::DragFloat("x##checkboxposition", &position2D.x);
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("y##buttonposition", &position2D.y);
+		ImGui::DragFloat("y##checkboxposition", &position2D.y);
 
 		// Rotation
 		ImGui::Text("Rotation:");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(60);
-		ImGui::DragFloat("##buttonrotation", &rotation2D);
+		ImGui::DragFloat("##checkboxrotation", &rotation2D);
 
 		// ------------------------------------------
 
@@ -178,6 +182,11 @@ void CheckBox::DrawInspector()
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Hovered");
 		if (state == HOVERED) ChangeColor(hovered_color);
+
+		ImGui::ColorEdit4("##Selected", (float*)&selected_color, ImGuiColorEditFlags_NoInputs);
+		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
+		ImGui::Text("Selected");
+		if (state == SELECTED || state == DRAGGING) ChangeColor(selected_color);
 
 		ImGui::ColorEdit4("##Locked", (float*)&locked_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);

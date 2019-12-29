@@ -198,9 +198,9 @@ Component* GameObject::AddComponent(Component::Type type, UI_Element::Type UI_ty
 		}
 		else if (UI_type == UI_Element::Type::INPUTTEXT)
 		{
-			//new_component = new InputText(this, UI_type);
-			//components.push_back(new_component);
-			//return new_component;
+			new_component = new InputText(this, UI_type);
+			components.push_back(new_component);
+			return new_component;
 		}
 	}
 	return nullptr;

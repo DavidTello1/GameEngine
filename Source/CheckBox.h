@@ -13,7 +13,7 @@ public:
 	~CheckBox();
 
 	void DrawInspector() override;
-	static inline UI_Element::Type GetType() { return UI_Element::Type::IMAGE; }
+	static inline UI_Element::Type GetType() { return UI_Element::Type::CHECKBOX; }
 
 	void Draw(ComponentCamera* camera);
 
@@ -28,7 +28,7 @@ public:
 	char buffer[MAX_TEXT_SIZE] = "CheckBox";
 
 	Color text_color = Color::black;
-	float2 text_pos = { 20,-13 };
+	float2 text_pos = { 30,-13 };
 
 private:
 	Color idle_color = { 1.0f, 1.0f, 1.0f, 1.0f };
