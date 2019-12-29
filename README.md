@@ -12,9 +12,6 @@ https://ponspack9.github.io/GameEngine/
 - Pressing “f” focuses the camera around the geometry closest side (_WIP phase when parent is selected_)
 - Holding SHIFT duplicates movement speed
 
-## Innovation
-- 
-
 ## Work division
 - Oscar: quadtrees, mousepicking(option to enable/disable in Panel Configuration>Scene), camera FOV, frustum culling, time management
 - David: inspector properties, own file format, reference counting, resource management
