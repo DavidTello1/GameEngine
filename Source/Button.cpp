@@ -105,9 +105,24 @@ void Button::DrawInspector()
 
 		// States (Colors)
 		ImGui::Separator();
+		static ImVec4 idle_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+		ImGui::ColorEdit4("##Idle", (float*)&idle_color, ImGuiColorEditFlags_NoInputs);
+		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
+		ImGui::Text("Idle");
+
+		static ImVec4 hovered_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+		ImGui::ColorEdit4("##Hovered", (float*)&hovered_color, ImGuiColorEditFlags_NoInputs);
+		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Hovered");
+
+		static ImVec4 selected_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+		ImGui::ColorEdit4("##Selected", (float*)&selected_color, ImGuiColorEditFlags_NoInputs);
+		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Selected");
-		ImGui::Text("Dragging");
+
+		static ImVec4 locked_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+		ImGui::ColorEdit4("##Locked", (float*)&locked_color, ImGuiColorEditFlags_NoInputs);
+		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Locked");
 
 		// Text
