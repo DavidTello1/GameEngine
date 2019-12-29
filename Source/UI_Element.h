@@ -6,6 +6,8 @@
 #include "Color.h"
 #include "ComponentCamera.h"
 
+#define NUM_ACTIONS 3
+
 class UI_Element : public Component
 {
 	friend class ModuleGUI;
@@ -36,7 +38,7 @@ public:
 	{
 		NONE = 0,
 		SWITCH_VSYNC,
-
+		HIDE_MAINMENU
 	};
 
 public:
@@ -86,9 +88,10 @@ protected:
 
 	SDL_Rect collider;
 
-	const char* action_list[2] = {
+	const char* action_list[NUM_ACTIONS] = {
 	"None",
-	"Switch VSync"
+	"Switch VSync",
+	"Hide Main Menu"
 	};
 
 };

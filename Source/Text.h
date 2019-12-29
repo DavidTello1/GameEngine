@@ -4,7 +4,7 @@
 #include "ResourceMaterial.h"
 #include "TextRenderer.hpp"
 
-#define DEFAULT_FONT_SIZE 45
+#define DEFAULT_FONT_SIZE 25
 #define MAX_TEXT_SIZE 256
 
 class Text : public UI_Element

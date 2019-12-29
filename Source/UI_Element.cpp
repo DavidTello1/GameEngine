@@ -1,5 +1,6 @@
 #include "UI_Element.h"
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleEditor.h"
 #include "Viewport.h"
 
@@ -97,6 +98,10 @@ void UI_Element::DoLogic(Action action)
 
 	case SWITCH_VSYNC:
 		App->renderer3D->SetVSync(!App->renderer3D->GetVSync());
+		break;
+
+	case HIDE_MAINMENU:
+		App->scene->hide_mainmenu = true;
 		break;
 	}
 }

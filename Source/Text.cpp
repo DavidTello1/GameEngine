@@ -16,7 +16,7 @@ Text::Text(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Elemen
 
 	material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 
-	LoadFont("Assets/Fonts/Dukas.ttf", DEFAULT_FONT_SIZE);
+	LoadFont("Assets/Fonts/Dukas.ttf", font_size);
 	font.path = "Assets/Fonts/Dukas.ttf";
 	canvas->AddElement(this);
 

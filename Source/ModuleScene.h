@@ -96,4 +96,12 @@ private:
 
 	Image* ingame_image = nullptr;
 	CheckBox* ingame_checkbox = nullptr;
+
+	Image* mainmenu_image = nullptr;
+	Button* mainmenu_button = nullptr;
+	Text* mainmenu_text = nullptr;
+	InputText* mainmenu_inputtext = nullptr;
+
+public:
+	bool hide_mainmenu = false;
 };
