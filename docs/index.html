@@ -13,7 +13,7 @@
 <body>
     <nav class="white" role="navigation">
         <div class="nav-wrapper container">
-            <a href="https://ponspack9.github.io/GameEngine/" ><img src="davos.png" alt="DAVOS Engine" width="100"></a>
+            <a href="https://ponspack9.github.io/GameEngine/"><img src="davos.png" alt="DAVOS Engine" width="100"></a>
             <ul class="right hide-on-med-and-down">
                 <li><a href="about/index.html">About</a></li>
             </ul>
@@ -46,53 +46,94 @@
 
             <div class="row">
                 <div class="col s12 center">
-                    <p class="left-align light">
+                    <p class="left-align">
                         Davos Engine is a 3D game engine developed by <a href="https://github.com/ponspack9">Oscar Pons</a> and <a href="https://github.com/DavidTello1">David Tello</a>, students of CITM (Barcelona), due to the subject Game Engines at third course.
-                        It uses common libraries such as OpenGL 4.6.0, Glew 2.1.0, Simple DirectMedia Layer (SDL 2.0.10), ImGui 1.73 and DevIL 1.8.0
+                        It uses common open libraries: <!--such as OpenGL 4.6.0, Glew 2.1.0, Simple DirectMedia Layer (SDL 2.0.10), ImGui 1.73 and DevIL 1.8.0-->
                     </p>
+                    <ul>
+                        <li class="left-align"><a href="https://www.libsdl.org/index.php">• SDL</a> to create the window and imputs.</li>
+                        <li class="left-align"><a href="https://github.com/ocornut/imgui">• ImGui</a> to create the UI.</li>
+                        <li class="left-align"><a href="https://www.opengl.org/">• OpenGL</a> to create the renderer, 3D shapes, buffers and textures.</li>
+                        <li class="left-align"><a href="https://github.com/Tencent/rapidjson">• Rapidjson</a> to read and write JSON files.</li>
+                        <li class="left-align"><a href="http://www.pcg-random.org/download.html">• PCG</a> to create random numbers.</li>
+                        <li class="left-align"><a href="https://github.com/juj/MathGeoLib">• MathGeolib</a> to make all the math operations.</li>
+                        <li class="left-align"><a href="http://www.assimp.org/">• Assimp</a> to import .FBX/.fbx of 3D models.</li>
+                        <li class="left-align"><a href="http://openil.sourceforge.net/">• DevIL</a> to import the .png and .dds to create te textures.</li>
+                        <li class="left-align"><a href="http://www.flipcode.com/archives/Presenting_A_Memory_Manager.shtml">• mmgr</a> to manage the memory used.</li>
+                        <li class="left-align"><a href="https://icculus.org/physfs/">• PHYSFS</a> to manage files.</li>
+                        <li class="left-align"><a href="https://github.com/CedricGuillemet/ImGuizmo">• ImGuizmo</a> Immediate mode 3D gizmo for scene editing and other controls based on Dear Imgui</li>
+                    </ul>
+
                 </div>
 
                 <div class="col s12 center">
 
                     <h4>Core</h4>
-                    <p class="left-align light">
-
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                        <br />
-                        Camera is controlled as expected with Left mouse button and WASD or SPACE. FPS like.
-
+                    <p class="left-align">
+                        The editor panels' position is fully customizable and can be docked anywhere inside the window.
+                        The main subcore systems are divided into panels to improve organization and easy access to the functionalities. Below are described in detail.
                     </p>
                     <div class="row">
-                        <h7 class="left">One</h7>
-                        <p class="left light">Text of subcore one</p>
+                        <h5 class="left-align">• Game objects</h5>
+                        <p class="left-align">Game objects are ordered and subdued to a hierarchy which can be seen in the hierarchy panel, where all the scene is broke down in a tree form.</p>
                     </div>
                     <div class="row">
-                        <h7 class="left">One</h7>
-                        <p class="left light">Text of subcore one</p>
+                        <h5 class="left-align">• Components</h5>
+                        <p class="left-align">Components can be added and removed to game objects and it's properties can be seen and edited in the inspector panel. There are diferent types of components, classified in two groups:</p>
+                        <ul class="left-align">
+                            <li>&nbsp &nbsp &nbsp &nbsp - Game object: Mesh, Material, Renderer, Camera</li>
+                            <li>&nbsp &nbsp &nbsp &nbsp - UI: Canvas, Image, Text, Button, Check box, Input text</li>
+                        </ul>
                     </div>
                     <div class="row">
-                        <h7 class="left">One</h7>
-                        <p class="left light">Text of subcore one</p>
+                        <h5 class="left-align">• Assets</h5>
+                        <p class="left-align">All resource assets are stored in an own file format, saving space and time. All the assets inside the project folder can be seen inside the assets panel, with cutom icons to quickly see the different types of resources available. It can be directly imported to the scene from this panel. </p>
                     </div>
                     <div class="row">
-                        <h7 class="left">One</h7>
-                        <p class="left light">Text of subcore one</p>
+                        <h5 class="left-align">• Viewport</h5>
+                        <p class="left-align">
+                            Main scene editor camera is controlled as usually with right mouse button held down and W,A,S,D and E,Q.(Forward, left, backward, right and up, down. Respectively)
+                            Rest of the cameras can be controlled through the inspector panel and can be promoted to a viewport panel anytime so you can see the game with as many points of views as you want.
+                        </p>
                     </div>
                     <div class="row">
-                        <h7 class="left">One</h7>
-                        <p class="left light">Text of subcore one</p>
+                        <h5 class="left-align">• Configuration</h5>
+                        <p class="left-align">Inside this panel there is the holy grail of costumization, here you can enable/disable features, change colors, see debug options and more. Moreover, the general style of the editor can be changed navigating throw options menu bar option.</p>
                     </div>
+                    <div class="row">
+                        <h5 class="left-align">• Console</h5>
+                        <p class="left-align">It is used to show all the feedback from the engine, such as errors, warnings or debug logs to keep track of what's happening.</p>
+                    </div>
+                    <div class="row">
+                        <h5 class="left-align">• Quadtrees</h5>
+                        <p class="left-align">They are designed to implement the camera culling so it restricts the number of objects to be drawn, improving considerably the performance. There are two options to choose, subspacing with quadtrees or octrees</p>
+                    </div>
+
 
                 </div>
 
 
 
             </div>
+        </div>
+    </div>
+    <div class="parallax-container valign-wrapper">
+        <div class="section no-pad-bot">
+            <div class="container">
+                <div class="row center">
+                    <h5 class="header col s12 light"></h5>
+                </div>
+            </div>
+        </div>
+        <div class="parallax"><img src="background5.jpg" alt="Unsplashed background img 2"></div>
+    </div>
+    <div class="container">
+        <div class="section">
 
 
             <div class="row">
                 <div class="col s12 center">
-                    <h4 >Scene authoring</h4>
+                    <h4>Scene authoring</h4>
                     <iframe width="640" height="360" src="https://www.youtube.com/embed/DJZ8k6WdsPA"></iframe>
                 </div>
 
@@ -106,7 +147,20 @@
                     </p>
                 </div>
             </div>
-
+        </div>
+    </div>
+    <div class="parallax-container valign-wrapper">
+        <div class="section no-pad-bot">
+            <div class="container">
+                <div class="row center">
+                    <h5 class="header col s12 light"></h5>
+                </div>
+            </div>
+        </div>
+        <div class="parallax"><img src="background4.jpg" alt="Unsplashed background img 2"></div>
+    </div>
+    <div class="container">
+        <div class="section">
             <div class="row">
                 <div class="col s12 center">
                     <h4>UI</h4>
@@ -134,7 +188,7 @@
                 </div>
             </div>
         </div>
-        <div class="parallax"><img src="background4.jpg" alt="Unsplashed background img 2"></div>
+        <div class="parallax"><img src="background2.jpg" alt="Unsplashed background img 2"></div>
     </div>
 
     <!-- Footer -->
