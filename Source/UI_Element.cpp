@@ -44,21 +44,21 @@ bool UI_Element::CheckClick()
 
 void UI_Element::UpdateState()
 {
-	if (state != NOTHING)
+	if (interactable)
 	{
 		if (CheckMousePos())
 		{
-			state == HOVERED;
+			ChangeStateTo(HOVERED);
 			if (CheckClick())
 			{
 				if (draggable && (drag_start.x != mouse_pos.x || drag_start.y != mouse_pos.y))
-					state == DRAGGING;
+					ChangeStateTo(DRAGGING);
 				else
-					state == SELECTED;
+					ChangeStateTo(SELECTED);
 			}
 		}
 		else
-			state == IDLE;
+			ChangeStateTo(IDLE);
 	}
 }
 

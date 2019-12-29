@@ -17,10 +17,45 @@ Button::Button(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_El
 		canvas = (Canvas*)gameObject->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
 
 	material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
+	font.init("Assets/Fonts/Dukas.ttf", DEFAULT_FONT_SIZE);
+	font.path = "Assets/Fonts/Dukas.ttf";
+
+	canvas->AddElement(this);
 }
 
 Button::~Button()
 {
+}
+
+void Button::Draw(ComponentCamera* camera)
+{
+	glPushMatrix();
+	glLoadIdentity();
+
+	glTranslatef(position2D.x, position2D.y, 1);
+	glMultTransposeMatrixf(camera->origin_view_matrix);
+
+	glColorColorF(color);
+
+	glBindTexture(GL_TEXTURE_2D, material->tex_id);
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	// Draw A Quad
+	glTexCoord2i(0, 0); glVertex2f(-size2D.x, -size2D.y);    // Top Left		glVertex2i(100, 100);
+	glTexCoord2i(0, 1); glVertex2f(-size2D.x, size2D.y);    // Top Right		glVertex2i(100, 500);
+	glTexCoord2i(1, 1); glVertex2f(size2D.x, size2D.y);    // Bottom Right	glVertex2i(500, 500);
+	glTexCoord2i(1, 0); glVertex2f(size2D.x, -size2D.y);    // Bottom Left	glVertex2i(500, 100);
+
+	//glDisable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glColorColorF(Color::white);
+
+	glEnd();
+	glPopMatrix();
+
+	glColorColorF(text_color);
+	glfreetype::print(camera, font, text_pos.x, text_pos.y, text);
 }
 
 void Button::DrawInspector()
@@ -109,28 +144,49 @@ void Button::DrawInspector()
 		ImGui::ColorEdit4("##Idle", (float*)&idle_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Idle");
+		if (state == IDLE) ChangeColor(Color(idle_color.w, idle_color.x, idle_color.y, idle_color.z));
 
 		static ImVec4 hovered_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Hovered", (float*)&hovered_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Hovered");
+		if (state == HOVERED) 
+			ChangeColor(Color(hovered_color.w, hovered_color.x, hovered_color.y, hovered_color.z));
 
 		static ImVec4 selected_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Selected", (float*)&selected_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Selected");
+		if (state == SELECTED || state == DRAGGING) ChangeColor(Color(selected_color.w, selected_color.x, selected_color.y, selected_color.z));
 
 		static ImVec4 locked_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Locked", (float*)&locked_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Locked");
+		if (state == LOCKED) ChangeColor(Color(locked_color.w, locked_color.x, locked_color.y, locked_color.z));
 
 		// Text
 		ImGui::Separator();
-		const int text_size = 120;
-		static char text[text_size] = "Button";
+		if (ImGui::DragFloat("Font size", &font_size, 1.0f, 0.0f, 100.0f, "%.2f")) {
+
+			font.clean();
+			font.init(font.path, font_size);
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Use with caution, may temporary freeze the editor with large numbers. \n It is recommended to directly input the number with the keyboard");
+
 		ImGui::Text("Text");
-		ImGui::InputText("##text", text, text_size, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
+		ImGui::InputText("##text", text, MAX_TEXT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
+		ImGui::ColorEdit3("Color", (float*)&text_color);
+
+		ImGui::Text("Position:");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("x##buttontextposition", &text_pos.x);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(60);
+		ImGui::DragFloat("y##buttontextposition", &text_pos.y);
+
 
 		// Action
 		ImGui::Separator();

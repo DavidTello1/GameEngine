@@ -16,7 +16,7 @@ public:
 
 	void Draw(ComponentCamera* camera);
 
-private:
+public:
 	Canvas* canvas = nullptr;
 	ResourceMaterial* material = nullptr;
 };

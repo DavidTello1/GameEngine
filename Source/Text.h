@@ -20,7 +20,7 @@ public:
 
 	void Draw(ComponentCamera* camera) override;
 
-private:
+public:
 	Canvas* canvas = nullptr;
 	ResourceMaterial* material = nullptr;
 	glfreetype::font_data font;

@@ -6,7 +6,7 @@
 Text::Text(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Element::Type::TEXT, gameObject)
 {
 	visible = true;
-	interactable = true;
+	interactable = false;
 	draggable = false;
 
 	if (!gameObject->HasComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS))
@@ -33,9 +33,9 @@ void Text::LoadFont(const char* path, int size)
 {
 	font.init(path, size /* size */);
 }
+
 void Text::Draw(ComponentCamera* camera)
 {
-	
 	glColorColorF(color);
 
 	glfreetype::print(camera, font, position2D.x, position2D.y, text);

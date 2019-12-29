@@ -17,7 +17,6 @@ Image::Image(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Elem
 		canvas = (Canvas*)gameObject->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
 
 	material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
-
 	canvas->AddElement(this);
 }
 
@@ -50,12 +49,12 @@ void Image::Draw(ComponentCamera* camera)
 	glColorColorF(Color::white);
 
 	glEnd();
+	glPopMatrix();
 
 
 
 	// THIS https://stackoverflow.com/questions/24262264/drawing-a-2d-texture-in-opengl/24266568
 	// https://stackoverflow.com/questions/30488155/opengl-fastest-way-to-draw-2d-image
-	glPopMatrix();
 
 	//ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 

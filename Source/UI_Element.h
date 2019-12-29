@@ -52,11 +52,12 @@ public:
 
 	void UpdateCollider();
 	void ChangeStateTo(State new_state) { state = new_state; }
+	void ChangeColor(Color new_color) { color = new_color; }
 	void UpdateState();
 	void DoLogic(Action action);
 
 	virtual void Draw(ComponentCamera* camera) {};
-	void DrawInspector() {};
+	virtual void DrawInspector() {};
 
 private:
 	bool CheckMousePos();
@@ -70,7 +71,7 @@ public:
 	float2 size2D = { 50,50 };
 	float2 position2D = { 50,50 };
 	float rotation2D = 0.0f;
-	float2 scale2D = float2::zero;
+	float2 scale2D = { 1,1 };
 
 	Color color = Color::white;
 
