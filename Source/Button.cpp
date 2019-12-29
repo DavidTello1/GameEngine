@@ -9,7 +9,7 @@ Button::Button(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_El
 {
 	visible = true;
 	interactable = true;
-	draggable = true;
+	draggable = false;
 
 	if (!gameObject->HasComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS))
 		canvas = (Canvas*)gameObject->AddComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
@@ -140,30 +140,25 @@ void Button::DrawInspector()
 
 		// States (Colors)
 		ImGui::Separator();
-		static ImVec4 idle_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Idle", (float*)&idle_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Idle");
-		if (state == IDLE) ChangeColor(Color(idle_color.w, idle_color.x, idle_color.y, idle_color.z));
+		if (state == IDLE) ChangeColor(idle_color);
 
-		static ImVec4 hovered_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Hovered", (float*)&hovered_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Hovered");
-		if (state == HOVERED) 
-			ChangeColor(Color(hovered_color.w, hovered_color.x, hovered_color.y, hovered_color.z));
+		if (state == HOVERED) ChangeColor(hovered_color);
 
-		static ImVec4 selected_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Selected", (float*)&selected_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Selected");
-		if (state == SELECTED || state == DRAGGING) ChangeColor(Color(selected_color.w, selected_color.x, selected_color.y, selected_color.z));
+		if (state == SELECTED || state == DRAGGING) ChangeColor(selected_color);
 
-		static ImVec4 locked_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		ImGui::ColorEdit4("##Locked", (float*)&locked_color, ImGuiColorEditFlags_NoInputs);
 		ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 		ImGui::Text("Locked");
-		if (state == LOCKED) ChangeColor(Color(locked_color.w, locked_color.x, locked_color.y, locked_color.z));
+		if (state == LOCKED) ChangeColor(locked_color);
 
 		// Text
 		ImGui::Separator();

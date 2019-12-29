@@ -34,7 +34,9 @@ public:
 
 	enum Action
 	{
-		NONE = 0
+		NONE = 0,
+		SWITCH_VSYNC,
+
 	};
 
 public:
@@ -45,14 +47,15 @@ public:
 	UI_Element::State GetState() { return state; }
 	UI_Element::Action GetAction() { return action; }
 
+	void ChangeActionTo(Action new_action) { action = new_action; }
+	void ChangeStateTo(State new_state) { state = new_state; }
+	void ChangeColor(Color new_color) { color = new_color; }
 	void ChangeSize(float2 size) { size2D = size; }
 	void ChangePosition(float2 pos) { position2D = pos; }
 	void ChangeRotation(float rot) { rotation2D = rot; }
 	void ChangeScale(float2 scale) { scale2D = scale; }
 
 	void UpdateCollider();
-	void ChangeStateTo(State new_state) { state = new_state; }
-	void ChangeColor(Color new_color) { color = new_color; }
 	void UpdateState();
 	void DoLogic(Action action);
 
@@ -84,5 +87,11 @@ protected:
 	float2 mouse_pos = float2::zero;
 
 	SDL_Rect collider;
+
+	const char* action_list[2] = {
+	"None",
+	"Switch VSync"
+	};
+
 };
 

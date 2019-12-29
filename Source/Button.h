@@ -30,8 +30,8 @@ public:
 	float2 text_pos = { -45,-25 };
 
 private:
-	const char* action_list[1] = {
-	"NONE"
-	};
-
+	Color idle_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Color hovered_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Color selected_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Color locked_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 };

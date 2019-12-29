@@ -36,15 +36,18 @@ bool UI_Element::CheckClick()
 		return true;
 	}
 
-	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
+	if (draggable && App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
 		return true;
+
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_UP)
+		return false;
 
 	return false;
 }
 
 void UI_Element::UpdateState()
 {
-	if (interactable)
+	if (interactable && visible)
 	{
 		if (state != DRAGGING)
 		{
@@ -56,7 +59,12 @@ void UI_Element::UpdateState()
 					if (draggable && (drag_start.x != mouse_pos.x || drag_start.y != mouse_pos.y))
 						ChangeStateTo(DRAGGING);
 					else
+					{
+						if (state != SELECTED)
+							DoLogic(action);
+
 						ChangeStateTo(SELECTED);
+					}
 				}
 			}
 			else
@@ -77,6 +85,10 @@ void UI_Element::DoLogic(Action action)
 	switch (action)
 	{
 	case NONE:
+		break;
+
+	case SWITCH_VSYNC:
+		App->renderer3D->SetVSync(!App->renderer3D->GetVSync());
 		break;
 	}
 }

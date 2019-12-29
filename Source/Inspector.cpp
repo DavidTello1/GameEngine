@@ -108,10 +108,10 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::BUTTON);
 
 				if (ImGui::MenuItem("Check Box", nullptr, false, !obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX)))
-					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX);
 
 				if (ImGui::MenuItem("Input Text", nullptr, false, !obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::INPUTTEXT)))
-					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+					obj->AddComponent(Component::Type::UI_Element, UI_Element::Type::INPUTTEXT);
 
 				ImGui::EndMenu();
 			}
@@ -147,10 +147,10 @@ void Inspector::DrawComponents(GameObject* obj, bool res)
 					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::BUTTON);
 
 				if (ImGui::MenuItem("Check Box", nullptr, false, obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX)))
-					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::CHECKBOX);
 
 				if (ImGui::MenuItem("Input Text", nullptr, false, obj->HasComponent(Component::Type::UI_Element, UI_Element::Type::INPUTTEXT)))
-					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::IMAGE);
+					obj->DeleteComponent(Component::Type::UI_Element, UI_Element::Type::INPUTTEXT);
 
 				ImGui::EndMenu();
 			}

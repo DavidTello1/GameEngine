@@ -80,6 +80,9 @@ void Image::DrawInspector()
 		ImGui::Checkbox("Visible", &visible);
 
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
+		ImGui::Checkbox("Interactable", &interactable);
+
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 		ImGui::Checkbox("Draggable", &draggable);
 		ImGui::Separator();
 
