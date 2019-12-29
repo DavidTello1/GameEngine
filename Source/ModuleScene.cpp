@@ -41,6 +41,7 @@ bool ModuleScene::Init(Config* config)
 
 	return true;
 }
+
 // Load assets
 bool ModuleScene::Start(Config* config)
 {
@@ -53,7 +54,7 @@ bool ModuleScene::Start(Config* config)
 
 	test_camera = test_camera_obj->GetComponent<ComponentCamera>();
 
-	//App->resources->ImportFromOutside("/Assets/Street/Street environment_V01.FBX");
+	//App->resources->ImportFromPath("/Assets/Street/Street environment_V01.FBX");
 	
 	quadtree = new Quadtree(AABB(Quadtree::min_point,Quadtree::max_point));
 
@@ -69,8 +70,7 @@ bool ModuleScene::Update(float dt)
 
 	if (quadtree->debug)
 		quadtree->Draw();
-	
-	
+
 	return true;
 }
 
@@ -169,7 +169,6 @@ bool ModuleScene::PostUpdate(float dt)
 			{
 				RedoQuatree();
 			}
-
 			obj->flags &= ~ProcessTransformUpdate;
 		}
 	}
@@ -204,9 +203,6 @@ bool ModuleScene::PostUpdate(float dt)
 		state = EDIT;
 		break;
 	}
-
-	//UpdateTransformationGuizmos();
-
 	return true;
 }
 

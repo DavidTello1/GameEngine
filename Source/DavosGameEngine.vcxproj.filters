@@ -67,6 +67,12 @@
     <Filter Include="Sources\Resources">
       <UniqueIdentifier>{a84cad31-bd31-4edd-b76a-23e4fb3de339}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\UI">
+      <UniqueIdentifier>{b2beb587-1274-4353-b7e3-7f669f0b668e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\UI\Components">
+      <UniqueIdentifier>{91ad41b6-4a28-4aae-88fe-1a7462a30f3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -521,6 +527,30 @@
     </ClInclude>
     <ClInclude Include="TextRenderer.hpp" />
     <ClInclude Include="ImGuizmo.h" />
+    <ClInclude Include="ModuleGUI.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckBox.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="InputText.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Canvas.h">
+      <Filter>Sources\UI\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Element.h">
+      <Filter>Sources\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleInput.cpp">
@@ -759,6 +789,30 @@
     </ClCompile>
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="ImGuizmo.cpp" />
+    <ClCompile Include="ModuleGUI.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckBox.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="InputText.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Canvas.cpp">
+      <Filter>Sources\UI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Element.cpp">
+      <Filter>Sources\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

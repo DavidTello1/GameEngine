@@ -34,7 +34,7 @@ Viewport::~Viewport()
 bool Viewport::PreUpdate()
 {
 	if (our_font.textures.empty())
-		our_font.init("Library/Fonts/Dukas.ttf", 45 /* size */);
+		our_font.init("Assets/Fonts/Dukas.ttf", 45 /* size */);
 
 	ImGuizmo::SetDrawlist();
 
@@ -86,6 +86,7 @@ void Viewport::Draw()
 	{
 		App->scene_base->Draw();
 	}
+	//App->gui->Draw();
 
 	float3 pos = camera->frustum.pos;
 	float3 up = camera->frustum.up;

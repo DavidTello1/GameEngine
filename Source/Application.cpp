@@ -27,7 +27,7 @@ Application::Application()
 	modules.push_back(file_system = new ModuleFileSystem(ASSETS_FOLDER));
 	modules.push_back(window = new ModuleWindow());
 	modules.push_back(resources = new ModuleResources());
-	//modules.push_back(tex = new ModuleTextures());
+	modules.push_back(gui = new ModuleGUI());
 	modules.push_back(scene_base = new ModuleSceneBase());
 	modules.push_back(scene = new ModuleScene());
 	modules.push_back(editor = new ModuleEditor());
@@ -190,7 +190,7 @@ void Application::SetFramerateLimit(uint max_framerate)
 
 void Application::ReadConfiguration(const Config& config)
 {
-	app_name = config.GetString("Name", "Davos Game Engine");
+	SetAppName(config.GetString("Name", "Davos Game Engine").c_str());
 	organization_name = config.GetString("Organization", "");
 	SetFramerateLimit(config.GetNumber("MaxFramerate", 0));
 }

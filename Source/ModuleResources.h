@@ -1,9 +1,7 @@
-#ifndef __MODULE_RESOURCES_H__
+ #ifndef __MODULE_RESOURCES_H__
 #define __MODULE_RESOURCES_H__
 
 #include "Module.h"
-#include "Resource.h"
-
 #include <vector>
 #include <map>
 #include <string>
@@ -17,16 +15,14 @@ struct PathNode;
 
 struct MetaFile
 {
+	UID uid = 0;
 	Resource::Type type = Resource::unknown;
-	std::string original_file = "";
-	std::string resource_name = "";
-	uint id = 0;
+  	std::string original_file = "";
 
-	bool Compare(const char* file, const char* name, Resource::Type type)
+	bool Compare(UID id, const char* file, Resource::Type type)
 	{
-		return (original_file == file && resource_name == name && type == this->type);
+		return (uid == id && original_file == file && type == this->type);
 	}
-
 };
 
 class ModuleResources : public Module
@@ -40,35 +36,26 @@ public:
 	bool CleanUp();
 
 	// Importing
-	UID GenerateUID();
-	bool ImportFromOutside(const char* path, UID uid = 0);
+	bool ImportFromPath(const char* path, UID uid = 0);
 	bool ImportResource(const char* path, UID uid = 0);
 	bool CheckLoaded(std::string path, UID uid);
 
 	// Resources
-	Resource* CreateResource(Resource::Type type, UID uid = 0);
-	Resource* CreateInitResource(Resource::Type type, UID uid, const char* path, std::string& written_file);
+	Resource* CreateResource(Resource::Type type, const char* path = nullptr, UID uid = 0);
 	void RemoveResource(UID uid);
 	const Resource* GetResource(UID uid) const;
-	Resource * GetResource(UID uid);
+	Resource* GetResource(UID uid);
 	Resource::Type GetResourceType(const char* path) const;
 
-	uint GetResourcesSize() { return resources.size(); }
+	uint GetNumResources() { return resources.size(); }
 	std::vector<Resource*> GetAllResourcesOfType(Resource::Type type);
+	const char* GetDirectory(Resource::Type type) const;
 
 	// Meta files
 	void SaveMeta(const Resource* resource);
-	bool LoadMeta(const char* file);
-	bool LoadSceneMeta(const char* file, const char* source_file);
-
-	// Utilities
-	const char* GetDirectory(Resource::Type type) const;
-	uint64 GetIDFromMeta(const char* path);
+	UID GetIDFromMeta(const char* path);
 
 private:
-	void LoadUID();
-	void SaveUID() const;
-
 	void LoadCheckersTexture();
 
 	void LoadAssetsIcons();
@@ -87,11 +74,7 @@ public:
 
 private:
 	std::map<UID, Resource*> resources;
-	std::vector<Resource*> removed;
 
-	std::map<uint64, MetaFile> existing_res;
-
-	UID last_uid = -1;
 };
 
 extern GLuint aabb_indices[24];

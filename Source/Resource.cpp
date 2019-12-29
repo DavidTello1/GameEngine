@@ -23,6 +23,39 @@ bool Resource::LoadToMemory()
 
 void Resource::ReleaseFromMemory()
 {
-	if (--times_loaded == 0)
+	if (times_loaded > 0)
+		times_loaded--;
+
+	if (times_loaded == 0)
 		UnLoad();
+}
+
+std::string Resource::GetExportedFile() const
+{
+	std::string file(std::to_string(uid));
+
+	switch (type)
+	{
+	case unknown:
+		break;
+	case model:
+		file += ".dvs_model";
+		break;
+	case mesh:
+		file += ".dvs_mesh";
+		break;
+	case material:
+		file += ".dvs_material";
+		break;
+	case scene:
+		file += ".dvs_scene";
+		break;
+	}
+
+	return file;
+}
+
+std::string Resource::GetName() const
+{
+	return App->file_system->GetFileName(GetFile());
 }

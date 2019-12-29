@@ -114,10 +114,13 @@ void Assets::Draw()
 		
 		else if (filter_scenes)
 			ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.0f, 1.0f), "Showing All Scenes");
+		
+		else if (selected_node.path != "")
+			ImGui::Text(selected_node.path.c_str());
 
 		else
 			ImGui::Text(current_node.path.c_str());
-		
+
 		ImGui::EndMenuBar();
 	}
 	DrawIcons(current_node); // Draw Icons
@@ -126,11 +129,10 @@ void Assets::Draw()
 
 void Assets::ImportAsset(const PathNode& node)
 {
-	std::string metaFile = node.path + (".meta");
-	uint64 resourceID = App->resources->GetIDFromMeta(metaFile.c_str());
-	Resource* resource = App->resources->GetResource(resourceID);
+	UID id = App->resources->GetIDFromMeta(std::string(node.path + (".meta")).c_str());
+	Resource* resource = App->resources->GetResource(id);
 
-	if (resource && resource->GetType() == Resource::material)
+	if (resource && resource->GetType() == Resource::material) // ***ERROR IMPORTING WHEN FILE EXISTS IN LIBRARY_FOLDER
 	{
 		GameObject* obj = App->scene->GetSelectedGameObject();
 		if (obj != nullptr)
@@ -226,7 +228,7 @@ void Assets::DrawHierarchy(const PathNode& node)
 
 	if (node.file == false) //if folder is not empty
 	{
-		bool open = ImGui::TreeNodeEx(node.localPath.c_str(), nodeFlags, node.localPath.c_str());
+		bool open = ImGui::TreeNodeEx(node.file_name.c_str(), nodeFlags, node.file_name.c_str());
 
 		if (ImGui::IsItemClicked()) //current_node update
 		{
@@ -265,7 +267,7 @@ void Assets::DrawIcons(const PathNode& node)
 		ImGui::Image((ImTextureID)GetIcon(node.children[i]), ImVec2(size, size), ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), border_color);
 
 		// Text size
-		std::string text = node.children[i].localPath;
+		std::string text = node.children[i].file_name;
 		std::string dots = "...";
 		
 		uint text_size = ImGui::CalcTextSize(text.c_str()).x;
@@ -288,7 +290,6 @@ void Assets::DrawIcons(const PathNode& node)
 		if (ImGui::IsItemClicked())
 		{
 			selected_node = node.children[i];
-			//App->editor.t
 		}
 
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0) && selected_node.file == false) //open folder
@@ -310,17 +311,19 @@ uint Assets::GetIcon(const PathNode& node)
 		uint64 resourceID = App->resources->GetIDFromMeta(metaFile.c_str());
 		Resource* resource = App->resources->GetResource(resourceID);
 
-		if (resource->GetType() == Resource::Type::model) //if model
-			return model_icon;
+		if (resource != nullptr)
+		{
+			if (resource->GetType() == Resource::Type::model) //if model
+				return model_icon;
 
-		else if (resource->GetType() == Resource::Type::material) //if material
-			return material_icon;
+			else if (resource->GetType() == Resource::Type::material) //if material
+				return material_icon;
 
-		else if (resource->GetType() == Resource::Type::scene) //if scene
-			return scene_icon;
-
-		else
-			return file_icon;
+			else if (resource->GetType() == Resource::Type::scene) //if scene
+				return scene_icon;
+		}
+		
+		return file_icon;
 	}
 }
 

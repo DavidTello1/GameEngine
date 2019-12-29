@@ -4,6 +4,17 @@
 
 #include "Globals.h"
 #include "Timer.h"
+#include "Module.h"
+#include "ModuleWindow.h"
+#include "ModuleInput.h"
+#include "ModuleSceneBase.h"
+#include "ModuleRenderer3D.h"
+#include "ModuleEditor.h"
+#include "ModuleFileSystem.h"
+#include "ModuleResources.h"
+#include "ModuleGUI.h"
+
+#include "Config.h"
 
 #include "MathGeoLib/include/MathGeoLibFwd.h"
 
@@ -62,6 +73,7 @@ public:
 	ModuleEditor* editor;
 	ModuleFileSystem* file_system;
 	ModuleResources* resources;
+	ModuleGUI* gui;
 
 private:
 	Timer	ms_timer;

@@ -26,34 +26,29 @@ ResourceMaterial::~ResourceMaterial()
 	UnLoad();
 }
 
-UID ResourceMaterial::Import(const char* source_file, std::string& output, const aiMaterial* ai_material)
+UID ResourceMaterial::Import(const char* source_file, const aiMaterial* ai_material)
 {
-	ResourceMaterial* material = static_cast<ResourceMaterial*>(App->resources->CreateResource(Resource::material)); //create new material
-
 	uint ret = 0;
-	ret = material->LoadTexture(source_file);
+	ret = LoadTexture(source_file);
 	if (ret == 0)
 		LOG("Error Importing texture from '%s'", source_file, 'e');
 
 	// Saving to own format
-	if (material->SaveOwnFormat(output))
+	if (SaveOwnFormat())
 	{
-		material->original_file = source_file; //get file
-		App->file_system->NormalizePath(material->original_file);
+		original_file = source_file; //get file
+		App->file_system->NormalizePath(original_file);
 
-		std::string file_name = App->file_system->GetFileName(output.c_str());//get exported file
-		material->exported_file = file_name;
-
-		LOG("Imported aiMaterial from [%s] to [%s]", material->GetFile(), material->GetExportedFile());
+		LOG("Imported aiMaterial from [%s]", GetFile());
 	}
 	else
 	{
 		LOG("Importing aiMaterial %s FAILED", source_file);
 	}
 
-	material->UnLoad();
+	UnLoad();
 
-	return material->uid;
+	return uid;
 }
 
 bool ResourceMaterial::ImportTexture(const char* path)
@@ -75,31 +70,38 @@ bool ResourceMaterial::ImportTexture(const char* path)
 	return false;
 }
 
-bool ResourceMaterial::SaveOwnFormat(std::string& output) const
+bool ResourceMaterial::SaveOwnFormat() const
 {
-	simple::mem_ostream<std::true_type> write_stream; //create output stream
+	simple::mem_ostream<std::true_type> write_stream; //create asset_file stream
 
 	write_stream << tex_id;
 	write_stream << tex_height;
 	write_stream << tex_width;
-
+	
 	const std::vector<char>& data = write_stream.get_internal_vec(); //get vector from stream
 
-	return App->file_system->SaveUnique(output, &data[0], data.size(), LIBRARY_MATERIAL_FOLDER, std::to_string(GetID()).c_str(), "dvs_material"); //save
+	std::string file = LIBRARY_MATERIAL_FOLDER + GetExportedFile();
+	if (App->file_system->Save(file.c_str(), &data[0], data.size()) > 0) //save file
+		return true;
+
+	return false;
 }
 
 bool ResourceMaterial::LoadtoScene()
 {
-	if (GetExportedFile() != nullptr)
+	if (GetExportedFile().c_str() != nullptr)
 	{
 		char* buffer = nullptr;
-		uint size = App->file_system->LoadFromPath(LIBRARY_MATERIAL_FOLDER, GetExportedFile(), &buffer);
+		std::string file = LIBRARY_MATERIAL_FOLDER + GetExportedFile();
+		uint size = App->file_system->Load(file.c_str(), &buffer); //get total size
 
 		simple::mem_istream<std::true_type> read_stream(buffer, size); //create input stream
 
-		read_stream >> tex_id;
-		read_stream >> tex_height;
-		read_stream >> tex_width;
+		//read_stream >> tex_id;
+		//read_stream >> tex_height;
+		//read_stream >> tex_width;
+
+		LoadTexture(original_file.c_str());
 
 		delete[] buffer;
 		return true;

@@ -19,7 +19,6 @@ enum SceneState {
 	PLAY,
 	PAUSE,
 	STOP
-
 };
 
 class ModuleScene :	public Module

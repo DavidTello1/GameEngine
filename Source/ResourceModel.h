@@ -22,8 +22,8 @@ public:
 	ResourceModel(UID id);
 	virtual ~ResourceModel();
 		 
-	static bool Import(const char* full_path, std::string& output);
-	bool SaveOwnFormat(std::string& output) const;
+	bool Import(const char* full_path);
+	bool SaveOwnFormat() const;
 	bool LoadtoScene();
 	void UnLoad();
 
