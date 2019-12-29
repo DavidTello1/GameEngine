@@ -8,7 +8,7 @@
 Image::Image(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Element::Type::IMAGE, gameObject)
 {
 	visible = true;
-	interactable = true;
+	interactable = false;
 	draggable = false;
 
 	if (!gameObject->HasComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS))
@@ -34,9 +34,6 @@ void Image::DrawInspector()
 	{
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 		ImGui::Checkbox("Visible", &visible);
-
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
-		ImGui::Checkbox("Interactable", &interactable);
 
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
 		ImGui::Checkbox("Draggable", &draggable);
@@ -75,11 +72,8 @@ void Image::DrawInspector()
 		ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("y##scale2D", &scale2D.y);
 
-		// Image
+		// ------------------------------------------
 		ImGui::Separator();
-		ImGui::Text("Image");
-		ImGui::SameLine();
-
 		if (ImGui::Button("Load..."))
 			ImGui::OpenPopup("Load Image");
 

@@ -19,4 +19,10 @@ public:
 	Canvas* canvas = nullptr;
 	ResourceMaterial* material = nullptr;
 	Text* text = nullptr;
+
+private:
+	const char* action_list[1] = {
+	"NONE"
+	};
+
 };

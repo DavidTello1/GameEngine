@@ -16,6 +16,7 @@ Button::Button(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_El
 	else
 		canvas = (Canvas*)gameObject->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
 
+	material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 }
 
 Button::~Button()
@@ -74,11 +75,10 @@ void Button::DrawInspector()
 		ImGui::SetNextItemWidth(60);
 		ImGui::DragFloat("y##scale2D", &scale2D.y);
 
-		// Button
-		ImGui::Separator();
-		ImGui::Text("Button");
-		ImGui::SameLine();
+		// ------------------------------------------
 
+		// Image
+		ImGui::Separator();
 		if (ImGui::Button("Load Image..."))
 			ImGui::OpenPopup("Load Button");
 
@@ -98,10 +98,41 @@ void Button::DrawInspector()
 			ImGui::EndPopup();
 		}
 
+		if (material->tex_id != 0)
+			ImGui::Image((ImTextureID)material->tex_id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		else
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "*Image not loaded*");
+
+		// States (Colors)
+		ImGui::Separator();
 		ImGui::Text("Hovered");
 		ImGui::Text("Selected");
 		ImGui::Text("Dragging");
 		ImGui::Text("Locked");
+
+		// Text
+		ImGui::Separator();
+		const int text_size = 120;
+		static char text[text_size] = "Button";
+		ImGui::Text("Text");
+		ImGui::InputText("##text", text, text_size, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
+
+		// Action
+		ImGui::Separator();
+		if (ImGui::Button("Action"))
+			ImGui::OpenPopup("Load Action");
+
+		if (ImGui::BeginPopup("Load Action"))
+		{
+			for (int i = 0; i < sizeof(action_list) / sizeof(const char*); i++)
+			{
+				if (ImGui::Selectable(action_list[i]))
+					action = (Action)i;
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), action_list[action]);
 
 		ImGui::Separator();
 		ImGui::Separator();
