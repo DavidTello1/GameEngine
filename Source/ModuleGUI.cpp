@@ -38,6 +38,11 @@ bool ModuleGUI::PreUpdate(float dt)
 
 					element->UpdateCollider(); //update colliders
 					element->UpdateState(); //update state
+
+					if (element->state == UI_Element::State::DRAGGING)
+					{
+						element->position2D = App->input->GetMousePosition();
+					}
 				}
 			}
 		}

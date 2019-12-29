@@ -46,19 +46,29 @@ void UI_Element::UpdateState()
 {
 	if (interactable)
 	{
-		if (CheckMousePos())
+		if (state != DRAGGING)
 		{
-			ChangeStateTo(HOVERED);
-			if (CheckClick())
+			if (CheckMousePos())
 			{
-				if (draggable && (drag_start.x != mouse_pos.x || drag_start.y != mouse_pos.y))
-					ChangeStateTo(DRAGGING);
-				else
-					ChangeStateTo(SELECTED);
+				ChangeStateTo(HOVERED);
+				if (CheckClick())
+				{
+					if (draggable && (drag_start.x != mouse_pos.x || drag_start.y != mouse_pos.y))
+						ChangeStateTo(DRAGGING);
+					else
+						ChangeStateTo(SELECTED);
+				}
 			}
+			else
+				ChangeStateTo(IDLE);
 		}
 		else
-			ChangeStateTo(IDLE);
+		{
+			if (!CheckClick())
+			{
+				ChangeStateTo(IDLE);
+			}
+		}
 	}
 }
 

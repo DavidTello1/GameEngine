@@ -9,7 +9,7 @@ Button::Button(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_El
 {
 	visible = true;
 	interactable = true;
-	draggable = false;
+	draggable = true;
 
 	if (!gameObject->HasComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS))
 		canvas = (Canvas*)gameObject->AddComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
@@ -17,7 +17,7 @@ Button::Button(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_El
 		canvas = (Canvas*)gameObject->GetComponent(Component::Type::UI_Element, UI_Element::Type::CANVAS);
 
 	material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
-	font.init("Assets/Fonts/Dukas.ttf", DEFAULT_FONT_SIZE);
+	font.init("Assets/Fonts/Dukas.ttf", font_size);
 	font.path = "Assets/Fonts/Dukas.ttf";
 
 	canvas->AddElement(this);
@@ -55,7 +55,7 @@ void Button::Draw(ComponentCamera* camera)
 	glPopMatrix();
 
 	glColorColorF(text_color);
-	glfreetype::print(camera, font, text_pos.x, text_pos.y, text);
+	glfreetype::print(camera, font, position2D.x + text_pos.x, position2D.y + text_pos.y, text);
 }
 
 void Button::DrawInspector()

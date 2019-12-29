@@ -80,7 +80,6 @@ protected:
 	State state = NOTHING;
 	Action action = NONE;
 
-private:
 	float2 drag_start = float2::zero;
 	float2 mouse_pos = float2::zero;
 

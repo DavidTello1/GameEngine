@@ -82,4 +82,10 @@ public:
 private:
 	GameObject* selected_gameobj = nullptr;
 
+
+	//DEMO-----------------------
+private:
+	//void MainMenu();
+	//void IngameWindow();
+
 };

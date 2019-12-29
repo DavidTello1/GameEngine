@@ -60,6 +60,11 @@ bool ModuleScene::Start(Config* config)
 
 	RedoQuatree();
 
+
+	// DEMO ------------------
+	//MainMenu();
+	//IngameWindow();
+
 	return true;
 }
 

@@ -22,12 +22,12 @@ public:
 	ResourceMaterial* material = nullptr;
 
 	glfreetype::font_data font;
-	float font_size = DEFAULT_FONT_SIZE;
+	float font_size = 40;
 	char text[MAX_TEXT_SIZE]   = "Text";
 	char buffer[MAX_TEXT_SIZE] = "Text";
 
 	Color text_color = Color::black;
-	float2 text_pos = float2::zero;
+	float2 text_pos = { -45,-25 };
 
 private:
 	const char* action_list[1] = {
