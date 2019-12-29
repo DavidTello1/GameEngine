@@ -3,6 +3,7 @@
 #include "Math.h"
 #include <vector>
 #include "SDL/include/SDL_rect.h"
+#include "Color.h"
 
 class UI_Element : public Component
 {
@@ -69,6 +70,8 @@ public:
 	float2 position2D = float2::zero;
 	float rotation2D = 0.0f;
 	float2 scale2D = float2::zero;
+
+	Color color = Color::white;
 
 protected:
 	Type type = UNKNOWN;

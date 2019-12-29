@@ -211,8 +211,8 @@ namespace glfreetype {
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
+		//glOrtho(Configuration::viewport[Configuration::l], Configuration::viewport[Configuration::r], Configuration::viewport[Configuration::b], -Configuration::viewport[Configuration::t], Configuration::n, Configuration::f);
 		glOrtho(viewport[0], viewport[2], viewport[1], viewport[3], 1, -1);
-
 
 		GLuint font = ft_font.list_base;
 		// We Make The Height A Little Bigger.  There Will Be Some Space Between Lines.

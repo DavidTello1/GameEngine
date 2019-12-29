@@ -25,7 +25,9 @@ private:
 	ResourceMaterial* material = nullptr;
 	glfreetype::font_data font;
 
-	char text[MAX_TEXT_SIZE] = "Text";
-	char buffer[MAX_TEXT_SIZE];
+	float font_size = DEFAULT_FONT_SIZE;
+
+	char text[MAX_TEXT_SIZE]   = "Text";
+	char buffer[MAX_TEXT_SIZE] = "Text";
 };
 

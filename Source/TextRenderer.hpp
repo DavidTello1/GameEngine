@@ -11,6 +11,7 @@ namespace glfreetype {
     // This Holds All Of The Information Related To Any
     // FreeType Font That We Want To Create. 
     struct font_data {
+		char* path;
         float h;                      // Holds The Height Of The Font.
         std::vector<GLuint> textures; // Holds The Texture Id's
         GLuint list_base;             // Holds The First Display List Id
@@ -31,5 +32,7 @@ namespace glfreetype {
 
 	void print(font_data const & ft_font, float x, float y,
 		std::string const & text);
+
+	
 
 }

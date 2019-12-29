@@ -99,12 +99,12 @@ void Viewport::Draw()
 	glColor3f(1, 0, 0);
 
 	glfreetype::print(camera, our_font, 0 /* xpos */, 80 /* ypos */,
-		"This text is at (0,80)\n abcdefghijklmnopqrstuwvxyz");
+		"This text is at (0,80) abcdefghijklmnopqrstuwvxyz");
 
 	glColor3f(1, 1, 1);
 
-	glfreetype::print(camera, our_font, 0 /* xpos */, 200 /* ypos */,
-		"This text is at (0,200) abcdefghijklmnopqrstuwvxyz");
+	glfreetype::print(camera, our_font, 0 /* xpos */, 0 /* ypos */,
+		"This text is at (0,0) abcdefghijklmnopqrstuwvxyz");
 
 
 	camera->frustum.up = up;

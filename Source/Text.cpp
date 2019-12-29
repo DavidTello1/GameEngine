@@ -18,6 +18,7 @@ Text::Text(GameObject* gameObject, UI_Element::Type type) : UI_Element(UI_Elemen
 	material = (ResourceMaterial*)App->resources->CreateResource(Resource::Type::material);
 
 	LoadFont("Assets/Fonts/Dukas.ttf", DEFAULT_FONT_SIZE);
+	font.path = "Assets/Fonts/Dukas.ttf";
 	canvas->AddElement(this);
 
 	position2D.y = 150;
@@ -36,7 +37,7 @@ void Text::LoadFont(const char* path, int size)
 void Text::Draw()
 {
 	
-	glColor3f(1, 0, 1);
+	glColorColorF(color);
 
 	glfreetype::print(viewport_camera, font, position2D.x, position2D.y, text);
 
@@ -60,9 +61,20 @@ void Text::DrawInspector()
 		ImGui::Checkbox("Draggable", &draggable);
 		ImGui::Separator();
 
+		ImGui::ColorEdit3("Color", (float*)&color);
+
+		if (ImGui::DragFloat("Font size", &font_size, 1.0f, 0.0f, 100.0f, "%.2f")) {
+
+			font.clean();
+			font.init(font.path, font_size);
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Use with caution, may temporary freeze the editor with large numbers. \n It is recommended to directly input the number with the keyboard");
+
+
 		ImGui::Text(text);
 		
-		if (ImGui::InputTextWithHint("##TextChange",text, buffer, MAX_TEXT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+		if (ImGui::InputTextWithHint("TextChange",text, buffer, MAX_TEXT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
 		{
 			strcpy_s(text, buffer);
 
@@ -103,7 +115,8 @@ void Text::DrawInspector()
 
 		// Image
 		ImGui::Separator();
-		ImGui::Text("Font");
+		ImGui::Text("Font: ");
+		ImGui::Text(font.path);
 		ImGui::SameLine();
 
 		if (ImGui::Button("Load..."))
@@ -114,18 +127,22 @@ void Text::DrawInspector()
 			if (ImGui::Selectable("Dukas")) {
 				font.clean();
 				LoadFont("Assets/Fonts/Dukas.ttf", DEFAULT_FONT_SIZE);
+				font.path = "Assets/Fonts/Dukas.ttf";
 			}
 			if (ImGui::Selectable("Wintersoul")) {
 				font.clean();
 				LoadFont("Assets/Fonts/Wintersoul.ttf", DEFAULT_FONT_SIZE);
+				font.path = "Assets/Fonts/Wintersoul.ttf";
 			}
 			if (ImGui::Selectable("EvilEmpire")) {
 				font.clean();
 				LoadFont("Assets/Fonts/EvilEmpire.otf", DEFAULT_FONT_SIZE);
+				font.path = "Assets/Fonts/EvilEmpire.otf";
 			}
 			if (ImGui::Selectable("Smack")) {
 				font.clean();
 				LoadFont("Assets/Fonts/Smack.otf", DEFAULT_FONT_SIZE);
+				font.path = "Assets/Fonts/Smack.otf";
 			}
 			//std::vector<Resource*> fonts = App->resources->GetAllResourcesOfType(Resource::Type::font);
 			//for (int i = 0; i < fonts.size(); i++)
